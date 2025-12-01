@@ -10,7 +10,8 @@
       "@/app/*": ["./app/*"],
       "@auth/*": ["./src/features/Auth/*"],
       "@classes/*": ["./src/features/Classes/*"],
-      "@attendance/*": ["./src/features/Attendance/*"]
+      "@attendance/*": ["./src/features/Attendance/*"],
+      "@role-selection/*": ["./src/features/RoleSelection/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]

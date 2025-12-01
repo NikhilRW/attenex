@@ -8,3 +8,4 @@ build/
 coverage/
 .env.local
 .env.production
+.env.example
