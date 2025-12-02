@@ -2,36 +2,17 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "baseUrl": ".",
     "paths": {
-      "@config/*": [
-        "./src/config/*"
-      ],
-      "@controllers/*": [
-        "./src/controllers/*"
-      ],
-      "@middleware/*": [
-        "./src/middleware/*"
-      ],
-      "@models/*": [
-        "./src/models/*"
-      ],
-      "@routes/*": [
-        "./src/routes/*"
-      ],
-      "@services/*": [
-        "./src/services/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ]
+      "@config/*": ["./src/config/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@middleware/*": ["./src/middleware/*"],
+      "@models/*": ["./src/models/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@services/*": ["./src/services/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": [
-    "src/**/*.js"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base"
 }

@@ -1,15 +1,16 @@
 import express from "express";
 import cors from "cors";
+import { userRoutes } from "@routes/userRoutes";
 
-const expressApp = express();
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-expressApp.use(cors());
+app.use(cors());
 
-expressApp.get("/api/test", (req, res) => {
-  res.json({ message: "Hello from the backend!" });
-});
+app.use(express.json());
 
-expressApp.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.use("/api/users", userRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
 });
