@@ -9,6 +9,7 @@ interface FuturisticInputProps extends TextInputProps {
     isPassword?: boolean;
     showPassword?: boolean;
     onTogglePassword?: () => void;
+    error?: string; // Error message from react-hook-form
 }
 
 export const FuturisticInput: React.FC<FuturisticInputProps> = ({
@@ -16,19 +17,20 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({
     isPassword = false,
     showPassword = false,
     onTogglePassword,
+    error,
     ...textInputProps
 }) => {
     return (
         <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>{label}</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="rgba(255,255,255,0.4)"
                     {...textInputProps}
                 />
                 <LinearGradient
-                    colors={["transparent", colors.primary.main, "transparent"]}
+                    colors={error ? ["transparent", "#ff3b3b", "transparent"] : ["transparent", colors.primary.main, "transparent"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.inputBorder}
@@ -46,6 +48,7 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({
                     </TouchableOpacity>
                 )}
             </View>
+            {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
     );
 };
@@ -86,5 +89,15 @@ const styles = StyleSheet.create({
     },
     eyeIcon: {
         padding: 8,
+    },
+    inputWrapperError: {
+        borderColor: "rgba(255, 59, 59, 0.5)",
+    },
+    errorText: {
+        color: "#ff6b6b",
+        fontSize: 12,
+        marginLeft: 4,
+        marginTop: 4,
+        fontWeight: "500",
     },
 });

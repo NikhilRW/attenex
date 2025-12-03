@@ -4,9 +4,9 @@ import { Tabs } from "expo-router";
 
 const _layout = () => {
   return (
-    <Tabs initialRouteName="attendance">
+    <Tabs initialRouteName="attendance/index">
       <Tabs.Screen
-        name="attendance"
+        name="attendance/index"
         options={{ headerShown: false, title: "Profile" }}
       />
       <Tabs.Screen

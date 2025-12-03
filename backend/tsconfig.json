@@ -12,7 +12,7 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js", "../src/shared/utils/logger.ts"],
   "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base"
 }

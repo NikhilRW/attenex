@@ -1,15 +1,11 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { useAuthStore } from "@/src/shared/stores/authStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import {
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthOptions } from "../components/AuthOptions";
@@ -17,28 +13,39 @@ import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
+import { styles } from "../styles/SignIn.styles";
+import {
+  handleEmailSignIn,
+  handleGoogleSignIn,
+  handleLinkedInSignIn,
+} from "../utils/common";
+import { SignInFormData, signInSchema } from "../validation/authSchemas";
 
 const SignIn = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSignIn = async () => {
-    // TODO: Implement sign-in logic
-    console.log("Sign in:", { email, password });
-  };
+  // Redirect to main stack if user is already authenticated (prevents seeing signin screen)
+  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace("/(main)/role-selection");
+    }
+  }, [authLoading, isAuthenticated]);
 
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google sign-in
-    console.log("Google sign-in");
-  };
-
-  const handleLinkedInSignIn = () => {
-    // TODO: Implement LinkedIn sign-in
-    console.log("LinkedIn sign-in");
-  };
+  // Initialize react-hook-form with Zod validation
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   const handleForgotPassword = () => {
     // TODO: Navigate to forgot password screen
@@ -71,24 +78,40 @@ const SignIn = () => {
           <FuturisticDivider text="OR ACCESS WITH EMAIL" />
 
           <View style={styles.formContainer}>
-            <FuturisticInput
-              label="EMAIL ADDRESS"
-              placeholder="name@example.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FuturisticInput
+                  label="EMAIL ADDRESS"
+                  placeholder="name@example.com"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  error={errors.email?.message}
+                />
+              )}
             />
 
-            <FuturisticInput
-              label="PASSWORD"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              isPassword
-              showPassword={showPassword}
-              onTogglePassword={() => setShowPassword(!showPassword)}
-              secureTextEntry={!showPassword}
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FuturisticInput
+                  label="PASSWORD"
+                  placeholder="Enter your password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  isPassword
+                  showPassword={showPassword}
+                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  secureTextEntry={!showPassword}
+                  error={errors.password?.message}
+                />
+              )}
             />
 
             <AuthOptions
@@ -97,7 +120,15 @@ const SignIn = () => {
               onForgotPassword={handleForgotPassword}
             />
 
-            <FuturisticButton title="Sign In" onPress={handleSignIn} />
+            <FuturisticButton
+              title="Sign In"
+              onPress={handleSubmit((data) => {
+                Keyboard.dismiss();
+                return handleEmailSignIn(data);
+              })}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            />
           </View>
 
           <AuthFooter
@@ -110,24 +141,5 @@ const SignIn = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#050511",
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 100,
-    paddingBottom: 40,
-  },
-  formContainer: {
-    gap: 24,
-  },
-});
 
 export default SignIn;
