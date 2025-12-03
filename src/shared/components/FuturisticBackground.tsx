@@ -9,7 +9,7 @@ import {
     Rect,
     vec,
 } from "@shopify/react-native-skia";
-import React, { useMemo } from "react";
+import React, { useEffect } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import {
     Easing,
@@ -27,7 +27,9 @@ export const FuturisticBackground = () => {
     const time2 = useSharedValue(0);
     const time3 = useSharedValue(0);
 
-    useMemo(() => {
+    useEffect(() => {
+        // Initialize animation cycles after first render to avoid writing shared
+        // values during the React render phase.
         time1.value = withRepeat(
             withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
             -1,
@@ -43,7 +45,15 @@ export const FuturisticBackground = () => {
             -1,
             false
         );
-    }, []);
+
+        return () => {
+            // Optional cleanup: stop animations by writing a stable value on unmount
+            // so that we don't leave long-running animations.
+            time1.value = 0;
+            time2.value = 0;
+            time3.value = 0;
+        };
+    }, [time1, time2, time3]);
 
     const centerX = width / 2;
     const centerY = height / 2;

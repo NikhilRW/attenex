@@ -1,11 +1,11 @@
 export const logger = {
-  info: (message: string) => {
-    console.log(`[INFO] ${message}`);
+  info: (message: string, ...args) => {
+    console.log(`[INFO] ${message}`, ...args);
   },
-  error: (message: string) => {
-    console.error(`[ERROR] ${message}`);
+  error: (message: string, ...args) => {
+    console.error(`[ERROR] ${message}`, ...args);
   },
-  warn: (message: string) => {
-    console.warn(`[WARN] ${message}`);
+  warn: (message: string, ...args) => {
+    console.warn(`[WARN] ${message}`, ...args);
   },
 };

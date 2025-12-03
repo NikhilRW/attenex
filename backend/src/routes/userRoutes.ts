@@ -1,10 +1,20 @@
-import { signUpUser } from "@controllers/auth/signUpUser";
-import { Router } from "express";
-import "dotenv/config";
+import {
+  requestPasswordReset,
+  resetPassword,
+  verifyResetToken,
+} from "@controllers/auth/resetPassword";
 import { signInUser } from "@controllers/auth/signInUser";
+import { signUpUser } from "@controllers/auth/signUpUser";
+import { verifyUser } from "@controllers/auth/verifyUser";
+import "dotenv/config";
+import { Router } from "express";
 
 export const userRoutes = Router();
 
 // Use clear, action-based routes and POST for operations that carry a request body
 userRoutes.post("/signup", signUpUser);
 userRoutes.post("/signin", signInUser);
+userRoutes.post("/forgot-password", requestPasswordReset); // Request password reset email
+userRoutes.post("/verify-reset-token", verifyResetToken); // Verify reset token is valid
+userRoutes.post("/reset-password", resetPassword); // Reset password with token
+userRoutes.post("/verify-user", verifyUser); // Reset password with token

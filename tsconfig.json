@@ -6,7 +6,7 @@
       "@/*": ["./*"],
       "@/src/*": ["./src/*"],
       "@/features/*": ["./src/features/*"],
-      "@/shared/*": ["./src/shared/*"],
+      "@shared/*": ["./src/shared/*"],
       "@/app/*": ["./app/*"],
       "@auth/*": ["./src/features/Auth/*"],
       "@classes/*": ["./src/features/Classes/*"],

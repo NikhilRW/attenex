@@ -91,6 +91,10 @@ export const users = pgTable(
     isVerified: boolean("is_verified").default(false), // Email verified for traditional auth, auto-true for OAuth
     otp: varchar("otp", { length: 6 }), // One-time password for email verification
     otpExpiresAt: timestamp("otp_expires_at", { withTimezone: true }), // OTP expiration timestamp
+    resetToken: text("reset_token"), // Password reset token (hashed)
+    resetTokenExpiresAt: timestamp("reset_token_expires_at", {
+      withTimezone: true,
+    }), // Reset token expiration
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },

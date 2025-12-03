@@ -5,7 +5,13 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthOptions } from "../components/AuthOptions";
@@ -48,8 +54,7 @@ const SignIn = () => {
   });
 
   const handleForgotPassword = () => {
-    // TODO: Navigate to forgot password screen
-    console.log("Forgot password");
+    router.push("/forgot-password");
   };
 
   return (

@@ -8,6 +8,10 @@ import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
+import * as Linking from "expo-linking";
+import { useAuthStore } from "@/src/shared/stores/authStore";
+import { secureStore } from "@/src/shared/utils/secureStore";
+import { email } from "zod";
 
 /**
  * Authentication Utility Functions
@@ -185,6 +189,17 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
       password: data.password!,
     });
 
+    if (user.isVerified === false) {
+      showMessage({
+        message: "Email Not Verified",
+        description: "Please verify your email before signing in.",
+        type: "warning",
+        duration: 3000,
+        position: "bottom",
+      });
+      return;
+    }
+
     if (status !== 200) {
       showMessage({
         message: "Sign-in Failed",
@@ -251,7 +266,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     } = await http.post<{
       user: User;
       token: string;
-    }>("/api/users/signup?authType=email", {
+    }>(BASE_URI + "/api/users/signup?authType=email", {
       name: data.fullName!,
       email: data.email!,
       password: data.password!,
@@ -269,6 +284,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     }
 
     await authService.login(user, token);
+    useAuthStore.setState({ isAuthenticated: false }); // Require email verification
 
     showMessage({
       message: "Account Created!",
@@ -278,8 +294,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       position: "bottom",
     });
 
-    // Replace route to main stack after successful sign-up
-    router.replace("/(main)/role-selection");
+    router.replace("/verify-email");
   } catch (err) {
     const e = err as any;
 
@@ -313,6 +328,57 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     logger.error(
       JSON.stringify(e.response?.data || e.message),
       "common.ts :: emailSignUp()"
+    );
+  }
+};
+export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
+  try {
+    const token = deepLink.queryParams!.token;
+    const response = await http.post<{ success: boolean; message: string }>(
+      BASE_URI + "/api/users/verify-user",
+      {
+        token: decodeURIComponent(token as string),
+        email: decodeURIComponent(deepLink.queryParams!.email as string),
+      }
+    );
+    console.log("response.data : " + JSON.stringify(response.data));
+
+    if (response.data.success) {
+      showMessage({
+        message: "Email Verified",
+        description: response.data.message,
+        type: "success",
+        duration: 3000,
+        position: "bottom",
+      });
+      router.replace("/(auth)/sign-in");
+      useAuthStore.setState({ isAuthenticated: false });
+    } else {
+      showMessage({
+        message: "Invalid or Expired Link",
+        description: response.data.message,
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+    }
+  } catch (err) {
+    const e = err as any;
+    let errorMessage = "Email verification failed. Please try again.";
+    if (e.response?.data?.error) {
+      errorMessage = e.response.data.error;
+    }
+    showMessage({
+      message: "Verification Failed",
+      description: errorMessage,
+      type: "danger",
+
+      duration: 3000,
+      position: "bottom",
+    });
+    logger.error(
+      JSON.stringify(e.response?.data || e.message),
+      "common.ts :: handleEmailVerification()"
     );
   }
 };

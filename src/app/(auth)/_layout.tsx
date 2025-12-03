@@ -45,6 +45,18 @@ const _layout = () => {
        * Security: Client secret never touches the frontend
        */}
       <Stack.Screen name="linkedin/index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="forgot-password/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="reset-password/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="verify-email/index"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 };

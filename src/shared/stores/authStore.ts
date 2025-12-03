@@ -9,7 +9,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setAuth: (user: User, token: string) => void;
+  setAuth: (user: User, token: string, isSignUp?: boolean) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -21,7 +21,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       isLoading: true,
-      setAuth: (user, token) => {
+      setAuth: (user, token, isSignUp = false) => {
         // Persist the token in secure storage (encrypted) and keep user in persisted storage
         secureStore.setItem("jwt", token).catch((err) => {
           // Log error but allow the state to be set (app should still function)
@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           token,
-          isAuthenticated: true,
+          isAuthenticated: isSignUp ? false : true,
           isLoading: false,
         });
       },
@@ -61,8 +61,13 @@ export const useAuthStore = create<AuthState>()(
         (async () => {
           // After rehydration, load token from secure storage (if any) into runtime store
           const token = await secureStore.getItem("jwt");
+          const isSignUp = await secureStore.getItem("is-signup");
           if (token) {
-            (state as any)?.setAuth?.((state as any).user, token);
+            if (isSignUp === "true") {
+              (state as any)?.setAuth?.((state as any).user, token, true);
+            } else {
+              (state as any)?.setAuth?.((state as any).user, token);
+            }
           } else {
             // No token found; set loading to false
             (state as any)?.setLoading?.(false);

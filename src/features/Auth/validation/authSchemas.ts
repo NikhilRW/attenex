@@ -63,8 +63,34 @@ export const signUpSchema = z
   });
 
 /**
+ * Reset Password Schema
+ *
+ * Validates password reset form.
+ * Requirements:
+ * - Strong new password (minimum 8 characters with uppercase, lowercase, number)
+ * - Password confirmation must match
+ */
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(1, "Please create a password")
+      .min(8, "Password should be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        "Password needs uppercase, lowercase, and a number"
+      ),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // Error will be attached to confirmPassword field
+  });
+
+/**
  * TypeScript Types derived from Zod Schemas
  * These provide type safety throughout the application
  */
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type SignUpFormData = z.infer<typeof signUpSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
