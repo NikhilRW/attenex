@@ -344,15 +344,8 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
     console.log("response.data : " + JSON.stringify(response.data));
 
     if (response.data.success) {
-      router.replace("/(auth)/sign-in");
+      router.replace("/(auth)/sign-in?verified=true");
       useAuthStore.setState({ isAuthenticated: false });
-      showMessage({
-        message: "Email Verified",
-        description: response.data.message,
-        type: "success",
-        duration: 3000,
-        position: "bottom",
-      });
     } else {
       showMessage({
         message: "Invalid or Expired Link",

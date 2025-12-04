@@ -60,8 +60,7 @@ export default function RootLayout() {
 
     // Handle verify-email deep link
     if (parsed.path && parsed.path.includes("verify-email")) {
-      await handleEmailVerification(parsed);
-      return;
+      return await handleEmailVerification(parsed);
     }
   };
 

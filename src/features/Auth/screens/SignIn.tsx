@@ -1,7 +1,7 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -26,17 +26,29 @@ import {
   handleLinkedInSignIn,
 } from "../utils/common";
 import { SignInFormData, signInSchema } from "../validation/authSchemas";
+import { showMessage } from "react-native-flash-message";
 
 const SignIn = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const params = useLocalSearchParams();
 
   // Redirect to main stack if user is already authenticated (prevents seeing signin screen)
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       router.replace("/(main)/role-selection");
+    }
+    if (params.verified === "true") {
+      // Show success message for email verification
+      showMessage({
+        message: "Email Verified",
+        description: "Your email has been successfully verified.",
+        type: "success",
+        duration: 3000,
+        position: "bottom",
+      });
     }
   }, [authLoading, isAuthenticated]);
 

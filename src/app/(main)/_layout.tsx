@@ -5,13 +5,11 @@ import { Tabs } from "expo-router";
 const _layout = () => {
   return (
     <Tabs initialRouteName="attendance/index">
+      <Tabs.Screen name="attendance/index" options={{ headerShown: false }} />
+      <Tabs.Screen name="classes" options={{ headerShown: false }} />
       <Tabs.Screen
-        name="attendance/index"
-        options={{ headerShown: false, title: "Profile" }}
-      />
-      <Tabs.Screen
-        name="classes"
-        options={{ headerShown: false, title: "Profile" }}
+        name="role-selection/index"
+        options={{ headerShown: false }}
       />
     </Tabs>
   );
