@@ -115,7 +115,7 @@ const ResetPassword = () => {
     };
 
     verifyToken();
-  }, [params]);
+  }, []);
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     let response;
@@ -138,7 +138,7 @@ const ResetPassword = () => {
 
       router.replace("/(auth)/sign-in");
     } catch (error: any) {
-      if (response?.data.message === undefined) {
+      if (response && response.data.error) {
         const errorMessage =
           error.response?.data?.error ||
           "Unable to reset password. Please try again.";

@@ -60,7 +60,14 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text style={styles.buttonText}>{title}</Text>
+            <Text
+              style={[
+                { fontFamily: "Inter_700Bold" },
+                styles.buttonText,
+              ]}
+            >
+              {title}
+            </Text>
           )}
           <View style={styles.buttonGlow} />
         </LinearGradient>
@@ -76,12 +83,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 26,
   },
   buttonText: {
     color: "#FFF",
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 17.5,
     letterSpacing: 1,
   },
   buttonGlow: {
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
-    elevation: 10,
+    // elevation: 10,
     zIndex: -1,
   },
 });

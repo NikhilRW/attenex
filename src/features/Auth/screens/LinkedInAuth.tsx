@@ -36,7 +36,6 @@ export const LinkedInAuth = () => {
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { login } = useAuth();
-
   /**
    * Constructs the LinkedIn OAuth authorization URL
    * This URL opens LinkedIn's login page with our app's configuration
@@ -62,6 +61,7 @@ export const LinkedInAuth = () => {
    * @param event - WebView navigation event containing the target URL
    * @returns boolean - Whether to allow the navigation
    */
+
   const handleNavigationStateChange = (event: ShouldStartLoadRequest) => {
     const { url } = event;
 
@@ -129,7 +129,8 @@ export const LinkedInAuth = () => {
         REDIRECT_URI
       );
 
-      if (!exchange) throw new Error("Unable to complete sign-in. Please try again.");
+      if (!exchange)
+        throw new Error("Unable to complete sign-in. Please try again.");
 
       const { user, token } = exchange;
 
@@ -160,9 +161,17 @@ export const LinkedInAuth = () => {
 
       if (err.response?.data?.error) {
         errorMessage = err.response.data.error;
-      } else if (err.message?.includes('Network Error') || err.message?.includes('connect')) {
-        errorMessage = "Unable to connect. Please check your internet connection.";
-      } else if (err.message && !err.message.includes('Object') && !err.message.includes('undefined')) {
+      } else if (
+        err.message?.includes("Network Error") ||
+        err.message?.includes("connect")
+      ) {
+        errorMessage =
+          "Unable to connect. Please check your internet connection.";
+      } else if (
+        err.message &&
+        !err.message.includes("Object") &&
+        !err.message.includes("undefined")
+      ) {
         errorMessage = err.message;
       }
 
@@ -175,7 +184,10 @@ export const LinkedInAuth = () => {
         position: "bottom",
       });
 
-      logger.error(JSON.stringify(err.response?.data || err.message), "LinkedInAuth :: handleAuthCallback()");
+      logger.error(
+        JSON.stringify(err.response?.data || err.message),
+        "LinkedInAuth :: handleAuthCallback()"
+      );
 
       // Return to sign-in screen on any error
       router.back();

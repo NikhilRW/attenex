@@ -22,7 +22,6 @@ http.interceptors.request.use(async (config) => {
     if (!token) {
       token = await secureStore.getItem("jwt");
     }
-
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }

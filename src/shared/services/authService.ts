@@ -20,7 +20,7 @@ export const authService = {
     } catch (err) {
       console.error("authService: failed to persist token", err);
     }
-    useAuthStore.getState().setAuth(user, token);
+    useAuthStore.getState().setAuth(user, token, true);
   },
 
   async logout() {

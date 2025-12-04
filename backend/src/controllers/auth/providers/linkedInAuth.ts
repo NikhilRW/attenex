@@ -77,7 +77,8 @@ export const linkedInAuth = async (req: Request, res: Response) => {
         },
       }
     );
-
+    
+    
     const { access_token } = tokenResponse.data;
 
     // Validate that we received an access token

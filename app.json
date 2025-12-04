@@ -23,7 +23,10 @@
               "pathPrefix": "/auth"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "package": "com.attenex.attenex",
@@ -52,7 +55,8 @@
       ],
       "@react-native-google-signin/google-signin",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

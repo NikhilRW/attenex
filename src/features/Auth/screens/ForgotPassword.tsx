@@ -20,11 +20,10 @@ import { AuthHeader } from "../components/AuthHeader";
 import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticInput } from "../components/FuturisticInput";
 import { BASE_URI } from "@/src/shared/constants/uri";
-
 /**
  * Forgot Password Screen
  *
- * Allows users to request a password reset link via email.
+ * Allows users to request a password reset link via email.`
  * The link will open the app with the reset password screen.
  */
 const ForgotPassword = () => {
@@ -123,17 +122,19 @@ const ForgotPassword = () => {
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
 
-          <AuthHeader
-            title={emailSent ? "Check Your Email" : "Forgot Password?"}
-            logoSource={require("../../../../assets/images/logo-transparent.png")}
-          />
+          {emailSent === false && (
+            <AuthHeader
+              title="Forgot Password"
+              logoSource={require("../../../../assets/images/logo-transparent.png")}
+            />
+          )}
 
           {emailSent ? (
             <View style={styles.successContainer}>
               <View style={styles.iconContainer}>
                 <Ionicons name="mail-outline" size={64} color="#667eea" />
               </View>
-              <Text style={styles.successTitle}>Email Sent!</Text>
+              <Text style={styles.successTitle}>Check Your Email</Text>
               <Text style={styles.successDescription}>
                 We've sent a password reset link to{" "}
                 <Text style={styles.emailText}>{email}</Text>

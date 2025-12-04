@@ -44,7 +44,7 @@ const VerifyEmail = () => {
             If you don&apos;t see the email, check your spam folder.
           </Text>
 
-          <View style={styles.tipsContainer}>
+          {/* <View style={styles.tipsContainer}>
             <Text style={styles.tipsTitle}>What&apos;s next?</Text>
             <View style={styles.tipItem}>
               <Ionicons name="checkmark-circle" size={20} color="#4ade80" />
@@ -58,7 +58,7 @@ const VerifyEmail = () => {
               <Ionicons name="checkmark-circle" size={20} color="#4ade80" />
               <Text style={styles.tipText}>Return here to sign in</Text>
             </View>
-          </View>
+          </View> */}
 
           <FuturisticButton
             title="Back to Sign In"

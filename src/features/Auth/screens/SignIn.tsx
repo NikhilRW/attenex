@@ -126,7 +126,7 @@ const SignIn = () => {
             />
 
             <FuturisticButton
-              title="Sign In"
+              title="Sign In "
               onPress={handleSubmit((data) => {
                 Keyboard.dismiss();
                 return handleEmailSignIn(data);

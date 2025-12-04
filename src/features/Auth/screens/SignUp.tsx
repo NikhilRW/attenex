@@ -11,7 +11,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  View
+  View,
 } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
@@ -19,7 +19,11 @@ import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
-import { handleEmailSignUp, handleGoogleSignIn, handleLinkedInSignIn } from "../utils/common";
+import {
+  handleEmailSignUp,
+  handleGoogleSignIn,
+  handleLinkedInSignIn,
+} from "../utils/common";
 import { SignUpFormData, signUpSchema } from "../validation/authSchemas";
 
 const SignUp = () => {
@@ -49,7 +53,6 @@ const SignUp = () => {
       confirmPassword: "",
     },
   });
-
 
   return (
     <View style={styles.container}>
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 80,
-    paddingBottom: 40,
+    paddingBottom: 70,
   },
   formContainer: {
     gap: 24,
