@@ -10,6 +10,8 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   setAuth: (user: User, token: string, isSignUp?: boolean) => void;
+
+  updateUser: (user: User) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -33,6 +35,11 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: isSignUp ? false : true,
           isLoading: false,
         });
+      },
+      updateUser: (user) => {
+        set((state) => ({
+          user: { ...state.user, ...user },
+        }));
       },
       logout: () => {
         // Remove token from secure storage and clear the persisted state

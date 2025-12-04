@@ -1,7 +1,7 @@
 import { Entypo, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Dimensions, Pressable, StyleSheet } from "react-native";
 import Animated, {
   Extrapolate,
   FadeOut,
@@ -15,6 +15,10 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useTheme } from "../hooks/useTheme";
+import {
+  SafeAreaInsetsContext,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 100;
@@ -25,13 +29,14 @@ const CustomTabBar = ({
   ...props
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const activatedBackgroundStyle = useAnimatedStyle(() => {
     return {
       position: "absolute",
       top: "50%",
       transform: [{ translateY: -30 }],
-      left: index * BUTTON_WIDTH + 8,
+      left: index * BUTTON_WIDTH + 10,
     };
   });
   return (
@@ -40,6 +45,7 @@ const CustomTabBar = ({
       style={[
         styles.container,
         {
+          bottom: insets.bottom,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,
         },
@@ -176,7 +182,6 @@ const styles = StyleSheet.create({
     height: 70,
     width: "80%",
     position: "absolute",
-    bottom: -5,
     left: "50%",
     transform: [
       {
@@ -185,16 +190,17 @@ const styles = StyleSheet.create({
     ],
     marginHorizontal: "auto",
     marginBottom: 30,
-    justifyContent: "center",
+    // justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: 10,
     borderRadius: 30,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    elevation: 0,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 4 },
+    // shadowOpacity: 0,
+    // shadowRadius: 8,
+    zIndex:2,
     borderWidth: 1,
   },
   navigationButton: {
@@ -210,7 +216,7 @@ const styles = StyleSheet.create({
   },
   activeBackground: {
     position: "absolute",
-    width: 116,
+    width: BUTTON_WIDTH,
     height: 60,
     borderRadius: 30,
   },

@@ -1,20 +1,24 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { authService } from "@/src/shared/services/authService";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { showMessage } from "react-native-flash-message";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Role = "teacher" | "student" | null;
 
@@ -23,6 +27,9 @@ const RoleSelection = () => {
   const { colors, mode, toggleTheme } = useTheme();
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [hoveredRole, setHoveredRole] = useState<Role>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { user } = useAuthStore();
+  const insets = useSafeAreaInsets();
 
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
@@ -31,7 +38,17 @@ const RoleSelection = () => {
     setSelectedRole(role);
   }, []);
 
+  useEffect(() => {
+    if (user && user.role) {
+      setSelectedRole(user.role as Role);
+    }
+  }, []);
+
   const handleTeacherPress = useCallback(() => {
+    if (user && user.role) {
+      alreadyHasRoleToast();
+      return;
+    }
     setHoveredRole("teacher");
     setSelectedRole("teacher");
     teacherScale.value = withSpring(1.05, { duration: 1000 });
@@ -39,25 +56,73 @@ const RoleSelection = () => {
   }, [teacherScale]);
 
   const handleStudentPress = useCallback(() => {
+    if (user && user.role) {
+      alreadyHasRoleToast();
+      return;
+    }
     setHoveredRole("student");
     setSelectedRole("student");
     teacherScale.value = withSpring(1, { duration: 1000 });
     studentScale.value = withSpring(1.05, { duration: 1000 });
   }, [studentScale]);
 
-  const handleConfirm = useCallback(() => {
-    if (!selectedRole) return;
+  const alreadyHasRoleToast = () => {
+    showMessage({
+      message: "Role Already Set",
+      description: `You are already assigned the role of ${user!.role}.`,
+      type: "info",
+      duration: 2000,
+      position: "bottom",
+    });
+  };
 
-    // Navigate based on selected role
-    if (selectedRole === "teacher") {
-      router.push("/(main)/classes");
-    } else {
-      router.push("/(main)/attendance");
+  const handleConfirm = useCallback(async () => {
+    if (user && user.role) {
+      alreadyHasRoleToast();
+      return;
     }
-  }, [selectedRole, router]);
+    if (!selectedRole || isUpdating) return;
+
+    setIsUpdating(true);
+
+    try {
+      // Call backend API to update user role
+      await authService.updateUserRole(selectedRole);
+
+      showMessage({
+        message: "Role Updated",
+        description: `You are now a ${selectedRole}!`,
+        type: "success",
+        duration: 2000,
+        position: "bottom",
+      });
+
+      // Navigate based on selected role
+      if (selectedRole === "teacher") {
+        router.replace("/(main)/classes");
+      } else {
+        router.replace("/(main)/attendance");
+      }
+    } catch (error: any) {
+      showMessage({
+        message: "Update Failed",
+        description:
+          error.message || "Failed to update role. Please try again.",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      setIsUpdating(false);
+    }
+  }, [selectedRole, router, isUpdating]);
+
+  console.log("insets.bottom",insets.bottom);
+  
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <View
+      style={[styles.container, { backgroundColor: colors.background.primary }]}
+    >
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
@@ -65,8 +130,12 @@ const RoleSelection = () => {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={[styles.title, { color: colors.text.primary }]}>Choose Your Role</Text>
-            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>Select how you'll be using Attenex</Text>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
+              Choose Your Role
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              Select how you'll be using Attenex
+            </Text>
           </View>
           <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
             <Ionicons
@@ -86,7 +155,7 @@ const RoleSelection = () => {
             styles.modelWrapper,
             {
               backgroundColor: colors.surface.glass,
-              borderColor: colors.surface.glassBorder
+              borderColor: colors.surface.glassBorder,
             },
             selectedRole === "teacher" && {
               borderColor: colors.primary.main,
@@ -94,6 +163,7 @@ const RoleSelection = () => {
             },
           ]}
           onPress={handleTeacherPress}
+          disabled={isUpdating}
         >
           <Animated.View
             style={[
@@ -107,14 +177,31 @@ const RoleSelection = () => {
               contentFit="contain"
             />
           </Animated.View>
-          <View style={[styles.labelContainer, { backgroundColor: colors.surface.cardBg }]}>
-            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>Teacher</Text>
-            <Text style={[styles.roleDescription, { color: colors.text.secondary }]}>
+          <View
+            style={[
+              styles.labelContainer,
+              { backgroundColor: colors.surface.cardBg },
+            ]}
+          >
+            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>
+              Teacher
+            </Text>
+            <Text
+              style={[styles.roleDescription, { color: colors.text.secondary }]}
+            >
               Manage classes & attendance
             </Text>
           </View>
           {selectedRole === "teacher" && (
-            <View style={[styles.selectedIndicator, { backgroundColor: colors.primary.main, shadowColor: colors.primary.main }]}>
+            <View
+              style={[
+                styles.selectedIndicator,
+                {
+                  backgroundColor: colors.primary.main,
+                  shadowColor: colors.primary.main,
+                },
+              ]}
+            >
               <Text style={styles.checkmark}>✓</Text>
             </View>
           )}
@@ -126,7 +213,7 @@ const RoleSelection = () => {
             styles.modelWrapper,
             {
               backgroundColor: colors.surface.glass,
-              borderColor: colors.surface.glassBorder
+              borderColor: colors.surface.glassBorder,
             },
             selectedRole === "student" && {
               borderColor: colors.primary.main,
@@ -134,6 +221,7 @@ const RoleSelection = () => {
             },
           ]}
           onPress={handleStudentPress}
+          disabled={isUpdating}
         >
           <Animated.View
             style={[
@@ -147,12 +235,31 @@ const RoleSelection = () => {
               contentFit="contain"
             />
           </Animated.View>
-          <View style={[styles.labelContainer, { backgroundColor: colors.surface.cardBg }]}>
-            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>Student</Text>
-            <Text style={[styles.roleDescription, { color: colors.text.secondary }]}>Mark your attendance</Text>
+          <View
+            style={[
+              styles.labelContainer,
+              { backgroundColor: colors.surface.cardBg },
+            ]}
+          >
+            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>
+              Student
+            </Text>
+            <Text
+              style={[styles.roleDescription, { color: colors.text.secondary }]}
+            >
+              Mark your attendance
+            </Text>
           </View>
           {selectedRole === "student" && (
-            <View style={[styles.selectedIndicator, { backgroundColor: colors.primary.main, shadowColor: colors.primary.main }]}>
+            <View
+              style={[
+                styles.selectedIndicator,
+                {
+                  backgroundColor: colors.primary.main,
+                  shadowColor: colors.primary.main,
+                },
+              ]}
+            >
               <Text style={styles.checkmark}>✓</Text>
             </View>
           )}
@@ -163,16 +270,19 @@ const RoleSelection = () => {
       <TouchableOpacity
         style={[
           styles.confirmButton,
-          !selectedRole && styles.confirmButtonDisabled,
-          { shadowColor: colors.primary.main }
+          {
+            marginBottom: 70 + insets.bottom * 2 ,
+          },
+          (!selectedRole || isUpdating) && styles.confirmButtonDisabled,
+          { shadowColor: colors.primary.main },
         ]}
         onPress={handleConfirm}
-        disabled={!selectedRole}
+        disabled={!selectedRole || isUpdating}
         activeOpacity={0.8}
       >
         <LinearGradient
           colors={
-            selectedRole
+            selectedRole && !isUpdating
               ? [colors.primary.main, colors.accent.blue]
               : [colors.text.muted, colors.background.tertiary]
           }
@@ -180,9 +290,17 @@ const RoleSelection = () => {
           end={{ x: 1, y: 1 }}
           style={styles.confirmGradient}
         >
-          <Text style={styles.confirmButtonText}>
-            {selectedRole ? `Continue as ${selectedRole}` : "Select a role"}
-          </Text>
+          {isUpdating ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.confirmButtonText}>
+              {user && user.role
+                ? `You are ${user.role}`
+                : selectedRole
+                  ? `Continue as ${selectedRole}`
+                  : "Select a role"}
+            </Text>
+          )}
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -289,7 +407,6 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginHorizontal: 24,
-    marginBottom: 140,
     borderRadius: 16,
     overflow: "hidden",
     shadowOffset: { width: 0, height: 4 },

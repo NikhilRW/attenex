@@ -2,6 +2,8 @@ import { db, users } from "@config/database_setup";
 import { eq } from "drizzle-orm";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
+import { logger } from "../../../src/shared/utils/logger";
 
 export interface AuthRequest extends Request {
   user?: any;
@@ -21,12 +23,13 @@ export const authenticate = async (
     }
     const token = authHeader.split(" ")[1];
     const payload: any = jwt.verify(token, JWT_SECRET);
+    logger.info("Payload : ",payload);
 
     // Optional: validate that user still exists in database
     const existingUsers = await db
       .select()
       .from(users)
-      .where(eq(users.id, payload.userId))
+      .where(eq(users.id, payload.id))
       .limit(1);
     if (!existingUsers?.length) {
       return res.status(401).json({ error: "User not found" });

@@ -2,6 +2,7 @@ import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import lectureRoutes from "./routes/lectureRoutes";
 import { logger } from "./utils/logger";
 
 /**
@@ -57,6 +58,17 @@ app.use(express.json());
  * - User data retrieval and updates
  */
 app.use("/api/users", userRoutes);
+
+/**
+ * Lecture Management Routes
+ *
+ * Handles lecture-related operations:
+ * - Lecture creation by teachers
+ * - Lecture management (start, end, update)
+ * - Passcode generation and refresh
+ * - Attendance tracking
+ */
+app.use("/api/lectures", lectureRoutes);
 
 /**
  * Authentication Routes

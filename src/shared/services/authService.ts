@@ -1,5 +1,8 @@
+import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
+import { http } from "@/src/shared/utils/http";
 import { secureStore } from "@/src/shared/utils/secureStore";
+import { logger } from "../utils/logger";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -31,5 +34,33 @@ export const authService = {
       console.error("authService: failed to remove token", err);
     }
     useAuthStore.getState().logout();
+  },
+
+  async updateUserRole(role: "teacher" | "student") {
+    try {
+      const response = await http.post(
+        BASE_URI + "/api/users/update-role",
+        {
+          role,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + (await secureStore.getItem("jwt")),
+          },
+        }
+      );
+
+      // Update the user in the auth store with the new role
+      if (response.data.user) {
+        useAuthStore.getState().updateUser(response.data.user);
+      }
+
+      return response.data;
+    } catch (error: any) {
+      logger.info("authService:updateUserRole - error", error);
+      throw new Error(
+        error.response?.data?.error || "Failed to update user role"
+      );
+    }
   },
 };

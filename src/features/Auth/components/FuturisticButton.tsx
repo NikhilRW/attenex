@@ -35,12 +35,17 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   const defaultGradient = [colors.primary.main, colors.accent.blue];
   const activeGradient = gradient || defaultGradient;
 
-  const handlePress = () => {
+  const handlePressIn = () => {
     if (loading) return;
     buttonScale.value = withSpring(0.95, {}, () => {
       buttonScale.value = withSpring(1);
     });
     onPress();
+  };
+
+  const handlePressOut = () => {
+    if (loading) return;
+    buttonScale.value = withSpring(1);
   };
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
@@ -51,7 +56,8 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   return (
     <Animated.View style={buttonAnimatedStyle}>
       <TouchableOpacity
-        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         disabled={disabled || loading}
         activeOpacity={0.9}
         style={{ elevation: 4 }}

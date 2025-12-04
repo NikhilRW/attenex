@@ -5,7 +5,7 @@ export const darkTheme = {
   background: {
     primary: "#0A0E27",
     secondary: "#131829",
-    tertiary: "#1A1F3A",
+    tertiary: "#1a1f3a",
     overlay: "rgba(10, 14, 39, 0.3)",
     gradientEnd: "rgba(0,0,0,0.8)",
   },
@@ -66,7 +66,7 @@ export const lightTheme = {
   background: {
     primary: "#F8FAFC",
     secondary: "#FFFFFF",
-    tertiary: "#E2E8F0",
+    tertiary: "#C7C4C4",
     overlay: "rgba(255, 255, 255, 0.3)",
     gradientEnd: "rgba(255,255,255,0.8)",
   },
