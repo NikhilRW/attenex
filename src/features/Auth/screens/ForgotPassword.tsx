@@ -1,4 +1,6 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { BASE_URI } from "@/src/shared/constants/uri";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { http } from "@/src/shared/utils/http";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -19,7 +21,7 @@ import Animated, {
 import { AuthHeader } from "../components/AuthHeader";
 import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticInput } from "../components/FuturisticInput";
-import { BASE_URI } from "@/src/shared/constants/uri";
+
 /**
  * Forgot Password Screen
  *
@@ -28,6 +30,7 @@ import { BASE_URI } from "@/src/shared/constants/uri";
  */
 const ForgotPassword = () => {
   const router = useRouter();
+  const { colors, mode } = useTheme();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -104,8 +107,8 @@ const ForgotPassword = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
       <Animated.ScrollView
@@ -116,10 +119,10 @@ const ForgotPassword = () => {
         <Animated.View style={animatedStyle}>
           {/* Back Button */}
           <TouchableOpacity
-            style={styles.backButton}
+            style={[styles.backButton, { backgroundColor: colors.surface.glass }]}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
+            <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
 
           {emailSent === false && (
@@ -131,21 +134,21 @@ const ForgotPassword = () => {
 
           {emailSent ? (
             <View style={styles.successContainer}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="mail-outline" size={64} color="#667eea" />
+              <View style={[styles.iconContainer, { backgroundColor: colors.primary.glow }]}>
+                <Ionicons name="mail-outline" size={64} color={colors.primary.main} />
               </View>
-              <Text style={styles.successTitle}>Check Your Email</Text>
-              <Text style={styles.successDescription}>
+              <Text style={[styles.successTitle, { color: colors.text.primary }]}>Check Your Email</Text>
+              <Text style={[styles.successDescription, { color: colors.text.secondary }]}>
                 We've sent a password reset link to{" "}
-                <Text style={styles.emailText}>{email}</Text>
+                <Text style={[styles.emailText, { color: colors.primary.main }]}>{email}</Text>
               </Text>
-              <Text style={styles.instructionText}>
+              <Text style={[styles.instructionText, { color: colors.text.muted }]}>
                 Click the link in the email to reset your password. The link
                 will expire in 1 hour.
               </Text>
 
               <View style={styles.helpContainer}>
-                <Text style={styles.helpText}>Didn't receive the email?</Text>
+                <Text style={[styles.helpText, { color: colors.text.secondary }]}>Didn't receive the email?</Text>
                 <TouchableOpacity
                   onPress={() => {
                     setEmailSent(false);
@@ -153,7 +156,7 @@ const ForgotPassword = () => {
                   }}
                   style={styles.resendButton}
                 >
-                  <Text style={styles.resendText}>Resend Email</Text>
+                  <Text style={[styles.resendText, { color: colors.primary.main }]}>Resend Email</Text>
                 </TouchableOpacity>
               </View>
 
@@ -164,7 +167,7 @@ const ForgotPassword = () => {
             </View>
           ) : (
             <View style={styles.formContainer}>
-              <Text style={styles.description}>
+              <Text style={[styles.description, { color: colors.text.secondary }]}>
                 Enter your email address and we'll send you a link to reset your
                 password.
               </Text>
@@ -188,9 +191,9 @@ const ForgotPassword = () => {
                 style={styles.backToSignIn}
                 onPress={() => router.back()}
               >
-                <Text style={styles.backToSignInText}>
+                <Text style={[styles.backToSignInText, { color: colors.text.secondary }]}>
                   Remember your password?{" "}
-                  <Text style={styles.signInLink}>Sign In</Text>
+                  <Text style={[styles.signInLink, { color: colors.primary.main }]}>Sign In</Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -204,7 +207,6 @@ const ForgotPassword = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050511",
   },
   scrollView: {
     flex: 1,
@@ -218,7 +220,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -227,7 +228,6 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   description: {
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
@@ -238,11 +238,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   backToSignInText: {
-    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
   },
   signInLink: {
-    color: "#667eea",
     fontWeight: "700",
   },
   successContainer: {
@@ -253,29 +251,24 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "rgba(102, 126, 234, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 20,
   },
   successTitle: {
-    color: "#FFF",
     fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
   },
   successDescription: {
-    color: "rgba(255, 255, 255, 0.8)",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
   },
   emailText: {
-    color: "#667eea",
     fontWeight: "700",
   },
   instructionText: {
-    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
     lineHeight: 22,
     textAlign: "center",
@@ -287,14 +280,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   helpText: {
-    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
   },
   resendButton: {
     padding: 8,
   },
   resendText: {
-    color: "#667eea",
     fontSize: 14,
     fontWeight: "700",
   },

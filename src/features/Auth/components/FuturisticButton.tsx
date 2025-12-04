@@ -1,4 +1,4 @@
-import { colors } from "@/src/shared/constants/colors";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -25,11 +25,15 @@ interface FuturisticButtonProps {
 export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,
   onPress,
-  gradient = [colors.primary.main, colors.accent.blue],
+  gradient,
   disabled = false,
   loading = false,
 }) => {
+  const { colors } = useTheme();
   const buttonScale = useSharedValue(1);
+
+  const defaultGradient = [colors.primary.main, colors.accent.blue];
+  const activeGradient = gradient || defaultGradient;
 
   const handlePress = () => {
     if (loading) return;
@@ -50,9 +54,10 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
         onPress={handlePress}
         disabled={disabled || loading}
         activeOpacity={0.9}
+        style={{ elevation: 4 }}
       >
         <LinearGradient
-          colors={gradient as [string, string, ...string[]]}
+          colors={activeGradient as [string, string, ...string[]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.button}
@@ -60,17 +65,14 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text
-              style={[
-                { fontFamily: "Inter_700Bold" },
-                styles.buttonText,
-              ]}
-            >
+            <Text style={[{ fontFamily: "Inter_700Bold" }, styles.buttonText]}>
               {title}
             </Text>
           )}
-          <View style={styles.buttonGlow} />
         </LinearGradient>
+        <View
+          style={[styles.buttonGlow, { shadowColor: colors.primary.main }]}
+        />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -97,11 +99,10 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 16,
-    shadowColor: colors.primary.main,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
-    // elevation: 10,
     zIndex: -1,
+    elevation: 10,
   },
 });

@@ -1,4 +1,6 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { BASE_URI } from "@/src/shared/constants/uri";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { http } from "@/src/shared/utils/http";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,14 +19,13 @@ import {
   View,
 } from "react-native";
 import { showMessage } from "react-native-flash-message";
-import { AuthHeader } from "../components/AuthHeader";
 import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticInput } from "../components/FuturisticInput";
 import {
   ResetPasswordFormData,
   resetPasswordSchema,
 } from "../validation/authSchemas";
-import { BASE_URI } from "@/src/shared/constants/uri";
+
 
 /**
  * Reset Password Screen
@@ -35,6 +36,7 @@ import { BASE_URI } from "@/src/shared/constants/uri";
 const ResetPassword = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { colors, mode } = useTheme();
 
   const [token, setToken] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -156,12 +158,12 @@ const ResetPassword = () => {
 
   if (isVerifying) {
     return (
-      <View style={styles.container}>
-        <StatusBar style="light" />
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+        <StatusBar style={mode === "dark" ? "light" : "dark"} />
         <FuturisticBackground />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667eea" />
-          <Text style={styles.loadingText}>Verifying reset link...</Text>
+          <ActivityIndicator size="large" color={colors.primary.main} />
+          <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Verifying link...</Text>
         </View>
       </View>
     );
@@ -169,15 +171,15 @@ const ResetPassword = () => {
 
   if (!isValid) {
     return (
-      <View style={styles.container}>
-        <StatusBar style="light" />
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+        <StatusBar style={mode === "dark" ? "light" : "dark"} />
         <FuturisticBackground />
         <View style={styles.errorContainer}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="close-circle-outline" size={64} color="#ff6b6b" />
+          <View style={[styles.iconContainer, { backgroundColor: colors.status.error + "20" }]}>
+            <Ionicons name="close-circle-outline" size={64} color={colors.status.error} />
           </View>
-          <Text style={styles.errorTitle}>Invalid Reset Link</Text>
-          <Text style={styles.errorDescription}>
+          <Text style={[styles.errorTitle, { color: colors.text.primary }]}>Invalid Reset Link</Text>
+          <Text style={[styles.errorDescription, { color: colors.text.secondary }]}>
             This password reset link is invalid or has expired. Reset links are
             only valid for 1 hour.
           </Text>
@@ -195,8 +197,8 @@ const ResetPassword = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
       <KeyboardAvoidingView
@@ -213,8 +215,8 @@ const ResetPassword = () => {
           /> */}
 
           <View style={styles.formContainer}>
-            {userName && <Text style={styles.greeting}>Hi {userName}!</Text>}
-            <Text style={styles.description}>
+            {userName && <Text style={[styles.greeting, { color: colors.text.primary }]}>Hi {userName}!</Text>}
+            <Text style={[styles.description, { color: colors.text.secondary }]}>
               Enter your new password below. Make it strong and memorable.
             </Text>
 
@@ -260,8 +262,8 @@ const ResetPassword = () => {
               )}
             />
 
-            <View style={styles.requirementsContainer}>
-              <Text style={styles.requirementsTitle}>
+            <View style={[styles.requirementsContainer, { backgroundColor: colors.primary.glow }]}>
+              <Text style={[styles.requirementsTitle, { color: colors.primary.main }]}>
                 Password Requirements:
               </Text>
               <View style={styles.requirementItem}>
@@ -274,11 +276,11 @@ const ResetPassword = () => {
                   size={16}
                   color={
                     newPassword.length >= 8
-                      ? "#4ade80"
-                      : "rgba(255, 255, 255, 0.4)"
+                      ? colors.status.success
+                      : colors.text.muted
                   }
                 />
-                <Text style={styles.requirementText}>
+                <Text style={[styles.requirementText, { color: colors.text.secondary }]}>
                   At least 8 characters
                 </Text>
               </View>
@@ -292,11 +294,11 @@ const ResetPassword = () => {
                   size={16}
                   color={
                     /(?=.*[A-Z])/.test(newPassword)
-                      ? "#4ade80"
-                      : "rgba(255, 255, 255, 0.4)"
+                      ? colors.status.success
+                      : colors.text.muted
                   }
                 />
-                <Text style={styles.requirementText}>One uppercase letter</Text>
+                <Text style={[styles.requirementText, { color: colors.text.secondary }]}>One uppercase letter</Text>
               </View>
               <View style={styles.requirementItem}>
                 <Ionicons
@@ -308,11 +310,11 @@ const ResetPassword = () => {
                   size={16}
                   color={
                     /(?=.*[a-z])/.test(newPassword)
-                      ? "#4ade80"
-                      : "rgba(255, 255, 255, 0.4)"
+                      ? colors.status.success
+                      : colors.text.muted
                   }
                 />
-                <Text style={styles.requirementText}>One lowercase letter</Text>
+                <Text style={[styles.requirementText, { color: colors.text.secondary }]}>One lowercase letter</Text>
               </View>
               <View style={styles.requirementItem}>
                 <Ionicons
@@ -324,11 +326,11 @@ const ResetPassword = () => {
                   size={16}
                   color={
                     /(?=.*\d)/.test(newPassword)
-                      ? "#4ade80"
-                      : "rgba(255, 255, 255, 0.4)"
+                      ? colors.status.success
+                      : colors.text.muted
                   }
                 />
-                <Text style={styles.requirementText}>One number</Text>
+                <Text style={[styles.requirementText, { color: colors.text.secondary }]}>One number</Text>
               </View>
               <View style={styles.requirementItem}>
                 <Ionicons
@@ -340,11 +342,11 @@ const ResetPassword = () => {
                   size={16}
                   color={
                     newPassword && newPassword === confirmPassword
-                      ? "#4ade80"
-                      : "rgba(255, 255, 255, 0.4)"
+                      ? colors.status.success
+                      : colors.text.muted
                   }
                 />
-                <Text style={styles.requirementText}>Passwords match</Text>
+                <Text style={[styles.requirementText, { color: colors.text.secondary }]}>Passwords match</Text>
               </View>
             </View>
 
@@ -364,7 +366,6 @@ const ResetPassword = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050511",
   },
   keyboardView: {
     flex: 1,
@@ -382,7 +383,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   loadingText: {
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
   },
   errorContainer: {
@@ -396,19 +396,16 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "rgba(255, 107, 107, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 20,
   },
   errorTitle: {
-    color: "#FFF",
     fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
   },
   errorDescription: {
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
@@ -417,26 +414,22 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   greeting: {
-    color: "#FFF",
     fontSize: 34,
     fontWeight: "700",
     textAlign: "center",
   },
   description: {
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
     marginBottom: 8,
   },
   requirementsContainer: {
-    backgroundColor: "rgba(102, 126, 234, 0.05)",
     borderRadius: 12,
     padding: 16,
     gap: 12,
   },
   requirementsTitle: {
-    color: "#667eea",
     fontSize: 14,
     fontWeight: "700",
     marginBottom: 4,
@@ -447,7 +440,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   requirementText: {
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 14,
   },
 });

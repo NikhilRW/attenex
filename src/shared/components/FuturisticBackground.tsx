@@ -18,11 +18,13 @@ import {
     withRepeat,
     withTiming,
 } from "react-native-reanimated";
-import { colors } from "../constants/colors";
+import { useTheme } from "../hooks/useTheme";
 
 const { width, height } = Dimensions.get("window");
 
 export const FuturisticBackground = () => {
+    const { colors, mode } = useTheme();
+    const isDark = mode === "dark";
     const time1 = useSharedValue(0);
     const time2 = useSharedValue(0);
     const time3 = useSharedValue(0);
@@ -87,18 +89,18 @@ export const FuturisticBackground = () => {
         <View style={StyleSheet.absoluteFillObject}>
             <Canvas style={StyleSheet.absoluteFillObject}>
                 {/* Deep Space Background */}
-                <Rect x={0} y={0} width={width} height={height} color="#050511" />
+                <Rect x={0} y={0} width={width} height={height} color={colors.background.primary} />
 
                 {/* Animated Glowing Orbs */}
-                <Group opacity={0.6}>
+                <Group opacity={isDark ? 0.6 : 0.35}>
                     <Circle c={c1} r={180} color={colors.primary.main}>
-                        <BlurMask blur={60} style="normal" />
+                        <BlurMask blur={isDark ? 60 : 90} style="normal" />
                     </Circle>
                     <Circle c={c2} r={180} color={colors.accent.purple}>
-                        <BlurMask blur={60} style="normal" />
+                        <BlurMask blur={isDark ? 60 : 90} style="normal" />
                     </Circle>
                     <Circle c={c3} r={160} color={colors.accent.blue}>
-                        <BlurMask blur={60} style="normal" />
+                        <BlurMask blur={isDark ? 60 : 90} style="normal" />
                     </Circle>
                 </Group>
 
@@ -106,13 +108,13 @@ export const FuturisticBackground = () => {
                 {/* We can simulate a grid or scanlines if needed, but let's keep it clean for now */}
 
                 {/* Glassmorphism Overlay */}
-                <BackdropFilter filter={<Blur blur={30} />}>
+                <BackdropFilter filter={<Blur blur={isDark ? 30 : 50} />}>
                     <Rect
                         x={0}
                         y={0}
                         width={width}
                         height={height}
-                        color="rgba(10, 14, 39, 0.3)"
+                        color={colors.background.overlay}
                     />
                 </BackdropFilter>
 
@@ -121,7 +123,7 @@ export const FuturisticBackground = () => {
                     <LinearGradient
                         start={vec(0, 0)}
                         end={vec(width, height)}
-                        colors={["transparent", "rgba(0,0,0,0.8)"]}
+                        colors={["transparent", colors.background.gradientEnd]}
                     />
                 </Rect>
             </Canvas>

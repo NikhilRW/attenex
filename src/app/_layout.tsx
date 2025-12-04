@@ -1,19 +1,29 @@
 import { handleEmailVerification } from "@/src/features/Auth/utils/common";
+import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
-import { useEffect } from "react";
-import FlashMessage from "react-native-flash-message";
 import * as SplashScreen from "expo-splash-screen";
-import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import { useEffect } from "react";
+import { useColorScheme } from "react-native";
+import FlashMessage from "react-native-flash-message";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const { setTheme } = useTheme();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,
   });
+
+  useEffect(() => {
+    if (colorScheme) {
+      setTheme(colorScheme);
+    }
+  }, [colorScheme]);
 
   useEffect(() => {
     if (loaded || error) {

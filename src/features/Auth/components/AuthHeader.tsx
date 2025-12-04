@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,15 +9,17 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, logoSource }) => {
+    const { colors } = useTheme();
+
     return (
         <View style={styles.headerContainer}>
-            <View style={styles.iconContainer}>
+            <View style={[styles.iconContainer, { backgroundColor: colors.surface.glass }]}>
                 <Image
                     source={logoSource}
                     style={styles.logo}
                 />
             </View>
-            <Text style={styles.welcomeText}>{title}</Text>
+            <Text style={[styles.welcomeText, { color: colors.text.primary }]}>{title}</Text>
         </View>
     );
 };
@@ -32,7 +35,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
         padding: 10,
         borderRadius: 16,
     },
@@ -45,7 +47,6 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 32,
         fontWeight: "800",
-        color: "#FFF",
         letterSpacing: 1,
         marginBottom: 8,
     },

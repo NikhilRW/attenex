@@ -1,4 +1,4 @@
-import { colors } from "@/src/shared/constants/colors";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -27,19 +27,27 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({
   error,
   ...textInputProps
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.inputGroup}>
-      <Text style={styles.inputLabel}>{label}</Text>
-      <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+      <Text style={[styles.inputLabel, { color: colors.primary.main }]}>{label}</Text>
+      <View style={[
+        styles.inputWrapper,
+        {
+          backgroundColor: colors.surface.cardBg,
+          borderColor: error ? colors.status.error : colors.surface.glassBorder
+        }
+      ]}>
         <TextInput
-          style={styles.input}
-          placeholderTextColor="rgba(255,255,255,0.4)"
+          style={[styles.input, { color: colors.text.primary }]}
+          placeholderTextColor={colors.text.muted}
           {...textInputProps}
         />
         <LinearGradient
           colors={
             error
-              ? ["transparent", "#ff3b3b", "transparent"]
+              ? ["transparent", colors.accent.red, "transparent"]
               : ["transparent", colors.primary.main, "transparent"]
           }
           start={{ x: 0, y: 0 }}
@@ -51,12 +59,12 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({
             <Ionicons
               name={showPassword ? "eye-outline" : "eye-off-outline"}
               size={20}
-              color="rgba(255,255,255,0.6)"
+              color={colors.text.secondary}
             />
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.accent.red }]}>{error}</Text>}
     </View>
   );
 };
@@ -66,7 +74,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   inputLabel: {
-    color: colors.primary.main,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1,
@@ -74,17 +81,14 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     height: 56,
-    backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
   },
   input: {
     flex: 1,
-    color: "#FFF",
     fontSize: 16,
   },
   inputBorder: {
@@ -97,15 +101,5 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     padding: 8,
-  },
-  inputWrapperError: {
-    borderColor: "rgba(255, 59, 59, 0.5)",
-  },
-  errorText: {
-    color: "#ff6b6b",
-    fontSize: 12,
-    marginLeft: 4,
-    marginTop: 4,
-    fontWeight: "500",
   },
 });

@@ -1,4 +1,5 @@
 import { useAuth } from "@/src/shared/hooks/useAuth";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { logger } from "@/src/shared/utils/logger";
 // axios not required here; use linkedinAuthService
 import { useRouter } from "expo-router";
@@ -36,6 +37,7 @@ export const LinkedInAuth = () => {
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { login } = useAuth();
+  const { colors } = useTheme();
   /**
    * Constructs the LinkedIn OAuth authorization URL
    * This URL opens LinkedIn's login page with our app's configuration
@@ -197,11 +199,11 @@ export const LinkedInAuth = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Loading overlay shown during WebView loading and auth processing */}
       {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#0A66C2" />
+        <View style={[styles.loadingOverlay, { backgroundColor: colors.background.overlay }]}>
+          <ActivityIndicator size="large" color={colors.primary.main} />
         </View>
       )}
 
@@ -227,7 +229,6 @@ export const LinkedInAuth = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000", // Dark background for immersive experience
   },
   webView: {
     flex: 1, // Takes full screen space
@@ -240,7 +241,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Semi-transparent dark overlay
     zIndex: 1000, // Ensure it appears above WebView
   },
 });

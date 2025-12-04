@@ -1,4 +1,4 @@
-import { colors } from "@/src/shared/constants/colors";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -13,11 +13,17 @@ export const AuthFooter: React.FC<AuthFooterProps> = ({
     linkText,
     onLinkPress,
 }) => {
+    const { colors } = useTheme();
+
     return (
         <View style={styles.footer}>
-            <Text style={styles.footerText}>{text}</Text>
+            <Text style={[styles.footerText, { color: colors.text.secondary }]}>
+                {text}
+            </Text>
             <TouchableOpacity onPress={onLinkPress}>
-                <Text style={styles.signUpLink}>{linkText}</Text>
+                <Text style={[styles.signUpLink, { color: colors.primary.main }]}>
+                    {linkText}
+                </Text>
             </TouchableOpacity>
         </View>
     );
@@ -30,11 +36,9 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     footerText: {
-        color: "rgba(255,255,255,0.6)",
         fontSize: 14,
     },
     signUpLink: {
-        color: colors.primary.main,
         fontSize: 14,
         fontWeight: "700",
     },

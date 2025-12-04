@@ -1,10 +1,10 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { AuthHeader } from "../components/AuthHeader";
 import { FuturisticButton } from "../components/FuturisticButton";
 
 /**
@@ -15,10 +15,11 @@ import { FuturisticButton } from "../components/FuturisticButton";
  */
 const VerifyEmail = () => {
   const router = useRouter();
+  const { colors, mode } = useTheme();
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
       <View style={styles.content}>
@@ -28,18 +29,18 @@ const VerifyEmail = () => {
         /> */}
 
         <View style={styles.successContainer}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="mail-outline" size={64} color="#667eea" />
+          <View style={[styles.iconContainer, { backgroundColor: colors.primary.glow }]}>
+            <Ionicons name="mail-outline" size={64} color={colors.primary.main} />
           </View>
 
-          <Text style={styles.successTitle}>Check Your Inbox!</Text>
+          <Text style={[styles.successTitle, { color: colors.text.primary }]}>Check Your Inbox!</Text>
 
-          <Text style={styles.successDescription}>
+          <Text style={[styles.successDescription, { color: colors.text.secondary }]}>
             We&apos;ve sent a verification email to your inbox.
             Please click the link in the email to verify your account.
           </Text>
 
-          <Text style={styles.instructionText}>
+          <Text style={[styles.instructionText, { color: colors.text.muted }]}>
             The verification link will expire in 24 hours.
             If you don&apos;t see the email, check your spam folder.
           </Text>
@@ -66,8 +67,8 @@ const VerifyEmail = () => {
           />
 
           <View style={styles.helpContainer}>
-            <Text style={styles.helpText}>Need help?</Text>
-            <Text style={styles.contactText}>
+            <Text style={[styles.helpText, { color: colors.text.secondary }]}>Need help?</Text>
+            <Text style={[styles.contactText, { color: colors.text.muted }]}>
               Contact support if you don&apos;t receive the email
             </Text>
           </View>
@@ -80,7 +81,6 @@ const VerifyEmail = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050511",
   },
   content: {
     flex: 1,
@@ -98,55 +98,27 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "rgba(102, 126, 234, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 20,
   },
   successTitle: {
-    color: "#FFF",
     fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
   },
   successDescription: {
-    color: "rgba(255, 255, 255, 0.8)",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
     paddingHorizontal: 20,
   },
   instructionText: {
-    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
     lineHeight: 22,
     textAlign: "center",
     paddingHorizontal: 20,
     marginTop: -8,
-  },
-  tipsContainer: {
-    backgroundColor: "rgba(102, 126, 234, 0.05)",
-    borderRadius: 16,
-    padding: 20,
-    width: "100%",
-    marginTop: 8,
-    gap: 12,
-  },
-  tipsTitle: {
-    color: "#667eea",
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  tipItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  tipText: {
-    color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 15,
-    flex: 1,
   },
   helpContainer: {
     alignItems: "center",
@@ -154,12 +126,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   helpText: {
-    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
     fontWeight: "600",
   },
   contactText: {
-    color: "rgba(255, 255, 255, 0.5)",
     fontSize: 13,
     textAlign: "center",
   },

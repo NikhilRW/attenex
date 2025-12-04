@@ -1,4 +1,5 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -12,6 +13,7 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { showMessage } from "react-native-flash-message";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthOptions } from "../components/AuthOptions";
@@ -26,10 +28,10 @@ import {
   handleLinkedInSignIn,
 } from "../utils/common";
 import { SignInFormData, signInSchema } from "../validation/authSchemas";
-import { showMessage } from "react-native-flash-message";
 
 const SignIn = () => {
   const router = useRouter();
+  const { colors, mode } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const params = useLocalSearchParams();
@@ -70,8 +72,8 @@ const SignIn = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
       <KeyboardAvoidingView

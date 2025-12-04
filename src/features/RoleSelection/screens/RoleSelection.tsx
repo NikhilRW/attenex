@@ -1,61 +1,48 @@
+import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
 import {
-  Animated,
   Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+
+import { LinearGradient } from "expo-linear-gradient";
 
 type Role = "teacher" | "student" | null;
 
 const RoleSelection = () => {
   const router = useRouter();
+  const { colors, mode, toggleTheme } = useTheme();
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [hoveredRole, setHoveredRole] = useState<Role>(null);
 
-  const teacherScale = React.useRef(new Animated.Value(1)).current;
-  const studentScale = React.useRef(new Animated.Value(1)).current;
+  const teacherScale = useSharedValue(1);
+  const studentScale = useSharedValue(1);
 
   const handleRoleSelect = useCallback((role: Role) => {
     setSelectedRole(role);
   }, []);
 
-  const handleTeacherPressIn = useCallback(() => {
+  const handleTeacherPress = useCallback(() => {
     setHoveredRole("teacher");
-    Animated.spring(teacherScale, {
-      toValue: 1.05,
-      useNativeDriver: true,
-    }).start();
+    setSelectedRole("teacher");
+    teacherScale.value = withSpring(1.05, { duration: 1000 });
+    studentScale.value = withSpring(1, { duration: 1000 });
   }, [teacherScale]);
 
-  const handleTeacherPressOut = useCallback(() => {
-    setHoveredRole(null);
-    Animated.spring(teacherScale, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  }, [teacherScale]);
-
-  const handleStudentPressIn = useCallback(() => {
+  const handleStudentPress = useCallback(() => {
     setHoveredRole("student");
-    Animated.spring(studentScale, {
-      toValue: 1.05,
-      useNativeDriver: true,
-    }).start();
-  }, [studentScale]);
-
-  const handleStudentPressOut = useCallback(() => {
-    setHoveredRole(null);
-    Animated.spring(studentScale, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
+    setSelectedRole("student");
+    teacherScale.value = withSpring(1, { duration: 1000 });
+    studentScale.value = withSpring(1.05, { duration: 1000 });
   }, [studentScale]);
 
   const handleConfirm = useCallback(() => {
@@ -70,17 +57,25 @@ const RoleSelection = () => {
   }, [selectedRole, router]);
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
-      <LinearGradient
-        colors={["#0f0c29", "#302b63", "#24243e"]}
-        style={styles.gradient}
-      />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <FuturisticBackground />
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Choose Your Role</Text>
-        <Text style={styles.subtitle}>Select how you'll be using Attenex</Text>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>Choose Your Role</Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>Select how you'll be using Attenex</Text>
+          </View>
+          <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
+            <Ionicons
+              name={mode === "dark" ? "sunny" : "moon"}
+              size={24}
+              color={colors.text.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* 3D Models Container */}
@@ -89,11 +84,16 @@ const RoleSelection = () => {
         <Pressable
           style={[
             styles.modelWrapper,
-            selectedRole === "teacher" && styles.modelWrapperSelected,
+            {
+              backgroundColor: colors.surface.glass,
+              borderColor: colors.surface.glassBorder
+            },
+            selectedRole === "teacher" && {
+              borderColor: colors.primary.main,
+              backgroundColor: colors.primary.glow,
+            },
           ]}
-          onPressIn={handleTeacherPressIn}
-          onPressOut={handleTeacherPressOut}
-          onPress={() => handleRoleSelect("teacher")}
+          onPress={handleTeacherPress}
         >
           <Animated.View
             style={[
@@ -107,14 +107,14 @@ const RoleSelection = () => {
               contentFit="contain"
             />
           </Animated.View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.roleLabel}>Teacher</Text>
-            <Text style={styles.roleDescription}>
+          <View style={[styles.labelContainer, { backgroundColor: colors.surface.cardBg }]}>
+            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>Teacher</Text>
+            <Text style={[styles.roleDescription, { color: colors.text.secondary }]}>
               Manage classes & attendance
             </Text>
           </View>
           {selectedRole === "teacher" && (
-            <View style={styles.selectedIndicator}>
+            <View style={[styles.selectedIndicator, { backgroundColor: colors.primary.main, shadowColor: colors.primary.main }]}>
               <Text style={styles.checkmark}>✓</Text>
             </View>
           )}
@@ -124,11 +124,16 @@ const RoleSelection = () => {
         <Pressable
           style={[
             styles.modelWrapper,
-            selectedRole === "student" && styles.modelWrapperSelected,
+            {
+              backgroundColor: colors.surface.glass,
+              borderColor: colors.surface.glassBorder
+            },
+            selectedRole === "student" && {
+              borderColor: colors.primary.main,
+              backgroundColor: colors.primary.glow,
+            },
           ]}
-          onPressIn={handleStudentPressIn}
-          onPressOut={handleStudentPressOut}
-          onPress={() => handleRoleSelect("student")}
+          onPress={handleStudentPress}
         >
           <Animated.View
             style={[
@@ -142,12 +147,12 @@ const RoleSelection = () => {
               contentFit="contain"
             />
           </Animated.View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.roleLabel}>Student</Text>
-            <Text style={styles.roleDescription}>Mark your attendance</Text>
+          <View style={[styles.labelContainer, { backgroundColor: colors.surface.cardBg }]}>
+            <Text style={[styles.roleLabel, { color: colors.text.primary }]}>Student</Text>
+            <Text style={[styles.roleDescription, { color: colors.text.secondary }]}>Mark your attendance</Text>
           </View>
           {selectedRole === "student" && (
-            <View style={styles.selectedIndicator}>
+            <View style={[styles.selectedIndicator, { backgroundColor: colors.primary.main, shadowColor: colors.primary.main }]}>
               <Text style={styles.checkmark}>✓</Text>
             </View>
           )}
@@ -159,6 +164,7 @@ const RoleSelection = () => {
         style={[
           styles.confirmButton,
           !selectedRole && styles.confirmButtonDisabled,
+          { shadowColor: colors.primary.main }
         ]}
         onPress={handleConfirm}
         disabled={!selectedRole}
@@ -166,7 +172,9 @@ const RoleSelection = () => {
       >
         <LinearGradient
           colors={
-            selectedRole ? ["#667eea", "#764ba2"] : ["#4a4a4a", "#2a2a2a"]
+            selectedRole
+              ? [colors.primary.main, colors.accent.blue]
+              : [colors.text.muted, colors.background.tertiary]
           }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -184,7 +192,6 @@ const RoleSelection = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f0c29",
   },
   gradient: {
     position: "absolute",
@@ -196,20 +203,25 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 60,
     paddingHorizontal: 24,
-    alignItems: "center",
     marginBottom: 20,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  themeToggle: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 8,
-    textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "rgba(255, 255, 255, 0.7)",
-    textAlign: "center",
   },
   modelsContainer: {
     flex: 1,
@@ -220,18 +232,11 @@ const styles = StyleSheet.create({
   },
   modelWrapper: {
     flex: 1,
-    height: "80%",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    height: "75%",
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.1)",
     overflow: "hidden",
     position: "relative",
-  },
-  modelWrapperSelected: {
-    borderColor: "#667eea",
-    borderWidth: 3,
-    backgroundColor: "rgba(102, 126, 234, 0.1)",
   },
   canvasContainer: {
     flex: 1,
@@ -244,39 +249,23 @@ const styles = StyleSheet.create({
     height: 210,
     zIndex: -2,
   },
-  imageGlow: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 24,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 10,
-  },
   labelContainer: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
     backdropFilter: "blur(10px)",
     zIndex: 2,
   },
   roleLabel: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
     textAlign: "center",
     marginBottom: 4,
   },
   roleDescription: {
     fontSize: 14,
-    color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
   },
   selectedIndicator: {
@@ -286,10 +275,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#667eea",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#667eea",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
@@ -302,10 +289,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginHorizontal: 24,
-    marginBottom: 40,
+    marginBottom: 140,
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: "#667eea",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

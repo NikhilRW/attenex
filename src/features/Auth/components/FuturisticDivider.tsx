@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,17 +8,19 @@ interface FuturisticDividerProps {
 }
 
 export const FuturisticDivider: React.FC<FuturisticDividerProps> = ({ text }) => {
+    const { colors } = useTheme();
+
     return (
         <View style={styles.dividerContainer}>
             <LinearGradient
-                colors={["transparent", "rgba(255,255,255,0.2)", "transparent"]}
+                colors={["transparent", colors.surface.glassBorder, "transparent"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.dividerLine}
             />
-            <Text style={styles.dividerText}>{text}</Text>
+            <Text style={[styles.dividerText, { color: colors.text.muted }]}>{text}</Text>
             <LinearGradient
-                colors={["transparent", "rgba(255,255,255,0.2)", "transparent"]}
+                colors={["transparent", colors.surface.glassBorder, "transparent"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.dividerLine}
@@ -38,7 +41,6 @@ const styles = StyleSheet.create({
         height: 1,
     },
     dividerText: {
-        color: "rgba(255,255,255,0.4)",
         fontSize: 12,
         fontWeight: "700",
         letterSpacing: 1,

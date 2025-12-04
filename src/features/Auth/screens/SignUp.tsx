@@ -1,4 +1,5 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
@@ -28,6 +29,7 @@ import { SignUpFormData, signUpSchema } from "../validation/authSchemas";
 
 const SignUp = () => {
   const router = useRouter();
+  const { colors, mode } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -55,8 +57,8 @@ const SignUp = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 
       <KeyboardAvoidingView
@@ -178,7 +180,6 @@ const SignUp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050511",
     paddingBottom: 20,
   },
   keyboardView: {

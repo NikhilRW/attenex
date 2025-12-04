@@ -1,4 +1,4 @@
-import { colors } from "@/src/shared/constants/colors";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -14,17 +14,32 @@ export const AuthOptions: React.FC<AuthOptionsProps> = ({
     onToggleRememberMe,
     onForgotPassword,
 }) => {
+    const { colors } = useTheme();
+
     return (
         <View style={styles.optionsRow}>
             <TouchableOpacity style={styles.rememberMe} onPress={onToggleRememberMe}>
-                <View style={[styles.checkbox, rememberMe && styles.checkboxActive]}>
-                    {rememberMe && <Ionicons name="checkmark" size={12} color="#000" />}
+                <View
+                    style={[
+                        styles.checkbox,
+                        { borderColor: colors.text.muted },
+                        rememberMe && {
+                            backgroundColor: colors.primary.main,
+                            borderColor: colors.primary.main,
+                        },
+                    ]}
+                >
+                    {rememberMe && <Ionicons name="checkmark" size={12} color="#FFF" />}
                 </View>
-                <Text style={styles.rememberText}>Remember me</Text>
+                <Text style={[styles.rememberText, { color: colors.text.secondary }]}>
+                    Remember me
+                </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={onForgotPassword}>
-                <Text style={styles.forgotText}>Forgot Password</Text>
+                <Text style={[styles.forgotText, { color: colors.primary.main }]}>
+                    Forgot Password
+                </Text>
             </TouchableOpacity>
         </View>
     );
@@ -46,20 +61,13 @@ const styles = StyleSheet.create({
         height: 20,
         borderRadius: 6,
         borderWidth: 1.5,
-        borderColor: "rgba(255,255,255,0.4)",
         justifyContent: "center",
         alignItems: "center",
     },
-    checkboxActive: {
-        backgroundColor: colors.primary.main,
-        borderColor: colors.primary.main,
-    },
     rememberText: {
-        color: "rgba(255,255,255,0.6)",
         fontSize: 14,
     },
     forgotText: {
-        color: colors.primary.light,
         fontSize: 14,
         fontWeight: "600",
     },
