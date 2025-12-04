@@ -82,7 +82,11 @@ const Main = () => {
           entering={FadeInDown.duration(600).springify()}
           style={styles.header}
         >
-          <Ionicons name="school-outline" size={40} color={colors.primary.main} />
+          <Ionicons
+            name="school-outline"
+            size={40}
+            color={colors.primary.main}
+          />
           <Text style={[styles.title, { color: colors.text.primary }]}>
             Create New Lecture
           </Text>
@@ -94,11 +98,7 @@ const Main = () => {
         {/* Form Card */}
         <Animated.View
           entering={FadeInUp.duration(600).delay(200).springify()}
-          style={[
-            styles.card,
-            
-            { backgroundColor: colors.surface.cardBg },
-          ]}
+          style={[styles.card, { backgroundColor: colors.surface.cardBg }]}
         >
           {/* Lecture Name Input */}
           <View style={styles.inputContainer}>
@@ -191,10 +191,14 @@ const Main = () => {
           entering={FadeInUp.duration(600).delay(400).springify()}
           style={[styles.infoCard, { backgroundColor: colors.surface.cardBg }]}
         >
-          <Ionicons name="information-circle" size={24} color={colors.status.info} />
+          <Ionicons
+            name="information-circle"
+            size={24}
+            color={colors.status.info}
+          />
           <Text style={[styles.infoText, { color: colors.text.secondary }]}>
-            After creating a lecture, you&apos;ll be able to start it and generate an
-            attendance passcode for your students.
+            After creating a lecture, you&apos;ll be able to start it and
+            generate an attendance passcode for your students.
           </Text>
         </Animated.View>
       </ScrollView>
@@ -207,7 +211,7 @@ export default Main;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"black"
+    backgroundColor: "black",
   },
   scrollView: {
     flex: 1,
