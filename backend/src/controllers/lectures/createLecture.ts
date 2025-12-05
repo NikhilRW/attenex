@@ -32,13 +32,14 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const { className, lectureName } = req.body;
+    const { className, lectureName, latitude, longitude, duration } = req.body;
 
     // Validate input
-    if (!className || !lectureName) {
+    if (!className || !lectureName || !latitude || !longitude || !duration) {
       return res.status(400).json({
         success: false,
-        message: "Class name and lecture name are required",
+        message:
+          "Class name, lecture name, location, and duration are required",
       });
     }
 
@@ -83,13 +84,6 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       logger.info(`Created new class: ${classId} for teacher: ${userId}`);
     }
 
-    // Generate a random 4-digit passcode
-    const passcode = Math.floor(1000 + Math.random() * 9000).toString();
-
-    // Set passcode expiration to 1 hour from now
-    const passcodeExpiresAt = new Date();
-    passcodeExpiresAt.setHours(passcodeExpiresAt.getHours() + 1);
-
     // Create the lecture
     const newLectures = await db
       .insert(lectures)
@@ -97,8 +91,9 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
         teacherId: userId,
         classId: classId,
         title: lectureName,
-        passcode: passcode,
-        passcodeExpiresAt: passcodeExpiresAt,
+        teacherLatitude: latitude.toString(),
+        teacherLongitude: longitude.toString(),
+        duration: duration.toString(),
         status: "active",
       })
       .returning();
@@ -115,7 +110,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
           id: newLecture.id,
           title: newLecture.title,
           className: className,
-          passcode: newLecture.passcode,
+          duration: newLecture.duration,
           status: newLecture.status,
           createdAt: newLecture.createdAt,
         },

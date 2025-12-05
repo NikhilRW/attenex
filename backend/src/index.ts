@@ -2,6 +2,7 @@ import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import { logger } from "./utils/logger";
 
@@ -69,6 +70,7 @@ app.use("/api/users", userRoutes);
  * - Attendance tracking
  */
 app.use("/api/lectures", lectureRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 /**
  * Authentication Routes

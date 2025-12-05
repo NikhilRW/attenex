@@ -48,13 +48,7 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
 
     return res.status(200).json({
       message: "Role updated successfully",
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        name: updatedUser.name,
-        role: updatedUser.role,
-        photoUrl: updatedUser.photoUrl,
-      },
+      user: updatedUser,
     });
   } catch (error) {
     console.error("Error updating user role:", error);

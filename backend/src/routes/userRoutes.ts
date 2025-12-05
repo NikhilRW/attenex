@@ -5,6 +5,7 @@ import {
 } from "@controllers/auth/resetPassword";
 import { signInUser } from "@controllers/auth/signInUser";
 import { signUpUser } from "@controllers/auth/signUpUser";
+import { updateStudentClass } from "@controllers/auth/updateStudentClass";
 import { updateUserRole } from "@controllers/auth/updateUserRole";
 import { verifyUser } from "@controllers/auth/verifyUser";
 import { authenticate } from "@middleware/auth";
@@ -21,3 +22,4 @@ userRoutes.post("/verify-reset-token", verifyResetToken); // Verify reset token 
 userRoutes.post("/reset-password", resetPassword); // Reset password with token
 userRoutes.post("/verify-user", verifyUser); // Verify user email
 userRoutes.post("/update-role", authenticate, updateUserRole); // Update user role (protected route)
+userRoutes.post("/update-class", authenticate, updateStudentClass); // Update student class (protected route)

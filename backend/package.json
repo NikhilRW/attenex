@@ -15,9 +15,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@types/react": "~19.1.10",
@@ -30,10 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "nodemailer": "^7.0.11",
-    "pg": "^8.16.3",
-    "expo": "~54.0.25",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

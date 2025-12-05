@@ -50,6 +50,19 @@ export const userRoleEnum = pgEnum("user_role", ["teacher", "student"]);
 export const lectureStatusEnum = pgEnum("lecture_status", ["active", "ended"]);
 
 /**
+ * Attendance Status Enumeration
+ * Tracks the final status of attendance:
+ * - present: Successfully verified at start, end, and during checks
+ * - absent: Failed verification or missed too many checks
+ * - incomplete: Joined but left early or failed final check
+ */
+export const attendanceStatusEnum = pgEnum("attendance_status", [
+  "present",
+  "absent",
+  "incomplete",
+]);
+
+/**
  * Attendance Method Enumeration
  * Records how attendance was marked:
  * - manual: Teacher manually marked student present
@@ -85,6 +98,7 @@ export const users = pgTable(
     photoUrl: text("photo_url"), // Optional profile photo URL from OAuth or user upload
     role: userRoleEnum("role"), // teacher or student - determines permissions
     classId: uuid("class_id").references(() => classes.id), // Student's assigned class (null for teachers)
+    rollNo: varchar("roll_no", { length: 20 }), // Student roll number (unique per class, null for teachers)
     passwordHash: text("password_hash"), // Only for traditional auth users (bcrypt hash)
     oauthProvider: text("oauth_provider"), // 'linkedin', 'google', etc. - null for traditional auth
     oauthId: text("oauth_id"), // Provider's unique user ID - never changes, used for account linking
@@ -102,6 +116,7 @@ export const users = pgTable(
     uniqueIndex("users_email_idx").on(table.email), // Fast email lookups for auth
     index("users_role_idx").on(table.role), // Filter users by role
     index("users_class_idx").on(table.classId), // Find students in a class
+    index("users_class_rollno_idx").on(table.classId, table.rollNo), // Unique roll numbers per class
   ]
 );
 
@@ -141,15 +156,12 @@ export const lectures = pgTable(
       .references(() => classes.id)
       .notNull(), // Class this lecture belongs to
     title: text("title").notNull(), // Lecture title/topic
-    passcode: varchar("passcode", { length: 4 }).notNull(), // 4-digit code for attendance
-    passcodeExpiresAt: timestamp("passcode_expires_at", { withTimezone: true }), // When passcode expires
-    passcodeRefreshedAt: timestamp("passcode_refreshed_at", {
-      withTimezone: true,
-    }).defaultNow(), // Last time passcode was refreshed
+    sessionToken: uuid("session_token").defaultRandom(), // Unique token for this session
+    duration: numeric("duration").default("60").notNull(), // Duration in minutes
     status: lectureStatusEnum("status").default("active"), // active or ended
     teacherLatitude: numeric("teacher_latitude", { precision: 10, scale: 7 }), // GPS coordinates for geofencing
     teacherLongitude: numeric("teacher_longitude", { precision: 10, scale: 7 }),
-    geofenceRadius: numeric("geofence_radius").default("50"), // Geofence radius in meters
+    geofenceRadius: numeric("geofence_radius").default("200"), // Geofence radius in meters (increased for GPS accuracy tolerance)
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     startedAt: timestamp("started_at", { withTimezone: true }), // When lecture actually began
     endedAt: timestamp("ended_at", { withTimezone: true }), // When lecture ended
@@ -178,10 +190,8 @@ export const attendanceAttempts = pgTable(
       .references(() => users.id)
       .notNull(), // Who attempted to mark attendance
     attemptTime: timestamp("attempt_time", { withTimezone: true }).defaultNow(), // When attempt occurred
-    providedPasscode: varchar("provided_passcode", { length: 4 }), // What passcode they entered
     distanceMeters: numeric("distance_meters"), // How far they were from teacher (for geofencing)
     success: boolean("success").notNull(), // Whether the attempt succeeded
-    failureReason: text("failure_reason"), // 'wrong_passcode', 'too_far', 'expired', etc.
     ipAddress: text("ip_address"), // Client IP for security/audit
     deviceInfo: jsonb("device_info"), // Device details for debugging (OS, browser, etc.)
   },
@@ -207,7 +217,10 @@ export const attendance = pgTable(
     studentId: uuid("student_id")
       .references(() => users.id)
       .notNull(), // Who attended
-    markedAt: timestamp("marked_at", { withTimezone: true }).defaultNow(), // When attendance was marked
+    joinTime: timestamp("join_time", { withTimezone: true }), // When student first joined
+    submitTime: timestamp("submit_time", { withTimezone: true }), // When final passcode was submitted
+    status: attendanceStatusEnum("status").default("incomplete"), // Final status
+    checkScore: numeric("check_score").default("0"), // Number of valid presence checks passed
     method: attendanceMethodEnum("method").default("auto"), // How attendance was marked
     locationSnapshot: jsonb("location_snapshot"), // GPS snapshot: { lat, lng, accuracy }
     extra: jsonb("extra"), // Additional metadata (future extensibility)
@@ -216,6 +229,56 @@ export const attendance = pgTable(
     uniqueIndex("attendance_unique_idx").on(table.lectureId, table.studentId), // One attendance per student per lecture
     index("attendance_lecture_idx").on(table.lectureId), // Attendance for a lecture
     index("attendance_student_idx").on(table.studentId), // Attendance by a student
+  ]
+);
+
+/**
+ * Attendance Pings Table - "Silent Guardian" Heartbeats
+ *
+ * Stores the periodic location checks sent by the student app during the lecture.
+ * Used to calculate the 'checkScore' for final attendance verification.
+ */
+export const attendancePings = pgTable(
+  "attendance_pings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lectureId: uuid("lecture_id")
+      .references(() => lectures.id)
+      .notNull(),
+    studentId: uuid("student_id")
+      .references(() => users.id)
+      .notNull(),
+    timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow(),
+    latitude: numeric("latitude", { precision: 10, scale: 7 }),
+    longitude: numeric("longitude", { precision: 10, scale: 7 }),
+    isValid: boolean("is_valid").notNull(), // True if within geofence radius
+  },
+  (table) => [
+    index("pings_lecture_student_idx").on(table.lectureId, table.studentId),
+  ]
+);
+
+/**
+ * Geofence Logs Table - Exit/Enter Events
+ *
+ * Logs when a student leaves or enters the geofence radius during a lecture.
+ * Used to detect "Leave and Return" cheating patterns.
+ */
+export const geofenceLogs = pgTable(
+  "geofence_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    lectureId: uuid("lecture_id")
+      .references(() => lectures.id)
+      .notNull(),
+    studentId: uuid("student_id")
+      .references(() => users.id)
+      .notNull(),
+    eventType: varchar("event_type", { length: 10 }).notNull(), // 'EXIT' or 'ENTER'
+    timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("geofence_lecture_student_idx").on(table.lectureId, table.studentId),
   ]
 );
 
@@ -237,6 +300,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   lecturesAsTeacher: many(lectures), // Teacher conducts many lectures
   attendanceRecords: many(attendance), // Student has many attendance records
   attendanceAttempts: many(attendanceAttempts), // Student has many attempt records
+  attendancePings: many(attendancePings),
+  geofenceLogs: many(geofenceLogs),
 }));
 
 export const classesRelations = relations(classes, ({ one, many }) => ({
