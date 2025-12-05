@@ -63,6 +63,7 @@ const Main = () => {
         description: error.message || "An unexpected error occurred",
         type: "danger",
         duration: 3000,
+        
       });
     } finally {
       setIsCreating(false);

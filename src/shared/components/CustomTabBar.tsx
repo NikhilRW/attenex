@@ -1,27 +1,23 @@
+import { User } from "@/backend/src/config/database_setup";
 import { Entypo, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
-import { Dimensions, Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, {
-  Extrapolate,
+  Easing,
   FadeOut,
-  FadingTransition,
-  interpolate,
   LinearTransition,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../hooks/useTheme";
-import {
-  SafeAreaInsetsContext,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useAuthStore } from "../stores/authStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const BUTTON_WIDTH = 100;
+const BUTTON_WIDTH = 80;
 
 const CustomTabBar = ({
   state: { index, routeNames },
@@ -30,22 +26,23 @@ const CustomTabBar = ({
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const role = useAuthStore().user!.role;
 
   const activatedBackgroundStyle = useAnimatedStyle(() => {
     return {
-      position: "absolute",
-      top: "50%",
-      transform: [{ translateY: -30 }],
+      width: BUTTON_WIDTH,
+      height: 60,
       left: index * BUTTON_WIDTH + 10,
     };
   });
+
+  
   return (
     <Animated.View
-      entering={LinearTransition}
       style={[
         styles.container,
         {
-          bottom: insets.bottom,
+          bottom: 5,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,
         },
@@ -67,6 +64,7 @@ const CustomTabBar = ({
           <TabBarButton
             key={`index-${idx}`}
             name={name}
+            role={role}
             isActivated={isActivated}
             onPress={() => navigation.navigate(name)}
             colors={colors}
@@ -84,6 +82,7 @@ interface TabBarButtonProps {
   isActivated: boolean;
   onPress: () => void;
   colors: any;
+  role: User["role"];
 }
 
 const TabBarButton: React.FC<TabBarButtonProps> = ({
@@ -91,6 +90,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   isActivated,
   onPress,
   colors,
+  role,
 }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(isActivated ? 1 : 0.6);
@@ -116,23 +116,16 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
     opacity: opacity.value,
   }));
 
-  const animatedBackgroundStyle = useAnimatedStyle(() => ({
-    opacity: backgroundOpacity.value,
-    transform: [
-      {
-        scale: interpolate(
-          backgroundOpacity.value,
-          [0, 1],
-          [0.8, 1],
-          Extrapolate.CLAMP
-        ),
-      },
-    ],
-  }));
-
   const animatedIconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: iconScale.value }],
   }));
+
+  // if (role && role === "student" && name.includes("classes")) {
+  //   return null;
+  // }
+  // if (role && role === "teacher" && name.includes("attendance")) {
+  //   return null;
+  // }
 
   return (
     <AnimatedPressable
@@ -144,7 +137,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
       <Animated.View layout={LinearTransition} style={animatedIconStyle}>
         {getIconForRoute(name, isActivated, colors)}
       </Animated.View>
-      {isActivated && (
+      {!isActivated && (
         <Animated.Text
           key={"key-" + name}
           exiting={FadeOut.duration(300).easing(Easing.inOut(Easing.quad))}
@@ -174,13 +167,14 @@ export const getIconForRoute = (
     return <Entypo name="blackboard" size={25} color={color} />;
   } else if (routeName.includes("role-selection")) {
     return <Ionicons name="people" size={25} color={color} />;
+  } else if (routeName.includes("create-class")) {
+    return <Ionicons name="school" size={25} color={color} />;
   }
 };
 
 const styles = StyleSheet.create({
   container: {
     height: 70,
-    width: "80%",
     position: "absolute",
     left: "50%",
     transform: [
@@ -189,7 +183,6 @@ const styles = StyleSheet.create({
       },
     ],
     marginHorizontal: "auto",
-    marginBottom: 30,
     // justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -200,7 +193,7 @@ const styles = StyleSheet.create({
     // shadowOffset: { width: 0, height: 4 },
     // shadowOpacity: 0,
     // shadowRadius: 8,
-    zIndex:2,
+    zIndex: 2,
     borderWidth: 1,
   },
   navigationButton: {
@@ -216,13 +209,12 @@ const styles = StyleSheet.create({
   },
   activeBackground: {
     position: "absolute",
-    width: BUTTON_WIDTH,
-    height: 60,
+    top: 5,
     borderRadius: 30,
   },
   tabLabel: {
     textAlign: "center",
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: "600",
     marginTop: 2,
   },

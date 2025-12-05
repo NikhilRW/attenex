@@ -2,6 +2,7 @@ import { FuturisticBackground } from "@/src/shared/components/FuturisticBackgrou
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
+import { logger } from "@/src/shared/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -104,6 +105,10 @@ const RoleSelection = () => {
         router.replace("/(main)/attendance");
       }
     } catch (error: any) {
+      logger.error(
+        "User update failed : handleConfirm() RoleSelection.tsx",
+        error
+      );
       showMessage({
         message: "Update Failed",
         description:
@@ -116,8 +121,7 @@ const RoleSelection = () => {
     }
   }, [selectedRole, router, isUpdating]);
 
-  console.log("insets.bottom",insets.bottom);
-  
+  console.log("insets.bottom", insets.bottom);
 
   return (
     <View
@@ -271,7 +275,7 @@ const RoleSelection = () => {
         style={[
           styles.confirmButton,
           {
-            marginBottom: 70 + insets.bottom * 2 ,
+            marginBottom: 70 + insets.bottom * 2,
           },
           (!selectedRole || isUpdating) && styles.confirmButtonDisabled,
           { shadowColor: colors.primary.main },

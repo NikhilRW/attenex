@@ -180,7 +180,6 @@ const SignUp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 20,
   },
   keyboardView: {
     flex: 1,
@@ -188,8 +187,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 70,
+    paddingTop:60,
+    paddingBottom: 40,
   },
   formContainer: {
     gap: 24,

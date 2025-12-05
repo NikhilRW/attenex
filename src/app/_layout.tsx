@@ -7,17 +7,26 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import FlashMessage from "react-native-flash-message";
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import {
-  SafeAreaInsetsContext,
   SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
 } from "react-native-safe-area-context";
+
+// Configure Reanimated logger to suppress warnings
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Disable strict mode to suppress "reading from value" warnings
+});
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const { setTheme } = useTheme();
+  const { setTheme, isDark } = useTheme();
+  const { bottom } = useSafeAreaInsets();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,
@@ -85,11 +94,15 @@ export default function RootLayout() {
   return (
     <>
       <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(main)" />
-        </Stack>
-        <FlashMessage position="top" />
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
+        >
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(main)" />
+          </Stack>
+          <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+        </SafeAreaView>
       </SafeAreaProvider>
     </>
   );

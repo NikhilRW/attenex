@@ -73,10 +73,10 @@ export const lightTheme = {
 
   // Primary Brand Colors
   primary: {
-    main: "#00D4FF", // Keeping brand color
-    light: "#33DDFF",
-    dark: "#00A8CC",
-    glow: "rgba(0, 212, 255, 0.3)",
+    main: "#0891B2", // Darker cyan for better contrast on light bg
+    light: "#06B6D4",
+    dark: "#0E7490",
+    glow: "rgba(8, 145, 178, 0.3)",
   },
 
   // Accent Colors
@@ -91,16 +91,16 @@ export const lightTheme = {
   // Text Colors
   text: {
     primary: "#0F172A", // Dark text for light background
-    secondary: "#475569",
-    tertiary: "#64748B",
-    muted: "#94A3B8",
+    secondary: "#334155",
+    tertiary: "#475569",
+    muted: "#64748B",
   },
 
   // Surface Colors
   surface: {
-    glass: "rgba(0, 0, 0, 0.1)",
-    glassBorder: "rgba(0, 0, 0, 0.05)",
-    cardBg: "rgba(255, 255, 255, 0.8)",
+    glass: "rgba(0, 0, 0, 0.02)",
+    glassBorder: "rgba(0, 0, 0, 0.15)",
+    cardBg: "rgba(255, 255, 255, 0.95)",
   },
 
   // Shadows

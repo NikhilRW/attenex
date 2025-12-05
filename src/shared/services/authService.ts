@@ -45,7 +45,7 @@ export const authService = {
         },
         {
           headers: {
-            Authorization: "Bearer " + (await secureStore.getItem("jwt")),
+            Authorization: "Bearer " + useAuthStore.getState().token,
           },
         }
       );
@@ -54,12 +54,38 @@ export const authService = {
       if (response.data.user) {
         useAuthStore.getState().updateUser(response.data.user);
       }
-
       return response.data;
     } catch (error: any) {
       logger.info("authService:updateUserRole - error", error);
       throw new Error(
         error.response?.data?.error || "Failed to update user role"
+      );
+    }
+  },
+
+  async updateStudentClass(className: string) {
+    try {
+      const response = await http.post(
+        BASE_URI + "/api/users/update-class",
+        {
+          className,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + useAuthStore.getState().token,
+          },
+        }
+      );
+
+      // Update the user in the auth store with the new class
+      if (response.data.data.user) {
+        useAuthStore.getState().updateUser(response.data.data.user);
+      }
+      return response.data;
+    } catch (error: any) {
+      logger.info("authService:updateStudentClass - error", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to update student class"
       );
     }
   },

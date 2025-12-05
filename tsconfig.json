@@ -3,16 +3,40 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"],
-      "@/src/*": ["./src/*"],
-      "@/features/*": ["./src/features/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@/app/*": ["./app/*"],
-      "@auth/*": ["./src/features/Auth/*"],
-      "@classes/*": ["./src/features/Classes/*"],
-      "@attendance/*": ["./src/features/Attendance/*"],
-      "@role-selection/*": ["./src/features/RoleSelection/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/src/*": [
+        "./src/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ],
+      "@/app/*": [
+        "./app/*"
+      ],
+      "@auth/*": [
+        "./src/features/Auth/*"
+      ],
+      "@classes/*": [
+        "./src/features/Classes/*"
+      ],
+      "@attendance/*": [
+        "./src/features/Attendance/*"
+      ],
+      "@role-selection/*": [
+        "./src/features/RoleSelection/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
 }
