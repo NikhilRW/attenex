@@ -1,13 +1,16 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { socketService } from "@/src/shared/services/socketService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    AppState,
+    Clipboard,
     Dimensions,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -31,7 +34,7 @@ interface AttendanceRecord {
     method: "manual" | "auto" | "oauth";
 }
 
-type FilterType = "all" | "present" | "absent";
+type FilterType = "all" | "present" | "absent" | "incomplete";
 
 const { width } = Dimensions.get("window");
 
@@ -47,6 +50,7 @@ const AttendanceViewScreen = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<FilterType>("all");
     const [searchQuery, setSearchQuery] = useState("");
+    const [showRollSummary, setShowRollSummary] = useState(false);
 
     const fetchAttendance = useCallback(async () => {
         try {
@@ -64,7 +68,62 @@ const AttendanceViewScreen = () => {
 
     useEffect(() => {
         fetchAttendance();
-    }, [fetchAttendance]);
+
+        // Connect to socket and join lecture room for real-time updates
+        socketService.connect();
+        socketService.joinLecture(lectureId);
+
+        // Listen for attendance submission events
+        socketService.onAttendanceSubmitted((data) => {
+            if (data.lectureId === lectureId) {
+                // Refresh attendance list when someone submits
+                fetchAttendance();
+            }
+        });
+
+        // Handle app state changes (background/foreground)
+        const subscription = AppState.addEventListener("change", (nextAppState) => {
+            if (nextAppState === "active") {
+                // App came back to foreground - reconnect socket
+                if (!socketService.isConnected()) {
+                    socketService.connect();
+                    socketService.joinLecture(lectureId);
+                    socketService.onAttendanceSubmitted((data) => {
+                        if (data.lectureId === lectureId) {
+                            fetchAttendance();
+                        }
+                    });
+                }
+            }
+        });
+
+        // Cleanup on unmount
+        return () => {
+            socketService.leaveLecture(lectureId);
+            socketService.offAttendanceSubmitted();
+            subscription.remove();
+        };
+    }, [fetchAttendance, lectureId]);
+
+    // Also use useFocusEffect to ensure connection when screen regains focus
+    useFocusEffect(
+        useCallback(() => {
+            // Reconnect socket when screen is focused
+            if (!socketService.isConnected()) {
+                socketService.connect();
+                socketService.joinLecture(lectureId);
+                socketService.onAttendanceSubmitted((data) => {
+                    if (data.lectureId === lectureId) {
+                        fetchAttendance();
+                    }
+                });
+            }
+
+            return () => {
+                // Don't disconnect on blur, just on unmount
+            };
+        }, [lectureId, fetchAttendance])
+    );
 
     const filteredAttendance = attendance.filter((record) => {
         const matchesFilter =
@@ -72,7 +131,9 @@ const AttendanceViewScreen = () => {
                 ? true
                 : filter === "present"
                     ? record.status === "present"
-                    : record.status === "absent" || record.status === "incomplete";
+                    : filter === "incomplete"
+                        ? record.status === "incomplete"
+                        : record.status === "absent";
 
         const matchesSearch =
             record.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -83,9 +144,8 @@ const AttendanceViewScreen = () => {
     });
 
     const presentCount = attendance.filter((r) => r.status === "present").length;
-    const absentCount = attendance.filter(
-        (r) => r.status === "absent" || r.status === "incomplete"
-    ).length;
+    const incompleteCount = attendance.filter((r) => r.status === "incomplete").length;
+    const absentCount = attendance.filter((r) => r.status === "absent").length;
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -107,6 +167,33 @@ const AttendanceViewScreen = () => {
             .join("")
             .toUpperCase()
             .slice(0, 2);
+    };
+
+    const getPresentRollNumbers = () => {
+        return attendance
+            .filter((r) => r.status === "present")
+            .map((r) => r.studentRollNo)
+            .filter((roll) => roll !== null && roll !== "")
+            .sort((a, b) => {
+                // Sort numerically if possible, otherwise alphabetically
+                const numA = parseInt(a!);
+                const numB = parseInt(b!);
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return numA - numB;
+                }
+                return a!.localeCompare(b!);
+            })
+            .join(", ");
+    };
+
+    const handleCopyRollNumbers = () => {
+        const rollNumbers = getPresentRollNumbers();
+        if (rollNumbers) {
+            Clipboard.setString(rollNumbers);
+            Alert.alert("Copied!", "Roll numbers copied to clipboard");
+        } else {
+            Alert.alert("No Data", "No present students with roll numbers");
+        }
     };
 
     return (
@@ -147,7 +234,19 @@ const AttendanceViewScreen = () => {
                             {lectureTitle}
                         </Text>
                     </View>
-                    <View style={{ width: 40 }} />
+                    <TouchableOpacity
+                        onPress={() => setShowRollSummary(true)}
+                        style={[
+                            styles.summaryButton,
+                            {
+                                backgroundColor: isDark
+                                    ? colors.surface.glass
+                                    : "rgba(0, 0, 0, 0.05)",
+                            },
+                        ]}
+                    >
+                        <Ionicons name="list" size={20} color={colors.primary.main} />
+                    </TouchableOpacity>
                 </View>
 
                 {/* Search Bar */}
@@ -189,7 +288,7 @@ const AttendanceViewScreen = () => {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Stats Cards */}
+                {/* // Stats Cards
                 <Animated.View
                     entering={FadeInDown.delay(100).springify()}
                     style={styles.statsContainer}
@@ -208,6 +307,19 @@ const AttendanceViewScreen = () => {
                     </LinearGradient>
 
                     <LinearGradient
+                        colors={["rgba(251, 191, 36, 0.2)", "rgba(251, 191, 36, 0.05)"]}
+                        style={[styles.statCard, { borderColor: "rgba(251, 191, 36, 0.3)" }]}
+                    >
+                        <View style={[styles.statIconContainer, { backgroundColor: "rgba(251, 191, 36, 0.2)" }]}>
+                            <Ionicons name="time" size={20} color="#FBBF24" />
+                        </View>
+                        <View>
+                            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Incomplete</Text>
+                            <Text style={[styles.statNumber, { color: "#FBBF24" }]}>{incompleteCount}</Text>
+                        </View>
+                    </LinearGradient>
+
+                    <LinearGradient
                         colors={["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.05)"]}
                         style={[styles.statCard, { borderColor: "rgba(239, 68, 68, 0.3)" }]}
                     >
@@ -219,20 +331,20 @@ const AttendanceViewScreen = () => {
                             <Text style={[styles.statNumber, { color: "#F87171" }]}>{absentCount}</Text>
                         </View>
                     </LinearGradient>
-                </Animated.View>
+                </Animated.View> */}
 
                 {/* Filter Tabs */}
                 <Animated.View
                     entering={FadeInDown.delay(200).springify()}
                     style={styles.filterContainer}
                 >
-                    {(["all", "present", "absent"] as FilterType[]).map((f) => (
+                    {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
                         <TouchableOpacity
                             key={f}
                             style={[
                                 styles.filterButton,
                                 filter === f && {
-                                    backgroundColor: f === 'present' ? '#4ADE80' : f === 'absent' ? '#F87171' : colors.primary.main,
+                                    backgroundColor: f === 'present' ? '#4ADE80' : f === 'incomplete' ? '#FBBF24' : f === 'absent' ? '#F87171' : colors.primary.main,
                                 },
                                 filter !== f && {
                                     backgroundColor: isDark
@@ -355,14 +467,17 @@ const AttendanceViewScreen = () => {
                                             </View>
                                         </View>
 
-                                        {/* Score/Status */}
+                                        {/* Roll Number/Status */}
                                         <View style={styles.statusContainer}>
                                             {record.status === 'present' ? (
-                                                <View style={styles.scoreBadge}>
-                                                    <Text style={[styles.scoreText, { color: getStatusColor(record.status) }]}>
-                                                        {record.checkScore}%
+                                                <View style={styles.rollBadge}>
+                                                    <Text style={[styles.rollText, { color: getStatusColor(record.status) }]}>
+                                                        {record.studentRollNo || "N/A"}
                                                     </Text>
-                                                    <Text style={[styles.scoreLabel, { color: colors.text.muted }]}>Score</Text>
+                                                </View>
+                                            ) : record.status === 'incomplete' ? (
+                                                <View style={[styles.absentBadge, { backgroundColor: "rgba(251, 191, 36, 0.1)" }]}>
+                                                    <Text style={[styles.absentText, { color: "#FBBF24" }]}>INC</Text>
                                                 </View>
                                             ) : (
                                                 <View style={[styles.absentBadge, { backgroundColor: "rgba(248, 113, 113, 0.1)" }]}>
@@ -378,6 +493,96 @@ const AttendanceViewScreen = () => {
                 )}
                 <View style={{ height: 40 }} />
             </ScrollView>
+
+            {/* Roll Number Summary Modal */}
+            <Modal
+                visible={showRollSummary}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowRollSummary(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View
+                        style={[
+                            styles.modalContent,
+                            {
+                                backgroundColor: isDark
+                                    ? colors.background.secondary
+                                    : "rgba(255, 255, 255, 0.98)",
+                            },
+                        ]}
+                    >
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
+                                Present Students
+                            </Text>
+                            <TouchableOpacity onPress={() => setShowRollSummary(false)}>
+                                <Ionicons name="close" size={24} color={colors.text.primary} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View
+                            style={[
+                                styles.rollNumberBox,
+                                {
+                                    backgroundColor: isDark
+                                        ? colors.surface.glass
+                                        : "rgba(0, 0, 0, 0.03)",
+                                    borderColor: colors.surface.glassBorder,
+                                },
+                            ]}
+                        >
+                            <Text
+                                style={[
+                                    styles.rollNumberText,
+                                    { color: colors.text.primary },
+                                ]}
+                                selectable
+                            >
+                                {getPresentRollNumbers() || "No present students"}
+                            </Text>
+                        </View>
+
+                        <View style={styles.modalStats}>
+                            <View style={styles.statItem}>
+                                <Text style={[styles.statValue, { color: "#4ADE80" }]}>
+                                    {presentCount}
+                                </Text>
+                                <Text style={[styles.statLabelSmall, { color: colors.text.secondary }]}>
+                                    Present
+                                </Text>
+                            </View>
+                            <View style={styles.statItem}>
+                                <Text style={[styles.statValue, { color: "#FBBF24" }]}>
+                                    {incompleteCount}
+                                </Text>
+                                <Text style={[styles.statLabelSmall, { color: colors.text.secondary }]}>
+                                    Incomplete
+                                </Text>
+                            </View>
+                            <View style={styles.statItem}>
+                                <Text style={[styles.statValue, { color: "#F87171" }]}>
+                                    {absentCount}
+                                </Text>
+                                <Text style={[styles.statLabelSmall, { color: colors.text.secondary }]}>
+                                    Absent
+                                </Text>
+                            </View>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[
+                                styles.copyButton,
+                                { backgroundColor: colors.primary.main },
+                            ]}
+                            onPress={handleCopyRollNumbers}
+                        >
+                            <Ionicons name="copy-outline" size={20} color="white" />
+                            <Text style={styles.copyButtonText}>Copy Roll Numbers</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -402,6 +607,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    summaryButton: {
         width: 40,
         height: 40,
         borderRadius: 12,
@@ -577,17 +789,17 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginLeft: 8,
     },
-    scoreBadge: {
+    rollBadge: {
         alignItems: "center",
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 10,
+        backgroundColor: "rgba(74, 222, 128, 0.1)",
     },
-    scoreText: {
-        fontSize: 18,
+    rollText: {
+        fontSize: 16,
         fontWeight: "800",
-    },
-    scoreLabel: {
-        fontSize: 10,
-        fontWeight: "600",
-        textTransform: "uppercase",
+        letterSpacing: 0.5,
     },
     absentBadge: {
         paddingHorizontal: 10,
@@ -597,6 +809,78 @@ const styles = StyleSheet.create({
     absentText: {
         fontSize: 12,
         fontWeight: "800",
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+    },
+    modalContent: {
+        width: "100%",
+        maxWidth: 500,
+        borderRadius: 24,
+        padding: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: "700",
+    },
+    rollNumberBox: {
+        borderRadius: 16,
+        borderWidth: 1,
+        padding: 20,
+        marginBottom: 20,
+        minHeight: 80,
+    },
+    rollNumberText: {
+        fontSize: 16,
+        lineHeight: 24,
+        fontWeight: "500",
+    },
+    modalStats: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        marginBottom: 20,
+        paddingVertical: 16,
+    },
+    statItem: {
+        alignItems: "center",
+    },
+    statValue: {
+        fontSize: 28,
+        fontWeight: "800",
+        marginBottom: 4,
+    },
+    statLabelSmall: {
+        fontSize: 12,
+        fontWeight: "600",
+        textTransform: "uppercase",
+    },
+    copyButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 14,
+        borderRadius: 12,
+        gap: 8,
+    },
+    copyButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "700",
     },
 });
 export default AttendanceViewScreen;

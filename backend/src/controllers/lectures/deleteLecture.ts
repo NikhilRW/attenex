@@ -1,6 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { attendance, db, lectures } from "../../config/database_setup";
+import {
+  attendance,
+  attendanceAttempts,
+  attendancePings,
+  db,
+  geofenceLogs,
+  lectures,
+} from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 
 interface AuthRequest extends Request {
@@ -63,13 +70,32 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Delete all attendance records for this lecture first (cascade)
+    // Delete all related records first (cascade delete)
+    // This ensures referential integrity is maintained
+    logger.info(`Deleting all related records for lecture: ${lectureId}`);
+
+    // Delete attendance pings
+    await db
+      .delete(attendancePings)
+      .where(eq(attendancePings.lectureId, lectureId));
+
+    // Delete geofence logs
+    await db.delete(geofenceLogs).where(eq(geofenceLogs.lectureId, lectureId));
+
+    // Delete attendance attempts
+    await db
+      .delete(attendanceAttempts)
+      .where(eq(attendanceAttempts.lectureId, lectureId));
+
+    // Delete attendance records
     await db.delete(attendance).where(eq(attendance.lectureId, lectureId));
 
-    // Delete the lecture
+    // Finally, delete the lecture itself
     await db.delete(lectures).where(eq(lectures.id, lectureId));
 
-    logger.info(`Lecture deleted: ${lectureId} by teacher: ${userId}`);
+    logger.info(
+      `Lecture and all related records deleted: ${lectureId} by teacher: ${userId}`
+    );
 
     return res.status(200).json({
       success: true,

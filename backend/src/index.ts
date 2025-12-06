@@ -2,6 +2,8 @@ import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import { logger } from "./utils/logger";
@@ -9,13 +11,17 @@ import { logger } from "./utils/logger";
 /**
  * Attenex Backend Server
  *
- * Express.js server for the Attenex attendance management system.
- * Provides REST API endpoints for user authentication, class management,
- * lecture sessions, and attendance tracking.
+ * Express.js server with Socket.IO for real-time updates in the Attenex attendance management system.
+ * Provides REST API endpoints and WebSocket connections for instant lecture status updates.
  *
  * Authentication Methods:
  * - Traditional: Email/password with bcrypt hashing and JWT tokens
  * - OAuth: Google Sign-In (mobile native) and LinkedIn OAuth (WebView-based)
+ *
+ * Real-time Features:
+ * - Socket.IO for instant lecture status updates
+ * - Room-based messaging (lecture-specific channels)
+ * - Automatic client updates when lectures end
  *
  * Security Features:
  * - CORS enabled for cross-origin requests from React Native app
@@ -26,10 +32,24 @@ import { logger } from "./utils/logger";
  * API Routes:
  * - /api/users: User management (registration, profile updates)
  * - /api/auth: Authentication endpoints (LinkedIn OAuth, Google auth)
+ * - /api/lectures: Lecture management
+ * - /api/attendance: Attendance tracking
  */
 
 // Initialize Express application
 const app = express();
+const httpServer = createServer(app);
+
+// Initialize Socket.IO with CORS
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*", // Configure specific origins in production
+    methods: ["GET", "POST"],
+  },
+});
+
+// Make io accessible to routes
+app.set("io", io);
 
 // Server configuration
 const PORT = process.env.PORT || 5000;
@@ -87,11 +107,40 @@ app.use("/api/attendance", attendanceRoutes);
  */
 
 /**
+ * Socket.IO Connection Handler
+ *
+ * Handles real-time WebSocket connections for instant updates:
+ * - Students and teachers join lecture rooms to receive status updates
+ * - Server emits events for lecture lifecycle (ended, passcode refresh)
+ * - Server emits events for student activity (join, attendance submission)
+ * - Eliminates need for polling, reduces server load
+ */
+io.on("connection", (socket) => {
+  logger.info(`Client connected: ${socket.id}`);
+
+  // Join a lecture room (both students and teachers)
+  socket.on("joinLecture", (lectureId: string) => {
+    socket.join(`lecture-${lectureId}`);
+    logger.info(`Socket ${socket.id} joined lecture-${lectureId}`);
+  });
+
+  // Leave a lecture room
+  socket.on("leaveLecture", (lectureId: string) => {
+    socket.leave(`lecture-${lectureId}`);
+    logger.info(`Socket ${socket.id} left lecture-${lectureId}`);
+  });
+
+  socket.on("disconnect", () => {
+    logger.info(`Client disconnected: ${socket.id}`);
+  });
+});
+
+/**
  * Server Startup
  *
- * Starts the Express server on the configured port.
+ * Starts the HTTP server with Socket.IO support on the configured port.
  * Logs the server URL for development convenience.
  */
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   logger.info(`Server is running on port http://localhost:${PORT}`);
 });

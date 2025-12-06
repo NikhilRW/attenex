@@ -67,7 +67,7 @@ export default function RootLayout() {
 
   const handleDeepLink = async (url: string) => {
     const parsed = Linking.parse(url);
-    console.log("Deep Link Received:", parsed);
+    // console.log("Deep Link Received:", parsed);
 
     // Handle reset-password deep link
     if (parsed.path && parsed.path.includes("reset-password")) {

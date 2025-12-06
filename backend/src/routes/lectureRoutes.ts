@@ -5,7 +5,9 @@ import { deleteLecture } from "../controllers/lectures/deleteLecture";
 import { endLecture } from "../controllers/lectures/endLecture";
 import { fetchLectureAttendance } from "../controllers/lectures/fetchLectureAttendance";
 import { getActiveLectures } from "../controllers/lectures/getActiveLectures";
+import { getAllLectures } from "../controllers/lectures/getAllLectures";
 import { getLectureDetails } from "../controllers/lectures/getLectureDetails";
+import { getPasscode } from "../controllers/lectures/getPasscode";
 import { getStudentLectures } from "../controllers/lectures/getStudentLectures";
 import { getTeacherClasses } from "../controllers/lectures/getTeacherClasses";
 import { updateLecture } from "../controllers/lectures/updateLecture";
@@ -15,10 +17,12 @@ const router = express.Router();
 
 // Lecture Management
 router.post("/create", authenticate, createLecture);
+router.get("/all", authenticate, getAllLectures);
 router.get("/active", authenticate, getActiveLectures);
 router.get("/student/lectures", authenticate, getStudentLectures);
 router.get("/classes", authenticate, getTeacherClasses);
 router.get("/:lectureId/details", authenticate, getLectureDetails);
+router.get("/:lectureId/passcode", authenticate, getPasscode);
 router.put("/:lectureId/end", authenticate, endLecture);
 router.put("/:lectureId/update", authenticate, updateLecture);
 router.delete("/:lectureId", authenticate, deleteLecture);

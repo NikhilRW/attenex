@@ -121,8 +121,6 @@ const RoleSelection = () => {
     }
   }, [selectedRole, router, isUpdating]);
 
-  console.log("insets.bottom", insets.bottom);
-
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}

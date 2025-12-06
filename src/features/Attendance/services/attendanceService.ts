@@ -1,6 +1,5 @@
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const API_URL = `${BASE_URI}/api/attendance`;

@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { classes, db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { generatePasscode } from "../../utils/passcode";
 
 interface AuthRequest extends Request {
   user?: {
@@ -85,6 +86,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     }
 
     // Create the lecture
+    const initialPasscode = generatePasscode();
     const newLectures = await db
       .insert(lectures)
       .values({
@@ -95,6 +97,8 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
         teacherLongitude: longitude.toString(),
         duration: duration.toString(),
         status: "active",
+        passcode: initialPasscode,
+        passcodeUpdatedAt: new Date(),
       })
       .returning();
 

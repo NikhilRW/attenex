@@ -1,7 +1,9 @@
 import { getStudentLectures } from "@/src/features/Classes/services/lectureService";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { authService } from "@/src/shared/services/authService";
+import { socketService } from "@/src/shared/services/socketService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
+import { storage } from "@/src/shared/utils/mmkvStorage";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
@@ -9,6 +11,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    AppState,
     Modal,
     ScrollView,
     StyleSheet,
@@ -23,15 +26,23 @@ import { startBackgroundTracking, stopBackgroundTracking } from "../services/bac
 const StudentDashboard = () => {
     const { colors, mode } = useTheme();
     const isDark = mode === "dark";
-    const { user } = useAuthStore();
+    const { user, updateUser } = useAuthStore();
     const [lectures, setLectures] = useState<any[]>([]);
     const [joinedLecture, setJoinedLecture] = useState<any | null>(null);
+    const [lectureStatus, setLectureStatus] = useState<"active" | "ended">("active");
     const [passcode, setPasscode] = useState("");
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<"idle" | "joined" | "submitting">("idle");
     const [showClassModal, setShowClassModal] = useState(false);
-    const [className, setClassName] = useState("");
+    const [className, setClassName] = useState(storage.getString("userClassName") || "");
     const [classUpdateLoading, setClassUpdateLoading] = useState(false);
+
+    // Save className to storage whenever it changes
+    useEffect(() => {
+        if (className) {
+            storage.set("userClassName", className);
+        }
+    }, [className]);
     const [showRollNoModal, setShowRollNoModal] = useState(false);
     const [rollNo, setRollNo] = useState("");
     const [pendingLecture, setPendingLecture] = useState<any | null>(null);
@@ -51,6 +62,69 @@ const StudentDashboard = () => {
         fetchLectures();
     }, [fetchLectures]);
 
+    // Connect to socket on mount
+    useEffect(() => {
+        socketService.connect();
+
+        // Handle app state changes (background/foreground)
+        const subscription = AppState.addEventListener("change", (nextAppState) => {
+            if (nextAppState === "active") {
+                // App came back to foreground - reconnect socket
+                if (!socketService.isConnected()) {
+                    socketService.connect();
+                }
+            }
+        });
+
+        return () => {
+            socketService.disconnect();
+            subscription.remove();
+        };
+    }, []);
+
+    // Listen for lecture ended events globally
+    useEffect(() => {
+        const handleLectureEnded = (data: { lectureId: string; status: string; endedAt: string }) => {
+            console.log("Lecture ended event received:", data);
+
+            // Update lecture status if it matches current joined lecture
+            if (joinedLecture && data.lectureId === joinedLecture.id) {
+                console.log("Updating lecture status to ended");
+                setLectureStatus("ended");
+
+                // Show alert to notify student
+                setTimeout(() => {
+                    Alert.alert(
+                        "Lecture Ended",
+                        "The teacher has ended the lecture. Please verify your attendance now with the passcode.",
+                        [{ text: "OK" }]
+                    );
+                }, 100);
+            }
+        };
+
+        socketService.onLectureEnded(handleLectureEnded);
+
+        return () => {
+            socketService.offLectureEnded();
+        };
+    }, [joinedLecture]);
+
+    // Join/leave lecture room when joinedLecture changes
+    useEffect(() => {
+        if (joinedLecture) {
+            socketService.joinLecture(joinedLecture.id);
+            console.log(`Joined socket room for lecture: ${joinedLecture.id}`);
+        }
+
+        return () => {
+            if (joinedLecture) {
+                socketService.leaveLecture(joinedLecture.id);
+                console.log(`Left socket room for lecture: ${joinedLecture.id}`);
+            }
+        };
+    }, [joinedLecture]);
+
     const handleUpdateClass = async () => {
         if (!className.trim()) {
             Alert.alert("Error", "Please enter a class name");
@@ -61,9 +135,10 @@ const StudentDashboard = () => {
         try {
             const response = await authService.updateStudentClass(className.trim());
             if (response.success) {
+                // Save to storage for persistence
+                storage.set("userClassName", className.trim());
                 Alert.alert("Success", "Class updated successfully!");
                 setShowClassModal(false);
-                setClassName("");
             }
         } catch (error: any) {
             Alert.alert("Error", error.message || "Failed to update class");
@@ -93,7 +168,7 @@ const StudentDashboard = () => {
                 return;
             }
 
-            let location = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.Highest});
+            let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
 
             const res = await joinLecture(
                 lecture.id,
@@ -103,9 +178,15 @@ const StudentDashboard = () => {
             );
 
             if (res.success) {
+                // Update user in auth store with roll number if returned
+                if (res.user && res.user.rollNo) {
+                    updateUser({ rollNo: res.user.rollNo as string});
+                }
+
                 setJoinedLecture(lecture);
+                setLectureStatus("active");
                 setStatus("joined");
-                Alert.alert("Joined!", "Class in progress. You can lock your phone now.");
+                Alert.alert("Joined!", "Location tracking started. Wait for class to end, then verify attendance.");
                 // Start Background Task
                 await startBackgroundTracking(lecture.id);
             }
@@ -139,7 +220,7 @@ const StudentDashboard = () => {
 
         setLoading(true);
         try {
-            let location = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});
+            let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
 
             const res = await submitAttendance(
                 joinedLecture.id,
@@ -150,6 +231,12 @@ const StudentDashboard = () => {
 
             if (res.success) {
                 Alert.alert("Success", "Attendance Marked Present! ✅");
+
+                // Cleanup socket connection
+                if (joinedLecture) {
+                    socketService.leaveLecture(joinedLecture.id);
+                }
+
                 setJoinedLecture(null);
                 setStatus("idle");
                 setPasscode("");
@@ -163,28 +250,119 @@ const StudentDashboard = () => {
         }
     };
 
-    if (status === "joined") {
+    const handleLeaveLecture = async () => {
+        Alert.alert(
+            "Leave Lecture",
+            "Are you sure you want to leave this lecture? Your attendance will not be recorded.",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Leave",
+                    style: "destructive",
+                    onPress: async () => {
+                        await stopBackgroundTracking();
+
+                        // Leave socket room
+                        if (joinedLecture) {
+                            socketService.leaveLecture(joinedLecture.id);
+                        }
+
+                        setJoinedLecture(null);
+                        setStatus("idle");
+                        setLectureStatus("active");
+                        fetchLectures();
+                    },
+                },
+            ]
+        );
+    };
+
+    // If joined and lecture is still active - show ongoing status
+    if (status === "joined" && lectureStatus === "active") {
         return (
             <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-                <LinearGradient
-                    colors={isDark ? ["rgba(20, 20, 20, 0.8)", "rgba(40, 40, 40, 0.8)"] : ["rgba(255, 255, 255, 0.8)", "rgba(240, 240, 255, 0.8)"]}
-                    style={styles.joinedContainer}
-                >
+                <View style={[styles.joinedContainer, {
+                    backgroundColor: colors.surface.cardBg,
+                    borderColor: colors.surface.glassBorder,
+                    borderWidth: 1,
+                }]}>
                     <View style={styles.guardianIconOuter}>
                         <LinearGradient
                             colors={[colors.accent.green, "#4CAF50"]}
                             style={styles.guardianIconInner}
                         >
-                            <Ionicons name="shield-checkmark" size={48} color="white" />
+                            <Ionicons
+                                name="school"
+                                size={48}
+                                color="white"
+                            />
                         </LinearGradient>
                     </View>
 
                     <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
-                        Silent Guardian Active
+                        Lecture Ongoing
                     </Text>
                     <Text style={[styles.guardianSubtitle, { color: colors.text.secondary }]}>
-                        You are currently attending {joinedLecture?.title}.{"\n"}
-                        Do not force quit the app.
+                        Attending: {joinedLecture?.title}{'\n'}Location tracking is active
+                    </Text>
+
+                    <View style={styles.ongoingInfo}>
+                        <View style={styles.trackingBadge}>
+                            <View style={[styles.pulseDot, { backgroundColor: colors.accent.green }]} />
+                            <Text style={[styles.trackingBadgeText, { color: colors.text.primary }]}>
+                                Tracking Active
+                            </Text>
+                        </View>
+
+                        <Text style={[styles.waitText, { color: colors.text.secondary }]}>
+                            Wait for your teacher to end the class
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={handleLeaveLecture}
+                        style={styles.leaveButtonWrapper}
+                    >
+                        <LinearGradient
+                            colors={["#EF4444", "#DC2626"]}
+                            style={styles.leaveButton}
+                        >
+                            <Ionicons name="exit-outline" size={20} color="white" />
+                            <Text style={styles.leaveButtonText}>Leave Lecture</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
+
+    // If joined and lecture ended - show verify button
+    if (status === "joined" && lectureStatus === "ended") {
+        return (
+            <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+                <View style={[styles.joinedContainer, {
+                    backgroundColor: colors.surface.cardBg,
+                    borderColor: colors.surface.glassBorder,
+                    borderWidth: 1,
+                }]}>
+                    <View style={styles.guardianIconOuter}>
+                        <LinearGradient
+                            colors={[colors.primary.main, "#3B82F6"]}
+                            style={styles.guardianIconInner}
+                        >
+                            <Ionicons
+                                name="checkmark-done-circle"
+                                size={48}
+                                color="white"
+                            />
+                        </LinearGradient>
+                    </View>
+
+                    <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
+                        Lecture Ended
+                    </Text>
+                    <Text style={[styles.guardianSubtitle, { color: colors.text.secondary }]}>
+                        Class finished! Verify your attendance now{'\n'}using the passcode from your teacher.
                     </Text>
 
                     <View
@@ -199,7 +377,7 @@ const StudentDashboard = () => {
                         ]}
                     >
                         <Text style={[styles.passcodeLabel, { color: colors.text.secondary }]}>
-                            End of Class?
+                            Enter Passcode to Verify
                         </Text>
                         <TextInput
                             style={[
@@ -224,18 +402,18 @@ const StudentDashboard = () => {
                             disabled={loading}
                         >
                             <LinearGradient
-                                colors={[colors.accent.green, "#43A047"]}
+                                colors={[colors.primary.main, "#3B82F6"]}
                                 style={styles.submitButton}
                             >
                                 {loading ? (
                                     <ActivityIndicator color="white" />
                                 ) : (
-                                    <Text style={styles.submitButtonText}>Submit Attendance</Text>
+                                    <Text style={styles.submitButtonText}>Verify Attendance</Text>
                                 )}
                             </LinearGradient>
                         </TouchableOpacity>
                     </View>
-                </LinearGradient>
+                </View>
             </View>
         );
     }
@@ -328,29 +506,46 @@ const StudentDashboard = () => {
                 </View>
             ) : (
                 lectures.map((lecture) => (
+                    
                     <LinearGradient
                         key={lecture.id}
-                        colors={isDark ? ["rgba(30, 30, 30, 0.9)", "rgba(20, 20, 20, 0.95)"] : ["rgba(255, 255, 255, 0.95)", "rgba(245, 247, 250, 0.95)"]}
+                        colors={isDark
+                              ? ["rgba(8, 145, 178, 0.15)", "rgba(8, 145, 178, 0.3)"]
+                            : ["rgba(8, 145, 178, 0.1)", "rgba(8, 145, 178, 0.3)"]}
                         style={[
                             styles.lectureCard,
                             {
                                 borderColor: colors.surface.glassBorder,
+                                borderWidth: 1,
+                                backdropFilter: "blur(10px)",
                             },
                         ]}
                     >
                         <View style={styles.lectureCardHeader}>
-                            <View style={styles.lectureInfo}>
-                                <Text style={[styles.lectureCardTitle, { color: colors.text.primary }]}>
-                                    {lecture.title}
-                                </Text>
-                                <Text style={[styles.lectureClassName, { color: colors.text.secondary }]}>
-                                    {lecture.className}
-                                </Text>
+                            <View style={styles.headerLeftContent}>
+                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255 255 255 / 0.42)' : 'rgba(0,0,0,0.04)' }]}>
+                                    <Ionicons name="easel" size={22} color={colors.primary.main} />
+                                </View>
+                                <View style={styles.lectureInfo}>
+                                    <Text style={[styles.lectureCardTitle, { color: colors.text.primary }]} numberOfLines={1}>
+                                        {lecture.title}
+                                    </Text>
+                                    <View style={styles.lectureMetaRow}>
+                                        <Ionicons name="school-outline" size={12} color={colors.text.secondary} style={{ marginRight: 4 }} />
+                                        <Text style={[styles.lectureClassName, { color: colors.text.secondary }]}>
+                                            {lecture.className}
+                                        </Text>
+                                    </View>
+                                </View>
                             </View>
                             <View
                                 style={[
                                     styles.liveBadge,
-                                    { backgroundColor: "rgba(76, 175, 80, 0.15)" },
+                                    {
+                                        backgroundColor: isDark ? "rgba(76, 175, 80, 0.2)" : "rgba(76, 175, 80, 0.1)",
+                                        borderColor: "rgba(76, 175, 80, 0.3)",
+                                        borderWidth: 1
+                                    },
                                 ]}
                             >
                                 <View style={[styles.liveDot, { backgroundColor: colors.accent.green }]} />
@@ -360,21 +555,26 @@ const StudentDashboard = () => {
                             </View>
                         </View>
 
+                        <View style={[styles.divider, { backgroundColor: colors.surface.glassBorder }]} />
+
                         <TouchableOpacity
                             onPress={() => handleJoin(lecture)}
                             disabled={loading}
+                            activeOpacity={0.8}
                         >
                             <LinearGradient
-                                colors={[colors.primary.main, "#4c669f"]}
+                                colors={[colors.primary.main, "#3B82F6"]}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
                                 style={styles.joinButton}
                             >
-                                <Text style={styles.joinButtonText}>Join Class</Text>
+                                <Text style={styles.joinButtonText}>Join Class Now</Text>
                                 {loading ? (
                                     <ActivityIndicator size="small" color="white" style={styles.joinButtonLoader} />
                                 ) : (
-                                    <Ionicons name="arrow-forward" size={20} color="white" style={styles.joinButtonIcon} />
+                                    <View style={styles.joinIconContainer}>
+                                        <Ionicons name="arrow-forward" size={18} color="white" />
+                                    </View>
                                 )}
                             </LinearGradient>
                         </TouchableOpacity>
@@ -694,28 +894,46 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.15,
         shadowRadius: 12,
-        elevation: 8,
+        // elevation: 8,
     },
     lectureCardHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "flex-start",
-        marginBottom: 20,
+        marginBottom: 16,
     },
-    lectureInfo: {
+    headerLeftContent: {
+        flexDirection: 'row',
         flex: 1,
         marginRight: 12,
     },
+    iconContainer: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: 12,
+    },
+    lectureInfo: {
+        flex: 1,
+        justifyContent: 'center',
+    },
     lectureCardTitle: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: "700",
         marginBottom: 4,
-        letterSpacing: -0.5,
+        letterSpacing: -0.3,
+        lineHeight: 24,
+    },
+    lectureMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     lectureClassName: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "500",
-        opacity: 0.8,
+        opacity: 0.7,
     },
     liveBadge: {
         flexDirection: "row",
@@ -735,6 +953,12 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         letterSpacing: 0.5,
     },
+    divider: {
+        height: 1,
+        width: '100%',
+        marginBottom: 16,
+        opacity: 0.5,
+    },
     joinButton: {
         flexDirection: "row",
         alignItems: "center",
@@ -753,6 +977,12 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         marginRight: 8,
     },
+    joinIconContainer: {
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 12,
+        padding: 4,
+        marginLeft: 8,
+    },
     joinButtonIcon: {
         marginLeft: 4,
     },
@@ -765,6 +995,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
+        margin: 20,
+        borderRadius: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8,
     },
     guardianIconOuter: {
         marginBottom: 32,
@@ -806,7 +1043,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
-        elevation: 5,
     },
     passcodeLabel: {
         fontSize: 14,
@@ -839,6 +1075,57 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     submitButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "700",
+    },
+    ongoingInfo: {
+        width: "100%",
+        alignItems: "center",
+        marginBottom: 32,
+        gap: 16,
+    },
+    trackingBadge: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 20,
+        backgroundColor: "rgba(76, 175, 80, 0.15)",
+        gap: 8,
+    },
+    pulseDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+    },
+    trackingBadgeText: {
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    waitText: {
+        fontSize: 14,
+        textAlign: "center",
+        opacity: 0.7,
+    },
+    leaveButtonWrapper: {
+        width: "100%",
+        marginTop: 16,
+    },
+    leaveButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 16,
+        borderRadius: 16,
+        gap: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    leaveButtonText: {
         color: "white",
         fontSize: 16,
         fontWeight: "700",
@@ -907,6 +1194,16 @@ const styles = StyleSheet.create({
     modalButtonText: {
         fontSize: 16,
         fontWeight: "600",
+    },
+    trackingIndicator: {
+        marginTop: 24,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+    },
+    trackingText: {
+        fontSize: 14,
+        fontStyle: "italic",
     },
 });
 

@@ -1,6 +1,6 @@
 import { User } from "@/backend/src/config/database_setup";
+import { mmkvStorage } from "@/src/shared/utils/mmkvStorage";
 import { secureStore } from "@/src/shared/utils/secureStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -11,7 +11,7 @@ interface AuthState {
   isLoading: boolean;
   setAuth: (user: User, token: string, isSignUp?: boolean) => void;
 
-  updateUser: (user: User) => void;
+  updateUser: (user: Partial<User>) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -57,8 +57,8 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => AsyncStorage),
-      // Persist only non-sensitive fields. We keep token out of AsyncStorage and store it in secure storage
+      storage: createJSONStorage(() => mmkvStorage),
+      // Persist only non-sensitive fields. We keep token out of MMKV and store it in secure storage
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

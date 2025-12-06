@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "@/src/shared/utils/mmkvStorage";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { sendPing } from "./attendanceService";
@@ -17,7 +17,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     if (location) {
       try {
         // Retrieve current lecture ID from storage
-        const lectureId = await AsyncStorage.getItem("currentLectureId");
+        const lectureId = storage.getString("currentLectureId");
 
         if (lectureId) {
           console.log("Sending background ping for lecture:", lectureId);
@@ -36,13 +36,13 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 export const startBackgroundTracking = async (lectureId: string) => {
   try {
-    await AsyncStorage.setItem("currentLectureId", lectureId);
+    storage.set("currentLectureId", lectureId);
 
     const { status } = await Location.requestBackgroundPermissionsAsync();
     if (status === "granted") {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.Highest,
-        timeInterval: 10 * 60 * 1000, // Check every 10 minutes
+        timeInterval: 3 * 60 * 1000, // Check every 3 minutes
         distanceInterval: 1,
         foregroundService: {
           notificationTitle: "Attendance Active",
@@ -50,7 +50,6 @@ export const startBackgroundTracking = async (lectureId: string) => {
           notificationColor: "#4CAF50",
         },
         pausesUpdatesAutomatically: false,
-        
       });
       console.log("Background tracking started");
     }
@@ -65,7 +64,7 @@ export const stopBackgroundTracking = async () => {
       await TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
     if (isRegistered) {
       await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-      await AsyncStorage.removeItem("currentLectureId");
+      storage.remove("currentLectureId");
       console.log("Background tracking stopped");
     }
   } catch (error) {

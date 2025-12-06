@@ -17,7 +17,7 @@ import { useTheme } from "../hooks/useTheme";
 import { useAuthStore } from "../stores/authStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const BUTTON_WIDTH = 80;
+const BUTTON_WIDTH = 40;
 
 const CustomTabBar = ({
   state: { index, routeNames },
@@ -36,7 +36,7 @@ const CustomTabBar = ({
     };
   });
 
-  
+
   return (
     <Animated.View
       style={[
@@ -162,13 +162,15 @@ export const getIconForRoute = (
 ) => {
   const color = activated ? colors.primary.main : colors.text.secondary;
   if (routeName.includes("attendance")) {
-    return <FontAwesome6 name="calendar" size={25} color={color} />;
+    return <FontAwesome6 name="calendar" size={15} color={color} />;
   } else if (routeName.includes("classes")) {
-    return <Entypo name="blackboard" size={25} color={color} />;
+    return <Entypo name="blackboard" size={15} color={color} />;
   } else if (routeName.includes("role-selection")) {
-    return <Ionicons name="people" size={25} color={color} />;
+    return <Ionicons name="people" size={15} color={color} />;
+  } else if (routeName.includes("settings")) {
+    return <Ionicons name="settings-outline" size={15} color={color} />;
   } else if (routeName.includes("create-class")) {
-    return <Ionicons name="school" size={25} color={color} />;
+    return <Ionicons name="school" size={15} color={color} />;
   }
 };
 

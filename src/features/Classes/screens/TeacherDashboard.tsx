@@ -1,5 +1,6 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { socketService } from "@/src/shared/services/socketService";
 import { Ionicons } from "@expo/vector-icons";
 import { Canvas, Path, Skia } from "@shopify/react-native-skia";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7,6 +8,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
+  AppState,
   Dimensions,
   Modal,
   ScrollView,
@@ -18,8 +20,7 @@ import {
 } from "react-native";
 import {
   Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
+  GestureHandlerRootView
 } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -35,7 +36,7 @@ import { scheduleOnRN } from "react-native-worklets";
 import {
   deleteLecture,
   endLecture,
-  getActiveLectures,
+  getAllLectures,
   getLectureDetails,
   updateLecture,
 } from "../services/lectureService";
@@ -57,9 +58,8 @@ circlePath.addCircle(30, 30, 25);
 
 const TeacherDashboard = () => {
   const router = useRouter();
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
-  const [activeLectures, setActiveLectures] = useState<LectureWithCount[]>([]);
+  const { colors, isDark } = useTheme();
+  const [lectures, setLectures] = useState<LectureWithCount[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
@@ -76,44 +76,32 @@ const TeacherDashboard = () => {
   const context = useSharedValue({ x: 0, y: 0 });
   const animatedTranslateY = useSharedValue(0);
 
-  const fetchLectureDetails = useCallback(async () => {
-    try {
-      const updatedLectures = await Promise.all(
-        activeLectures.map(async (lecture) => {
-          try {
-            const res = await getLectureDetails(lecture.id);
-            return { ...lecture, studentCount: res.data.studentCount || 0 };
-          } catch {
-            return lecture;
-          }
-        })
-      );
-      setActiveLectures(updatedLectures);
-    } catch (error) {
-      console.log("Error fetching lecture details", error);
-    }
-  }, [activeLectures]);
-
   const fetchActiveLectures = useCallback(async () => {
     try {
       setRefreshing(true);
-      const res = await getActiveLectures();
+      const res = await getAllLectures();
       if (res.success) {
-        const lectures = res.data.map((lec: any) => ({
-          ...lec,
-          courseName: lec.className,
-          studentCount: 0,
-        }));
+        const lecturesWithCount = await Promise.all(
+          res.data.map(async (lec: any) => {
+            try {
+              const detailsRes = await getLectureDetails(lec.id);
+              return {
+                ...lec,
+                courseName: lec.className,
+                studentCount: detailsRes.data.studentCount || 0,
+              };
+            } catch {
+              return {
+                ...lec,
+                courseName: lec.className,
+                studentCount: 0,
+              };
+            }
+          })
+        );
 
-        const sortedLectures = lectures.sort((a: any, b: any) => {
-          if (a.status === "active" && b.status !== "active") return -1;
-          if (a.status !== "active" && b.status === "active") return 1;
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        });
-
-        setActiveLectures(sortedLectures);
+        // Already sorted by most recent first from backend (desc order)
+        setLectures(lecturesWithCount);
       }
     } catch (error) {
       console.log("Error fetching lectures", error);
@@ -128,21 +116,59 @@ const TeacherDashboard = () => {
     }, [fetchActiveLectures])
   );
 
-  useEffect(() => {
-    if (activeLectures.length > 0) {
-      fetchLectureDetails();
-    }
-  }, [activeLectures.length]);
+  // Removed the separate fetchLectureDetails useEffect since it's now integrated into fetchActiveLectures
 
+  // Setup socket listeners for real-time updates
   useEffect(() => {
-    if (activeLectures.length === 0) return;
-    const interval = setInterval(() => {
-      fetchLectureDetails();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeLectures.length, fetchLectureDetails]);
+    if (lectures.length === 0) return;
 
-  const handleEndLecture = async (id: string) => {
+    // Connect to socket
+    socketService.connect();
+
+    // Join all lecture rooms
+    lectures.forEach((lecture) => {
+      socketService.joinLecture(lecture.id);
+    });
+
+    // Handle app state changes (background/foreground)
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        // App came back to foreground - reconnect socket
+        if (!socketService.isConnected()) {
+          socketService.connect();
+          lectures.forEach((lecture) => {
+            socketService.joinLecture(lecture.id);
+          });
+        }
+      }
+    });
+
+    // Listen for student join events
+    socketService.onStudentJoined((data) => {
+      console.log("Student joined event:", data);
+      // Refresh lecture list to update student count
+      fetchActiveLectures();
+    });
+
+    // Listen for attendance submission events
+    socketService.onAttendanceSubmitted((data) => {
+      console.log("Attendance submitted event:", data);
+      // Refresh lecture list to update student count
+      fetchActiveLectures();
+    });
+
+    // Cleanup
+    return () => {
+      lectures.forEach((lecture) => {
+        socketService.leaveLecture(lecture.id);
+      });
+      socketService.offStudentJoined();
+      socketService.offAttendanceSubmitted();
+      subscription.remove();
+    };
+  }, [lectures]);
+
+  const handleEndLecture = async (id: string, lectureTitle: string) => {
     Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -153,6 +179,14 @@ const TeacherDashboard = () => {
             const res = await endLecture(id);
             if (res.success) {
               fetchActiveLectures();
+              // Navigate to lecture ended screen
+              router.push({
+                pathname: "/(main)/classes/lecture-ended",
+                params: {
+                  lectureId: id,
+                  lectureTitle: lectureTitle,
+                },
+              });
             }
           } catch (error: any) {
             Alert.alert("Error", error.message || "Failed to end lecture");
@@ -250,15 +284,15 @@ const TeacherDashboard = () => {
   };
 
   // Filter logic
-  const filteredLectures = activeLectures.filter(
+  const filteredLectures = lectures.filter(
     (l) =>
       l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Stats
-  const totalActive = activeLectures.filter((l) => l.status === "active").length;
-  const totalStudents = activeLectures.reduce(
+  const totalActive = lectures.filter((l) => l.status === "active").length;
+  const totalStudents = lectures.reduce(
     (acc, curr) => acc + curr.studentCount,
     0
   );
@@ -275,7 +309,12 @@ const TeacherDashboard = () => {
         const translateY = dy * damping;
         if (translateY < 150) {
           animatedTranslateY.value = translateY;
-          pullProgress.value = interpolate(translateY, [0, 100], [0, 1], Extrapolation.CLAMP);
+          pullProgress.value = interpolate(
+            translateY,
+            [0, 100],
+            [0, 1],
+            Extrapolation.CLAMP
+          );
         }
       }
     })
@@ -295,262 +334,524 @@ const TeacherDashboard = () => {
     opacity: pullProgress.value,
     transform: [
       { scale: interpolate(pullProgress.value, [0, 1], [0.8, 1.2]) },
-      { translateY: interpolate(pullProgress.value, [0, 1], [0, -70],Extrapolation.CLAMP) },
+      {
+        translateY: interpolate(
+          pullProgress.value,
+          [0, 1],
+          [0, -70],
+          Extrapolation.CLAMP
+        ),
+      },
     ],
   }));
 
   return (
     <View style={styles.container}>
-      {/* <FuturisticBackground /> */}
+      <FuturisticBackground />
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GestureDetector gesture={swipeGesture}>
-          <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}>
-
-            {/* Pull Indicator */}
-            <Animated.View style={[styles.pullIndicator, pullIndicatorStyle]}>
-              <View style={{ width: 60, height: 60, justifyContent: "center", alignItems: "center" }}>
-                <Canvas style={{ position: "absolute", width: 60, height: 60 }}>
-                  <Path
-                    path={circlePath}
-                    color={isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
-                    style="stroke"
-                    strokeWidth={4}
-                  />
-                  <Path
-                    path={circlePath}
-                    color={colors.primary.main}
-                    style="stroke"
-                    strokeWidth={4}
-                    start={0}
-                    end={pullProgress}
-                    strokeCap="round"
-                  />
-                </Canvas>
-                <View style={{
+        {/* <GestureDetector gesture={swipeGesture}> */}
+        <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}>
+          {/* Pull Indicator */}
+          <Animated.View style={[styles.pullIndicator, pullIndicatorStyle]}>
+            <View
+              style={{
+                width: 60,
+                height: 60,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Canvas style={{ position: "absolute", width: 60, height: 60 }}>
+                <Path
+                  path={circlePath}
+                  color={
+                    isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
+                  }
+                  style="stroke"
+                  strokeWidth={4}
+                />
+                <Path
+                  path={circlePath}
+                  color={colors.primary.main}
+                  style="stroke"
+                  strokeWidth={4}
+                  start={0}
+                  end={pullProgress}
+                  strokeCap="round"
+                />
+              </Canvas>
+              <View
+                style={{
                   width: 40,
                   height: 40,
-                  borderRadius: 20,
-                  backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+                  borderRadius: 40,
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(255,255,255,0.8)",
                   justifyContent: "center",
                   alignItems: "center",
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
                   shadowRadius: 4,
-                  elevation: 2
-                }}>
-                  <Ionicons name="add" size={24} color={colors.primary.main} />
-                </View>
+                }}
+              >
+                <Ionicons name="add" size={24} color={colors.primary.main} />
               </View>
-              {/* <Text style={[styles.pullText, { color: colors.text.secondary, marginTop: 8 }]}>
+            </View>
+            {/* <Text style={[styles.pullText, { color: colors.text.secondary, marginTop: 8 }]}>
                 Create New Lecture
               </Text> */}
-            </Animated.View>
+          </Animated.View>
 
-            <ScrollView
-              style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-              onScroll={(e) => {
-                scrollY.value = e.nativeEvent.contentOffset.y;
-              }}
-              scrollEventThrottle={16}
-            >
-              {/* Header Section */}
-              <Animated.View entering={FadeInDown.delay(100).springify()}>
-                <View style={styles.header}>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            onScroll={(e) => {
+              scrollY.value = e.nativeEvent.contentOffset.y;
+            }}
+            scrollEventThrottle={16}
+          >
+            {/* Header Section */}
+            <Animated.View entering={FadeInDown.delay(100).springify()}>
+              <View style={styles.header}>
+                <View>
+                  <Text
+                    style={[
+                      styles.headerTitle,
+                      { color: colors.text.primary },
+                    ]}
+                  >
+                    Dashboard
+                  </Text>
+                  <Text
+                    style={[
+                      styles.headerSubtitle,
+                      { color: colors.text.secondary },
+                    ]}
+                  >
+                    Overview & Management
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={navigateToCreate}
+                  style={[
+                    styles.addButton,
+                    { backgroundColor: colors.primary.main },
+                  ]}
+                >
+                  <Ionicons name="add" size={24} color="white" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Stats Cards */}
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                style={styles.statsScroll}
+                contentContainerStyle={styles.statsContent}
+              >
+                <LinearGradient
+                  colors={
+                    isDark
+                      ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"]
+                      : [
+                        "rgba(59, 130, 246, 0.1)",
+                        "rgba(59, 130, 246, 0.05)",
+                      ]
+                  }
+                  style={[
+                    styles.statsCard,
+                    { borderColor: "rgba(59, 130, 246, 0.3)" },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.statsIcon,
+                      { backgroundColor: "rgba(59, 130, 246, 0.2)" },
+                    ]}
+                  >
+                    <Ionicons name="radio" size={20} color="#60A5FA" />
+                  </View>
                   <View>
-                    <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-                      Dashboard
+                    <Text
+                      style={[
+                        styles.statsValue,
+                        { color: colors.text.primary },
+                      ]}
+                    >
+                      {totalActive}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
-                      Overview & Management
+                    <Text
+                      style={[
+                        styles.statsLabel,
+                        { color: colors.text.secondary },
+                      ]}
+                    >
+                      Active Now
                     </Text>
                   </View>
-                  <TouchableOpacity
-                    onPress={navigateToCreate}
-                    style={[styles.addButton, { backgroundColor: colors.primary.main }]}
-                  >
-                    <Ionicons name="add" size={24} color="white" />
-                  </TouchableOpacity>
-                </View>
+                </LinearGradient>
 
-                {/* Stats Cards */}
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  style={styles.statsScroll}
-                  contentContainerStyle={styles.statsContent}
+                <LinearGradient
+                  colors={
+                    isDark
+                      ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"]
+                      : [
+                        "rgba(16, 185, 129, 0.1)",
+                        "rgba(16, 185, 129, 0.05)",
+                      ]
+                  }
+                  style={[
+                    styles.statsCard,
+                    { borderColor: "rgba(16, 185, 129, 0.3)" },
+                  ]}
                 >
-                  <LinearGradient
-                    colors={isDark ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"] : ["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"]}
-                    style={[styles.statsCard, { borderColor: "rgba(59, 130, 246, 0.3)" }]}
+                  <View
+                    style={[
+                      styles.statsIcon,
+                      { backgroundColor: "rgba(16, 185, 129, 0.2)" },
+                    ]}
                   >
-                    <View style={[styles.statsIcon, { backgroundColor: "rgba(59, 130, 246, 0.2)" }]}>
-                      <Ionicons name="radio" size={20} color="#60A5FA" />
-                    </View>
-                    <View>
-                      <Text style={[styles.statsValue, { color: colors.text.primary }]}>{totalActive}</Text>
-                      <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>Active Now</Text>
-                    </View>
-                  </LinearGradient>
-
-                  <LinearGradient
-                    colors={isDark ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"] : ["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"]}
-                    style={[styles.statsCard, { borderColor: "rgba(16, 185, 129, 0.3)" }]}
-                  >
-                    <View style={[styles.statsIcon, { backgroundColor: "rgba(16, 185, 129, 0.2)" }]}>
-                      <Ionicons name="people" size={20} color="#34D399" />
-                    </View>
-                    <View>
-                      <Text style={[styles.statsValue, { color: colors.text.primary }]}>{totalStudents}</Text>
-                      <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>Total Students</Text>
-                    </View>
-                  </LinearGradient>
-
-                  <LinearGradient
-                    colors={isDark ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"] : ["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"]}
-                    style={[styles.statsCard, { borderColor: "rgba(245, 158, 11, 0.3)" }]}
-                  >
-                    <View style={[styles.statsIcon, { backgroundColor: "rgba(245, 158, 11, 0.2)" }]}>
-                      <Ionicons name="library" size={20} color="#FBBF24" />
-                    </View>
-                    <View>
-                      <Text style={[styles.statsValue, { color: colors.text.primary }]}>{activeLectures.length}</Text>
-                      <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>Total Lectures</Text>
-                    </View>
-                  </LinearGradient>
-                </ScrollView>
-              </Animated.View>
-
-              {/* Search Bar */}
-              <Animated.View
-                entering={FadeInDown.delay(200).springify()}
-                style={[styles.searchContainer, { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)", borderColor: colors.surface.glassBorder }]}
-              >
-                <Ionicons name="search" size={20} color={colors.text.muted} />
-                <TextInput
-                  style={[styles.searchInput, { color: colors.text.primary }]}
-                  placeholder="Search lectures..."
-                  placeholderTextColor={colors.text.muted}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={() => setSearchQuery("")}>
-                    <Ionicons name="close-circle" size={20} color={colors.text.muted} />
-                  </TouchableOpacity>
-                )}
-              </Animated.View>
-
-              {/* Lectures List */}
-              <View style={styles.listContainer}>
-                <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-                  {searchQuery ? "Search Results" : "Recent Lectures"}
-                </Text>
-
-                {filteredLectures.length === 0 ? (
-                  <Animated.View entering={FadeInUp.springify()} style={styles.emptyState}>
-                    <Ionicons name="search-outline" size={48} color={colors.text.muted} style={{ opacity: 0.5 }} />
-                    <Text style={[styles.emptyText, { color: colors.text.muted }]}>
-                      {searchQuery ? "No lectures found" : "No lectures yet"}
-                    </Text>
-                    {!searchQuery && (
-                      <Text style={[styles.emptySubText, { color: colors.text.muted }]}>
-                        Pull down to create one
-                      </Text>
-                    )}
-                  </Animated.View>
-                ) : (
-                  filteredLectures.map((lecture, index) => (
-                    <Animated.View
-                      key={lecture.id}
-                      entering={FadeInDown.delay(300 + index * 100).springify()}
-                      layout={Layout.springify()}
+                    <Ionicons name="people" size={20} color="#34D399" />
+                  </View>
+                  <View>
+                    <Text
+                      style={[
+                        styles.statsValue,
+                        { color: colors.text.primary },
+                      ]}
                     >
-                      <LinearGradient
-                        colors={isDark ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]}
-                        style={[
-                          styles.lectureCard,
-                          { borderColor: lecture.status === "active" ? "rgba(34, 197, 94, 0.4)" : colors.surface.glassBorder }
-                        ]}
-                      >
-                        <View style={styles.cardHeader}>
-                          <View style={styles.cardTitleContainer}>
-                            <Text style={[styles.cardTitle, { color: colors.text.primary }]}>{lecture.title}</Text>
-                            <Text style={[styles.cardSubtitle, { color: colors.text.secondary }]}>{lecture.courseName}</Text>
-                          </View>
-                          {lecture.status === "active" ? (
-                            <View style={styles.activeBadge}>
-                              <View style={styles.pulsingDot} />
-                              <Text style={styles.activeText}>LIVE</Text>
-                            </View>
-                          ) : (
-                            <View style={[styles.statusBadge, { backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)" }]}>
-                              <Text style={[styles.statusText, { color: colors.text.muted }]}>Ended</Text>
-                            </View>
-                          )}
-                        </View>
+                      {totalStudents}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statsLabel,
+                        { color: colors.text.secondary },
+                      ]}
+                    >
+                      Total Students
+                    </Text>
+                  </View>
+                </LinearGradient>
 
-                        <View style={styles.cardStats}>
-                          <View style={styles.statItem}>
-                            <Ionicons name="people-outline" size={16} color={colors.text.secondary} />
-                            <Text style={[styles.statText, { color: colors.text.secondary }]}>{lecture.studentCount} Students</Text>
+                <LinearGradient
+                  colors={
+                    isDark
+                      ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"]
+                      : [
+                        "rgba(245, 158, 11, 0.1)",
+                        "rgba(245, 158, 11, 0.05)",
+                      ]
+                  }
+                  style={[
+                    styles.statsCard,
+                    { borderColor: "rgba(245, 158, 11, 0.3)" },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.statsIcon,
+                      { backgroundColor: "rgba(245, 158, 11, 0.2)" },
+                    ]}
+                  >
+                    <Ionicons name="library" size={20} color="#FBBF24" />
+                  </View>
+                  <View>
+                    <Text
+                      style={[
+                        styles.statsValue,
+                        { color: colors.text.primary },
+                      ]}
+                    >
+                      {lectures.length}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statsLabel,
+                        { color: colors.text.secondary },
+                      ]}
+                    >
+                      Total Lectures
+                    </Text>
+                  </View>
+                </LinearGradient>
+              </ScrollView>
+            </Animated.View>
+
+            {/* Search Bar */}
+            <Animated.View
+              entering={FadeInDown.delay(200).springify()}
+              style={[
+                styles.searchContainer,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                  borderColor: colors.surface.glassBorder,
+                },
+              ]}
+            >
+              <Ionicons name="search" size={20} color={colors.text.muted} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.text.primary }]}
+                placeholder="Search lectures..."
+                placeholderTextColor={colors.text.muted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.text.muted}
+                  />
+                </TouchableOpacity>
+              )}
+            </Animated.View>
+
+            {/* Lectures List */}
+            <View style={styles.listContainer}>
+              <Text
+                style={[styles.sectionTitle, { color: colors.text.primary }]}
+              >
+                {searchQuery ? "Search Results" : "Recent Lectures"}
+              </Text>
+
+              {filteredLectures.length === 0 ? (
+                <Animated.View
+                  entering={FadeInUp.springify()}
+                  style={styles.emptyState}
+                >
+                  <Ionicons
+                    name="search-outline"
+                    size={48}
+                    color={colors.text.muted}
+                    style={{ opacity: 0.5 }}
+                  />
+                  <Text
+                    style={[styles.emptyText, { color: colors.text.muted }]}
+                  >
+                    {searchQuery ? "No lectures found" : "No lectures yet"}
+                  </Text>
+                  {!searchQuery && (
+                    <Text
+                      style={[
+                        styles.emptySubText,
+                        { color: colors.text.muted },
+                      ]}
+                    >
+                      Pull down to create one
+                    </Text>
+                  )}
+                </Animated.View>
+              ) : (
+                filteredLectures.map((lecture, index) => (
+                  <Animated.View
+                    key={lecture.id}
+                    entering={FadeInDown.delay(300 + index * 100).springify()}
+                    layout={Layout.springify()}
+                  >
+                    <LinearGradient
+                      colors={
+                        isDark
+                          ? [
+                            "rgba(255,255,255,0.08)",
+                            "rgba(255,255,255,0.02)",
+                          ]
+                          : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
+                      }
+                      style={[
+                        styles.lectureCard,
+                        {
+                          borderColor:
+                            lecture.status === "active"
+                              ? "rgba(34, 197, 94, 0.4)"
+                              : colors.surface.glassBorder,
+                        },
+                      ]}
+                    >
+                      <View style={styles.cardHeader}>
+                        <View style={styles.cardTitleContainer}>
+                          <Text
+                            style={[
+                              styles.cardTitle,
+                              { color: colors.text.primary },
+                            ]}
+                          >
+                            {lecture.title}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.cardSubtitle,
+                              { color: colors.text.secondary },
+                            ]}
+                          >
+                            {lecture.courseName}
+                          </Text>
+                        </View>
+                        {lecture.status === "active" ? (
+                          <View style={styles.activeBadge}>
+                            <View style={styles.pulsingDot} />
+                            <Text style={styles.activeText}>LIVE</Text>
                           </View>
-                          <View style={styles.statItem}>
-                            <Ionicons name="time-outline" size={16} color={colors.text.secondary} />
-                            <Text style={[styles.statText, { color: colors.text.secondary }]}>
-                              {new Date(lecture.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        ) : (
+                          <View
+                            style={[
+                              styles.statusBadge,
+                              {
+                                backgroundColor: isDark
+                                  ? "rgba(255,255,255,0.1)"
+                                  : "rgba(0,0,0,0.05)",
+                              },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.statusText,
+                                { color: colors.text.muted },
+                              ]}
+                            >
+                              Ended
                             </Text>
                           </View>
-                        </View>
+                        )}
+                      </View>
 
-                        <View style={[styles.divider, { backgroundColor: colors.surface.glassBorder }]} />
-
-                        <View style={styles.cardActions}>
-                          <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: isDark ? "rgba(59, 130, 246, 0.15)" : "rgba(59, 130, 246, 0.1)" }]}
-                            onPress={() => handleViewAttendance(lecture)}
+                      <View style={styles.cardStats}>
+                        <View style={styles.statItem}>
+                          <Ionicons
+                            name="people-outline"
+                            size={16}
+                            color={colors.text.secondary}
+                          />
+                          <Text
+                            style={[
+                              styles.statText,
+                              { color: colors.text.secondary },
+                            ]}
                           >
-                            <Text style={styles.actionBtnText}>View Attendance</Text>
-                            <Ionicons name="arrow-forward" size={16} color="#3B82F6" />
-                          </TouchableOpacity>
-
-                          <View style={styles.iconActions}>
-                            {lecture.status === "active" && (
-                              <>
-                                <TouchableOpacity
-                                  style={[styles.iconBtn, { backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)" }]}
-                                  onPress={() => handleEditLecture(lecture)}
-                                >
-                                  <Ionicons name="create-outline" size={20} color={colors.text.primary} />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                  style={[styles.iconBtn, { backgroundColor: "rgba(239, 68, 68, 0.15)" }]}
-                                  onPress={() => handleEndLecture(lecture.id)}
-                                >
-                                  <Ionicons name="stop" size={20} color="#EF4444" />
-                                </TouchableOpacity>
-                              </>
-                            )}
-                            {lecture.status === "ended" && (
-                              <TouchableOpacity
-                                style={[styles.iconBtn, { backgroundColor: "rgba(239, 68, 68, 0.15)" }]}
-                                onPress={() => handleDeleteLecture(lecture)}
-                              >
-                                <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                              </TouchableOpacity>
-                            )}
-                          </View>
+                            {lecture.studentCount} Students
+                          </Text>
                         </View>
-                      </LinearGradient>
-                    </Animated.View>
-                  ))
-                )}
-              </View>
-            </ScrollView>
-          </Animated.View>
-        </GestureDetector>
+                        <View style={styles.statItem}>
+                          <Ionicons
+                            name="time-outline"
+                            size={16}
+                            color={colors.text.secondary}
+                          />
+                          <Text
+                            style={[
+                              styles.statText,
+                              { color: colors.text.secondary },
+                            ]}
+                          >
+                            {new Date(lecture.createdAt).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" }
+                            )}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View
+                        style={[
+                          styles.divider,
+                          { backgroundColor: colors.surface.glassBorder },
+                        ]}
+                      />
+
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={[
+                            styles.actionBtn,
+                            {
+                              backgroundColor: isDark
+                                ? "rgba(59, 130, 246, 0.15)"
+                                : "rgba(59, 130, 246, 0.1)",
+                            },
+                          ]}
+                          onPress={() => handleViewAttendance(lecture)}
+                        >
+                          <Text style={styles.actionBtnText}>
+                            View Attendance
+                          </Text>
+                          <Ionicons
+                            name="arrow-forward"
+                            size={16}
+                            color="#3B82F6"
+                          />
+                        </TouchableOpacity>
+
+                        <View style={styles.iconActions}>
+                          {lecture.status === "active" && (
+                            <>
+                              <TouchableOpacity
+                                style={[
+                                  styles.iconBtn,
+                                  {
+                                    backgroundColor: isDark
+                                      ? "rgba(255,255,255,0.1)"
+                                      : "rgba(0,0,0,0.05)",
+                                  },
+                                ]}
+                                onPress={() => handleEditLecture(lecture)}
+                              >
+                                <Ionicons
+                                  name="create-outline"
+                                  size={20}
+                                  color={colors.text.primary}
+                                />
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={[
+                                  styles.iconBtn,
+                                  {
+                                    backgroundColor:
+                                      "rgba(239, 68, 68, 0.15)",
+                                  },
+                                ]}
+                                onPress={() =>
+                                  handleEndLecture(lecture.id, lecture.title)
+                                }
+                              >
+                                <Ionicons
+                                  name="stop"
+                                  size={20}
+                                  color="#EF4444"
+                                />
+                              </TouchableOpacity>
+                            </>
+                          )}
+                          {lecture.status === "ended" && (
+                            <TouchableOpacity
+                              style={[
+                                styles.iconBtn,
+                                {
+                                  backgroundColor: "rgba(239, 68, 68, 0.15)",
+                                },
+                              ]}
+                              onPress={() => handleDeleteLecture(lecture)}
+                            >
+                              <Ionicons
+                                name="trash-outline"
+                                size={20}
+                                color="#EF4444"
+                              />
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </View>
+                    </LinearGradient>
+                  </Animated.View>
+                ))
+              )}
+            </View>
+          </ScrollView>
+        </Animated.View>
+        {/* </GestureDetector> */}
       </GestureHandlerRootView>
 
       {/* Edit Modal */}
@@ -561,13 +862,35 @@ const TeacherDashboard = () => {
         onRequestClose={() => setEditModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <Animated.View entering={FadeInUp.springify()} style={[styles.modalContent, { backgroundColor: isDark ? "#1E1E1E" : "#FFFFFF", borderColor: colors.surface.glassBorder }]}>
-            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Edit Lecture</Text>
+          <Animated.View
+            entering={FadeInUp.springify()}
+            style={[
+              styles.modalContent,
+              {
+                backgroundColor: isDark ? "#1E1E1E" : "#FFFFFF",
+                borderColor: colors.surface.glassBorder,
+              },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
+              Edit Lecture
+            </Text>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.text.secondary }]}>Title</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>
+                Title
+              </Text>
               <TextInput
-                style={[styles.modalInput, { color: colors.text.primary, borderColor: colors.surface.glassBorder, backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)" }]}
+                style={[
+                  styles.modalInput,
+                  {
+                    color: colors.text.primary,
+                    borderColor: colors.surface.glassBorder,
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.02)",
+                  },
+                ]}
                 value={editTitle}
                 onChangeText={setEditTitle}
                 placeholder="Lecture Title"
@@ -576,9 +899,20 @@ const TeacherDashboard = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.text.secondary }]}>Duration (min)</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>
+                Duration (min)
+              </Text>
               <TextInput
-                style={[styles.modalInput, { color: colors.text.primary, borderColor: colors.surface.glassBorder, backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)" }]}
+                style={[
+                  styles.modalInput,
+                  {
+                    color: colors.text.primary,
+                    borderColor: colors.surface.glassBorder,
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.02)",
+                  },
+                ]}
                 value={editDuration}
                 onChangeText={setEditDuration}
                 keyboardType="number-pad"
@@ -589,16 +923,32 @@ const TeacherDashboard = () => {
 
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)" }]}
+                style={[
+                  styles.modalBtn,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0,0,0,0.05)",
+                  },
+                ]}
                 onPress={() => setEditModalVisible(false)}
               >
-                <Text style={[styles.modalBtnText, { color: colors.text.primary }]}>Cancel</Text>
+                <Text
+                  style={[styles.modalBtnText, { color: colors.text.primary }]}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: colors.primary.main }]}
+                style={[
+                  styles.modalBtn,
+                  { backgroundColor: colors.primary.main },
+                ]}
                 onPress={handleUpdateLecture}
               >
-                <Text style={[styles.modalBtnText, { color: "white" }]}>Update</Text>
+                <Text style={[styles.modalBtnText, { color: "white" }]}>
+                  Update
+                </Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -616,6 +966,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    flexGrow: 1,
     padding: 20,
     paddingTop: 20,
     paddingBottom: 100,

@@ -32,7 +32,7 @@ export const darkTheme = {
     primary: "#FFFFFF",
     secondary: "#94A3B8",
     tertiary: "#64748B",
-    muted: "#475569",
+    muted: "#79889C",
   },
 
   // Surface Colors

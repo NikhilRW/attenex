@@ -157,6 +157,8 @@ export const lectures = pgTable(
       .notNull(), // Class this lecture belongs to
     title: text("title").notNull(), // Lecture title/topic
     sessionToken: uuid("session_token").defaultRandom(), // Unique token for this session
+    passcode: varchar("passcode", { length: 4 }), // 4-digit passcode that refreshes every 10 seconds
+    passcodeUpdatedAt: timestamp("passcode_updated_at", { withTimezone: true }), // Last time passcode was refreshed
     duration: numeric("duration").default("60").notNull(), // Duration in minutes
     status: lectureStatusEnum("status").default("active"), // active or ended
     teacherLatitude: numeric("teacher_latitude", { precision: 10, scale: 7 }), // GPS coordinates for geofencing
@@ -380,6 +382,8 @@ export const db = drizzle(pool, {
     lectures,
     attendance,
     attendanceAttempts,
+    attendancePings,
+    geofenceLogs,
   },
 });
 

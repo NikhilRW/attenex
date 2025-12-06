@@ -52,6 +52,20 @@ export const endLecture = async (lectureId: string) => {
   }
 };
 
+export const getAllLectures = async () => {
+  try {
+    const { token } = useAuthStore.getState();
+    const response = await axios.get(`${API_URL}/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
 export const getActiveLectures = async () => {
   try {
     const { token } = useAuthStore.getState();
@@ -175,6 +189,20 @@ export const getStudentLectures = async () => {
   try {
     const { token } = useAuthStore.getState();
     const response = await axios.get(`${API_URL}/student/lectures`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getPasscode = async (lectureId: string) => {
+  try {
+    const { token } = useAuthStore.getState();
+    const response = await axios.get(`${API_URL}/${lectureId}/passcode`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

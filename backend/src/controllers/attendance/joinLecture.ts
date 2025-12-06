@@ -84,6 +84,11 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Get the updated user data to return
+    const updatedUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
     // Check if already joined
     const existingAttendance = await db.query.attendance.findFirst({
       where: and(
@@ -97,6 +102,7 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
         success: true,
         message: "Already joined",
         data: existingAttendance,
+        user: updatedUser,
       });
     }
 
@@ -109,13 +115,33 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
         joinTime: new Date(),
         status: "incomplete",
         method: "auto",
+        checkScore: "1", // First check passed at join time
       })
       .returning();
+
+    logger.info(
+      `Student ${userId} joined lecture ${lectureId} successfully. Initial checkScore: 1`
+    );
+
+    // Emit socket event to notify teacher about new student join
+    const io = (req as any).app.get("io");
+    if (io) {
+      io.to(`lecture-${lectureId}`).emit("studentJoined", {
+        lectureId,
+        studentId: userId,
+        studentName: updatedUser?.name || "Unknown",
+        joinTime: newAttendance[0].joinTime,
+      });
+      logger.info(
+        `Socket event emitted: studentJoined for lecture-${lectureId}`
+      );
+    }
 
     return res.status(200).json({
       success: true,
       message: "Joined successfully",
       data: newAttendance[0],
+      user: updatedUser,
     });
   } catch (error: any) {
     logger.error("Join lecture error", error);

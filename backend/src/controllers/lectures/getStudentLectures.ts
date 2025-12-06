@@ -32,7 +32,7 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Get student's class ID
+    // Get student's class name
     const student = await db
       .select()
       .from(users)
@@ -56,7 +56,24 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Fetch all active lectures for this class
+    // Get the student's class name
+    const studentClass = await db
+      .select()
+      .from(classes)
+      .where(eq(classes.id, studentClassId))
+      .limit(1);
+
+    if (studentClass.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "Class not found. Please update your class.",
+      });
+    }
+
+    const studentClassName = studentClass[0].name;
+
+    // Fetch all active lectures for classes with matching name
     const activeLectures = await db
       .select({
         id: lectures.id,
@@ -73,12 +90,12 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       .from(lectures)
       .leftJoin(classes, eq(lectures.classId, classes.id))
       .where(
-        and(eq(lectures.classId, studentClassId), eq(lectures.status, "active"))
+        and(eq(classes.name, studentClassName), eq(lectures.status, "active"))
       )
       .orderBy(lectures.createdAt);
 
     logger.info(
-      `Fetched ${activeLectures.length} active lectures for student: ${userId} in class: ${studentClassId}`
+      `Fetched ${activeLectures.length} active lectures for student: ${userId} in class: ${studentClassName}`
     );
 
     return res.status(200).json({

@@ -1,6 +1,11 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { attendancePings, db, lectures } from "../../config/database_setup";
+import {
+  attendance,
+  attendancePings,
+  db,
+  lectures,
+} from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
 
@@ -58,7 +63,38 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
       timestamp: new Date(),
     });
 
-    return res.status(200).json({ success: true, message: "Ping received" });
+    // If ping is valid, increment the checkScore in attendance table
+    if (isValid) {
+      const currentAttendance = await db.query.attendance.findFirst({
+        where: and(
+          eq(attendance.lectureId, lectureId),
+          eq(attendance.studentId, userId)
+        ),
+      });
+
+      if (currentAttendance) {
+        const currentScore = parseInt(currentAttendance.checkScore || "0");
+        const newScore = Math.min(currentScore + 1, 7); // Cap at 7
+
+        await db
+          .update(attendance)
+          .set({ checkScore: newScore.toString() })
+          .where(
+            and(
+              eq(attendance.lectureId, lectureId),
+              eq(attendance.studentId, userId)
+            )
+          );
+
+        logger.info(
+          `Updated checkScore for student ${userId} in lecture ${lectureId}: ${currentScore} -> ${newScore}`
+        );
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Ping received", isValid });
   } catch (error: any) {
     logger.error("Ping error", error);
     return res

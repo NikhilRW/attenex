@@ -89,6 +89,19 @@ export const endLecture = async (req: AuthRequest, res: Response) => {
 
     logger.info(`Lecture ended: ${lectureId} by teacher: ${userId}`);
 
+    // Emit Socket.IO event to notify all students in the lecture room
+    const io = (req as any).app.get("io");
+    if (io) {
+      io.to(`lecture-${lectureId}`).emit("lectureEnded", {
+        lectureId,
+        status: "ended",
+        endedAt: updatedLecture[0].endedAt,
+      });
+      logger.info(
+        `Socket event emitted: lectureEnded for lecture-${lectureId}`
+      );
+    }
+
     return res.status(200).json({
       success: true,
       message: "Lecture ended successfully",

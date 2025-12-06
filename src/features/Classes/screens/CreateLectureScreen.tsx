@@ -1,5 +1,6 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { storage } from "@/src/shared/utils/mmkvStorage";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
@@ -54,6 +55,20 @@ const CreateLectureScreen = () => {
       const res = await getTeacherClasses();
       if (res.success) {
         setExistingClasses(res.data);
+      }
+
+      // Load user-created classes from local storage
+      const savedClasses = storage.getString('user_created_classes');
+      if (savedClasses) {
+        const parsedClasses = JSON.parse(savedClasses);
+        // Merge with existing classes, avoiding duplicates
+        const allClasses = [...res.data];
+        parsedClasses.forEach((saved: ClassItem) => {
+          if (!allClasses.find(c => c.name === saved.name)) {
+            allClasses.push(saved);
+          }
+        });
+        setExistingClasses(allClasses);
       }
     } catch (error) {
       console.log("Error fetching classes", error);
@@ -120,15 +135,27 @@ const CreateLectureScreen = () => {
     setShowNewClassModal(true);
   };
 
-  const handleCreateNewClass = () => {
+  const handleCreateNewClass = async () => {
     if (!newClassName.trim()) {
       Alert.alert("Error", "Please enter a class name");
       return;
     }
 
     const newClass = { id: Date.now().toString(), name: newClassName };
-    setExistingClasses([...existingClasses, newClass]);
+    const updatedClasses = [...existingClasses, newClass];
+    setExistingClasses(updatedClasses);
     setSelectedClass(newClassName);
+
+    // Save user-created classes to MMKV
+    try {
+      const savedClasses = storage.getString('user_created_classes');
+      const parsedClasses = savedClasses ? JSON.parse(savedClasses) : [];
+      parsedClasses.push(newClass);
+      storage.set('user_created_classes', JSON.stringify(parsedClasses));
+    } catch (error) {
+      console.log("Error saving class to storage", error);
+    }
+
     setNewClassName("");
     setShowNewClassModal(false);
   };
@@ -137,7 +164,7 @@ const CreateLectureScreen = () => {
     duration === -1
       ? "Custom"
       : DURATION_OPTIONS.find((opt) => opt.value === duration)?.label ||
-        "1 hour";
+      "1 hour";
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,11 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { attendance, db, lectures } from "../../config/database_setup";
+import {
+  attendance,
+  attendancePings,
+  db,
+  lectures,
+} from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
 
@@ -18,9 +23,9 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
     if (!userId)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const { lectureId, latitude, longitude } = req.body;
+    const { lectureId, latitude, longitude, passcode } = req.body;
 
-    if (!lectureId || !latitude || !longitude) {
+    if (!lectureId || !latitude || !longitude || !passcode) {
       return res
         .status(400)
         .json({ success: false, message: "Missing parameters" });
@@ -35,6 +40,15 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       return res
         .status(404)
         .json({ success: false, message: "Lecture not found" });
+
+    // Validate passcode
+    if (lecture.passcode !== passcode) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Invalid passcode. Please enter the correct code from your teacher.",
+      });
+    }
 
     // Verify Location
     const distance = calculateDistance(
@@ -68,17 +82,83 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Check score: need at least 4 out of 7 checks (57%)
-    const checkScore = parseInt(attendanceRecord.checkScore || "0");
-    const minRequired = 4;
+    // Get all valid pings for this student in this lecture to verify presence over time
+    const pings = await db.query.attendancePings.findMany({
+      where: and(
+        eq(attendancePings.lectureId, lectureId),
+        eq(attendancePings.studentId, userId),
+        eq(attendancePings.isValid, true)
+      ),
+      orderBy: (pings, { asc }) => [asc(pings.timestamp)],
+    });
 
-    let finalStatus: "present" | "absent" | "incomplete" = "present";
-    let message = "Attendance Marked Present!";
+    // Calculate lecture duration and segments
+    // Use startedAt if available, otherwise createdAt
+    const startTime = new Date(lecture.startedAt || lecture.createdAt!);
+    const endTime = new Date(); // Current time as the end of participation
+    const durationMs = endTime.getTime() - startTime.getTime();
+    const durationMinutes = durationMs / (1000 * 60);
 
-    if (checkScore < minRequired) {
-      finalStatus = "incomplete";
-      message = `Attendance incomplete - you passed ${checkScore}/7 presence checks (need ${minRequired})`;
+    let finalStatus: "present" | "absent" | "incomplete" = "incomplete";
+    let message = "Attendance Incomplete";
+
+    // Helper to check for pings in a time window
+    const hasPingInWindow = (startMs: number, endMs: number) => {
+      const start = new Date(startTime.getTime() + startMs);
+      const end = new Date(startTime.getTime() + endMs);
+      return pings.some((p) => {
+        const t = new Date(p.timestamp!);
+        return t >= start && t <= end;
+      });
+    };
+
+    // Define Time Windows
+    // Start: First 33% of the duration
+    // Middle: Middle 33% of the duration
+    // End: Last 33% of the duration
+    const oneThird = durationMs / 3;
+    const hasStart = hasPingInWindow(0, oneThird);
+    const hasMiddle = hasPingInWindow(oneThird, oneThird * 2);
+    const hasEnd = hasPingInWindow(oneThird * 2, durationMs);
+    const hasAnyPing = pings.length > 0;
+
+    // Logic Refinement:
+    // 1. Short Duration (< 10 mins): Any valid ping is sufficient.
+    // 2. Medium Duration (< 30 mins): Require Start AND End pings (Middle skipped).
+    //    - This handles the "earlier lecture end" case where a middle ping might be missed.
+    // 3. Long Duration (>= 30 mins): Require Start AND Middle AND End pings.
+    //    - Ensures consistent presence ("no constant movement" out of class).
+
+    if (durationMinutes < 10) {
+      if (hasAnyPing) {
+        finalStatus = "present";
+        message = "Attendance Marked Present!";
+      } else {
+        message = "Attendance Incomplete - No location pings received.";
+      }
+    } else if (durationMinutes < 30) {
+      if (hasStart && hasEnd) {
+        finalStatus = "present";
+        message = "Attendance Marked Present!";
+      } else {
+        message = `Attendance Incomplete - Missing pings. Found: Start=${hasStart}, End=${hasEnd}.`;
+      }
+    } else {
+      if (hasStart && hasMiddle && hasEnd) {
+        finalStatus = "present";
+        message = "Attendance Marked Present!";
+      } else {
+        // Fallback: If middle is missing but Start and End are present, and duration is borderline?
+        // Strict adherence to "Start Middle End" for long lectures.
+        message = `Attendance Incomplete - Missing pings. Found: Start=${hasStart}, Middle=${hasMiddle}, End=${hasEnd}.`;
+      }
     }
+
+    logger.info(
+      `Student ${userId} submitting attendance for lecture ${lectureId}. Duration: ${durationMinutes.toFixed(
+        1
+      )}m. Pings: ${pings.length}. Status: ${finalStatus}`
+    );
 
     // Update Attendance
     const result = await db
@@ -86,6 +166,7 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       .set({
         submitTime: new Date(),
         status: finalStatus,
+        checkScore: pings.length.toString(),
         locationSnapshot: { lat: latitude, lng: longitude, accuracy: 0 },
       })
       .where(
@@ -95,6 +176,21 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
         )
       )
       .returning();
+
+    // Emit socket event to notify teacher about attendance submission
+    const io = (req as any).app.get("io");
+    if (io) {
+      io.to(`lecture-${lectureId}`).emit("attendanceSubmitted", {
+        lectureId,
+        studentId: userId,
+        status: finalStatus,
+        checkScore: pings.length,
+        submitTime: result[0].submitTime,
+      });
+      logger.info(
+        `Socket event emitted: attendanceSubmitted for lecture-${lectureId}`
+      );
+    }
 
     return res.status(200).json({
       success: true,
