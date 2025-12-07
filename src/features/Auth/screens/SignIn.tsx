@@ -53,7 +53,7 @@ const SignIn = () => {
         position: "bottom",
       });
     }
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, params.verified, router]);
 
   // Initialize react-hook-form with Zod validation
   const {

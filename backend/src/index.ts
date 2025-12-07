@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import { logger } from "./utils/logger";
+import asyncHandler from "@utils/asyncHandler";
 
 /**
  * Attenex Backend Server
@@ -135,12 +136,26 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/no-wrap", async (req, res) => {
+  await Promise.reject(new Error("boom - no wrap"));
+  res.json({ ok: true });
+});
+
+app.get(
+  "/wrapped",
+  asyncHandler(async (req, res) => {
+    await Promise.reject(new Error("boom - wrapped"));
+    res.json({ ok: true });
+  })
+);
+
 /**
  * Server Startup
  *
  * Starts the HTTP server with Socket.IO support on the configured port.
  * Logs the server URL for development convenience.
  */
+
 httpServer.listen(PORT, () => {
   logger.info(`Server is running on port http://localhost:${PORT}`);
 });

@@ -1,6 +1,7 @@
 import { User } from "@/backend/src/config/database_setup";
 import { mmkvStorage } from "@/src/shared/utils/mmkvStorage";
 import { secureStore } from "@/src/shared/utils/secureStore";
+import { router } from "expo-router";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -52,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
         });
+        router.replace("/sign-in");
       },
       setLoading: (loading) => set({ isLoading: loading }),
     }),

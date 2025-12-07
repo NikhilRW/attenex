@@ -10,7 +10,7 @@ import { updateStudentClass } from "@controllers/auth/updateStudentClass";
 import { updateUserRole } from "@controllers/auth/updateUserRole";
 import { verifyUser } from "@controllers/auth/verifyUser";
 import { authenticate } from "@middleware/auth";
-import { asyncHandler } from "@utils/asyncHandler";
+import asyncHandler from "@utils/asyncHandler";
 import "dotenv/config";
 import { Router } from "express";
 

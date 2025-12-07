@@ -35,8 +35,17 @@ const CustomTabBar = ({
     if (role === "student" && name.includes("classes")) {
       return false; // Hide classes tab for students
     }
-    if (role === "teacher" && (name.includes("attendance") || name.includes("create-") || name.includes("lecture-ended"))) {
+    if (
+      role === "teacher" &&
+      (name.includes("attendance") ||
+        name.includes("create-") ||
+        name.includes("lecture-ended"))
+    ) {
       return false; // Hide attendance tab for teachers
+    }
+
+    if (!role && !name.includes("role-selection")) {
+      return false; // If no role, only show role-selection
     }
     return true;
   });
@@ -49,7 +58,8 @@ const CustomTabBar = ({
     return {
       width: BUTTON_WIDTH,
       height: 60,
-      left: activeFilteredIndex >= 0 ? activeFilteredIndex * BUTTON_WIDTH + 10 : 10,
+      left:
+        activeFilteredIndex >= 0 ? activeFilteredIndex * BUTTON_WIDTH + 10 : 10,
     };
   });
 

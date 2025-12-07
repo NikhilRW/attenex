@@ -196,6 +196,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
         duration: 3000,
         position: "bottom",
       });
+      router.replace(`/verify-email?email=${encodeURIComponent(data.email!)}`);
       return;
     }
 
@@ -270,6 +271,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       email: data.email!,
       password: data.password!,
     });
+  
 
     if (status !== 201) {
       showMessage({
@@ -340,8 +342,6 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
         email: decodeURIComponent(deepLink.queryParams!.email as string),
       }
     );
-    console.log("response.data : " + JSON.stringify(response.data));
-
     if (response.data.success) {
       router.replace("/(auth)/sign-in?verified=true");
       useAuthStore.setState({ isAuthenticated: false });

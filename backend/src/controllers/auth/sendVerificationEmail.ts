@@ -12,20 +12,21 @@ export const sendVerificationEmailController = async (
   const user = (await db.select().from(users).where(eq(users.email, email)))[0];
 
   if (!user) {
-    return res.json({
-      message: "User does not exist",
-      success: false,
-    });
+    return res
+      .json({
+        message: "User does not exist",
+        success: false,
+      })
+      .status(400);
   }
 
-  console.log(JSON.stringify(user));
-  
-
   if (user.isVerified) {
-    return res.json({
-      message: "User is already verified kindly sign up",
-      success: false,
-    });
+    return res
+      .json({
+        message: "User is already verified kindly sign up",
+        success: false,
+      })
+      .status(400);
   }
 
   await sendVerificationEmail({
@@ -34,8 +35,10 @@ export const sendVerificationEmailController = async (
     name: user.name,
   });
 
-  return res.json({
-    success: true,
-    message: "Email has been sended",
-  });
+  return res
+    .json({
+      success: true,
+      message: "Email has been sended",
+    })
+    .status(200);
 };
