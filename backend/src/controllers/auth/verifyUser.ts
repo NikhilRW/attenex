@@ -57,7 +57,7 @@ export const verifyUser = async (req: Request, res: Response) => {
 
     await db
       .update(users)
-      .set({ isVerified: true, verificationCode: null })
+      .set({ isVerified: true,  })
       .where(eq(users.email, email));
     return res.status(200).json({
       success: true,

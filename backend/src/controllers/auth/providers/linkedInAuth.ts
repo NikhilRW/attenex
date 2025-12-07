@@ -25,7 +25,7 @@ const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET || "";
  *
  * Response:
  * - success: boolean
- * - user: User object with id, email, name, role, classId
+ * - user: User object with id, email, name, role, className
  * - token: JWT token for session authentication
  *
  * Security Notes:
@@ -205,7 +205,7 @@ export const linkedInAuth = async (req: Request, res: Response) => {
         name: user.name,
         role: user.role,
         photoUrl: user.photoUrl,
-        classId: user.classId,
+        className: user.className,
       },
       token,
     });

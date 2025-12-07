@@ -98,7 +98,7 @@ export const lightTheme = {
 
   // Surface Colors
   surface: {
-    glass: "rgba(0, 0, 0, 0.02)",
+    glass: "rgba(0, 0, 0, 0.1)",
     glassBorder: "rgba(0, 0, 0, 0.15)",
     cardBg: "rgba(255, 255, 255, 0.95)",
   },

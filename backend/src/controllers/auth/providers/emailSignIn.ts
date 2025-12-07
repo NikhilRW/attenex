@@ -56,7 +56,7 @@ export const emailSignIn = async (req: Request, res: Response) => {
       email: userFound.email,
       photoUrl: userFound.photoUrl,
       role: userFound.role,
-      classId: userFound.classId,
+      className: userFound.className,
       isVerified: userFound.isVerified,
       createdAt: userFound.createdAt,
     };

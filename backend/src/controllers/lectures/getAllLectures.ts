@@ -38,7 +38,6 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
         id: lectures.id,
         title: lectures.title,
         className: classes.name,
-        classId: lectures.classId,
         duration: lectures.duration,
         status: lectures.status,
         createdAt: lectures.createdAt,
@@ -48,7 +47,7 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
         teacherLongitude: lectures.teacherLongitude,
       })
       .from(lectures)
-      .fullJoin(classes, eq(lectures.classId, classes.id))
+      .fullJoin(classes, eq(lectures.className, classes.name))
       .where(eq(lectures.teacherId, userId))
       .orderBy(desc(lectures.createdAt));
 

@@ -46,9 +46,9 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const studentClassId = student[0].classId;
+    const studentClassName = student[0].className;
 
-    if (!studentClassId) {
+    if (!studentClassName) {
       return res.status(200).json({
         success: true,
         data: [],
@@ -60,7 +60,7 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
     const studentClass = await db
       .select()
       .from(classes)
-      .where(eq(classes.id, studentClassId))
+      .where(eq(classes.name, studentClassName))
       .limit(1);
 
     if (studentClass.length === 0) {
@@ -71,7 +71,6 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const studentClassName = studentClass[0].name;
 
     // Fetch all active lectures for classes with matching name
     const activeLectures = await db
@@ -79,7 +78,6 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
         id: lectures.id,
         title: lectures.title,
         className: classes.name,
-        classId: lectures.classId,
         duration: lectures.duration,
         status: lectures.status,
         createdAt: lectures.createdAt,
@@ -88,7 +86,7 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
         teacherLongitude: lectures.teacherLongitude,
       })
       .from(lectures)
-      .leftJoin(classes, eq(lectures.classId, classes.id))
+      .leftJoin(classes, eq(lectures.className, classes.name))
       .where(
         and(eq(classes.name, studentClassName), eq(lectures.status, "active"))
       )

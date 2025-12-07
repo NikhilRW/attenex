@@ -63,7 +63,7 @@ const Main = () => {
         description: error.message || "An unexpected error occurred",
         type: "danger",
         duration: 3000,
-        
+
       });
     } finally {
       setIsCreating(false);
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 30,
   },
   header: {
     alignItems: "center",

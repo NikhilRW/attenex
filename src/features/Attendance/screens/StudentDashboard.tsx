@@ -18,10 +18,15 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
+import Animated, { FadeInDown, FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { joinLecture, submitAttendance } from "../services/attendanceService";
-import { startBackgroundTracking, stopBackgroundTracking } from "../services/backgroundTask";
+import {
+    startBackgroundTracking,
+    stopBackgroundTracking,
+} from "../services/backgroundTask";
 
 const StudentDashboard = () => {
     const { colors, mode } = useTheme();
@@ -29,27 +34,28 @@ const StudentDashboard = () => {
     const { user, updateUser } = useAuthStore();
     const [lectures, setLectures] = useState<any[]>([]);
     const [joinedLecture, setJoinedLecture] = useState<any | null>(null);
-    const [lectureStatus, setLectureStatus] = useState<"active" | "ended">("active");
+    const [lectureStatus, setLectureStatus] = useState<"active" | "ended">(
+        "active"
+    );
     const [passcode, setPasscode] = useState("");
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState<"idle" | "joined" | "submitting">("idle");
+    const [status, setStatus] = useState<"idle" | "joined" | "submitting">(
+        "idle"
+    );
     const [showClassModal, setShowClassModal] = useState(false);
-    const [className, setClassName] = useState(storage.getString("userClassName") || "");
+    const [className, setClassName] = useState(
+        (user as any)?.className || storage.getString("userClassName") || ""
+    );
     const [classUpdateLoading, setClassUpdateLoading] = useState(false);
+    const insets = useSafeAreaInsets();
 
-    // Save className to storage whenever it changes
-    useEffect(() => {
-        if (className) {
-            storage.set("userClassName", className);
-        }
-    }, [className]);
     const [showRollNoModal, setShowRollNoModal] = useState(false);
     const [rollNo, setRollNo] = useState("");
     const [pendingLecture, setPendingLecture] = useState<any | null>(null);
 
     const fetchLectures = useCallback(async () => {
         try {
-            const res = await getStudentLectures();
+            const res = await getStudentLectures(user?.className!);
             if (res.success) {
                 setLectures(res.data);
             }
@@ -60,7 +66,7 @@ const StudentDashboard = () => {
 
     useEffect(() => {
         fetchLectures();
-    }, [fetchLectures]);
+    }, [fetchLectures, (user as any)?.className]); // Refetch when className changes
 
     // Connect to socket on mount
     useEffect(() => {
@@ -84,7 +90,11 @@ const StudentDashboard = () => {
 
     // Listen for lecture ended events globally
     useEffect(() => {
-        const handleLectureEnded = (data: { lectureId: string; status: string; endedAt: string }) => {
+        const handleLectureEnded = (data: {
+            lectureId: string;
+            status: string;
+            endedAt: string;
+        }) => {
             console.log("Lecture ended event received:", data);
 
             // Update lecture status if it matches current joined lecture
@@ -139,6 +149,7 @@ const StudentDashboard = () => {
                 storage.set("userClassName", className.trim());
                 Alert.alert("Success", "Class updated successfully!");
                 setShowClassModal(false);
+                fetchLectures();
             }
         } catch (error: any) {
             Alert.alert("Error", error.message || "Failed to update class");
@@ -168,7 +179,9 @@ const StudentDashboard = () => {
                 return;
             }
 
-            let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+            let location = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Highest,
+            });
 
             const res = await joinLecture(
                 lecture.id,
@@ -180,13 +193,16 @@ const StudentDashboard = () => {
             if (res.success) {
                 // Update user in auth store with roll number if returned
                 if (res.user && res.user.rollNo) {
-                    updateUser({ rollNo: res.user.rollNo as string});
+                    updateUser({ rollNo: res.user.rollNo as string });
                 }
 
                 setJoinedLecture(lecture);
                 setLectureStatus("active");
                 setStatus("joined");
-                Alert.alert("Joined!", "Location tracking started. Wait for class to end, then verify attendance.");
+                Alert.alert(
+                    "Joined!",
+                    "Location tracking started. Wait for class to end, then verify attendance."
+                );
                 // Start Background Task
                 await startBackgroundTracking(lecture.id);
             }
@@ -220,7 +236,9 @@ const StudentDashboard = () => {
 
         setLoading(true);
         try {
-            let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+            let location = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.High,
+            });
 
             const res = await submitAttendance(
                 joinedLecture.id,
@@ -244,7 +262,10 @@ const StudentDashboard = () => {
                 fetchLectures();
             }
         } catch (error: any) {
-            Alert.alert("Submission Failed", error.message || "Could not mark attendance");
+            Alert.alert(
+                "Submission Failed",
+                error.message || "Could not mark attendance"
+            );
         } finally {
             setLoading(false);
         }
@@ -280,36 +301,56 @@ const StudentDashboard = () => {
     // If joined and lecture is still active - show ongoing status
     if (status === "joined" && lectureStatus === "active") {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-                <View style={[styles.joinedContainer, {
-                    backgroundColor: colors.surface.cardBg,
-                    borderColor: colors.surface.glassBorder,
-                    borderWidth: 1,
-                }]}>
+            <View
+                style={[
+                    styles.container,
+                    { backgroundColor: colors.background.primary },
+                ]}
+            >
+                <View
+                    style={[
+                        styles.joinedContainer,
+                        {
+                            backgroundColor: colors.surface.cardBg,
+                            borderColor: colors.surface.glassBorder,
+                            borderWidth: 1,
+                            marginBottom: 70 + insets.bottom,
+                        },
+                    ]}
+                >
                     <View style={styles.guardianIconOuter}>
                         <LinearGradient
                             colors={[colors.accent.green, "#4CAF50"]}
                             style={styles.guardianIconInner}
                         >
-                            <Ionicons
-                                name="school"
-                                size={48}
-                                color="white"
-                            />
+                            <Ionicons name="school" size={48} color="white" />
                         </LinearGradient>
                     </View>
 
                     <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
                         Lecture Ongoing
                     </Text>
-                    <Text style={[styles.guardianSubtitle, { color: colors.text.secondary }]}>
-                        Attending: {joinedLecture?.title}{'\n'}Location tracking is active
+                    <Text
+                        style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
+                    >
+                        Attending: {joinedLecture?.title}
+                        {"\n"}Location tracking is active
                     </Text>
 
                     <View style={styles.ongoingInfo}>
                         <View style={styles.trackingBadge}>
-                            <View style={[styles.pulseDot, { backgroundColor: colors.accent.green }]} />
-                            <Text style={[styles.trackingBadgeText, { color: colors.text.primary }]}>
+                            <View
+                                style={[
+                                    styles.pulseDot,
+                                    { backgroundColor: colors.accent.green },
+                                ]}
+                            />
+                            <Text
+                                style={[
+                                    styles.trackingBadgeText,
+                                    { color: colors.text.primary },
+                                ]}
+                            >
                                 Tracking Active
                             </Text>
                         </View>
@@ -339,30 +380,40 @@ const StudentDashboard = () => {
     // If joined and lecture ended - show verify button
     if (status === "joined" && lectureStatus === "ended") {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-                <View style={[styles.joinedContainer, {
-                    backgroundColor: colors.surface.cardBg,
-                    borderColor: colors.surface.glassBorder,
-                    borderWidth: 1,
-                }]}>
+            <View
+                style={[
+                    styles.container,
+                    { backgroundColor: colors.background.primary },
+                ]}
+            >
+                <View
+                    style={[
+                        styles.joinedContainer,
+                        {
+                            backgroundColor: colors.surface.cardBg,
+                            borderColor: colors.surface.glassBorder,
+                            borderWidth: 1,
+                            marginBottom: 70 + insets.bottom,
+                        },
+                    ]}
+                >
                     <View style={styles.guardianIconOuter}>
                         <LinearGradient
                             colors={[colors.primary.main, "#3B82F6"]}
                             style={styles.guardianIconInner}
                         >
-                            <Ionicons
-                                name="checkmark-done-circle"
-                                size={48}
-                                color="white"
-                            />
+                            <Ionicons name="checkmark-done-circle" size={48} color="white" />
                         </LinearGradient>
                     </View>
 
                     <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
                         Lecture Ended
                     </Text>
-                    <Text style={[styles.guardianSubtitle, { color: colors.text.secondary }]}>
-                        Class finished! Verify your attendance now{'\n'}using the passcode from your teacher.
+                    <Text
+                        style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
+                    >
+                        Class finished! Verify your attendance now{"\n"}using the passcode
+                        from your teacher.
                     </Text>
 
                     <View
@@ -376,7 +427,9 @@ const StudentDashboard = () => {
                             },
                         ]}
                     >
-                        <Text style={[styles.passcodeLabel, { color: colors.text.secondary }]}>
+                        <Text
+                            style={[styles.passcodeLabel, { color: colors.text.secondary }]}
+                        >
                             Enter Passcode to Verify
                         </Text>
                         <TextInput
@@ -397,10 +450,7 @@ const StudentDashboard = () => {
                             keyboardType="numeric"
                             maxLength={4}
                         />
-                        <TouchableOpacity
-                            onPress={handleSubmit}
-                            disabled={loading}
-                        >
+                        <TouchableOpacity onPress={handleSubmit} disabled={loading}>
                             <LinearGradient
                                 colors={[colors.primary.main, "#3B82F6"]}
                                 style={styles.submitButton}
@@ -420,7 +470,10 @@ const StudentDashboard = () => {
 
     return (
         <ScrollView
-            style={[styles.container, { backgroundColor: colors.background.secondary }]}
+            style={[
+                styles.container,
+                { backgroundColor: colors.background.secondary },
+            ]}
             contentContainerStyle={styles.scrollContent}
         >
             <View style={styles.headerSection}>
@@ -463,7 +516,7 @@ const StudentDashboard = () => {
                                         { color: colors.text.primary },
                                     ]}
                                 >
-                                    {user?.classId ? (user as any).className || "Not Set" : "Not Set"}
+                                    {(user as any)?.className || "Not Set"}
                                 </Text>
                             </View>
                         </View>
@@ -478,11 +531,7 @@ const StudentDashboard = () => {
                                 },
                             ]}
                         >
-                            <Ionicons
-                                name="pencil"
-                                size={18}
-                                color={colors.primary.main}
-                            />
+                            <Ionicons name="pencil" size={18} color={colors.primary.main} />
                         </TouchableOpacity>
                     </View>
                 </LinearGradient>
@@ -492,13 +541,38 @@ const StudentDashboard = () => {
                 Available Classes
             </Text>
 
-            {lectures.length === 0 ? (
+            {!(user as any)?.className ? (
+                <View style={styles.emptyContainer}>
+                    <Ionicons name="school-outline" size={64} color={colors.text.muted} />
+                    <Text style={[styles.emptyText, { color: colors.text.muted }]}>
+                        No class selected.
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => setShowClassModal(true)}
+                        style={[
+                            styles.refreshButton,
+                            {
+                                backgroundColor: colors.primary.main,
+                                borderRadius: 12,
+                                marginTop: 20,
+                            },
+                        ]}
+                    >
+                        <Text style={[styles.refreshText, { color: "white" }]}>
+                            Select Class
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            ) : lectures.length === 0 ? (
                 <View style={styles.emptyContainer}>
                     <Ionicons name="school-outline" size={64} color={colors.text.muted} />
                     <Text style={[styles.emptyText, { color: colors.text.muted }]}>
                         No active lectures found.
                     </Text>
-                    <TouchableOpacity onPress={fetchLectures} style={styles.refreshButton}>
+                    <TouchableOpacity
+                        onPress={fetchLectures}
+                        style={styles.refreshButton}
+                    >
                         <Text style={[styles.refreshText, { color: colors.primary.main }]}>
                             Refresh List
                         </Text>
@@ -506,12 +580,13 @@ const StudentDashboard = () => {
                 </View>
             ) : (
                 lectures.map((lecture) => (
-                    
                     <LinearGradient
                         key={lecture.id}
-                        colors={isDark
-                              ? ["rgba(8, 145, 178, 0.15)", "rgba(8, 145, 178, 0.3)"]
-                            : ["rgba(8, 145, 178, 0.1)", "rgba(8, 145, 178, 0.3)"]}
+                        colors={
+                            isDark
+                                ? ["rgba(8, 145, 178, 0.15)", "rgba(8, 145, 178, 0.3)"]
+                                : ["rgba(8, 145, 178, 0.1)", "rgba(8, 145, 178, 0.3)"]
+                        }
                         style={[
                             styles.lectureCard,
                             {
@@ -523,16 +598,45 @@ const StudentDashboard = () => {
                     >
                         <View style={styles.lectureCardHeader}>
                             <View style={styles.headerLeftContent}>
-                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255 255 255 / 0.42)' : 'rgba(0,0,0,0.04)' }]}>
-                                    <Ionicons name="easel" size={22} color={colors.primary.main} />
+                                <View
+                                    style={[
+                                        styles.iconContainer,
+                                        {
+                                            backgroundColor: isDark
+                                                ? "rgba(255 255 255 / 0.12)"
+                                                : "rgba(0,0,0,0.04)",
+                                        },
+                                    ]}
+                                >
+                                    <Ionicons
+                                        name="easel"
+                                        size={22}
+                                        color={colors.primary.main}
+                                    />
                                 </View>
                                 <View style={styles.lectureInfo}>
-                                    <Text style={[styles.lectureCardTitle, { color: colors.text.primary }]} numberOfLines={1}>
+                                    <Text
+                                        style={[
+                                            styles.lectureCardTitle,
+                                            { color: colors.text.primary },
+                                        ]}
+                                        numberOfLines={1}
+                                    >
                                         {lecture.title}
                                     </Text>
                                     <View style={styles.lectureMetaRow}>
-                                        <Ionicons name="school-outline" size={12} color={colors.text.secondary} style={{ marginRight: 4 }} />
-                                        <Text style={[styles.lectureClassName, { color: colors.text.secondary }]}>
+                                        <Ionicons
+                                            name="school-outline"
+                                            size={12}
+                                            color={colors.text.secondary}
+                                            style={{ marginRight: 4 }}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.lectureClassName,
+                                                { color: colors.text.secondary },
+                                            ]}
+                                        >
                                             {lecture.className}
                                         </Text>
                                     </View>
@@ -542,20 +646,34 @@ const StudentDashboard = () => {
                                 style={[
                                     styles.liveBadge,
                                     {
-                                        backgroundColor: isDark ? "rgba(76, 175, 80, 0.2)" : "rgba(76, 175, 80, 0.1)",
+                                        backgroundColor: isDark
+                                            ? "rgba(76, 175, 80, 0.2)"
+                                            : "rgba(76, 175, 80, 0.1)",
                                         borderColor: "rgba(76, 175, 80, 0.3)",
-                                        borderWidth: 1
+                                        borderWidth: 1,
                                     },
                                 ]}
                             >
-                                <View style={[styles.liveDot, { backgroundColor: colors.accent.green }]} />
-                                <Text style={[styles.liveBadgeText, { color: colors.accent.green }]}>
+                                <View
+                                    style={[
+                                        styles.liveDot,
+                                        { backgroundColor: colors.accent.green },
+                                    ]}
+                                />
+                                <Text
+                                    style={[styles.liveBadgeText, { color: colors.accent.green }]}
+                                >
                                     LIVE
                                 </Text>
                             </View>
                         </View>
 
-                        <View style={[styles.divider, { backgroundColor: colors.surface.glassBorder }]} />
+                        <View
+                            style={[
+                                styles.divider,
+                                { backgroundColor: colors.surface.glassBorder },
+                            ]}
+                        />
 
                         <TouchableOpacity
                             onPress={() => handleJoin(lecture)}
@@ -570,7 +688,11 @@ const StudentDashboard = () => {
                             >
                                 <Text style={styles.joinButtonText}>Join Class Now</Text>
                                 {loading ? (
-                                    <ActivityIndicator size="small" color="white" style={styles.joinButtonLoader} />
+                                    <ActivityIndicator
+                                        size="small"
+                                        color="white"
+                                        style={styles.joinButtonLoader}
+                                    />
                                 ) : (
                                     <View style={styles.joinIconContainer}>
                                         <Ionicons name="arrow-forward" size={18} color="white" />
@@ -586,108 +708,135 @@ const StudentDashboard = () => {
             <Modal
                 visible={showClassModal}
                 transparent
-                animationType="slide"
+                animationType="fade"
                 onRequestClose={() => setShowClassModal(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <LinearGradient
-                        colors={
-                            isDark
-                                ? ["rgba(30, 30, 30, 0.98)", "rgba(20, 20, 20, 0.98)"]
-                                : ["rgba(255, 255, 255, 0.98)", "rgba(245, 245, 245, 0.98)"]
-                        }
-                        style={[
-                            styles.modalContent,
-                            { borderColor: colors.surface.glassBorder },
-                        ]}
+                    <Animated.View
+                        entering={FadeInUp.duration(400)}
+                        exiting={FadeOutDown.duration(400)}
+                        style={{ width: '100%', maxWidth: 400 }}
                     >
-                        <View style={styles.modalHeader}>
-                            <Text
-                                style={[styles.modalTitle, { color: colors.text.primary }]}
-                            >
-                                Update Class
-                            </Text>
-                            <TouchableOpacity
-                                onPress={() => setShowClassModal(false)}
-                                style={styles.closeButton}
-                            >
-                                <Ionicons
-                                    name="close"
-                                    size={24}
-                                    color={colors.text.primary}
-                                />
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.modalBody}>
-                            <Text
-                                style={[
-                                    styles.modalLabel,
-                                    { color: colors.text.secondary },
-                                ]}
-                            >
-                                Enter your class name
-                            </Text>
-                            <TextInput
-                                style={[
-                                    styles.modalInput,
-                                    {
-                                        color: colors.text.primary,
-                                        backgroundColor: isDark
-                                            ? "rgba(255, 255, 255, 0.05)"
-                                            : "rgba(0, 0, 0, 0.03)",
-                                        borderColor: colors.surface.glassBorder,
-                                    },
-                                ]}
-                                value={className}
-                                onChangeText={setClassName}
-                                placeholder="e.g., Computer Science 101"
-                                placeholderTextColor={colors.text.muted}
-                            />
-                        </View>
-
-                        <View style={styles.modalFooter}>
-                            <TouchableOpacity
-                                style={[
-                                    styles.modalButton,
-                                    {
-                                        backgroundColor: isDark
-                                            ? "rgba(255, 255, 255, 0.1)"
-                                            : "rgba(0, 0, 0, 0.05)",
-                                    },
-                                ]}
-                                onPress={() => setShowClassModal(false)}
-                            >
-                                <Text
-                                    style={[
-                                        styles.modalButtonText,
-                                        { color: colors.text.primary },
-                                    ]}
-                                >
-                                    Cancel
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[
-                                    styles.modalButton,
-                                    { backgroundColor: colors.primary.main },
-                                ]}
-                                onPress={handleUpdateClass}
-                                disabled={classUpdateLoading}
-                            >
-                                {classUpdateLoading ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <Text
-                                        style={[styles.modalButtonText, { color: "white" }]}
-                                    >
-                                        Update
+                        <LinearGradient
+                            colors={
+                                isDark
+                                    ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
+                                    : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
+                            }
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={[
+                                styles.modalContent,
+                                {
+                                    borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+                                    borderWidth: 1,
+                                    shadowOffset: { width: 0, height: 0 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 20,
+                                    // elevation: 10,
+                                },
+                            ]}
+                        >
+                            <View style={styles.modalHeader}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <View style={{
+                                        width: 40, height: 40, borderRadius: 12,
+                                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                        alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <Ionicons name="school" size={20} color={colors.primary.main} />
+                                    </View>
+                                    <Text style={[styles.modalTitle, { color: colors.text.primary, fontSize: 22 }]}>
+                                        Update Class
                                     </Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-                    </LinearGradient>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setShowClassModal(false)}
+                                    style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}
+                                >
+                                    <Ionicons name="close" size={20} color={colors.text.secondary} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={[styles.modalBody, { paddingTop: 10 }]}>
+                                <Text
+                                    style={[styles.modalLabel, { color: colors.text.secondary, marginBottom: 12 }]}
+                                >
+                                    Enter your class name to join lectures
+                                </Text>
+
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.8)",
+                                    borderRadius: 16,
+                                    borderWidth: 1,
+                                    borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+                                    paddingHorizontal: 16,
+                                    height: 56,
+                                }}>
+                                    <Ionicons name="text-outline" size={20} color={colors.text.muted} style={{ marginRight: 12 }} />
+                                    <TextInput
+                                        style={{
+                                            flex: 1,
+                                            color: colors.text.primary,
+                                            fontSize: 16,
+                                            fontWeight: '500'
+                                        }}
+                                        value={className}
+                                        onChangeText={setClassName}
+                                        placeholder="e.g., Computer Science 101"
+                                        placeholderTextColor={colors.text.muted}
+                                        autoFocus={true}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={[styles.modalFooter, { borderTopWidth: 0, paddingTop: 10 }]}>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.modalButton,
+                                        {
+                                            backgroundColor: 'transparent',
+                                            borderWidth: 1,
+                                            borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                                        },
+                                    ]}
+                                    onPress={() => setShowClassModal(false)}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.modalButtonText,
+                                            { color: colors.text.secondary },
+                                        ]}
+                                    >
+                                        Cancel
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={{ flex: 1 }}
+                                    onPress={handleUpdateClass}
+                                    disabled={classUpdateLoading}
+                                >
+                                    <LinearGradient
+                                        colors={[colors.primary.main, "#3B82F6"]}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                        style={[styles.modalButton, { borderWidth: 0 }]}
+                                    >
+                                        {classUpdateLoading ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <Text style={[styles.modalButtonText, { color: "white", fontWeight: '700' }]}>
+                                                Update Class
+                                            </Text>
+                                        )}
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                            </View>
+                        </LinearGradient>
+                    </Animated.View>
                 </View>
             </Modal>
 
@@ -711,9 +860,7 @@ const StudentDashboard = () => {
                         ]}
                     >
                         <View style={styles.modalHeader}>
-                            <Text
-                                style={[styles.modalTitle, { color: colors.text.primary }]}
-                            >
+                            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
                                 Enter Roll Number
                             </Text>
                             <TouchableOpacity
@@ -724,20 +871,13 @@ const StudentDashboard = () => {
                                 }}
                                 style={styles.closeButton}
                             >
-                                <Ionicons
-                                    name="close"
-                                    size={24}
-                                    color={colors.text.primary}
-                                />
+                                <Ionicons name="close" size={24} color={colors.text.primary} />
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.modalBody}>
                             <Text
-                                style={[
-                                    styles.modalLabel,
-                                    { color: colors.text.secondary },
-                                ]}
+                                style={[styles.modalLabel, { color: colors.text.secondary }]}
                             >
                                 Please enter your roll number to continue
                             </Text>
@@ -794,9 +934,7 @@ const StudentDashboard = () => {
                                 ]}
                                 onPress={handleRollNoSubmit}
                             >
-                                <Text
-                                    style={[styles.modalButtonText, { color: "white" }]}
-                                >
+                                <Text style={[styles.modalButtonText, { color: "white" }]}>
                                     Submit
                                 </Text>
                             </TouchableOpacity>
@@ -814,7 +952,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
-        paddingTop: 60,
+        paddingTop: 30,
     },
     headerSection: {
         marginBottom: 24,
@@ -903,7 +1041,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     headerLeftContent: {
-        flexDirection: 'row',
+        flexDirection: "row",
         flex: 1,
         marginRight: 12,
     },
@@ -917,7 +1055,7 @@ const styles = StyleSheet.create({
     },
     lectureInfo: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: "center",
     },
     lectureCardTitle: {
         fontSize: 18,
@@ -927,8 +1065,8 @@ const styles = StyleSheet.create({
         lineHeight: 24,
     },
     lectureMetaRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
     lectureClassName: {
         fontSize: 14,
@@ -955,7 +1093,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        width: '100%',
+        width: "100%",
         marginBottom: 16,
         opacity: 0.5,
     },
@@ -978,7 +1116,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     joinIconContainer: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: "rgba(255,255,255,0.2)",
         borderRadius: 12,
         padding: 4,
         marginLeft: 8,
@@ -1001,7 +1139,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.15,
         shadowRadius: 12,
-        elevation: 8,
     },
     guardianIconOuter: {
         marginBottom: 32,
@@ -1059,9 +1196,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         fontSize: 20,
         fontWeight: "600",
-        textAlign: "center",
+        textAlign: "auto",
         marginBottom: 20,
-        letterSpacing: 4,
     },
     submitButton: {
         height: 56,

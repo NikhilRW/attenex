@@ -211,14 +211,6 @@ const LectureEndedScreen = () => {
                                     >
                                         Students need this code to verify attendance
                                     </Text>
-
-                                    {lastUpdated && (
-                                        <Text
-                                            style={[styles.updateTime, { color: "rgba(255, 255, 255, 0.4)" }]}
-                                        >
-                                            Last updated: {lastUpdated.toLocaleTimeString()}
-                                        </Text>
-                                    )}
                                 </>
                             ) : (
                                 <Text
@@ -469,7 +461,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
-        elevation: 4,
     },
     passcodeDigitText: {
         fontSize: 36,

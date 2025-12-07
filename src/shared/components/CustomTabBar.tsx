@@ -12,12 +12,11 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../hooks/useTheme";
 import { useAuthStore } from "../stores/authStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const BUTTON_WIDTH = 40;
+const BUTTON_WIDTH = 80;
 
 const CustomTabBar = ({
   state: { index, routeNames },
@@ -25,17 +24,34 @@ const CustomTabBar = ({
   ...props
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const role = useAuthStore().user!.role;
+
+  // Filter routes based on user role
+  const filteredRoutes = routeNames.filter((name) => {
+    // Hide role-selection if user already has a role
+    if (role && name.includes("role-selection")) {
+      return false;
+    }
+    if (role === "student" && name.includes("classes")) {
+      return false; // Hide classes tab for students
+    }
+    if (role === "teacher" && (name.includes("attendance") || name.includes("create-") || name.includes("lecture-ended"))) {
+      return false; // Hide attendance tab for teachers
+    }
+    return true;
+  });
+
+  // Find the active tab index in the filtered routes
+  const activeRouteName = routeNames[index];
+  const activeFilteredIndex = filteredRoutes.indexOf(activeRouteName);
 
   const activatedBackgroundStyle = useAnimatedStyle(() => {
     return {
       width: BUTTON_WIDTH,
       height: 60,
-      left: index * BUTTON_WIDTH + 10,
+      left: activeFilteredIndex >= 0 ? activeFilteredIndex * BUTTON_WIDTH + 10 : 10,
     };
   });
-
 
   return (
     <Animated.View
@@ -58,8 +74,9 @@ const CustomTabBar = ({
         ]}
       />
 
-      {routeNames.map((name, idx) => {
-        const isActivated = index === idx;
+      {filteredRoutes.map((name, idx) => {
+        const routeIndex = routeNames.indexOf(name);
+        const isActivated = index === routeIndex;
         return (
           <TabBarButton
             key={`index-${idx}`}
@@ -101,7 +118,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
     opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
     backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
     iconScale.value = withSpring(isActivated ? 1.1 : 1);
-  }, [isActivated]);
+  }, [backgroundOpacity, iconScale, isActivated, opacity]);
 
   const handlePressIn = () => {
     scale.value = withSpring(0.9, {});
@@ -119,13 +136,6 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   const animatedIconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: iconScale.value }],
   }));
-
-  // if (role && role === "student" && name.includes("classes")) {
-  //   return null;
-  // }
-  // if (role && role === "teacher" && name.includes("attendance")) {
-  //   return null;
-  // }
 
   return (
     <AnimatedPressable
@@ -162,15 +172,15 @@ export const getIconForRoute = (
 ) => {
   const color = activated ? colors.primary.main : colors.text.secondary;
   if (routeName.includes("attendance")) {
-    return <FontAwesome6 name="calendar" size={15} color={color} />;
+    return <FontAwesome6 name="calendar" size={25} color={color} />;
   } else if (routeName.includes("classes")) {
-    return <Entypo name="blackboard" size={15} color={color} />;
+    return <Entypo name="blackboard" size={25} color={color} />;
   } else if (routeName.includes("role-selection")) {
-    return <Ionicons name="people" size={15} color={color} />;
+    return <Ionicons name="people" size={25} color={color} />;
   } else if (routeName.includes("settings")) {
-    return <Ionicons name="settings-outline" size={15} color={color} />;
+    return <Ionicons name="settings-outline" size={25} color={color} />;
   } else if (routeName.includes("create-class")) {
-    return <Ionicons name="school" size={15} color={color} />;
+    return <Ionicons name="school" size={25} color={color} />;
   }
 };
 
@@ -216,7 +226,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     textAlign: "center",
-    fontSize: 8,
+    fontSize: 11,
     fontWeight: "600",
     marginTop: 2,
   },

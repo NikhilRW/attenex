@@ -7,7 +7,7 @@ import { secureStore } from "./secureStore";
  * Centralized axios instance for API calls. Automatically attaches Authorization
  * Bearer token from the auth store or secure store to each request.
  */
-export const http = axios.create({
+const http = axios.create({
   baseURL: BASE_URI,
   timeout: 10000,
 });

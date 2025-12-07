@@ -185,14 +185,17 @@ export const addManualAttendance = async (
   }
 };
 
-export const getStudentLectures = async () => {
+export const getStudentLectures = async (className: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/student/lectures`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/student/lectures?class=${className}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error: any) {
     throw error.response?.data || error.message;
@@ -206,6 +209,18 @@ export const getPasscode = async (lectureId: string) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getAllClasses = async () => {
+  const { token } = useAuthStore.getState();
+  try {
+    const response = await axios.get(`${API_URL}/classes/all`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } catch (error: any) {

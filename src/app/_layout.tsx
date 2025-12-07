@@ -7,7 +7,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import FlashMessage from "react-native-flash-message";
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -25,7 +28,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const { setTheme, isDark } = useTheme();
+  const { setTheme, isDark, mode } = useTheme();
   const { bottom } = useSafeAreaInsets();
 
   const [loaded, error] = useFonts({
@@ -33,8 +36,8 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (colorScheme) {
-      setTheme(colorScheme);
+    if (mode === "system") {
+      setTheme(colorScheme as "light" | "dark");
     }
   }, [colorScheme]);
 

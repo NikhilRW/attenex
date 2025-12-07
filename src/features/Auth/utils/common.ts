@@ -1,17 +1,16 @@
 import { User } from "@/backend/src/config/database_setup";
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { authService } from "@/src/shared/services/authService";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 import { googleAuth } from "@/src/shared/utils/google-auth";
-import { http } from "@/src/shared/utils/http";
+import http from "@/src/shared/utils/http";
 import { logger } from "@/src/shared/utils/logger";
+import { getStartingScreenPath } from "@/src/shared/utils/navigation";
+import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
-import * as Linking from "expo-linking";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { secureStore } from "@/src/shared/utils/secureStore";
-import { email } from "zod";
 
 /**
  * Authentication Utility Functions
@@ -93,7 +92,7 @@ export const handleGoogleSignIn = async () => {
     );
 
     // Navigate to the main stack (replace to avoid back navigation to auth)
-    router.replace("/(main)/role-selection");
+    router.replace(getStartingScreenPath());
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;
@@ -222,7 +221,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // Replace to main stack after successful signin
-    router.replace("/(main)/role-selection");
+    router.replace(getStartingScreenPath());
   } catch (err) {
     const e = err as any;
 

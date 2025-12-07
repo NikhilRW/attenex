@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { createLecture, getTeacherClasses } from "../services/lectureService";
 
 interface ClassItem {
@@ -34,8 +35,7 @@ const DURATION_OPTIONS = [
 
 const CreateLectureScreen = () => {
   const router = useRouter();
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
 
   const [lectureName, setLectureName] = useState("");
   const [selectedClass, setSelectedClass] = useState<string>("");
@@ -58,13 +58,13 @@ const CreateLectureScreen = () => {
       }
 
       // Load user-created classes from local storage
-      const savedClasses = storage.getString('user_created_classes');
+      const savedClasses = storage.getString("user_created_classes");
       if (savedClasses) {
         const parsedClasses = JSON.parse(savedClasses);
         // Merge with existing classes, avoiding duplicates
         const allClasses = [...res.data];
         parsedClasses.forEach((saved: ClassItem) => {
-          if (!allClasses.find(c => c.name === saved.name)) {
+          if (!allClasses.find((c) => c.name === saved.name)) {
             allClasses.push(saved);
           }
         });
@@ -148,10 +148,10 @@ const CreateLectureScreen = () => {
 
     // Save user-created classes to MMKV
     try {
-      const savedClasses = storage.getString('user_created_classes');
+      const savedClasses = storage.getString("user_created_classes");
       const parsedClasses = savedClasses ? JSON.parse(savedClasses) : [];
       parsedClasses.push(newClass);
-      storage.set('user_created_classes', JSON.stringify(parsedClasses));
+      storage.set("user_created_classes", JSON.stringify(parsedClasses));
     } catch (error) {
       console.log("Error saving class to storage", error);
     }
@@ -164,7 +164,7 @@ const CreateLectureScreen = () => {
     duration === -1
       ? "Custom"
       : DURATION_OPTIONS.find((opt) => opt.value === duration)?.label ||
-      "1 hour";
+        "1 hour";
 
   return (
     <View style={styles.container}>
@@ -481,76 +481,196 @@ const CreateLectureScreen = () => {
         onRequestClose={() => setShowNewClassModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              {
-                backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.5,
-                shadowRadius: 20,
-                elevation: 20,
-              },
-            ]}
+          <Animated.View
+            entering={FadeInUp.duration(400)}
+            exiting={FadeOutDown.duration(400)}
+            style={{ width: "100%", maxWidth: 400 }}
           >
-            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
-              Add New Class
-            </Text>
-
-            <TextInput
+            <LinearGradient
+              colors={
+                isDark
+                  ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
+                  : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={[
-                styles.modalInput,
+                styles.modalContent,
                 {
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.05)",
-                  borderColor: colors.surface.glassBorder,
-                  color: colors.text.primary,
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(255,255,255,0.8)",
+                  borderWidth: 1,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 20,
+                  elevation: 10,
+                  padding: 0, // Reset padding to handle internal layout
+                  overflow: "hidden",
                 },
               ]}
-              placeholder="Enter class name (e.g., CS101)"
-              placeholderTextColor={colors.text.muted}
-              value={newClassName}
-              onChangeText={setNewClassName}
-            />
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.05)",
-                  },
-                ]}
-                onPress={() => {
-                  setNewClassName("");
-                  setShowNewClassModal(false);
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: 20,
+                  borderBottomWidth: 1,
+                  borderBottomColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.05)",
                 }}
               >
-                <Text
-                  style={[
-                    styles.modalButtonTextSecondary,
-                    { color: colors.text.secondary },
-                  ]}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
                 >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "700",
+                      color: colors.text.primary,
+                    }}
+                  >
+                    Add New Class
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setShowNewClassModal(false)}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons
+                    name="close"
+                    size={20}
+                    color={colors.text.secondary}
+                  />
+                </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.primary.main },
-                ]}
-                onPress={handleCreateNewClass}
+              <View style={{ padding: 24 }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "600",
+                    color: colors.text.secondary,
+                    marginBottom: 12,
+                    marginLeft: 4,
+                  }}
+                >
+                  Class Name
+                </Text>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: isDark
+                      ? "rgba(0, 0, 0, 0.3)"
+                      : "rgba(255, 255, 255, 0.8)",
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: isDark
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0,0,0,0.05)",
+                    paddingHorizontal: 16,
+                    height: 56,
+                    marginBottom: 8,
+                  }}
+                >
+                  <TextInput
+                    style={{
+                      flex: 1,
+                      color: colors.text.primary,
+                      fontSize: 16,
+                      fontWeight: "500",
+                    }}
+                    placeholder="e.g., Computer Science 101"
+                    placeholderTextColor={colors.text.muted}
+                    value={newClassName}
+                    onChangeText={setNewClassName}
+                    autoFocus
+                  />
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  padding: 20,
+                  paddingTop: 0,
+                  gap: 12,
+                }}
               >
-                <Text style={styles.modalButtonTextPrimary}>Add Class</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    padding: 16,
+                    borderRadius: 16,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 1,
+                    borderColor: isDark
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.1)",
+                  }}
+                  onPress={() => {
+                    setNewClassName("");
+                    setShowNewClassModal(false);
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "600",
+                      color: colors.text.secondary,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={handleCreateNewClass}
+                >
+                  <LinearGradient
+                    colors={[colors.primary.main, "#3B82F6"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      padding: 16,
+                      borderRadius: 16,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: 16,
+                      }}
+                    >
+                      Create Class
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </Animated.View>
         </View>
       </Modal>
     </View>

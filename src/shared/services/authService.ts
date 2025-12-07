@@ -1,8 +1,9 @@
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
-import { http } from "@/src/shared/utils/http";
+import http  from "@/src/shared/utils/http";
 import { secureStore } from "@/src/shared/utils/secureStore";
 import { logger } from "../utils/logger";
+import { router } from "expo-router";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -34,6 +35,7 @@ export const authService = {
       console.error("authService: failed to remove token", err);
     }
     useAuthStore.getState().logout();
+    router.replace("/sign-in");
   },
 
   async updateUserRole(role: "teacher" | "student") {

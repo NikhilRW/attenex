@@ -293,7 +293,7 @@ const TeacherDashboard = () => {
   // Stats
   const totalActive = lectures.filter((l) => l.status === "active").length;
   const totalStudents = lectures.reduce(
-    (acc, curr) => acc + curr.studentCount,
+    (acc, curr) => acc + Number(curr.studentCount),
     0
   );
 

@@ -52,11 +52,11 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
       .where(eq(classes.name, className.trim()))
       .limit(1);
 
-    let classId: string;
+    let exisitingClassName: string;
 
     if (classRecord.length > 0) {
-      classId = classRecord[0].id;
-      logger.info(`Found existing class: ${classId} for student: ${userId}`);
+      exisitingClassName = classRecord[0].name;
+      logger.info(`Found existing class: ${exisitingClassName} for student: ${userId}`);
     } else {
       // Create new class with no teacher (student-created class)
       const newClass = await db
@@ -67,20 +67,20 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
         })
         .returning();
 
-      classId = newClass[0].id;
-      logger.info(`Created new class: ${classId} for student: ${userId}`);
+      let newClassName = newClass[0].name;
+      logger.info(`Created new class: ${newClassName} for student: ${userId}`);
     }
 
     // Update the student's class
     const updatedUser = await db
       .update(users)
       .set({
-        classId: classId,
+        className: className.trim(),
       })
       .where(eq(users.id, userId))
       .returning();
 
-    logger.info(`Updated student ${userId} class to: ${classId}`);
+    logger.info(`Updated student ${userId} class to: ${className.trim()}`);
 
     return res.status(200).json({
       success: true,
@@ -91,7 +91,6 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
           email: updatedUser[0].email,
           name: updatedUser[0].name,
           role: updatedUser[0].role,
-          classId: updatedUser[0].classId,
           className: className.trim(),
         },
       },

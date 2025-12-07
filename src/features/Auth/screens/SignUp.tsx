@@ -26,6 +26,7 @@ import {
   handleLinkedInSignIn,
 } from "../utils/common";
 import { SignUpFormData, signUpSchema } from "../validation/authSchemas";
+import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 
 const SignUp = () => {
   const router = useRouter();
@@ -37,7 +38,7 @@ const SignUp = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.replace("/(main)/role-selection");
+      router.replace(getStartingScreenPath());
     }
   }, [authLoading, isAuthenticated]);
 

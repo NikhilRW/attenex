@@ -9,6 +9,7 @@ import { showMessage } from "react-native-flash-message";
 import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { linkedinAuthService } from "../services/linkedinAuthService";
+import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 
 /**
  * LinkedIn OAuth Configuration
@@ -154,7 +155,7 @@ export const LinkedInAuth = () => {
       );
 
       // Navigate to role selection screen (next step in user onboarding)
-      router.replace("/(main)/role-selection");
+      router.replace(getStartingScreenPath());
     } catch (error) {
       const err = error as any;
 

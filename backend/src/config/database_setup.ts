@@ -97,7 +97,7 @@ export const users = pgTable(
     name: text("name"), // Display name, can be updated from OAuth providers
     photoUrl: text("photo_url"), // Optional profile photo URL from OAuth or user upload
     role: userRoleEnum("role"), // teacher or student - determines permissions
-    classId: uuid("class_id").references(() => classes.id), // Student's assigned class (null for teachers)
+    className: text("class_name"), // Student's assigned class (null for teachers)
     rollNo: varchar("roll_no", { length: 20 }), // Student roll number (unique per class, null for teachers)
     passwordHash: text("password_hash"), // Only for traditional auth users (bcrypt hash)
     oauthProvider: text("oauth_provider"), // 'linkedin', 'google', etc. - null for traditional auth
@@ -115,8 +115,8 @@ export const users = pgTable(
   (table) => [
     uniqueIndex("users_email_idx").on(table.email), // Fast email lookups for auth
     index("users_role_idx").on(table.role), // Filter users by role
-    index("users_class_idx").on(table.classId), // Find students in a class
-    index("users_class_rollno_idx").on(table.classId, table.rollNo), // Unique roll numbers per class
+    index("users_class_idx").on(table.className), // Find students in a class
+    index("users_class_rollno_idx").on(table.className, table.rollNo), // Unique roll numbers per class
   ]
 );
 
@@ -129,8 +129,7 @@ export const users = pgTable(
 export const classes = pgTable(
   "classes",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    name: text("name").notNull(), // Class name (e.g., "Computer Science 101")
+    name: text("name").notNull().primaryKey(), // Class name (e.g., "Computer Science 101")
     teacherId: uuid("teacher_id").references(() => users.id), // Teacher who created the class
     metadata: jsonb("metadata"), // Flexible storage for class settings, schedule, etc.
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -152,8 +151,8 @@ export const lectures = pgTable(
     teacherId: uuid("teacher_id")
       .references(() => users.id)
       .notNull(), // Teacher conducting the lecture
-    classId: uuid("class_id")
-      .references(() => classes.id)
+    className: text("class_name")
+      .references(() => classes.name)
       .notNull(), // Class this lecture belongs to
     title: text("title").notNull(), // Lecture title/topic
     sessionToken: uuid("session_token").defaultRandom(), // Unique token for this session
@@ -170,7 +169,7 @@ export const lectures = pgTable(
   },
   (table) => [
     index("lectures_teacher_status_idx").on(table.teacherId, table.status), // Active lectures by teacher
-    index("lectures_class_idx").on(table.classId), // Lectures in a class
+    index("lectures_class_idx").on(table.className), // Lectures in a class
   ]
 );
 
@@ -295,8 +294,8 @@ export const geofenceLogs = pgTable(
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   class: one(classes, {
-    fields: [users.classId],
-    references: [classes.id],
+    fields: [users.className],
+    references: [classes.name],
   }), // Student belongs to one class
   teachingClasses: many(classes), // Teacher can teach many classes
   lecturesAsTeacher: many(lectures), // Teacher conducts many lectures
@@ -321,8 +320,8 @@ export const lecturesRelations = relations(lectures, ({ one, many }) => ({
     references: [users.id],
   }), // Lecture has one teacher
   class: one(classes, {
-    fields: [lectures.classId],
-    references: [classes.id],
+    fields: [lectures.className],
+    references: [classes.name],
   }), // Lecture belongs to one class
   attendanceRecords: many(attendance), // Lecture has many attendance records
   attendanceAttempts: many(attendanceAttempts), // Lecture has many attempt records

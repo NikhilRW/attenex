@@ -28,6 +28,7 @@ import {
   handleLinkedInSignIn,
 } from "../utils/common";
 import { SignInFormData, signInSchema } from "../validation/authSchemas";
+import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 
 const SignIn = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const SignIn = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.replace("/(main)/role-selection");
+      router.replace(getStartingScreenPath());
     }
     if (params.verified === "true") {
       // Show success message for email verification
