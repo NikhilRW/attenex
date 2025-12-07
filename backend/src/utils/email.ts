@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 export const getTransporter = () => {
   // Setup email transporter
+  
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
     secure: true,
