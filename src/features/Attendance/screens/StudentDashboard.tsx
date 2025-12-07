@@ -20,7 +20,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import Animated, { FadeInDown, FadeInUp, FadeOutDown } from "react-native-reanimated";
+import Animated, {  FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { joinLecture, submitAttendance } from "../services/attendanceService";
 import {
@@ -64,9 +64,10 @@ const StudentDashboard = () => {
         }
     }, []);
 
+    const changedClassName = (user as any)?.className;
     useEffect(() => {
         fetchLectures();
-    }, [fetchLectures, (user as any)?.className]); // Refetch when className changes
+    }, [fetchLectures, changedClassName]); // Refetch when className changes
 
     // Connect to socket on mount
     useEffect(() => {
