@@ -18,10 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  Gesture,
-  GestureHandlerRootView
-} from "react-native-gesture-handler";
+import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
   FadeInDown,
@@ -347,7 +344,7 @@ const TeacherDashboard = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
+      {isDark && <FuturisticBackground />}
       <GestureHandlerRootView style={{ flex: 1 }}>
         {/* <GestureDetector gesture={swipeGesture}> */}
         <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}>
@@ -364,9 +361,7 @@ const TeacherDashboard = () => {
               <Canvas style={{ position: "absolute", width: 60, height: 60 }}>
                 <Path
                   path={circlePath}
-                  color={
-                    isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
-                  }
+                  color={isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
                   style="stroke"
                   strokeWidth={4}
                 />
@@ -418,10 +413,7 @@ const TeacherDashboard = () => {
               <View style={styles.header}>
                 <View>
                   <Text
-                    style={[
-                      styles.headerTitle,
-                      { color: colors.text.primary },
-                    ]}
+                    style={[styles.headerTitle, { color: colors.text.primary }]}
                   >
                     Dashboard
                   </Text>
@@ -456,10 +448,7 @@ const TeacherDashboard = () => {
                   colors={
                     isDark
                       ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"]
-                      : [
-                        "rgba(59, 130, 246, 0.1)",
-                        "rgba(59, 130, 246, 0.05)",
-                      ]
+                      : ["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"]
                   }
                   style={[
                     styles.statsCard,
@@ -498,10 +487,7 @@ const TeacherDashboard = () => {
                   colors={
                     isDark
                       ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"]
-                      : [
-                        "rgba(16, 185, 129, 0.1)",
-                        "rgba(16, 185, 129, 0.05)",
-                      ]
+                      : ["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"]
                   }
                   style={[
                     styles.statsCard,
@@ -540,10 +526,7 @@ const TeacherDashboard = () => {
                   colors={
                     isDark
                       ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"]
-                      : [
-                        "rgba(245, 158, 11, 0.1)",
-                        "rgba(245, 158, 11, 0.05)",
-                      ]
+                      : ["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"]
                   }
                   style={[
                     styles.statsCard,
@@ -657,10 +640,7 @@ const TeacherDashboard = () => {
                     <LinearGradient
                       colors={
                         isDark
-                          ? [
-                            "rgba(255,255,255,0.08)",
-                            "rgba(255,255,255,0.02)",
-                          ]
+                          ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
                           : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
                       }
                       style={[
@@ -809,8 +789,7 @@ const TeacherDashboard = () => {
                                 style={[
                                   styles.iconBtn,
                                   {
-                                    backgroundColor:
-                                      "rgba(239, 68, 68, 0.15)",
+                                    backgroundColor: "rgba(239, 68, 68, 0.15)",
                                   },
                                 ]}
                                 onPress={() =>

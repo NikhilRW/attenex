@@ -21,9 +21,11 @@ const VerifyEmail = () => {
   const { colors, mode } = useTheme();
 
   useEffect(() => {
-    if (params.email) {
-      sendVerificationEmail(params.email as string);
-    }
+    (async () => {
+      if (params.email) {
+        await sendVerificationEmail(params.email as string);
+      }
+    })();
   }, [params.email]);
 
   return (

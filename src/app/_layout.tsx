@@ -16,6 +16,8 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { useAuthStore } from "../shared/stores/authStore";
+import { getStartingScreenPath } from "../shared/utils/navigation";
 
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
@@ -30,6 +32,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const { setTheme, isDark, mode } = useTheme();
   const { bottom } = useSafeAreaInsets();
+  const { isAuthenticated } = useAuthStore();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,

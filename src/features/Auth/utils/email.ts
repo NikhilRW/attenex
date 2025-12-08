@@ -13,6 +13,14 @@ export const sendVerificationEmail = async (email: string) => {
       }
     );
     if (response.data.success) {
+      showMessage({
+        message: "Verification Email Sent",
+        description:
+          "A verification email has been sent to your inbox. Please check your email to verify your account.",
+        type: "success",
+        duration: 3000,
+        position: "bottom",
+      });
     } else {
       showMessage({
         message: "Error",

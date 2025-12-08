@@ -10,7 +10,7 @@ export const sendVerificationEmail = async ({
 }: {
   email: string;
   id: string;
-  name;
+  name: string;
 }) => {
   const tokenExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 10);
 

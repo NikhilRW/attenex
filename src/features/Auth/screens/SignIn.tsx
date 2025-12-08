@@ -29,6 +29,7 @@ import {
 } from "../utils/common";
 import { SignInFormData, signInSchema } from "../validation/authSchemas";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
+import { secureStore } from "@/src/shared/utils/secureStore";
 
 const SignIn = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const SignIn = () => {
   // Redirect to main stack if user is already authenticated (prevents seeing signin screen)
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!authLoading && isAuthenticated && !params.loggedOut) {
       router.replace(getStartingScreenPath());
     }
     if (params.verified === "true") {
@@ -53,7 +54,18 @@ const SignIn = () => {
         position: "bottom",
       });
     }
-  }, [authLoading, isAuthenticated, params.verified, router]);
+    if (params.loggedOut === "true") {
+      const main = async () => {
+        secureStore.removeItem("jwt");
+      };
+      main();
+      useAuthStore.setState({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+      });
+    }
+  }, [authLoading, isAuthenticated, params.loggedOut, params.verified, router]);
 
   // Initialize react-hook-form with Zod validation
   const {
@@ -73,7 +85,9 @@ const SignIn = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <View
+      style={[styles.container, { backgroundColor: colors.background.primary }]}
+    >
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <FuturisticBackground />
 

@@ -46,6 +46,8 @@ export const handleGoogleSignIn = async () => {
     // Step 1: Initiate Google sign-in
     const response = await googleAuth.signIn();
 
+    logger.info("Google Sign-In Response: ", response.data?.user.photo);
+
     // Handle user cancellation (when they dismiss the Google account picker)
     if (response.type === "cancelled") {
       showMessage({
@@ -74,23 +76,34 @@ export const handleGoogleSignIn = async () => {
     // Step 3: Update local authentication state
     // Stores user data and Google ID token in Zustand store
     // Use authService to persist token securely and set user state
-    await authService.login(newUser.data.user!, response.data.idToken!);
 
-    // Step 4: Show success feedback to user and navigate to main flow
-    showMessage({
-      message: "Sign-in Successful!",
-      description: `Welcome, ${newUser.data.user?.name}`,
-      type: "success",
-      duration: 2500,
-      position: "bottom",
-    });
+    if (newUser.data.success) {
+      await authService.login(newUser.data.user, newUser.data.token);
 
-    // Step 5: Log successful authentication for monitoring
-    logger.info(
-      `Google sign-in successful for user: ${newUser.data.user?.email}`,
-      "common.ts :: handleGoogleSignIn()"
-    );
+      // Step 4: Show success feedback to user and navigate to main flow
+      showMessage({
+        message: "Sign-in Successful!",
+        description: `Welcome, ${newUser.data.user?.name}`,
+        type: "success",
+        duration: 2500,
+        position: "bottom",
+      });
 
+      // Step 5: Log successful authentication for monitoring
+      logger.info(
+        `Google sign-in successful for user: ${newUser.data.user?.email}`,
+        "common.ts :: handleGoogleSignIn()"
+      );
+    } else {
+      showMessage({
+        message: "Sign-in Failed",
+        description: "Unable to sign in with Google. Please try again.",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      return;
+    }
     // Navigate to the main stack (replace to avoid back navigation to auth)
     router.replace(getStartingScreenPath());
   } catch (err) {
@@ -222,7 +235,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // Replace to main stack after successful signin
-    router.replace(getStartingScreenPath());
+    router.navigate(getStartingScreenPath());
   } catch (err) {
     const e = err as any;
 
@@ -271,7 +284,6 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       email: data.email!,
       password: data.password!,
     });
-  
 
     if (status !== 201) {
       showMessage({

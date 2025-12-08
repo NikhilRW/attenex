@@ -20,7 +20,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import Animated, {  FadeInUp, FadeOutDown } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { joinLecture, submitAttendance } from "../services/attendanceService";
 import {
@@ -55,19 +55,38 @@ const StudentDashboard = () => {
 
     const fetchLectures = useCallback(async () => {
         try {
-            const res = await getStudentLectures(user?.className!);
+            const userClassName = (user as any)?.className;
+            console.log("🔍 Fetching lectures for user:", {
+                userId: user?.id,
+                className: userClassName,
+                hasClassName: !!userClassName
+            });
+
+            if (!userClassName) {
+                console.log("⚠️ No className set for user");
+                setLectures([]);
+                return;
+            }
+
+            const res = await getStudentLectures(userClassName);
+            console.log("📚 Lectures API response:", res);
+
             if (res.success) {
-                setLectures(res.data);
+                setLectures(res.data || []);
+                console.log("✅ Lectures set:", res.data?.length || 0);
+            } else {
+                console.log("❌ API returned success=false:", res.message);
+                setLectures([]);
             }
         } catch (error) {
-            console.log("Error fetching lectures", error);
+            console.log("❌ Error fetching lectures:", error);
+            setLectures([]);
         }
-    }, []);
+    }, [user]);
 
-    const changedClassName = (user as any)?.className;
     useEffect(() => {
         fetchLectures();
-    }, [fetchLectures, changedClassName]); // Refetch when className changes
+    }, [fetchLectures]); // Refetch when user changes
 
     // Connect to socket on mount
     useEffect(() => {
@@ -776,7 +795,6 @@ const StudentDashboard = () => {
                                     paddingHorizontal: 16,
                                     height: 56,
                                 }}>
-                                    <Ionicons name="text-outline" size={20} color={colors.text.muted} style={{ marginRight: 12 }} />
                                     <TextInput
                                         style={{
                                             flex: 1,

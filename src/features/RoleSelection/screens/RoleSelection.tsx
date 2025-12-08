@@ -377,6 +377,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backdropFilter: "blur(10px)",
     zIndex: 2,
+    height:110,
   },
   roleLabel: {
     fontSize: 24,

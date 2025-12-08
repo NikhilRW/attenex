@@ -2,7 +2,10 @@ import { useAuthStore } from "../stores/authStore";
 
 export const getStartingScreenPath = () => {
   const user = useAuthStore.getState().user;
-
+  
+  if (!user) {
+    return "/(auth)/sign-in";
+  }
   if (user?.role === "teacher") {
     return "/(main)/classes";
   }

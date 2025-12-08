@@ -188,8 +188,9 @@ export const addManualAttendance = async (
 export const getStudentLectures = async (className: string) => {
   try {
     const { token } = useAuthStore.getState();
+    console.log("className : "+className);
     const response = await axios.get(
-      `${API_URL}/student/lectures?class=${className}`,
+      `${API_URL}/student/lectures?class=${encodeURI(className)}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

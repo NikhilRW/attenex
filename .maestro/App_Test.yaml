@@ -1,0 +1,13 @@
+appId: com.attenex.attenex
+---
+- launchApp
+
+- assertVisible: name@example.com
+- tapOn : name@example.com
+- inputText: nikhilwankhede0707@gmail.com
+- tapOn : Enter your password
+- inputText: Nikhil009
+- tapOn : Password
+- tapOn : Sign in
+- assertVisible: Student
+- assertVisible: Teacher

@@ -17,17 +17,17 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { handleResetPassword } from "../utils/common";
+import { Image } from "expo-image";
 
 const SettingsScreen = () => {
   const { colors, isDark, mode, setTheme } = useTheme();
-  const { user, updateUser, logout } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<"teacher" | "student">(
     (user?.role as any) || "teacher"
   );
   const [savingRole, setSavingRole] = useState(false);
   const [savingName, setSavingName] = useState(false);
-  const [clearing, setClearing] = useState(false);
 
   const handleRoleUpdate = async () => {
     setSavingRole(true);
@@ -66,27 +66,21 @@ const SettingsScreen = () => {
   };
 
   const handleDeleteAccount = async () => {
-    Alert.alert(
-      "Delete Account",
-      "This will remove your session. Backend deletion endpoint not wired.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await authService.logout();
-            Alert.alert(
-              "Account",
-              "Session cleared. Add API call to delete account."
-            );
-          },
+    Alert.alert("Delete Account", "This will remove your account forever.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await authService.deleteUserAccount();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const getInitials = (name: string) => {
+    console.log("user?.photoUrl", user!.photoUrl);
+
     return (name || "User").slice(0, 2).toUpperCase();
   };
 
@@ -134,14 +128,22 @@ const SettingsScreen = () => {
             ]}
           >
             <View style={styles.profileHeader}>
-              <LinearGradient
-                colors={[colors.primary.main, colors.accent.purple]}
-                style={styles.avatar}
-              >
-                <Text style={styles.avatarText}>
-                  {getInitials(displayName)}
-                </Text>
-              </LinearGradient>
+              {user?.photoUrl ? (
+                <Image
+                  source={{ uri: user.photoUrl }}
+                  style={{ borderRadius: 25, height: 50, width: 50 }}
+                />
+              ) : (
+                <LinearGradient
+                  colors={[colors.primary.main, colors.accent.purple]}
+                  style={styles.avatar}
+                >
+                  <Text style={styles.avatarText}>
+                    {getInitials(displayName)}
+                  </Text>
+                </LinearGradient>
+              )}
+
               <View style={styles.profileInfo}>
                 <Text style={[styles.label, { color: colors.text.secondary }]}>
                   Display Name

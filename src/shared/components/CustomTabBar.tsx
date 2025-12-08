@@ -44,8 +44,8 @@ const CustomTabBar = ({
       return false; // Hide attendance tab for teachers
     }
 
-    if (!role && !name.includes("role-selection")) {
-      return false; // If no role, only show role-selection
+    if (!role) {
+      return false; // If no role, only show nothing
     }
     return true;
   });
@@ -54,9 +54,11 @@ const CustomTabBar = ({
   const activeRouteName = routeNames[index];
   const activeFilteredIndex = filteredRoutes.indexOf(activeRouteName);
 
+  const isEmptyTabBar = filteredRoutes.length === 0;
+
   const activatedBackgroundStyle = useAnimatedStyle(() => {
     return {
-      width: BUTTON_WIDTH,
+      width: isEmptyTabBar ? 0 : BUTTON_WIDTH,
       height: 60,
       left:
         activeFilteredIndex >= 0 ? activeFilteredIndex * BUTTON_WIDTH + 10 : 10,
@@ -68,6 +70,7 @@ const CustomTabBar = ({
       style={[
         styles.container,
         {
+          display:isEmptyTabBar ? 'none' : 'flex',
           bottom: 5,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,

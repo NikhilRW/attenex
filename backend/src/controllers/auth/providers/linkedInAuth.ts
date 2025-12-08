@@ -77,8 +77,7 @@ export const linkedInAuth = async (req: Request, res: Response) => {
         },
       }
     );
-    
-    
+
     const { access_token } = tokenResponse.data;
 
     // Validate that we received an access token
@@ -144,11 +143,12 @@ export const linkedInAuth = async (req: Request, res: Response) => {
           name: linkedinUser.name || user.name, // Update name if changed
           oauthProvider: "linkedin",
           oauthId: linkedinUser.sub, // LinkedIn's unique user ID
-          photoUrl: linkedinUser.picture || user.photoUrl,
+          photoUrl: linkedinUser.picture || user.photoUrlz,
           updatedAt: new Date(),
         })
         .where(eq(users.id, user.id));
 
+        
       logger.info(`LinkedIn OAuth: Updated existing user: ${user.email}`);
     } else {
       // New user - create account with LinkedIn data
@@ -159,7 +159,7 @@ export const linkedInAuth = async (req: Request, res: Response) => {
           name: linkedinUser.name || linkedinUser.email.split("@")[0], // Fallback name
           oauthProvider: "linkedin",
           oauthId: linkedinUser.sub,
-          photoUrl: (linkedinUser.picture && linkedinUser.picture.url) || null,
+          photoUrl: linkedinUser.picture || linkedinUser.picture.url,
           isVerified: true, // LinkedIn users are pre-verified
         })
         .returning();
@@ -183,7 +183,7 @@ export const linkedInAuth = async (req: Request, res: Response) => {
      */
     const token = jwt.sign(
       {
-        userId: user.id,
+        id: user.id,
         email: user.email,
         role: user.role,
       },

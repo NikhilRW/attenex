@@ -10,6 +10,7 @@ import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { linkedinAuthService } from "../services/linkedinAuthService";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
+import { authService } from "@/src/shared/services/authService";
 
 /**
  * LinkedIn OAuth Configuration
@@ -37,7 +38,6 @@ export const LinkedInAuth = () => {
   const router = useRouter();
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { login } = useAuth();
   const { colors } = useTheme();
   /**
    * Constructs the LinkedIn OAuth authorization URL
@@ -137,8 +137,10 @@ export const LinkedInAuth = () => {
 
       const { user, token } = exchange;
 
+      console.log("linkedin token : " + token);
+
       // Store user data and JWT token using the auth hook
-      await login(user, token);
+      await authService.login(user, token);
 
       // Show success feedback to user
       showMessage({
@@ -154,8 +156,11 @@ export const LinkedInAuth = () => {
         "LinkedInAuth"
       );
 
+      setTimeout(() => {
+        router.replace(getStartingScreenPath());
+      },1000);
+
       // Navigate to role selection screen (next step in user onboarding)
-      router.replace(getStartingScreenPath());
     } catch (error) {
       const err = error as any;
 
@@ -200,10 +205,17 @@ export const LinkedInAuth = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <View
+      style={[styles.container, { backgroundColor: colors.background.primary }]}
+    >
       {/* Loading overlay shown during WebView loading and auth processing */}
       {isLoading && (
-        <View style={[styles.loadingOverlay, { backgroundColor: colors.background.overlay }]}>
+        <View
+          style={[
+            styles.loadingOverlay,
+            { backgroundColor: colors.background.overlay },
+          ]}
+        >
           <ActivityIndicator size="large" color={colors.primary.main} />
         </View>
       )}

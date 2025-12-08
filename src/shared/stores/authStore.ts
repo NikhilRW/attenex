@@ -4,7 +4,7 @@ import { secureStore } from "@/src/shared/utils/secureStore";
 import { router } from "expo-router";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
+import { useThemeStore } from "../hooks/useTheme";
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -25,11 +25,6 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: true,
       setAuth: (user, token, isSignUp = false) => {
-        // Persist the token in secure storage (encrypted) and keep user in persisted storage
-        secureStore.setItem("jwt", token).catch((err) => {
-          // Log error but allow the state to be set (app should still function)
-          console.error("Failed to store token in secure storage", err);
-        });
         set({
           user,
           token,
@@ -47,13 +42,8 @@ export const useAuthStore = create<AuthState>()(
         secureStore.removeItem("jwt").catch((err) => {
           console.error("Failed to remove token from secure storage", err);
         });
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
-        router.replace("/sign-in");
+        useThemeStore.setState({ mode: "system" });
+        router.replace("/sign-in?loggedOut=true");
       },
       setLoading: (loading) => set({ isLoading: loading }),
     }),

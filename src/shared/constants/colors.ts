@@ -39,7 +39,7 @@ export const darkTheme = {
   surface: {
     glass: "rgba(255, 255, 255, 0.05)",
     glassBorder: "rgba(255, 255, 255, 0.1)",
-    cardBg: "rgba(26, 31, 58, 0.6)",
+    cardBg: "rgba(26, 31, 58, 0.8)",
   },
 
   // Shadows
@@ -100,7 +100,7 @@ export const lightTheme = {
   surface: {
     glass: "rgba(0, 0, 0, 0.1)",
     glassBorder: "rgba(0, 0, 0, 0.15)",
-    cardBg: "rgba(255, 255, 255, 0.95)",
+    cardBg: "rgba(255, 255, 255, 0.8)",
   },
 
   // Shadows

@@ -141,7 +141,7 @@ const CreateLectureScreen = () => {
       return;
     }
 
-    const newClass = { id: Date.now().toString(), name: newClassName };
+    const newClass = { id: Date.now().toString(), name: newClassName.trim() };
     const updatedClasses = [...existingClasses, newClass];
     setExistingClasses(updatedClasses);
     setSelectedClass(newClassName);
