@@ -13,7 +13,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { handleResetPassword } from "../utils/common";
@@ -362,7 +362,7 @@ const SettingsScreen = () => {
           >
             <TouchableOpacity
               style={styles.dangerRow}
-              onPress={handleResetPassword}
+              onPress={async () => await handleResetPassword()}
             >
               <View style={styles.rowLeft}>
                 <View
