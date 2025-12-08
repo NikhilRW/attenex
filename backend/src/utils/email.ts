@@ -1,20 +1,7 @@
-import nodemailer from "nodemailer";
 import "dotenv/config";
 import { logger } from "./logger";
 import jwt from "jsonwebtoken";
-
-export const getTransporter = () => {
-  // Setup email transporter
-  
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    secure: true,
-    auth: {
-      user: process.env.GMAIL_USER!,
-      pass: process.env.GMAIL_APP_PASSWORD!,
-    },
-  });
-};
+import axios from "axios";
 
 export const sendVerificationEmail = async ({
   email,
@@ -25,8 +12,6 @@ export const sendVerificationEmail = async ({
   id: string;
   name;
 }) => {
-  // Setup verification token and email
-  const transporter = getTransporter();
   const tokenExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 10);
 
   const verificationToken = jwt.sign(
@@ -85,10 +70,9 @@ export const sendVerificationEmail = async ({
 
   // Send email (do not block signup; log error if sending fails)
   try {
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+    await axios.post(`https://attenex-email-backend.vercel.app/send-email`, {
       to: email,
-      subject: "Verify your email — Attenex",
+      subject: "Verify your email for Attenex",
       text,
       html,
     });

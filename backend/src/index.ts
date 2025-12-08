@@ -1,3 +1,4 @@
+import "tsconfig-paths/register";
 import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import "dotenv/config";

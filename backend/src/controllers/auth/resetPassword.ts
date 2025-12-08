@@ -5,7 +5,7 @@ import crypto from "crypto";
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import nodemailer from "nodemailer";
+import axios from 'axios';
 
 /**
  * Request Password Reset
@@ -67,12 +67,9 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     // Setup email transporter
     const transporter = getTransporter();
 
-    // Send reset email
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: email,
-      subject: "Reset Your Password - Attenex",
-      html: `
+    const to = email;
+    const subject = "Reset Your Password - Attenex";
+    const html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -109,10 +106,17 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
           </div>
         </body>
         </html>
-      `,
-      text: `Hi ${
-        user.name || "there"
-      },\n\nWe received a request to reset your password for your Attenex account.\n\nClick this link to reset your password (expires in 1 hour):\n${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nThe Attenex Team`,
+      `;
+    const text = `Hi ${
+      user.name || "there"
+    },\n\nWe received a request to reset your password for your Attenex account.\n\nClick this link to reset your password (expires in 1 hour):\n${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nThe Attenex Team`;
+
+    // Send reset email
+    await axios.post(`https://attenex-email-backend.vercel.app/send-email`, {
+      to: email,
+      subject: "Reset Your Password - Attenex",
+      text,
+      html,
     });
 
     return res.status(200).json({
@@ -169,8 +173,6 @@ export const verifyResetToken = async (req: Request, res: Response) => {
         error: "Invalid or expired reset link",
       });
     }
-
-    
 
     return res.status(200).json({
       message: "Token is valid",
