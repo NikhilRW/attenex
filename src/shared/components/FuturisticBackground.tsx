@@ -20,7 +20,7 @@ import {
 } from "react-native-reanimated";
 import { useTheme } from "../hooks/useTheme";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 export const FuturisticBackground = () => {
     const { colors, mode } = useTheme();
@@ -86,8 +86,8 @@ export const FuturisticBackground = () => {
     });
 
     return (
-        <View style={StyleSheet.absoluteFillObject}>
-            <Canvas style={StyleSheet.absoluteFillObject}>
+        <View style={[StyleSheet.absoluteFillObject]}>
+            <Canvas style={[StyleSheet.absoluteFillObject]}>
                 {/* Deep Space Background */}
                 <Rect x={0} y={0} width={width} height={height} color={colors.background.primary} />
 

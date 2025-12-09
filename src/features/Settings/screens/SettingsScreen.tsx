@@ -24,7 +24,7 @@ import Animated, {
   useSharedValue,
   withSequence,
   withSpring,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
 import { handleResetPassword } from "../utils/common";
 
@@ -333,13 +333,23 @@ const SettingsScreen = () => {
                 styles.statsRow,
                 {
                   borderTopColor: colors.surface.glassBorder,
-                  justifyContent: 'center',
-                  gap: 8
+                  justifyContent: "center",
+                  gap: 8,
                 },
               ]}
             >
-              <Ionicons name="mail-outline" size={16} color={colors.text.muted} />
-              <Text style={{ color: colors.text.secondary, fontSize: 14, fontWeight: '500' }}>
+              <Ionicons
+                name="mail-outline"
+                size={16}
+                color={colors.text.muted}
+              />
+              <Text
+                style={{
+                  color: colors.text.secondary,
+                  fontSize: 14,
+                  fontWeight: "500",
+                }}
+              >
                 {user?.email || "No email connected"}
               </Text>
             </View>
@@ -570,6 +580,7 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   header: {
     paddingTop: 30,

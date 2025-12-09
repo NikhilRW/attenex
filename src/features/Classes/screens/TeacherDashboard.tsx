@@ -51,7 +51,7 @@ interface LectureWithCount {
   duration: string;
 }
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get("screen");
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);

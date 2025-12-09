@@ -44,7 +44,7 @@ interface AttendanceRecord {
 
 type FilterType = "all" | "present" | "absent" | "incomplete";
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get("screen");
 
 const AttendanceViewScreen = () => {
   const router = useRouter();
