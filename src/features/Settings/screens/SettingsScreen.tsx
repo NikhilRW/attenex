@@ -3,11 +3,14 @@ import { useTheme } from "@/src/shared/hooks/useTheme";
 import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,9 +18,131 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming
+} from "react-native-reanimated";
 import { handleResetPassword } from "../utils/common";
-import { Image } from "expo-image";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const ThemeOption = ({
+  mode,
+  isActive,
+  onPress,
+  colors,
+  icon,
+  label,
+}: {
+  mode: string;
+  isActive: boolean;
+  onPress: () => void;
+  colors: any;
+  icon: any;
+  label: string;
+}) => {
+  const scale = useSharedValue(1);
+  const rotation = useSharedValue(0);
+
+  useEffect(() => {
+    if (isActive) {
+      // 3D Flip Animation
+      rotation.value = withSequence(
+        // withSpring(180, { duration: 200, dampingRatio: 4 }),
+        withSpring(360, { duration: 200, dampingRatio: 4 })
+      );
+    } else {
+      rotation.value = withTiming(0, { duration: 0 });
+    }
+  }, [isActive, rotation]);
+
+  const animatedIconStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotateZ: `${rotation.value}deg` }],
+    };
+  });
+
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1);
+  };
+
+  return (
+    <AnimatedPressable
+      onPress={() => {
+        Haptics.selectionAsync();
+        onPress();
+      }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={[
+        styles.roleCard,
+        animatedContainerStyle,
+        {
+          backgroundColor: isActive
+            ? "rgba(0, 212, 255, 0.15)"
+            : colors.surface.cardBg,
+          borderColor: isActive
+            ? colors.primary.main
+            : colors.surface.glassBorder,
+        },
+      ]}
+    >
+      <Animated.View
+        style={[
+          styles.roleIcon,
+          animatedIconStyle,
+          {
+            backgroundColor: isActive
+              ? colors.primary.main
+              : colors.surface.glass,
+          },
+        ]}
+      >
+        <Ionicons
+          name={icon}
+          size={24}
+          color={isActive ? "#FFF" : colors.text.muted}
+        />
+      </Animated.View>
+      <Text
+        style={[
+          styles.roleText,
+          {
+            color: isActive ? colors.text.primary : colors.text.secondary,
+          },
+        ]}
+      >
+        {label}
+      </Text>
+      {isActive && (
+        <Animated.View
+          entering={FadeInDown.springify()}
+          style={styles.checkIcon}
+        >
+          <Ionicons
+            name="checkmark-circle"
+            size={20}
+            color={colors.primary.main}
+          />
+        </Animated.View>
+      )}
+    </AnimatedPressable>
+  );
+};
 
 const SettingsScreen = () => {
   const { colors, isDark, mode, setTheme } = useTheme();
@@ -31,6 +156,7 @@ const SettingsScreen = () => {
 
   const handleRoleUpdate = async () => {
     setSavingRole(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     try {
       await authService.updateUserRole(role);
       Alert.alert("Role updated", `Your role is now set to ${role}.`);
@@ -43,8 +169,8 @@ const SettingsScreen = () => {
 
   const handleNameUpdate = async () => {
     setSavingName(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      // Backend endpoint not defined; update locally for now.
       updateUser({ name: displayName } as any);
       Alert.alert("Saved", "Name updated locally.");
     } catch (error: any) {
@@ -55,6 +181,7 @@ const SettingsScreen = () => {
   };
 
   const handleLogout = async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -66,6 +193,7 @@ const SettingsScreen = () => {
   };
 
   const handleDeleteAccount = async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     Alert.alert("Delete Account", "This will remove your account forever.", [
       { text: "Cancel", style: "cancel" },
       {
@@ -79,8 +207,6 @@ const SettingsScreen = () => {
   };
 
   const getInitials = (name: string) => {
-    console.log("user?.photoUrl", user!.photoUrl);
-
     return (name || "User").slice(0, 2).toUpperCase();
   };
 
@@ -127,22 +253,36 @@ const SettingsScreen = () => {
               },
             ]}
           >
-            <View style={styles.profileHeader}>
-              {user?.photoUrl ? (
-                <Image
-                  source={{ uri: user.photoUrl }}
-                  style={{ borderRadius: 25, height: 50, width: 50 }}
+            <LinearGradient
+              colors={[
+                isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+                "transparent",
+              ]}
+              style={styles.profileHeader}
+            >
+              <View style={styles.avatarContainer}>
+                {user?.photoUrl ? (
+                  <Image
+                    source={{ uri: user.photoUrl }}
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <LinearGradient
+                    colors={[colors.primary.main, colors.accent.purple]}
+                    style={styles.avatar}
+                  >
+                    <Text style={styles.avatarText}>
+                      {getInitials(displayName)}
+                    </Text>
+                  </LinearGradient>
+                )}
+                <View
+                  style={[
+                    styles.onlineBadge,
+                    { borderColor: colors.surface.cardBg },
+                  ]}
                 />
-              ) : (
-                <LinearGradient
-                  colors={[colors.primary.main, colors.accent.purple]}
-                  style={styles.avatar}
-                >
-                  <Text style={styles.avatarText}>
-                    {getInitials(displayName)}
-                  </Text>
-                </LinearGradient>
-              )}
+              </View>
 
               <View style={styles.profileInfo}>
                 <Text style={[styles.label, { color: colors.text.secondary }]}>
@@ -185,6 +325,23 @@ const SettingsScreen = () => {
                   )}
                 </View>
               </View>
+            </LinearGradient>
+
+            {/* User Email */}
+            <View
+              style={[
+                styles.statsRow,
+                {
+                  borderTopColor: colors.surface.glassBorder,
+                  justifyContent: 'center',
+                  gap: 8
+                },
+              ]}
+            >
+              <Ionicons name="mail-outline" size={16} color={colors.text.muted} />
+              <Text style={{ color: colors.text.secondary, fontSize: 14, fontWeight: '500' }}>
+                {user?.email || "No email connected"}
+              </Text>
             </View>
           </View>
         </Animated.View>
@@ -201,73 +358,33 @@ const SettingsScreen = () => {
             {(["teacher", "student"] as const).map((r) => {
               const isActive = role === r;
               return (
-                <TouchableOpacity
+                <ThemeOption
                   key={r}
+                  mode={r}
+                  isActive={isActive}
                   onPress={() => setRole(r)}
-                  style={[
-                    styles.roleCard,
-                    {
-                      backgroundColor: isActive
-                        ? "rgba(0, 212, 255, 0.15)"
-                        : colors.surface.cardBg,
-                      borderColor: isActive
-                        ? colors.primary.main
-                        : colors.surface.glassBorder,
-                    },
-                  ]}
-                >
-                  <LinearGradient
-                    colors={
-                      isActive
-                        ? [colors.primary.main, colors.primary.dark]
-                        : [colors.surface.glass, colors.surface.glass]
-                    }
-                    style={styles.roleIcon}
-                  >
-                    <Ionicons
-                      name={r === "teacher" ? "school" : "people"}
-                      size={24}
-                      color={isActive ? "#FFF" : colors.text.muted}
-                    />
-                  </LinearGradient>
-                  <Text
-                    style={[
-                      styles.roleText,
-                      {
-                        color: isActive
-                          ? colors.text.primary
-                          : colors.text.secondary,
-                      },
-                    ]}
-                  >
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
-                  </Text>
-                  {isActive && (
-                    <View style={styles.checkIcon}>
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={20}
-                        color={colors.primary.main}
-                      />
-                    </View>
-                  )}
-                </TouchableOpacity>
+                  colors={colors}
+                  icon={r === "teacher" ? "school" : "people"}
+                  label={r.charAt(0).toUpperCase() + r.slice(1)}
+                />
               );
             })}
           </View>
           {role !== user?.role && (
-            <TouchableOpacity
-              style={[
-                styles.updateButton,
-                { backgroundColor: colors.primary.main },
-              ]}
-              onPress={handleRoleUpdate}
-              disabled={savingRole}
-            >
-              <Text style={styles.updateButtonText}>
-                {savingRole ? "Updating..." : "Confirm Role Change"}
-              </Text>
-            </TouchableOpacity>
+            <Animated.View entering={FadeInDown.springify()}>
+              <TouchableOpacity
+                style={[
+                  styles.updateButton,
+                  { backgroundColor: colors.primary.main },
+                ]}
+                onPress={handleRoleUpdate}
+                disabled={savingRole}
+              >
+                <Text style={styles.updateButtonText}>
+                  {savingRole ? "Updating..." : "Confirm Role Change"}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
           )}
         </Animated.View>
 
@@ -283,63 +400,21 @@ const SettingsScreen = () => {
             {(["light", "dark", "system"] as const).map((m) => {
               const isActive = mode === m;
               return (
-                <TouchableOpacity
+                <ThemeOption
                   key={m}
+                  mode={m}
+                  isActive={isActive}
                   onPress={() => setTheme(m)}
-                  style={[
-                    styles.roleCard,
-                    {
-                      backgroundColor: isActive
-                        ? "rgba(0, 212, 255, 0.15)"
-                        : colors.surface.cardBg,
-                      borderColor: isActive
-                        ? colors.primary.main
-                        : colors.surface.glassBorder,
-                    },
-                  ]}
-                >
-                  <LinearGradient
-                    colors={
-                      isActive
-                        ? [colors.primary.main, colors.primary.dark]
-                        : [colors.surface.glass, colors.surface.glass]
-                    }
-                    style={styles.roleIcon}
-                  >
-                    <Ionicons
-                      name={
-                        m === "light"
-                          ? "sunny"
-                          : m === "dark"
-                            ? "moon"
-                            : "settings-outline"
-                      }
-                      size={24}
-                      color={isActive ? "#FFF" : colors.text.muted}
-                    />
-                  </LinearGradient>
-                  <Text
-                    style={[
-                      styles.roleText,
-                      {
-                        color: isActive
-                          ? colors.text.primary
-                          : colors.text.secondary,
-                      },
-                    ]}
-                  >
-                    {m.charAt(0).toUpperCase() + m.slice(1)}
-                  </Text>
-                  {isActive && (
-                    <View style={styles.checkIcon}>
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={20}
-                        color={colors.primary.main}
-                      />
-                    </View>
-                  )}
-                </TouchableOpacity>
+                  colors={colors}
+                  icon={
+                    m === "light"
+                      ? "sunny"
+                      : m === "dark"
+                        ? "moon"
+                        : "settings-outline"
+                  }
+                  label={m.charAt(0).toUpperCase() + m.slice(1)}
+                />
               );
             })}
           </View>
@@ -538,6 +613,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
   },
+  avatarContainer: {
+    position: "relative",
+  },
   avatar: {
     width: 64,
     height: 64,
@@ -545,10 +623,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  avatarImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 24,
+  },
   avatarText: {
     fontSize: 24,
     fontWeight: "800",
     color: "#FFF",
+  },
+  onlineBadge: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: "#10B981",
+    borderWidth: 2,
   },
   profileInfo: {
     flex: 1,
@@ -572,6 +665,31 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     height: "100%",
+  },
+  statsRow: {
+    flexDirection: "row",
+    paddingVertical: 16,
+    borderTopWidth: 1,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4,
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  statDivider: {
+    width: 1,
+    height: "80%",
+    alignSelf: "center",
   },
   roleContainer: {
     flexDirection: "row",
