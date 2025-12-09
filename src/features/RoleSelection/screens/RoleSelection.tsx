@@ -119,7 +119,7 @@ const RoleSelection = () => {
       });
       setIsUpdating(false);
     }
-  }, [selectedRole, router, isUpdating]);
+  }, [user, selectedRole, isUpdating, alreadyHasRoleToast, router]);
 
   return (
     <View
@@ -286,16 +286,21 @@ const RoleSelection = () => {
           colors={
             selectedRole && !isUpdating
               ? [colors.primary.main, colors.accent.blue]
-              : [colors.text.muted, colors.background.tertiary]
+              : [colors.surface.glassBorder, colors.surface.glass]
           }
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          end={{ x: 1, y: 0 }}
           style={styles.confirmGradient}
         >
           {isUpdating ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.confirmButtonText}>
+            <Text
+              style={[
+                styles.confirmButtonText,
+                !selectedRole && !isUpdating && { opacity: 0.7 },
+              ]}
+            >
               {user && user.role
                 ? `You are ${user.role}`
                 : selectedRole
@@ -377,7 +382,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backdropFilter: "blur(10px)",
     zIndex: 2,
-    height:110,
+    height: 110,
   },
   roleLabel: {
     fontSize: 24,

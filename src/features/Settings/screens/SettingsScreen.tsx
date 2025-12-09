@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: 64,
     height: 64,
-    borderRadius: 24,
+    borderRadius: 32,
   },
   avatarText: {
     fontSize: 24,

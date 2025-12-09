@@ -159,7 +159,9 @@ export const LinkedInAuth = () => {
 
       // Navigate to role selection screen (next step in user onboarding)
       useAuthStore.subscribe((newState, prevState) => {
-        router.replace(getStartingScreenPath());
+        if (newState.user && prevState.user === null) {
+          router.replace(getStartingScreenPath());
+        }
       });
     } catch (error) {
       const err = error as any;

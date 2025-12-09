@@ -44,6 +44,8 @@ interface LectureWithCount {
   courseName: string;
   createdAt: string;
   studentCount: number;
+  absentCount?: number;
+  totalClassStudents?: number;
   status: "active" | "ended";
   duration: string;
 }
@@ -86,12 +88,16 @@ const TeacherDashboard = () => {
                 ...lec,
                 courseName: lec.className,
                 studentCount: detailsRes.data.studentCount || 0,
+                absentCount: detailsRes.data.absentCount || 0,
+                totalClassStudents: detailsRes.data.totalClassStudents || 0,
               };
             } catch {
               return {
                 ...lec,
                 courseName: lec.className,
                 studentCount: 0,
+                absentCount: 0,
+                totalClassStudents: 0,
               };
             }
           })
@@ -117,9 +123,7 @@ const TeacherDashboard = () => {
 
   // Setup socket listeners for real-time updates
   useEffect(() => {
-    if (lectures.length === 0) return;
-
-    // Connect to socket
+    // Connect to socket immediately
     socketService.connect();
 
     // Join all lecture rooms
@@ -127,31 +131,37 @@ const TeacherDashboard = () => {
       socketService.joinLecture(lecture.id);
     });
 
+    // Listen for student join events (use stable callback)
+    const handleStudentJoined = (data: any) => {
+      console.log("Student joined event:", data);
+      // Refresh lecture list to update student count
+      fetchActiveLectures();
+    };
+
+    // Listen for attendance submission events (use stable callback)
+    const handleAttendanceSubmitted = (data: any) => {
+      console.log("Attendance submitted event:", data);
+      // Refresh lecture list to update student count
+      fetchActiveLectures();
+    };
+
+    socketService.onStudentJoined(handleStudentJoined);
+    socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+
     // Handle app state changes (background/foreground)
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
-        // App came back to foreground - reconnect socket
+        // App came back to foreground - reconnect socket and refresh
         if (!socketService.isConnected()) {
           socketService.connect();
           lectures.forEach((lecture) => {
             socketService.joinLecture(lecture.id);
           });
+          socketService.onStudentJoined(handleStudentJoined);
+          socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
         }
+        fetchActiveLectures();
       }
-    });
-
-    // Listen for student join events
-    socketService.onStudentJoined((data) => {
-      console.log("Student joined event:", data);
-      // Refresh lecture list to update student count
-      fetchActiveLectures();
-    });
-
-    // Listen for attendance submission events
-    socketService.onAttendanceSubmitted((data) => {
-      console.log("Attendance submitted event:", data);
-      // Refresh lecture list to update student count
-      fetchActiveLectures();
     });
 
     // Cleanup
@@ -163,7 +173,7 @@ const TeacherDashboard = () => {
       socketService.offAttendanceSubmitted();
       subscription.remove();
     };
-  }, [lectures]);
+  }, [lectures, fetchActiveLectures]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
@@ -703,9 +713,9 @@ const TeacherDashboard = () => {
                       <View style={styles.cardStats}>
                         <View style={styles.statItem}>
                           <Ionicons
-                            name="people-outline"
+                            name="checkmark-circle-outline"
                             size={16}
-                            color={colors.text.secondary}
+                            color="#22C55E"
                           />
                           <Text
                             style={[
@@ -713,7 +723,22 @@ const TeacherDashboard = () => {
                               { color: colors.text.secondary },
                             ]}
                           >
-                            {lecture.studentCount} Students
+                            {lecture.studentCount} Present
+                          </Text>
+                        </View>
+                        <View style={styles.statItem}>
+                          <Ionicons
+                            name="close-circle-outline"
+                            size={16}
+                            color="#EF4444"
+                          />
+                          <Text
+                            style={[
+                              styles.statText,
+                              { color: colors.text.secondary },
+                            ]}
+                          >
+                            {lecture.absentCount || 0} Absent
                           </Text>
                         </View>
                         <View style={styles.statItem}>
@@ -735,6 +760,24 @@ const TeacherDashboard = () => {
                           </Text>
                         </View>
                       </View>
+
+                      {/* Class Info */}
+                      {lecture.totalClassStudents && lecture.totalClassStudents > 0 && (
+                        <View style={[
+                          styles.classInfoBanner,
+                          {
+                            backgroundColor: isDark
+                              ? "rgba(245, 158, 11, 0.1)"
+                              : "rgba(245, 158, 11, 0.05)",
+                            borderColor: "rgba(245, 158, 11, 0.3)",
+                          }
+                        ]}>
+                          <Ionicons name="information-circle" size={16} color="#F59E0B" />
+                          <Text style={[styles.classInfoText, { color: colors.text.secondary }]}>
+                            {lecture.totalClassStudents} total students in {lecture.courseName}
+                          </Text>
+                        </View>
+                      )}
 
                       <View
                         style={[
@@ -1101,6 +1144,19 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 13,
+  },
+  classInfoBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  classInfoText: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   divider: {
     height: 1,

@@ -105,8 +105,10 @@ export const handleGoogleSignIn = async () => {
       return;
     }
     // Navigate to the main stack (replace to avoid back navigation to auth)
-    useAuthStore.subscribe(() => {
-      router.replace(getStartingScreenPath());
+    useAuthStore.subscribe((newState,prevState) => {
+      if (newState.user && prevState.user === null) {
+        router.replace(getStartingScreenPath());
+      }
     });
   } catch (err) {
     // Handle any errors during the sign-in process
@@ -236,8 +238,10 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // Replace to main stack after successful signin
-    useAuthStore.subscribe(() => {
-      router.replace(getStartingScreenPath());
+    useAuthStore.subscribe((newState,prevState) => {
+      if (newState.user && prevState.user === null) {
+        router.replace(getStartingScreenPath());
+      }
     });
   } catch (err) {
     const e = err as any;

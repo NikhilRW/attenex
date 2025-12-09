@@ -28,7 +28,7 @@ interface AttendanceRecord {
     studentEmail: string;
     studentRollNo: string | null;
     status: "present" | "absent" | "incomplete";
-    joinTime: string;
+    joinTime: string | null;
     submitTime: string | null;
     checkScore: number;
     method: "manual" | "auto" | "oauth";
@@ -66,6 +66,12 @@ const AttendanceViewScreen = () => {
         }
     }, [lectureId]);
 
+    // Separate ref to avoid stale closures in socket callbacks
+    const fetchAttendanceRef = React.useRef(fetchAttendance);
+    React.useEffect(() => {
+        fetchAttendanceRef.current = fetchAttendance;
+    }, [fetchAttendance]);
+
     useEffect(() => {
         fetchAttendance();
 
@@ -73,56 +79,66 @@ const AttendanceViewScreen = () => {
         socketService.connect();
         socketService.joinLecture(lectureId);
 
-        // Listen for attendance submission events
-        socketService.onAttendanceSubmitted((data) => {
+        // Listen for student joined events (when they first enter the lecture)
+        const handleStudentJoined = (data: any) => {
+            console.log('Student joined event received:', data);
+            if (data.lectureId === lectureId) {
+                // Refresh attendance list when someone joins
+                fetchAttendanceRef.current();
+            }
+        };
+
+        // Listen for attendance submission events (when they submit final attendance)
+        const handleAttendanceSubmitted = (data: any) => {
+            console.log('Attendance submitted event received:', data);
             if (data.lectureId === lectureId) {
                 // Refresh attendance list when someone submits
-                fetchAttendance();
+                fetchAttendanceRef.current();
             }
-        });
+        };
+
+        socketService.onStudentJoined(handleStudentJoined);
+        socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
 
         // Handle app state changes (background/foreground)
         const subscription = AppState.addEventListener("change", (nextAppState) => {
             if (nextAppState === "active") {
-                // App came back to foreground - reconnect socket
+                // App came back to foreground - reconnect socket and refresh data
                 if (!socketService.isConnected()) {
                     socketService.connect();
                     socketService.joinLecture(lectureId);
-                    socketService.onAttendanceSubmitted((data) => {
-                        if (data.lectureId === lectureId) {
-                            fetchAttendance();
-                        }
-                    });
+                    socketService.onStudentJoined(handleStudentJoined);
+                    socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
                 }
+                fetchAttendanceRef.current();
             }
         });
 
         // Cleanup on unmount
         return () => {
             socketService.leaveLecture(lectureId);
+            socketService.offStudentJoined();
             socketService.offAttendanceSubmitted();
             subscription.remove();
         };
-    }, [fetchAttendance, lectureId]);
+    }, [lectureId]);
 
     // Also use useFocusEffect to ensure connection when screen regains focus
     useFocusEffect(
         useCallback(() => {
-            // Reconnect socket when screen is focused
+            // Refresh data when screen is focused
+            fetchAttendanceRef.current();
+
+            // Reconnect socket when screen is focused if disconnected
             if (!socketService.isConnected()) {
                 socketService.connect();
                 socketService.joinLecture(lectureId);
-                socketService.onAttendanceSubmitted((data) => {
-                    if (data.lectureId === lectureId) {
-                        fetchAttendance();
-                    }
-                });
             }
 
             return () => {
                 // Don't disconnect on blur, just on unmount
             };
-        }, [lectureId, fetchAttendance])
+        }, [lectureId])
     );
 
     const filteredAttendance = attendance.filter((record) => {
@@ -447,23 +463,34 @@ const AttendanceViewScreen = () => {
                                             </Text>
 
                                             <View style={styles.metaRow}>
-                                                <View style={styles.metaItem}>
-                                                    <Ionicons name="time-outline" size={12} color={colors.text.muted} />
-                                                    <Text style={[styles.metaText, { color: colors.text.muted }]}>
-                                                        {new Date(record.joinTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </Text>
-                                                </View>
-                                                <View style={styles.metaDot} />
-                                                <View style={styles.metaItem}>
-                                                    <Ionicons
-                                                        name={record.method === 'manual' ? "hand-left-outline" : "location-outline"}
-                                                        size={12}
-                                                        color={colors.text.muted}
-                                                    />
-                                                    <Text style={[styles.metaText, { color: colors.text.muted }]}>
-                                                        {record.method}
-                                                    </Text>
-                                                </View>
+                                                {record.joinTime ? (
+                                                    <>
+                                                        <View style={styles.metaItem}>
+                                                            <Ionicons name="time-outline" size={12} color={colors.text.muted} />
+                                                            <Text style={[styles.metaText, { color: colors.text.muted }]}>
+                                                                {new Date(record.joinTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </Text>
+                                                        </View>
+                                                        <View style={styles.metaDot} />
+                                                        <View style={styles.metaItem}>
+                                                            <Ionicons
+                                                                name={record.method === 'manual' ? "hand-left-outline" : "location-outline"}
+                                                                size={12}
+                                                                color={colors.text.muted}
+                                                            />
+                                                            <Text style={[styles.metaText, { color: colors.text.muted }]}>
+                                                                {record.method}
+                                                            </Text>
+                                                        </View>
+                                                    </>
+                                                ) : (
+                                                    <View style={styles.metaItem}>
+                                                        <Ionicons name="close-circle-outline" size={12} color={colors.text.muted} />
+                                                        <Text style={[styles.metaText, { color: colors.text.muted }]}>
+                                                            Did not attend
+                                                        </Text>
+                                                    </View>
+                                                )}
                                             </View>
                                         </View>
 

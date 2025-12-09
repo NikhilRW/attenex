@@ -8,7 +8,7 @@ export const handleResetPassword = async () => {
   await http.post(BASE_URI + "/api/users/forgot-password", {
     email: user?.email.trim().toLowerCase(),
   });
-  router.replace(
+  router.push(
     `/(auth)/forgot-password?email=${encodeURIComponent(user?.email || "")}`
   );
 };
