@@ -761,23 +761,6 @@ const TeacherDashboard = () => {
                         </View>
                       </View>
 
-                      {/* Class Info */}
-                      {lecture.totalClassStudents && lecture.totalClassStudents > 0 && (
-                        <View style={[
-                          styles.classInfoBanner,
-                          {
-                            backgroundColor: isDark
-                              ? "rgba(245, 158, 11, 0.1)"
-                              : "rgba(245, 158, 11, 0.05)",
-                            borderColor: "rgba(245, 158, 11, 0.3)",
-                          }
-                        ]}>
-                          <Ionicons name="information-circle" size={16} color="#F59E0B" />
-                          <Text style={[styles.classInfoText, { color: colors.text.secondary }]}>
-                            {lecture.totalClassStudents} total students in {lecture.courseName}
-                          </Text>
-                        </View>
-                      )}
 
                       <View
                         style={[

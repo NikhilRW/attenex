@@ -165,14 +165,14 @@ export const fetchLectureAttendance = async (lectureId: string) => {
 
 export const addManualAttendance = async (
   lectureId: string,
-  studentEmail: string
+  studentRollNo: string
 ) => {
   try {
     const { token } = useAuthStore.getState();
     const response = await axios.post(
       `${API_URL}/${lectureId}/attendance/manual`,
       {
-        studentEmail,
+        studentRollNo,
       },
       {
         headers: {
@@ -189,7 +189,7 @@ export const addManualAttendance = async (
 export const getStudentLectures = async (className: string) => {
   try {
     const { token } = useAuthStore.getState();
-    console.log("className : "+className);
+    console.log("className : " + className);
     const response = await axios.get(
       `${API_URL}/student/lectures?class=${encodeURI(className)}`,
       {

@@ -19,7 +19,7 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp, Layout } from "react-native-reanimated";
-import { fetchLectureAttendance } from "../services/lectureService";
+import { addManualAttendance, fetchLectureAttendance } from "../services/lectureService";
 
 interface AttendanceRecord {
     id: string;
@@ -51,6 +51,9 @@ const AttendanceViewScreen = () => {
     const [filter, setFilter] = useState<FilterType>("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [showRollSummary, setShowRollSummary] = useState(false);
+    const [showManualAttendance, setShowManualAttendance] = useState(false);
+    const [manualRollNo, setManualRollNo] = useState("");
+    const [isSubmittingManual, setIsSubmittingManual] = useState(false);
 
     const fetchAttendance = useCallback(async () => {
         try {
@@ -209,6 +212,28 @@ const AttendanceViewScreen = () => {
             Alert.alert("Copied!", "Roll numbers copied to clipboard");
         } else {
             Alert.alert("No Data", "No present students with roll numbers");
+        }
+    };
+
+    const handleManualAttendance = async () => {
+        if (!manualRollNo.trim()) {
+            Alert.alert("Error", "Please enter student roll number");
+            return;
+        }
+
+        try {
+            setIsSubmittingManual(true);
+            const res = await addManualAttendance(lectureId, manualRollNo.trim());
+            if (res.success) {
+                Alert.alert("Success", res.message);
+                setManualRollNo("");
+                setShowManualAttendance(false);
+                await fetchAttendance(); // Refresh the list
+            }
+        } catch (error: any) {
+            Alert.alert("Error", error.message || "Failed to add manual attendance");
+        } finally {
+            setIsSubmittingManual(false);
         }
     };
 
@@ -610,6 +635,112 @@ const AttendanceViewScreen = () => {
                     </View>
                 </View>
             </Modal>
+
+            {/* Manual Attendance Modal */}
+            <Modal
+                visible={showManualAttendance}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowManualAttendance(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View
+                        style={[
+                            styles.modalContent,
+                            {
+                                backgroundColor: isDark
+                                    ? colors.background.secondary
+                                    : "rgba(255, 255, 255, 0.98)",
+                            },
+                        ]}
+                    >
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
+                                Add Manual Attendance
+                            </Text>
+                            <TouchableOpacity onPress={() => setShowManualAttendance(false)}>
+                                <Ionicons name="close" size={24} color={colors.text.primary} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={[styles.modalDescription, { color: colors.text.secondary }]}>
+                            Enter the student's roll number to manually mark them present. This is useful for students who had technical issues or forgot their device.
+                        </Text>
+
+                        <View
+                            style={[
+                                styles.inputContainer,
+                                {
+                                    backgroundColor: isDark
+                                        ? colors.surface.glass
+                                        : "rgba(0, 0, 0, 0.03)",
+                                    borderColor: colors.surface.glassBorder,
+                                },
+                            ]}
+                        >
+                            <Ionicons name="id-card-outline" size={20} color={colors.text.muted} />
+                            <TextInput
+                                style={[styles.input, { color: colors.text.primary }]}
+                                placeholder="e.g., 101, R001"
+                                placeholderTextColor={colors.text.muted}
+                                value={manualRollNo}
+                                onChangeText={setManualRollNo}
+                                autoCapitalize="characters"
+                                autoCorrect={false}
+                            />
+                        </View>
+
+                        <View style={styles.modalActions}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.actionButton,
+                                    styles.cancelButton,
+                                    {
+                                        backgroundColor: isDark
+                                            ? colors.surface.glass
+                                            : "rgba(0, 0, 0, 0.05)",
+                                    },
+                                ]}
+                                onPress={() => {
+                                    setManualRollNo("");
+                                    setShowManualAttendance(false);
+                                }}
+                            >
+                                <Text style={[styles.cancelButtonText, { color: colors.text.secondary }]}>
+                                    Cancel
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.actionButton,
+                                    styles.submitButton,
+                                    { backgroundColor: colors.primary.main },
+                                ]}
+                                onPress={handleManualAttendance}
+                                disabled={isSubmittingManual}
+                            >
+                                {isSubmittingManual ? (
+                                    <ActivityIndicator color="white" size="small" />
+                                ) : (
+                                    <>
+                                        <Ionicons name="checkmark-circle" size={20} color="white" />
+                                        <Text style={styles.submitButtonText}>Mark Present</Text>
+                                    </>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Floating Action Button for Manual Attendance */}
+            <TouchableOpacity
+                style={[styles.fab, { backgroundColor: colors.primary.main }]}
+                onPress={() => setShowManualAttendance(true)}
+            >
+                <Ionicons name="person-add" size={24} color="white" />
+            </TouchableOpacity>
         </View>
     );
 };
@@ -905,6 +1036,68 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     copyButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "700",
+    },
+    fab: {
+        position: "absolute",
+        right: 20,
+        bottom: 30,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    modalDescription: {
+        fontSize: 14,
+        lineHeight: 20,
+        marginBottom: 20,
+    },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        height: 50,
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        borderWidth: 1,
+        marginBottom: 24,
+    },
+    input: {
+        flex: 1,
+        marginLeft: 12,
+        fontSize: 15,
+        height: "100%",
+    },
+    modalActions: {
+        flexDirection: "row",
+        gap: 12,
+    },
+    actionButton: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: 8,
+    },
+    cancelButton: {
+        borderWidth: 1,
+        borderColor: "rgba(150, 150, 150, 0.2)",
+    },
+    cancelButtonText: {
+        fontSize: 16,
+        fontWeight: "600",
+    },
+    submitButton: {},
+    submitButtonText: {
         color: "white",
         fontSize: 16,
         fontWeight: "700",
