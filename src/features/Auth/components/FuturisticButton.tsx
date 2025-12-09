@@ -1,5 +1,4 @@
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { useAuthStore } from "@/src/shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {

@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import CustomTabBar from "@/src/shared/components/CustomTabBar";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 
 const _layout = () => {
   return (

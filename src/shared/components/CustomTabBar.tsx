@@ -24,31 +24,39 @@ const CustomTabBar = ({
   ...props
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
-  const role = useAuthStore().user!.role;
+  const { user } = useAuthStore();
+  let role = user?.role;
 
   // Filter routes based on user role
-  const filteredRoutes = routeNames.filter((name) => {
-    // Hide role-selection if user already has a role
-    if (role && name.includes("role-selection")) {
-      return false;
-    }
-    if (role === "student" && name.includes("classes")) {
-      return false; // Hide classes tab for students
-    }
-    if (
-      role === "teacher" &&
-      (name.includes("attendance") ||
-        name.includes("create-") ||
-        name.includes("lecture-ended"))
-    ) {
-      return false; // Hide attendance tab for teachers
-    }
+  const filteredRoutes = routeNames
+    .filter((name) => {
+      // Hide role-selection if user already has a role
+      if (role && name.includes("role-selection")) {
+        return false;
+      }
+      if (role === "student" && name.includes("classes")) {
+        return false; // Hide classes tab for students
+      }
+      if (
+        role === "teacher" &&
+        (name.includes("attendance") ||
+          name.includes("create-") ||
+          name.includes("lecture-ended"))
+      ) {
+        return false; // Hide attendance tab for teachers
+      }
 
-    if (!role) {
-      return false; // If no role, only show nothing
-    }
-    return true;
-  });
+      if (!role) {
+        return false; // If no role, only show nothing
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      // Ensure settings always comes last
+      if (a.includes("settings")) return 1;
+      if (b.includes("settings")) return -1;
+      return 0;
+    });
 
   // Find the active tab index in the filtered routes
   const activeRouteName = routeNames[index];
@@ -70,7 +78,7 @@ const CustomTabBar = ({
       style={[
         styles.container,
         {
-          display:isEmptyTabBar ? 'none' : 'flex',
+          display: isEmptyTabBar ? "none" : "flex",
           bottom: 5,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,

@@ -187,7 +187,7 @@ const SettingsScreen = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => authService.logout(),
+        onPress: async () => await authService.logout(),
       },
     ]);
   };
@@ -491,7 +491,7 @@ const SettingsScreen = () => {
               ]}
             />
 
-            <TouchableOpacity style={styles.dangerRow} onPress={handleLogout}>
+            <TouchableOpacity style={styles.dangerRow} onPress={async () => await handleLogout()}>
               <View style={styles.rowLeft}>
                 <View
                   style={[

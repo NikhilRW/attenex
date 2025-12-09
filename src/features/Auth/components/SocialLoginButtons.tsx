@@ -2,16 +2,18 @@ import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface SocialLoginButtonsProps {
   onGooglePress?: () => void;
   onLinkedInPress?: () => void;
+  isGoogleLoading?: boolean;
 }
 
 export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   onGooglePress,
   onLinkedInPress,
+  isGoogleLoading = false,
 }) => {
   const { colors } = useTheme();
 
@@ -21,6 +23,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         style={[styles.socialButton, { borderColor: "rgba(0, 119, 181, 0.4)" }]}
         activeOpacity={0.8}
         onPress={onGooglePress}
+        disabled={isGoogleLoading}
       >
         <LinearGradient
           colors={["#4286F414", "#34A85314", "#FBBC0514", "#EA433514"]}
@@ -29,21 +32,27 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
           style={[
             styles.socialButton,
             styles.googleGradient,
-            { borderWidth: 0 },
+            { borderWidth: 0, opacity: isGoogleLoading ? 0.6 : 1 },
           ]}
         >
-          <View style={styles.socialIconWrapper}>
-            <Ionicons
-              name="logo-google"
-              size={24}
-              color={colors.text.primary}
-            />
-          </View>
-          <Text
-            style={[styles.socialButtonText, { color: colors.text.primary }]}
-          >
-            Google
-          </Text>
+          {isGoogleLoading ? (
+            <ActivityIndicator size="small" color={colors.text.primary} />
+          ) : (
+            <>
+              <View style={styles.socialIconWrapper}>
+                <Ionicons
+                  name="logo-google"
+                  size={24}
+                  color={colors.text.primary}
+                />
+              </View>
+              <Text
+                style={[styles.socialButtonText, { color: colors.text.primary }]}
+              >
+                Google
+              </Text>
+            </>
+          )}
         </LinearGradient>
       </TouchableOpacity>
 

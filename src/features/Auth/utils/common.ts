@@ -78,6 +78,7 @@ export const handleGoogleSignIn = async () => {
     // Use authService to persist token securely and set user state
 
     if (newUser.data.success) {
+      
       await authService.login(newUser.data.user, newUser.data.token);
 
       // Step 4: Show success feedback to user and navigate to main flow

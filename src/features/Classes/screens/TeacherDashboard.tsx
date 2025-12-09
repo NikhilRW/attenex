@@ -426,7 +426,7 @@ const TeacherDashboard = () => {
                   <Text
                     style={[styles.headerTitle, { color: colors.text.primary }]}
                   >
-                    Dashboard
+                    Teacher Dashboard
                   </Text>
                   <Text
                     style={[
