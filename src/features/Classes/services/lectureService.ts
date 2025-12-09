@@ -30,6 +30,7 @@ export const createLecture = async (
     );
     return response.data;
   } catch (error: any) {
+    console.log(error);
     throw error.response?.data || error.message;
   }
 };

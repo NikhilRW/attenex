@@ -11,6 +11,7 @@ import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { linkedinAuthService } from "../services/linkedinAuthService";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 import { authService } from "@/src/shared/services/authService";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 
 /**
  * LinkedIn OAuth Configuration
@@ -156,11 +157,10 @@ export const LinkedInAuth = () => {
         "LinkedInAuth"
       );
 
-      setTimeout(() => {
-        router.replace(getStartingScreenPath());
-      },1000);
-
       // Navigate to role selection screen (next step in user onboarding)
+      useAuthStore.subscribe((newState, prevState) => {
+        router.replace(getStartingScreenPath());
+      });
     } catch (error) {
       const err = error as any;
 

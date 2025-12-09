@@ -1,4 +1,5 @@
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -16,7 +17,7 @@ import Animated, {
 
 interface FuturisticButtonProps {
   title: string;
-  onPress: () => void;
+  onPress: () => void | Promise<void>;
   gradient?: string[];
   disabled?: boolean;
   loading?: boolean;
@@ -40,12 +41,12 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
     buttonScale.value = withSpring(0.95, {}, () => {
       buttonScale.value = withSpring(1);
     });
-    onPress();
   };
 
-  const handlePressOut = () => {
+  const handlePressOut = async () => {
     if (loading) return;
     buttonScale.value = withSpring(1);
+    await onPress();
   };
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
@@ -57,7 +58,7 @@ export const FuturisticButton: React.FC<FuturisticButtonProps> = ({
     <Animated.View style={buttonAnimatedStyle}>
       <TouchableOpacity
         onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+        onPressOut={async () => await handlePressOut()}
         disabled={disabled || loading}
         activeOpacity={0.9}
         style={{ elevation: 4 }}

@@ -105,7 +105,9 @@ export const handleGoogleSignIn = async () => {
       return;
     }
     // Navigate to the main stack (replace to avoid back navigation to auth)
-    router.replace(getStartingScreenPath());
+    useAuthStore.subscribe(() => {
+      router.replace(getStartingScreenPath());
+    });
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;
@@ -225,7 +227,6 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     }
 
     await authService.login(user, token);
-
     showMessage({
       message: "Welcome Back!",
       description: `Hi ${user.name}, you're all set!`,
@@ -235,7 +236,9 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // Replace to main stack after successful signin
-    router.navigate(getStartingScreenPath());
+    useAuthStore.subscribe(() => {
+      router.replace(getStartingScreenPath());
+    });
   } catch (err) {
     const e = err as any;
 

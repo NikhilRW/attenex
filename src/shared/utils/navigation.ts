@@ -1,8 +1,12 @@
+import { User } from "@/backend/src/config/database_setup";
 import { useAuthStore } from "../stores/authStore";
 
-export const getStartingScreenPath = () => {
-  const user = useAuthStore.getState().user;
-  
+export const getStartingScreenPath = (newUser: User | null = null) => {
+  let user = newUser;
+  if (!user) {
+    user = useAuthStore.getState().user;
+  }
+
   if (!user) {
     return "/(auth)/sign-in";
   }

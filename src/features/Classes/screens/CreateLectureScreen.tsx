@@ -19,6 +19,7 @@ import {
 } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { createLecture, getTeacherClasses } from "../services/lectureService";
+import { logger } from "@/src/shared/utils/logger";
 
 interface ClassItem {
   id: string;

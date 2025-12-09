@@ -156,9 +156,9 @@ const SignIn = () => {
 
             <FuturisticButton
               title="Sign In "
-              onPress={handleSubmit((data) => {
+              onPress={handleSubmit(async (data) => {
                 Keyboard.dismiss();
-                return handleEmailSignIn(data);
+                return await handleEmailSignIn(data);
               })}
               disabled={isSubmitting}
               loading={isSubmitting}
