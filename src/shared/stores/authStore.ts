@@ -10,7 +10,11 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setAuth: (user: User | null, token: string | null, isSignUp?: boolean) => void;
+  setAuth: (
+    user: User | null,
+    token: string | null,
+    isSignUp?: boolean
+  ) => void;
 
   updateUser: (user: Partial<User>) => void;
   logout: () => void;
@@ -45,6 +49,11 @@ export const useAuthStore = create<AuthState>()(
           console.error("Failed to remove token from secure storage", err);
         });
         useThemeStore.setState({ mode: "system" });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+        });
         router.replace("/sign-in?loggedOut=true");
       },
       setLoading: (loading) => set({ isLoading: loading }),

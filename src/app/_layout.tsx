@@ -1,7 +1,28 @@
 import { handleEmailVerification } from "@/src/features/Auth/utils/common";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { useNotificationStore } from "@/src/shared/stores/notificationStore";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import {
+  FirebaseMessagingTypes,
+  getInitialNotification,
+  getMessaging,
+  onMessage,
+  onNotificationOpenedApp,
+  setBackgroundMessageHandler,
+} from "@react-native-firebase/messaging";
 import * as Linking from "expo-linking";
+import {
+  addNotificationResponseReceivedListener,
+  AndroidImportance,
+  AndroidNotificationPriority,
+  AndroidNotificationVisibility,
+  getLastNotificationResponseAsync,
+  NotificationContentInput,
+  NotificationResponse,
+  scheduleNotificationAsync,
+  setNotificationChannelAsync,
+  setNotificationHandler,
+} from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -16,8 +37,10 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useAuthStore } from "../shared/stores/authStore";
-import { getStartingScreenPath } from "../shared/utils/navigation";
+
+const ATTENEX_NOTIFICATION_IMAGE_URL =
+  "https://attenex.vercel.app/notification-attachment.png";
+const ATTENEX_ANDROID_CHANNEL_ID = "attenex";
 
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
@@ -30,9 +53,12 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const { setTheme, isDark, mode } = useTheme();
+  const { setTheme, isDark, mode, colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
-  const { isAuthenticated } = useAuthStore();
+
+  // Track if we've already handled the killed-state notification to prevent infinite loop
+  const { hasHandledKilledStateNotification, setHasHandledKilledStateNotification } =
+    useNotificationStore();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,
@@ -42,7 +68,7 @@ export default function RootLayout() {
     if (mode === "system") {
       setTheme(colorScheme as "light" | "dark");
     }
-  }, [colorScheme]);
+  }, [colorScheme, mode, setTheme]);
 
   useEffect(() => {
     if (loaded || error) {
@@ -51,6 +77,28 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   useEffect(() => {
+    const buildAttenexNotificationContent = (
+      remoteMessage: FirebaseMessagingTypes.RemoteMessage
+    ): NotificationContentInput => {
+      const title = remoteMessage.notification?.title ?? "Attenex";
+      const body = remoteMessage.notification?.body ?? "";
+
+      return {
+        title,
+        body,
+        data: remoteMessage.data,
+        sound: "default" as const,
+        color: isDark ? colors.primary.light : colors.primary.main,
+        attachments: [
+          {
+            url: ATTENEX_NOTIFICATION_IMAGE_URL,
+            identifier: ATTENEX_NOTIFICATION_IMAGE_URL,
+            type: "image" as const,
+          },
+        ],
+      };
+    };
+
     // Handle deep link when app is opened from a closed state
     const handleInitialURL = async () => {
       const initialUrl = await Linking.getInitialURL();
@@ -66,9 +114,155 @@ export default function RootLayout() {
 
     handleInitialURL();
 
+    // Android: create an Attenex notification channel (controls importance, vibration, accent light)
+    // Safe to call repeatedly; Android will keep existing channel settings.
+    setNotificationChannelAsync(ATTENEX_ANDROID_CHANNEL_ID, {
+      name: "Attenex",
+      importance: AndroidImportance.MAX,
+      lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+      enableVibrate: true,
+      vibrationPattern: [0, 250, 200, 250],
+      lightColor: colors.primary.main,
+      sound: "default",
+    }).catch(() => {
+      // Ignore channel creation failures to avoid blocking app startup.
+    });
+
+    // Check if the app was opened from a notification (when the app was completely quit)
+    // This checks both Firebase data messages and Expo scheduled notifications
+    const checkInitialNotification = async () => {
+      try {
+        // Check Firebase initial notification (for data-only messages)
+        const remoteMessage = await getInitialNotification(getMessaging());
+        console.log("Checking Firebase initial notification...", remoteMessage);
+        if (remoteMessage?.data?.lectureId) {
+          console.log(
+            "✅ Firebase notification caused app to open from quit state:",
+            JSON.stringify(remoteMessage)
+          );
+          console.log("Navigating to lecture:", remoteMessage.data.lectureId);
+          router.replace(
+            `/attendance?lectureId=${remoteMessage.data.lectureId}`
+          );
+          return;
+        }
+      } catch (error) {
+        console.error("Error getting Firebase initial notification:", error);
+      }
+    };
+
+    // Delay to ensure services are initialized
+    setTimeout(checkInitialNotification, 1000);
+
+    // Set up the notification handler for the app
+    setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+        priority: AndroidNotificationPriority.MAX,
+      }),
+    });
+
+    // Handle push notifications when the app is in the background
+    setBackgroundMessageHandler(
+      getMessaging(),
+      async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+        console.log("Message handled in the background!", remoteMessage);
+        // Schedule the notification with a null trigger to show immediately
+        await scheduleNotificationAsync({
+          content: {
+            ...buildAttenexNotificationContent(remoteMessage),
+          },
+          trigger: null,
+        });
+      }
+    );
+
+    // Handle user clicking on a notification and open the screen
+    // This works for both background and killed state when using Expo Notifications
+    const handleNotificationClick = async (response: NotificationResponse) => {
+      // const lectureId =
+      //   response?.notification?.request?.content?.data?.lectureId;
+      // console.log("📲 Notification clicked/opened app:", JSON.stringify(response));
+      // console.log("📍 Action identifier:", response?.actionIdentifier);
+      // if (lectureId) {
+      //   console.log("✅ Navigating to lecture from notification:", lectureId);
+      //   // Use replace for cold start, navigate for warm start
+      //   if (response?.actionIdentifier === "expo.modules.notifications.actions.DEFAULT") {
+      //     router.replace(`/attendance?lectureId=${lectureId}`);
+      //   } else {
+      //     router.navigate(`/attendance?lectureId=${lectureId}`);
+      //   }
+      // }
+    };
+
+    // Handle user opening the app from a notification (when the app is in the background)
+    const onNotificationOpenedAppListener = onNotificationOpenedApp(
+      getMessaging(),
+      (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+        console.log(
+          "Notification caused app to open from background state:",
+          remoteMessage?.data?.lectureId
+        );
+        if (remoteMessage?.data?.lectureId) {
+          router.navigate(
+            `/attendance?lectureId=${remoteMessage.data.lectureId}`
+          );
+        }
+      }
+    );
+
+    // Listen for user clicking on a notification (both foreground and background)
+    const notificationClickSubscription =
+      addNotificationResponseReceivedListener(handleNotificationClick);
+
+    // CRITICAL: Check if there's a notification response from when app was killed
+    // This handles the case where user taps notification when app is completely closed
+    // Only check ONCE on initial mount to prevent infinite loop
+    if (!hasHandledKilledStateNotification) {
+      setHasHandledKilledStateNotification(true);
+
+      getLastNotificationResponseAsync().then((response) => {
+        if (response) {
+          console.log(
+            "📱 Found last notification response (app was killed):",
+            JSON.stringify(response)
+          );
+          const lectureId =
+            response?.notification?.request?.content?.data?.lectureId;
+
+          if (lectureId) {
+            console.log("✅ Navigating to lecture from notification:", lectureId);
+            // Use replace for cold start to set up the navigation stack correctly
+            router.replace(`/attendance?lectureId=${lectureId}`);
+          }
+        } else {
+          console.log("No last notification response found");
+        }
+      });
+    }
+    const handlePushNotification = async (
+      remoteMessage: FirebaseMessagingTypes.RemoteMessage
+    ) => {
+      // Schedule the notification with a null trigger to show immediately
+      await scheduleNotificationAsync({
+        content: buildAttenexNotificationContent(remoteMessage),
+        trigger: null,
+      });
+    };
+
+    const unsubscribe = onMessage(getMessaging(), handlePushNotification);
+
     return () => {
       subscription.remove();
+      notificationClickSubscription.remove();
+      unsubscribe();
+      onNotificationOpenedAppListener();
     };
+    // eslint-disable-next-line
   }, []);
 
   const handleDeepLink = async (url: string) => {

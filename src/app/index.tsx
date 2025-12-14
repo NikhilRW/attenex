@@ -2,6 +2,7 @@ import { useAuthStore } from "@/src/shared/stores/authStore";
 import { Redirect } from "expo-router";
 import { getStartingScreenPath } from "../shared/utils/navigation";
 
+
 export default function Index() {
   const { isAuthenticated, isLoading } = useAuthStore();
 

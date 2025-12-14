@@ -20,6 +20,10 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
 
     const { lectureId, latitude, longitude, rollNo } = req.body;
 
+    logger.info(
+      `Join lecture request: userId=${userId}, lectureId=${lectureId}, latitude=${latitude}, longitude=${longitude}, rollNo=${rollNo}`
+    );
+
     if (!lectureId || !latitude || !longitude) {
       return res
         .status(400)

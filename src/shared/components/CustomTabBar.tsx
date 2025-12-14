@@ -1,4 +1,3 @@
-import { User } from "@/backend/src/config/database_setup";
 import { Entypo, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
@@ -24,7 +23,7 @@ const CustomTabBar = ({
   ...props
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   let role = user?.role;
 
   // Filter routes based on user role
@@ -73,12 +72,16 @@ const CustomTabBar = ({
     };
   });
 
+  if (user === null) {
+    return null;
+  }
+
   return (
     <Animated.View
       style={[
         styles.container,
         {
-          display: isEmptyTabBar ? "none" : "flex",
+          display: isEmptyTabBar ? "none" : isAuthenticated ? "flex" : "none",
           bottom: 5,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,
@@ -102,7 +105,6 @@ const CustomTabBar = ({
           <TabBarButton
             key={`index-${idx}`}
             name={name}
-            role={role}
             isActivated={isActivated}
             onPress={() => navigation.navigate(name)}
             colors={colors}
@@ -120,7 +122,6 @@ interface TabBarButtonProps {
   isActivated: boolean;
   onPress: () => void;
   colors: any;
-  role: User["role"];
 }
 
 const TabBarButton: React.FC<TabBarButtonProps> = ({
@@ -128,7 +129,6 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   isActivated,
   onPress,
   colors,
-  role,
 }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(isActivated ? 1 : 0.6);
@@ -139,7 +139,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
     opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
     backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
     iconScale.value = withSpring(isActivated ? 1.1 : 1);
-  }, [backgroundOpacity, iconScale, isActivated, opacity]);
+  }, [isActivated]);
 
   const handlePressIn = () => {
     scale.value = withSpring(0.9, {});

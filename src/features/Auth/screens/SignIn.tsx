@@ -30,6 +30,7 @@ import {
 import { SignInFormData, signInSchema } from "../validation/authSchemas";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 import { secureStore } from "@/src/shared/utils/secureStore";
+import { useShallow } from "zustand/shallow";
 
 const SignIn = () => {
   const router = useRouter();
@@ -39,7 +40,14 @@ const SignIn = () => {
   const params = useLocalSearchParams();
 
   // Redirect to main stack if user is already authenticated (prevents seeing signin screen)
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isAuthenticated, isLoading: authLoading } = useAuthStore(
+    useShallow((state) => ({
+      isAuthenticated: state.isAuthenticated,
+      isLoading: state.isLoading,
+    }))
+  );
+  console.log("isAuthenticated : " + isAuthenticated);
+
   useEffect(() => {
     if (!authLoading && isAuthenticated && !params.loggedOut) {
       router.replace(getStartingScreenPath());
@@ -52,17 +60,6 @@ const SignIn = () => {
         type: "success",
         duration: 3000,
         position: "bottom",
-      });
-    }
-    if (params.loggedOut === "true") {
-      const main = async () => {
-        secureStore.removeItem("jwt");
-      };
-      main();
-      useAuthStore.setState({
-        user: null,
-        token: null,
-        isAuthenticated: false,
       });
     }
   }, [authLoading, isAuthenticated, params.loggedOut, params.verified, router]);
@@ -156,10 +153,12 @@ const SignIn = () => {
 
             <FuturisticButton
               title="Sign In "
-              onPress={handleSubmit(async (data) => {
-                Keyboard.dismiss();
-                return await handleEmailSignIn(data);
-              })}
+              onPress={async () =>
+                await handleSubmit(async (data) => {
+                  Keyboard.dismiss();
+                  return await handleEmailSignIn(data);
+                })()
+              }
               disabled={isSubmitting}
               loading={isSubmitting}
             />

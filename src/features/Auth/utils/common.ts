@@ -95,6 +95,7 @@ export const handleGoogleSignIn = async () => {
         `Google sign-in successful for user: ${newUser.data.user?.email}`,
         "common.ts :: handleGoogleSignIn()"
       );
+
     } else {
       showMessage({
         message: "Sign-in Failed",

@@ -1,12 +1,22 @@
-import { getStudentLectures } from "@/src/features/Classes/services/lectureService";
+import {
+  getLectureDetails,
+  getStudentLectures,
+} from "@/src/features/Classes/services/lectureService";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { authService } from "@/src/shared/services/authService";
 import { socketService } from "@/src/shared/services/socketService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { storage } from "@/src/shared/utils/mmkvStorage";
+import { Lecture } from "@attendance/types/common";
 import { Ionicons } from "@expo/vector-icons";
+import { getApp } from "@react-native-firebase/app";
+import {
+  getMessaging,
+  subscribeToTopic,
+} from "@react-native-firebase/messaging";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
+import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -31,8 +41,8 @@ import {
 const StudentDashboard = () => {
   const { colors, isDark } = useTheme();
   const { user, updateUser } = useAuthStore();
-  const [lectures, setLectures] = useState<any[]>([]);
-  const [joinedLecture, setJoinedLecture] = useState<any | null>(null);
+  const [lectures, setLectures] = useState<Lecture[]>([]);
+  const [joinedLecture, setJoinedLecture] = useState<Lecture | null>(null);
   const [lectureStatus, setLectureStatus] = useState<"active" | "ended">(
     "active"
   );
@@ -50,7 +60,129 @@ const StudentDashboard = () => {
 
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [rollNo, setRollNo] = useState("");
-  const [pendingLecture, setPendingLecture] = useState<any | null>(null);
+  const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
+  const [fetchingLectureDetails, setFetchingLectureDetails] = useState(false);
+
+  const { lectureId } = useLocalSearchParams();
+
+  console.log("Student Dashboard : " + lectureId);
+
+  const proceedWithJoin = useCallback(
+    async (lecture: any, studentRollNo: string) => {
+      setLoading(true);
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Permission denied",
+            "Location is required to join class."
+          );
+          setLoading(false);
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+        });
+
+        const res = await joinLecture(
+          lecture.id,
+          location.coords.latitude,
+          location.coords.longitude,
+          studentRollNo
+        );
+
+        if (res.success) {
+          // Update user in auth store with roll number if returned
+          if (res.user && res.user.rollNo) {
+            updateUser({ rollNo: res.user.rollNo as string });
+          }
+
+          setJoinedLecture(lecture);
+          setLectureStatus("active");
+          setStatus("joined");
+          Alert.alert(
+            "Joined!",
+            "Location tracking started. Wait for class to end, then verify attendance."
+          );
+          // Start Background Task
+          await startBackgroundTracking(lecture.id);
+        }
+      } catch (error: any) {
+        console.log(error);
+        Alert.alert("Join Failed", error.message || "Could not join class");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [updateUser]
+  );
+
+  // Fetch lecture details and auto-join when navigating from notification
+  useEffect(() => {
+    const fetchAndJoinLecture = async () => {
+      if (lectureId) {
+        // First check if we already have the lecture in our list
+        const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
+
+        if (lectureToJoin) {
+          await handleJoin(lectureToJoin);
+        } else {
+          // Fetch lecture details from API if not in list
+          setFetchingLectureDetails(true);
+          try {
+            console.log("📥 Fetching lecture details for:", lectureId);
+            const res = await getLectureDetails(lectureId as string);
+
+            if (res.success && res.data) {
+              console.log("✅ Lecture details fetched:", res.data);
+              const lectureData = {
+                id: res.data.lecture.id,
+                title: res.data.lecture.title,
+                className: res.data.lecture.class.name,
+                startTime: res.data.lecture.startedAt,
+              };
+              await handleJoin(lectureData);
+            } else {
+              console.log("❌ Failed to fetch lecture details");
+              Alert.alert(
+                "Error",
+                "Could not load lecture details. Please try again."
+              );
+              // Still try to join with minimal data
+              await handleJoin({ id: lectureId });
+            }
+          } catch (error: any) {
+            console.error("❌ Error fetching lecture details:", error);
+            Alert.alert(
+              "Error",
+              error.message || "Could not load lecture details"
+            );
+            // Fallback: try to join with just the ID
+            await handleJoin({ id: lectureId });
+          } finally {
+            setFetchingLectureDetails(false);
+          }
+        }
+      }
+    };
+
+    fetchAndJoinLecture();
+  }, [lectureId]);
+
+  const handleJoin = useCallback(
+    async (lecture: any) => {
+      // Check if user has a roll number set
+      if (!user?.rollNo) {
+        setPendingLecture(lecture);
+        setShowRollNoModal(true);
+        return;
+      }
+
+      await proceedWithJoin(lecture, user.rollNo);
+    },
+    [proceedWithJoin, user]
+  );
 
   const fetchLectures = useCallback(async () => {
     try {
@@ -81,11 +213,22 @@ const StudentDashboard = () => {
       console.log("❌ Error fetching lectures:", error);
       setLectures([]);
     }
-  }, [user]);
+  }, []);
 
+  // Auto-reload lectures every 30 seconds and when user changes
   useEffect(() => {
     fetchLectures();
-  }, [fetchLectures]); // Refetch when user changes
+
+    // Set up interval for auto-refresh every 30 seconds
+    const intervalId = setInterval(() => {
+      console.log("🔄 Auto-refreshing lectures...");
+      fetchLectures();
+    }, 30000); // 30 seconds
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [user, fetchLectures]); // Refetch when user changes
 
   // Connect to socket on mount
   useEffect(() => {
@@ -94,10 +237,12 @@ const StudentDashboard = () => {
     // Handle app state changes (background/foreground)
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
-        // App came back to foreground - reconnect socket
+        // App came back to foreground - reconnect socket and refresh lectures
         if (!socketService.isConnected()) {
           socketService.connect();
         }
+        console.log("📱 App came to foreground - refreshing lectures");
+        fetchLectures();
       }
     });
 
@@ -105,7 +250,7 @@ const StudentDashboard = () => {
       socketService.disconnect();
       subscription.remove();
     };
-  }, []);
+  }, [fetchLectures]);
 
   // Listen for lecture ended events globally
   useEffect(() => {
@@ -169,67 +314,12 @@ const StudentDashboard = () => {
         Alert.alert("Success", "Class updated successfully!");
         setShowClassModal(false);
         fetchLectures();
+        await subscribeToTopic(getMessaging(getApp()), className.trim());
       }
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to update class");
     } finally {
       setClassUpdateLoading(false);
-    }
-  };
-
-  const handleJoin = async (lecture: any) => {
-    // Check if user has a roll number set
-    if (!user?.rollNo) {
-      setPendingLecture(lecture);
-      setShowRollNoModal(true);
-      return;
-    }
-
-    await proceedWithJoin(lecture, user.rollNo);
-  };
-
-  const proceedWithJoin = async (lecture: any, studentRollNo: string) => {
-    setLoading(true);
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission denied", "Location is required to join class.");
-        setLoading(false);
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-      });
-
-      const res = await joinLecture(
-        lecture.id,
-        location.coords.latitude,
-        location.coords.longitude,
-        studentRollNo
-      );
-
-      if (res.success) {
-        // Update user in auth store with roll number if returned
-        if (res.user && res.user.rollNo) {
-          updateUser({ rollNo: res.user.rollNo as string });
-        }
-
-        setJoinedLecture(lecture);
-        setLectureStatus("active");
-        setStatus("joined");
-        Alert.alert(
-          "Joined!",
-          "Location tracking started. Wait for class to end, then verify attendance."
-        );
-        // Start Background Task
-        await startBackgroundTracking(lecture.id);
-      }
-    } catch (error: any) {
-      console.log(error);
-      Alert.alert("Join Failed", error.message || "Could not join class");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -260,7 +350,7 @@ const StudentDashboard = () => {
       });
 
       const res = await submitAttendance(
-        joinedLecture.id,
+        joinedLecture!.id,
         passcode,
         location.coords.latitude,
         location.coords.longitude
@@ -317,6 +407,32 @@ const StudentDashboard = () => {
     );
   };
 
+  // Show loading screen while fetching lecture details
+  if (fetchingLectureDetails) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background.primary,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary.main} />
+        <Text
+          style={[
+            styles.loadingText,
+            { color: colors.text.secondary, marginTop: 16 },
+          ]}
+        >
+          Loading lecture details...
+        </Text>
+      </View>
+    );
+  }
+
   // If joined and lecture is still active - show ongoing status
   if (status === "joined" && lectureStatus === "active") {
     return (
@@ -352,8 +468,16 @@ const StudentDashboard = () => {
           <Text
             style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
           >
-            Attending: {joinedLecture?.title}
-            {"\n"}Location tracking is active
+            {joinedLecture?.title ? (
+              <>
+                Attending:{" "}
+                <Text style={{ fontWeight: "700", color: colors.primary.main }}>
+                  {joinedLecture.title}
+                </Text>
+                {"\n"}
+              </>
+            ) : null}
+            Location tracking is active
           </Text>
 
           <View style={styles.ongoingInfo}>
@@ -431,8 +555,18 @@ const StudentDashboard = () => {
           <Text
             style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
           >
-            Class finished! Verify your attendance now{"\n"}using the passcode
-            from your teacher.
+            {joinedLecture?.title ? (
+              <>
+                <Text style={{ fontWeight: "700", color: colors.primary.main }}>
+                  {joinedLecture.title}
+                </Text>{" "}
+                has finished!
+                {"\n"}
+              </>
+            ) : (
+              "Class finished!\n"
+            )}
+            Verify your attendance now using the passcode from your teacher.
           </Text>
 
           <View
@@ -656,7 +790,7 @@ const StudentDashboard = () => {
                         { color: colors.text.secondary },
                       ]}
                     >
-                      {lecture.className}
+                      {lecture!.className}
                     </Text>
                   </View>
                 </View>
@@ -695,7 +829,7 @@ const StudentDashboard = () => {
             />
 
             <TouchableOpacity
-              onPress={() => handleJoin(lecture)}
+              onPress={async () => await handleJoin(lecture)}
               disabled={loading}
               activeOpacity={0.8}
             >
@@ -1088,6 +1222,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     marginTop: 16,
+    textAlign: "center",
+  },
+  loadingText: {
+    fontSize: 16,
     textAlign: "center",
   },
   refreshButton: {

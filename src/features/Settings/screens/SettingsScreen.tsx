@@ -58,7 +58,7 @@ const ThemeOption = ({
     } else {
       rotation.value = withTiming(0, { duration: 0 });
     }
-  }, [isActive, rotation]);
+  }, [isActive]);
 
   const animatedIconStyle = useAnimatedStyle(() => {
     return {

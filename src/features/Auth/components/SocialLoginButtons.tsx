@@ -2,10 +2,16 @@ import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface SocialLoginButtonsProps {
-  onGooglePress?: () => void;
+  onGooglePress?: () => Promise<void>;
   onLinkedInPress?: () => void;
   isGoogleLoading?: boolean;
 }
@@ -22,7 +28,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
       <TouchableOpacity
         style={[styles.socialButton, { borderColor: "rgba(0, 119, 181, 0.4)" }]}
         activeOpacity={0.8}
-        onPress={onGooglePress}
+        onPress={async () => await onGooglePress?.()}
         disabled={isGoogleLoading}
       >
         <LinearGradient
@@ -47,7 +53,10 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
                 />
               </View>
               <Text
-                style={[styles.socialButtonText, { color: colors.text.primary }]}
+                style={[
+                  styles.socialButtonText,
+                  { color: colors.text.primary },
+                ]}
               >
                 Google
               </Text>

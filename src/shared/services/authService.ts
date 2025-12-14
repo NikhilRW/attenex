@@ -4,6 +4,7 @@ import http from "@/src/shared/utils/http";
 import { secureStore } from "@/src/shared/utils/secureStore";
 import { logger } from "../utils/logger";
 import { showMessage } from "react-native-flash-message";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -33,6 +34,9 @@ export const authService = {
       await secureStore.removeItem("jwt");
     } catch (err) {
       console.error("authService: failed to remove token", err);
+    }
+    if (GoogleSignin.hasPreviousSignIn()) {
+      await GoogleSignin.signOut();
     }
     useAuthStore.getState().logout();
   },
@@ -77,6 +81,8 @@ export const authService = {
           },
         }
       );
+
+      
 
       // Update the user in the auth store with the new class
       if (response.data.data.user) {
