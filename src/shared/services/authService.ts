@@ -82,8 +82,6 @@ export const authService = {
         }
       );
 
-      
-
       // Update the user in the auth store with the new class
       if (response.data.data.user) {
         useAuthStore.getState().updateUser(response.data.data.user);
@@ -109,6 +107,9 @@ export const authService = {
       if (response.data.success) {
         await secureStore.removeItem("jwt");
         await secureStore.removeItem("is-signup");
+        if (GoogleSignin.hasPreviousSignIn()) {
+          await GoogleSignin.signOut();
+        }
         showMessage({
           message: "Account deleted successfully",
           type: "success",

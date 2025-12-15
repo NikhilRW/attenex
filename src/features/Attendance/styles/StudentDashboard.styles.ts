@@ -1,9 +1,16 @@
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContent: { padding: 20, paddingTop: 30 },
-  headerSection: { marginBottom: 24 },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 30,
+  },
+  headerSection: {
+    marginBottom: 24,
+  },
   title: {
     fontSize: 32,
     fontWeight: "800",
@@ -21,7 +28,11 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  classInfoLeft: { flexDirection: "row", alignItems: "center", flex: 1 },
+  classInfoLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
   classInfoLabel: {
     fontSize: 12,
     fontWeight: "600",
@@ -29,7 +40,10 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: 4,
   },
-  classInfoValue: { fontSize: 18, fontWeight: "700" },
+  classInfoValue: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
   editClassButton: {
     width: 36,
     height: 36,
@@ -37,16 +51,36 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  subtitle: { fontSize: 18, fontWeight: "600", marginBottom: 24, opacity: 0.8 },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 24,
+    opacity: 0.8,
+  },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 60,
     opacity: 0.7,
   },
-  emptyText: { fontSize: 16, marginTop: 16, textAlign: "center" },
-  refreshButton: { marginTop: 16, paddingVertical: 8, paddingHorizontal: 16 },
-  refreshText: { fontSize: 16, fontWeight: "600" },
+  emptyText: {
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  refreshButton: {
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  refreshText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
   lectureCard: {
     padding: 20,
     borderRadius: 24,
@@ -56,6 +90,7 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
+    // elevation: 8,
   },
   lectureCardHeader: {
     flexDirection: "row",
@@ -63,7 +98,11 @@ export const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 16,
   },
-  headerLeftContent: { flexDirection: "row", flex: 1, marginRight: 12 },
+  headerLeftContent: {
+    flexDirection: "row",
+    flex: 1,
+    marginRight: 12,
+  },
   iconContainer: {
     width: 44,
     height: 44,
@@ -72,7 +111,10 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
-  lectureInfo: { flex: 1, justifyContent: "center" },
+  lectureInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
   lectureCardTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -80,8 +122,15 @@ export const styles = StyleSheet.create({
     letterSpacing: -0.3,
     lineHeight: 24,
   },
-  lectureMetaRow: { flexDirection: "row", alignItems: "center" },
-  lectureClassName: { fontSize: 14, fontWeight: "500", opacity: 0.7 },
+  lectureMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  lectureClassName: {
+    fontSize: 14,
+    fontWeight: "500",
+    opacity: 0.7,
+  },
   liveBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -89,9 +138,23 @@ export const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 12,
   },
-  liveDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
-  liveBadgeText: { fontSize: 12, fontWeight: "700", letterSpacing: 0.5 },
-  divider: { height: 1, width: "100%", marginBottom: 16, opacity: 0.5 },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
+  },
+  liveBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  divider: {
+    height: 1,
+    width: "100%",
+    marginBottom: 16,
+    opacity: 0.5,
+  },
   joinButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -116,8 +179,13 @@ export const styles = StyleSheet.create({
     padding: 4,
     marginLeft: 8,
   },
-  joinButtonIcon: { marginLeft: 4 },
-  joinButtonLoader: { marginLeft: 8 },
+  joinButtonIcon: {
+    marginLeft: 4,
+  },
+  joinButtonLoader: {
+    marginLeft: 8,
+  },
+  // Joined State Styles
   joinedContainer: {
     flex: 1,
     alignItems: "center",
@@ -136,6 +204,7 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
+    elevation: 10,
   },
   guardianIconInner: {
     width: 100,
@@ -185,6 +254,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 20,
     fontWeight: "600",
+    textAlign: "auto",
     marginBottom: 20,
   },
   submitButton: {
@@ -198,7 +268,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  submitButtonText: { color: "white", fontSize: 16, fontWeight: "700" },
+  submitButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "700",
+  },
   ongoingInfo: {
     width: "100%",
     alignItems: "center",
@@ -214,10 +288,24 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(76, 175, 80, 0.15)",
     gap: 8,
   },
-  pulseDot: { width: 8, height: 8, borderRadius: 4 },
-  trackingBadgeText: { fontSize: 14, fontWeight: "600" },
-  waitText: { fontSize: 14, textAlign: "center", opacity: 0.7 },
-  leaveButtonWrapper: { width: "100%", marginTop: 16 },
+  pulseDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  trackingBadgeText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  waitText: {
+    fontSize: 14,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  leaveButtonWrapper: {
+    width: "100%",
+    marginTop: 16,
+  },
   leaveButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -231,7 +319,12 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  leaveButtonText: { color: "white", fontSize: 16, fontWeight: "700" },
+  leaveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -254,7 +347,10 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255, 255, 255, 0.1)",
   },
-  modalTitle: { fontSize: 20, fontWeight: "bold" },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   closeButton: {
     width: 32,
     height: 32,
@@ -262,9 +358,20 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  modalBody: { padding: 20 },
-  modalLabel: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
-  modalInput: { borderWidth: 1, borderRadius: 12, padding: 14, fontSize: 16 },
+  modalBody: {
+    padding: 20,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+  },
   modalFooter: {
     flexDirection: "row",
     gap: 12,
@@ -272,15 +379,25 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "rgba(255, 255, 255, 0.1)",
   },
-  modalButton: { flex: 1, padding: 14, borderRadius: 12, alignItems: "center" },
-  modalButtonText: { fontSize: 16, fontWeight: "600" },
+  modalButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
   trackingIndicator: {
     marginTop: 24,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  trackingText: { fontSize: 14, fontStyle: "italic" },
+  trackingText: {
+    fontSize: 14,
+    fontStyle: "italic",
+  },
 });
-
 export default styles;

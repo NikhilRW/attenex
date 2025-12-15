@@ -99,7 +99,7 @@ export const getTeacherClasses = async () => {
 export const getLectureDetails = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/${lectureId}/details`, {
+    const response = await axios.get(`${API_URL}/student/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

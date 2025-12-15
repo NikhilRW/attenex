@@ -78,6 +78,9 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Get all class IDs with this name
+    const classIds = matchingClasses.map((c) => c.id);
+
     // Fetch all active lectures for classes with matching name
     const activeLectures = await db
       .select({

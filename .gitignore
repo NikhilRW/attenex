@@ -50,3 +50,5 @@ backend/.env
 assets/models/*.glb
 assets/models/*.gltf
 assets/models/*.bin
+
+backend/personal/

@@ -1,4 +1,3 @@
-import { useAuth } from "@/src/shared/hooks/useAuth";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { logger } from "@/src/shared/utils/logger";
 // axios not required here; use linkedinAuthService
@@ -12,6 +11,7 @@ import { linkedinAuthService } from "../services/linkedinAuthService";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
+import { subscribeToClassName } from "../utils/common";
 
 /**
  * LinkedIn OAuth Configuration
@@ -142,6 +142,10 @@ export const LinkedInAuth = () => {
 
       // Store user data and JWT token using the auth hook
       await authService.login(user, token);
+
+      if (user.className) {
+        await subscribeToClassName(user.className);
+      }
 
       // Show success feedback to user
       showMessage({

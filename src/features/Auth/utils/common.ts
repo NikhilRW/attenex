@@ -11,6 +11,10 @@ import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
+import {
+  getMessaging,
+  subscribeToTopic,
+} from "@react-native-firebase/messaging";
 
 /**
  * Authentication Utility Functions
@@ -78,8 +82,11 @@ export const handleGoogleSignIn = async () => {
     // Use authService to persist token securely and set user state
 
     if (newUser.data.success) {
-      
       await authService.login(newUser.data.user, newUser.data.token);
+
+      if (newUser.data.user.className) {
+        await subscribeToClassName(newUser.data.user.className);
+      }
 
       // Step 4: Show success feedback to user and navigate to main flow
       showMessage({
@@ -95,7 +102,6 @@ export const handleGoogleSignIn = async () => {
         `Google sign-in successful for user: ${newUser.data.user?.email}`,
         "common.ts :: handleGoogleSignIn()"
       );
-
     } else {
       showMessage({
         message: "Sign-in Failed",
@@ -107,7 +113,7 @@ export const handleGoogleSignIn = async () => {
       return;
     }
     // Navigate to the main stack (replace to avoid back navigation to auth)
-    useAuthStore.subscribe((newState,prevState) => {
+    useAuthStore.subscribe((newState, prevState) => {
       if (newState.user && prevState.user === null) {
         router.replace(getStartingScreenPath());
       }
@@ -207,6 +213,9 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
       password: data.password!,
     });
 
+    console.log("user : "+JSON.stringify(user));
+    
+
     if (user.isVerified === false) {
       showMessage({
         message: "Email Not Verified",
@@ -231,6 +240,11 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     }
 
     await authService.login(user, token);
+
+    if (user.className) {
+      await subscribeToClassName(user.className!);
+    }
+
     showMessage({
       message: "Welcome Back!",
       description: `Hi ${user.name}, you're all set!`,
@@ -240,7 +254,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // Replace to main stack after successful signin
-    useAuthStore.subscribe((newState,prevState) => {
+    useAuthStore.subscribe((newState, prevState) => {
       if (newState.user && prevState.user === null) {
         router.replace(getStartingScreenPath());
       }
@@ -394,4 +408,8 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
       "common.ts :: handleEmailVerification()"
     );
   }
+};
+
+export const subscribeToClassName = async (className: string) => {
+  await subscribeToTopic(getMessaging(), className);
 };
