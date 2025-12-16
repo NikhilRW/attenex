@@ -26,7 +26,6 @@ import {
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import {
   configureReanimatedLogger,
