@@ -113,11 +113,11 @@ export const handleGoogleSignIn = async () => {
       return;
     }
     // Navigate to the main stack (replace to avoid back navigation to auth)
-    useAuthStore.subscribe((newState, prevState) => {
-      if (newState.user && prevState.user === null) {
-        router.replace(getStartingScreenPath());
-      }
-    });
+    // useAuthStore.subscribe((newState, prevState) => {
+    //   if (newState.user && prevState.user === null) {
+    //     router.replace(getStartingScreenPath());
+    //   }
+    // });
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;
@@ -208,13 +208,12 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     } = await http.post<{
       user: User;
       token: string;
-    }>("/api/users/signin?authType=email", {
+    }>(BASE_URI + "/api/users/signin?authType=email", {
       email: data.email!,
       password: data.password!,
     });
 
-    console.log("user : "+JSON.stringify(user));
-    
+    console.log("user : " + JSON.stringify(user));
 
     if (user.isVerified === false) {
       showMessage({
@@ -253,12 +252,13 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
       position: "bottom",
     });
 
-    // Replace to main stack after successful signin
-    useAuthStore.subscribe((newState, prevState) => {
-      if (newState.user && prevState.user === null) {
-        router.replace(getStartingScreenPath());
-      }
-    });
+    // // Replace to main stack after successful signin
+    // useAuthStore.subscribe((newState, prevState) => {
+    //   console.log("I am here");
+    //   if (newState.user && prevState.user === null) {
+    //     router.replace(getStartingScreenPath());
+    //   }
+    // });
   } catch (err) {
     const e = err as any;
 
@@ -297,7 +297,6 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
 export const handleEmailSignUp = async (data: SignUpFormData) => {
   try {
     const {
-      data: { token, user },
       status,
     } = await http.post<{
       user: User;
@@ -319,12 +318,11 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       return;
     }
 
-    await authService.signup(user, token);
     useAuthStore.setState({ isAuthenticated: false }); // Require email verification
 
     showMessage({
       message: "Account Created!",
-      description: `Welcome aboard, ${user.name}! Let's get started.`,
+      description: `Sign in to get started`,
       type: "success",
       duration: 2500,
       position: "bottom",

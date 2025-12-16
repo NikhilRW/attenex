@@ -1,4 +1,5 @@
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useShallow } from "zustand/shallow";
 
 interface SocialLoginButtonsProps {
   onGooglePress?: () => Promise<void>;
@@ -22,6 +24,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   isGoogleLoading = false,
 }) => {
   const { colors } = useTheme();
+  const { user } = useAuthStore(useShallow((state) => ({ user: state.user })));
 
   return (
     <View style={styles.socialSection}>
@@ -29,7 +32,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         style={[styles.socialButton, { borderColor: "rgba(0, 119, 181, 0.4)" }]}
         activeOpacity={0.8}
         onPress={async () => await onGooglePress?.()}
-        disabled={isGoogleLoading}
+        disabled={isGoogleLoading || !!user}
       >
         <LinearGradient
           colors={["#4286F414", "#34A85314", "#FBBC0514", "#EA433514"]}

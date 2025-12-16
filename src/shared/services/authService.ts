@@ -18,17 +18,6 @@ export const authService = {
     }
   },
 
-  async signup(user: any, token: string) {
-    // Persist token securely and set state
-    try {
-      await secureStore.setItem("jwt", token);
-      await secureStore.setItem("is-signup", "true");
-    } catch (err) {
-      console.error("authService: failed to persist token", err);
-    }
-    useAuthStore.getState().setAuth(user, token, true);
-  },
-
   async logout() {
     try {
       await secureStore.removeItem("jwt");

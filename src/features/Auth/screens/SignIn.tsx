@@ -44,13 +44,14 @@ const SignIn = () => {
     useShallow((state) => ({
       isAuthenticated: state.isAuthenticated,
       isLoading: state.isLoading,
+      user: state.user,
     }))
   );
-  console.log("isAuthenticated : " + isAuthenticated);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated && !params.loggedOut) {
+    if (!authLoading && isAuthenticated) {
       router.replace(getStartingScreenPath());
+      return;
     }
     if (params.verified === "true") {
       // Show success message for email verification
@@ -62,7 +63,7 @@ const SignIn = () => {
         position: "bottom",
       });
     }
-  }, [authLoading, isAuthenticated, params.loggedOut, params.verified, router]);
+  }, [authLoading, isAuthenticated, params.verified, router]);
 
   // Initialize react-hook-form with Zod validation
   const {
@@ -153,13 +154,11 @@ const SignIn = () => {
 
             <FuturisticButton
               title="Sign In "
-              onPress={async () =>
-                await handleSubmit(async (data) => {
-                  Keyboard.dismiss();
-                  return await handleEmailSignIn(data);
-                })()
-              }
-              disabled={isSubmitting}
+              onPress={handleSubmit(async (data) => {
+                Keyboard.dismiss();
+                return await handleEmailSignIn(data);
+              })}
+              disabled={isSubmitting || isAuthenticated}
               loading={isSubmitting}
             />
           </View>

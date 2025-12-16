@@ -28,11 +28,11 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       isLoading: true,
-      setAuth: (user, token, isSignUp = false) => {
+      setAuth: (user, token) => {
         set({
           user,
           token,
-          isAuthenticated: isSignUp ? false : true,
+          isAuthenticated: true,
           isLoading: false,
         });
       },
@@ -53,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           token: null,
           isAuthenticated: false,
+          isLoading: false,
         });
         router.replace("/sign-in?loggedOut=true");
       },
@@ -71,13 +72,8 @@ export const useAuthStore = create<AuthState>()(
         (async () => {
           // After rehydration, load token from secure storage (if any) into runtime store
           const token = await secureStore.getItem("jwt");
-          const isSignUp = await secureStore.getItem("is-signup");
           if (token) {
-            if (isSignUp === "true") {
-              (state as any)?.setAuth?.((state as any).user, token, true);
-            } else {
-              (state as any)?.setAuth?.((state as any).user, token);
-            }
+            (state as any)?.setAuth?.((state as any).user, token);
           } else {
             // No token found; set loading to false
             (state as any)?.setLoading?.(false);
