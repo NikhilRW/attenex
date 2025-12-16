@@ -5,16 +5,12 @@ import { useAuthStore } from "@/src/shared/stores/authStore";
 import { googleAuth } from "@/src/shared/utils/google-auth";
 import http from "@/src/shared/utils/http";
 import { logger } from "@/src/shared/utils/logger";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
-import {
-  getMessaging,
-  subscribeToTopic,
-} from "@react-native-firebase/messaging";
+import { subscribeToClassName } from "@/src/shared/utils/fcm";
 
 /**
  * Authentication Utility Functions
@@ -84,7 +80,7 @@ export const handleGoogleSignIn = async () => {
     if (newUser.data.success) {
       await authService.login(newUser.data.user, newUser.data.token);
 
-      if (newUser.data.user.className) {
+      if (newUser.data.user.className && newUser.data.user.role === "student") {
         await subscribeToClassName(newUser.data.user.className);
       }
 
@@ -240,7 +236,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
 
     await authService.login(user, token);
 
-    if (user.className) {
+    if (user.className && user.role === "student") {
       await subscribeToClassName(user.className!);
     }
 
@@ -406,8 +402,4 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
       "common.ts :: handleEmailVerification()"
     );
   }
-};
-
-export const subscribeToClassName = async (className: string) => {
-  await subscribeToTopic(getMessaging(), className);
 };

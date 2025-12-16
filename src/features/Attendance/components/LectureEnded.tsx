@@ -8,7 +8,6 @@ import {
 import React from "react";
 import styles from "../styles/StudentDashboard.styles";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors } from "@/src/shared/constants/colors";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,7 +27,7 @@ const LectureEnded = ({
   loading: boolean;
 }) => {
   const insets = useSafeAreaInsets();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}

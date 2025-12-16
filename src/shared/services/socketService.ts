@@ -1,6 +1,6 @@
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { io, Socket } from "socket.io-client";
-
+import { logger } from "../utils/logger";
 class SocketService {
   private socket: Socket | null = null;
 

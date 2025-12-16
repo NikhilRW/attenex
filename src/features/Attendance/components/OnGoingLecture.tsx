@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import React from "react";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { colors } from "@/src/shared/constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "../styles/StudentDashboard.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,7 +15,7 @@ const OnGoingLecture = ({
   loading: boolean;
   handleJoin: (lecture: Lecture) => Promise<void>;
 }) => {
-  const { isDark } = useTheme();
+  const { isDark,colors } = useTheme();
   return (
     <LinearGradient
       key={lecture.id}

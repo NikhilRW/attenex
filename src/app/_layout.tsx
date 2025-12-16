@@ -169,6 +169,7 @@ export default function RootLayout() {
         await scheduleNotificationAsync({
           content: {
             ...buildAttenexNotificationContent(remoteMessage),
+
           },
           trigger: null,
         });
@@ -178,19 +179,25 @@ export default function RootLayout() {
     // Handle user clicking on a notification and open the screen
     // This works for both background and killed state when using Expo Notifications
     const handleNotificationClick = async (response: NotificationResponse) => {
-      // const lectureId =
-      //   response?.notification?.request?.content?.data?.lectureId;
-      // console.log("📲 Notification clicked/opened app:", JSON.stringify(response));
-      // console.log("📍 Action identifier:", response?.actionIdentifier);
-      // if (lectureId) {
-      //   console.log("✅ Navigating to lecture from notification:", lectureId);
-      //   // Use replace for cold start, navigate for warm start
-      //   if (response?.actionIdentifier === "expo.modules.notifications.actions.DEFAULT") {
-      //     router.replace(`/attendance?lectureId=${lectureId}`);
-      //   } else {
-      //     router.navigate(`/attendance?lectureId=${lectureId}`);
-      //   }
-      // }
+      const lectureId =
+        response?.notification?.request?.content?.data?.lectureId;
+      console.log(
+        "📲 Notification clicked/opened app:",
+        JSON.stringify(response)
+      );
+      console.log("📍 Action identifier:", response?.actionIdentifier);
+      if (lectureId) {
+        console.log("✅ Navigating to lecture from notification:", lectureId);
+        // Use replace for cold start, navigate for warm start
+        if (
+          response?.actionIdentifier ===
+          "expo.modules.notifications.actions.DEFAULT"
+        ) {
+          router.replace(`/attendance?lectureId=${lectureId}`);
+        } else {
+          router.navigate(`/attendance?lectureId=${lectureId}`);
+        }
+      }
     };
 
     // Handle user opening the app from a notification (when the app is in the background)
@@ -218,7 +225,6 @@ export default function RootLayout() {
     // Only check ONCE on initial mount to prevent infinite loop
     if (!hasHandledKilledStateNotification) {
       setHasHandledKilledStateNotification(true);
-
       getLastNotificationResponseAsync().then((response) => {
         if (response) {
           console.log(

@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { colors } from "@/src/shared/constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "../styles/StudentDashboard.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +13,7 @@ const ClassInfo = ({
   user: User | null;
   setShowClassModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   return (
     <LinearGradient
       colors={

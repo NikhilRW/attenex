@@ -11,8 +11,7 @@ import { linkedinAuthService } from "../services/linkedinAuthService";
 import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
-import { subscribeToClassName } from "../utils/common";
-
+import { subscribeToClassName } from "@/src/shared/utils/fcm";
 /**
  * LinkedIn OAuth Configuration
  * These values must match your LinkedIn Developer App settings
@@ -143,7 +142,7 @@ export const LinkedInAuth = () => {
       // Store user data and JWT token using the auth hook
       await authService.login(user, token);
 
-      if (user.className) {
+      if (user.className && user.role === "student") {
         await subscribeToClassName(user.className);
       }
 

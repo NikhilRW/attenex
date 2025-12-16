@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import styles from "../styles/StudentDashboard.styles";
-import { colors } from "@/src/shared/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Lecture } from "../types/common";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 
 const LectureOngoing = ({
   handleLeaveLecture,
@@ -15,7 +15,7 @@ const LectureOngoing = ({
   joinedLecture: Lecture;
 }) => {
   const insets = useSafeAreaInsets();
-
+  const { colors } = useTheme();
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}

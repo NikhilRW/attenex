@@ -2,7 +2,6 @@ import { View, Text, Modal, TouchableOpacity, TextInput } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "../styles/StudentDashboard.styles";
-import { colors } from "@/src/shared/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { Lecture } from "../types/common";
@@ -22,7 +21,7 @@ const RollnoModal = ({
   handleRollNoSubmit: () => void;
   setPendingLecture: React.Dispatch<React.SetStateAction<Lecture | null>>;
 }) => {
-  const { isDark } = useTheme();
+  const { isDark,colors } = useTheme();
   return (
     <Modal
       visible={showRollNoModal}

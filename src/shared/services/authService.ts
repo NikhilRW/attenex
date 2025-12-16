@@ -5,6 +5,7 @@ import { secureStore } from "@/src/shared/utils/secureStore";
 import { logger } from "../utils/logger";
 import { showMessage } from "react-native-flash-message";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { subscribeToClassName, unsubscribeFromClassName } from "../utils/fcm";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -27,6 +28,7 @@ export const authService = {
     if (GoogleSignin.hasPreviousSignIn()) {
       await GoogleSignin.signOut();
     }
+    unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
     useAuthStore.getState().logout();
   },
 
@@ -47,6 +49,16 @@ export const authService = {
       // Update the user in the auth store with the new role
       if (response.data.user) {
         useAuthStore.getState().updateUser(response.data.user);
+      }
+      if (role === "teacher") {
+        unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+      }
+      if (role === "student") {
+        // Ensure className is subscribed if role is changed to student
+        const className = useAuthStore.getState().user?.className;
+        if (className) {
+          await subscribeToClassName(className);
+        }
       }
       return response.data;
     } catch (error: any) {
@@ -70,11 +82,14 @@ export const authService = {
           },
         }
       );
-
+      unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+      await subscribeToClassName(className);
       // Update the user in the auth store with the new class
       if (response.data.data.user) {
         useAuthStore.getState().updateUser(response.data.data.user);
       }
+
+      await subscribeToClassName(className.trim());
       return response.data;
     } catch (error: any) {
       logger.info("authService:updateStudentClass - error", error);
@@ -105,6 +120,7 @@ export const authService = {
           duration: 1500,
           position: "bottom",
         });
+        unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
         useAuthStore.getState().logout();
       } else {
         showMessage({

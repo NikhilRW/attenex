@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { colors } from "@/src/shared/constants/colors";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "../styles/StudentDashboard.styles";
@@ -29,7 +28,7 @@ const ClassUpdateModal = ({
   handleUpdateClass: () => void;
   classUpdateLoading: boolean;
 }) => {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   return (
     <Modal
       visible={showClassModal}

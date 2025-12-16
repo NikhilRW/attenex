@@ -8,16 +8,10 @@ import { socketService } from "@/src/shared/services/socketService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { storage } from "@/src/shared/utils/mmkvStorage";
 import { Lecture } from "@attendance/types/common";
-import { getApp } from "@react-native-firebase/app";
-import {
-  getMessaging,
-  subscribeToTopic,
-} from "@react-native-firebase/messaging";
 import * as Location from "expo-location";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, AppState, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { joinLecture, submitAttendance } from "../services/attendanceService";
 import {
   startBackgroundTracking,
@@ -52,7 +46,6 @@ const StudentDashboard = () => {
     (user as any)?.className || storage.getString("userClassName") || ""
   );
   const [classUpdateLoading, setClassUpdateLoading] = useState(false);
-  const insets = useSafeAreaInsets();
 
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [rollNo, setRollNo] = useState("");
@@ -310,7 +303,6 @@ const StudentDashboard = () => {
         Alert.alert("Success", "Class updated successfully!");
         setShowClassModal(false);
         fetchLectures();
-        await subscribeToTopic(getMessaging(getApp()), className.trim());
       }
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to update class");

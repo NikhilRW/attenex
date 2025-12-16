@@ -1,9 +1,10 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
-import { colors } from "@/src/shared/constants/colors";
 import styles from "../styles/StudentDashboard.styles";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 
 const LoadingScreen = () => {
+  const { colors } = useTheme();
   return (
     <View
       style={[

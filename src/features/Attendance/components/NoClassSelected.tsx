@@ -2,13 +2,14 @@ import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/StudentDashboard.styles";
-import { colors } from "@/src/shared/constants/colors";
+import { useTheme } from "@/src/shared/hooks/useTheme";
 
 const NoClassSelected = ({
   setShowClassModal,
 }: {
   setShowClassModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { colors } = useTheme();
   return (
     <View style={styles.emptyContainer}>
       <Ionicons name="school-outline" size={64} color={colors.text.muted} />
