@@ -52,23 +52,18 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const { setTheme, isDark, mode, colors } = useTheme();
+  const { isDark, colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
 
   // Track if we've already handled the killed-state notification to prevent infinite loop
-  const { hasHandledKilledStateNotification, setHasHandledKilledStateNotification } =
-    useNotificationStore();
+  const {
+    hasHandledKilledStateNotification,
+    setHasHandledKilledStateNotification,
+  } = useNotificationStore();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,
   });
-
-  useEffect(() => {
-    if (mode === "system") {
-      setTheme(colorScheme as "light" | "dark");
-    }
-  }, [colorScheme, mode, setTheme]);
 
   useEffect(() => {
     if (loaded || error) {
@@ -235,7 +230,10 @@ export default function RootLayout() {
             response?.notification?.request?.content?.data?.lectureId;
 
           if (lectureId) {
-            console.log("✅ Navigating to lecture from notification:", lectureId);
+            console.log(
+              "✅ Navigating to lecture from notification:",
+              lectureId
+            );
             // Use replace for cold start to set up the navigation stack correctly
             router.replace(`/attendance?lectureId=${lectureId}`);
           }

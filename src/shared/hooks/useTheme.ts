@@ -3,6 +3,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { darkTheme, lightTheme, type ThemeColors } from "../constants/colors";
 import { mmkvStorage } from "../utils/mmkvStorage";
 import { useColorScheme } from "react-native";
+import { useShallow } from "zustand/shallow";
+import { useMemo } from "react";
 
 export type ThemeMode = "dark" | "light" | "system";
 
@@ -24,7 +26,6 @@ export const useThemeStore = create<ThemeStore>()(
         mode: state.mode,
       }),
       onRehydrateStorage: () => (state) => {
-        
         if (state?.mode) {
           state.setTheme(state.mode);
         }
@@ -35,7 +36,12 @@ export const useThemeStore = create<ThemeStore>()(
 
 // Hook for easy access
 export const useTheme = () => {
-  const { mode, setTheme } = useThemeStore();
+  const { mode, setTheme } = useThemeStore(
+    useShallow((state) => ({
+      mode: state.mode,
+      setTheme: state.setTheme,
+    }))
+  );
   const systemScheme = useColorScheme();
 
   const effectiveMode =
@@ -43,9 +49,11 @@ export const useTheme = () => {
 
   const colors = effectiveMode === "dark" ? darkTheme : lightTheme;
 
-  const toggleTheme = () => {
-    setTheme(effectiveMode === "dark" ? "light" : "dark");
-  };
+  const toggleTheme = useMemo(() => {
+    return () => {
+      setTheme(effectiveMode === "dark" ? "light" : "dark");
+    };
+  }, [effectiveMode, setTheme]);
 
   return {
     colors,

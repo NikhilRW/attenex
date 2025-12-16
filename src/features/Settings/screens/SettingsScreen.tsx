@@ -410,6 +410,8 @@ const SettingsScreen = () => {
           <View style={styles.roleContainer}>
             {(["light", "dark", "system"] as const).map((m) => {
               const isActive = mode === m;
+              console.log("mode = "+mode);
+              console.log("option = "+m);
               return (
                 <ThemeOption
                   key={m}
