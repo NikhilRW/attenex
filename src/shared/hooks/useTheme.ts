@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { darkTheme, lightTheme, type ThemeColors } from "../constants/colors";
+import { darkTheme, lightTheme} from "../constants/colors";
 import { mmkvStorage } from "../utils/mmkvStorage";
 import { useColorScheme } from "react-native";
 import { useShallow } from "zustand/shallow";

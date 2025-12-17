@@ -1,30 +1,20 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { storage } from "@/src/shared/utils/mmkvStorage";
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { Alert, ScrollView, View } from "react-native";
 import { createLecture, getTeacherClasses } from "../services/lectureService";
-import { logger } from "@/src/shared/utils/logger";
-
-interface ClassItem {
-  id: string;
-  name: string;
-}
+import { styles } from "../styles/CreateLecture.styles";
+import { ClassItem } from "../types/common";
+import { CreateLectureHeader } from "../components/CreateLectureHeader";
+import { ClassSelector } from "../components/ClassSelector";
+import { TopicInput } from "../components/TopicInput";
+import { DurationSelector } from "../components/DurationSelector";
+import { StartLectureButton } from "../components/StartLectureButton";
+import { NewClassModal } from "../components/NewClassModal";
 
 const DURATION_OPTIONS = [
   { label: "30 min", value: 30 },
@@ -161,27 +151,11 @@ const CreateLectureScreen = () => {
     setShowNewClassModal(false);
   };
 
-  const selectedDurationLabel =
-    duration === -1
-      ? "Custom"
-      : DURATION_OPTIONS.find((opt) => opt.value === duration)?.label ||
-        "1 hour";
-
   return (
     <View style={styles.container}>
       <FuturisticBackground />
 
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-          New Lecture
-        </Text>
-      </View>
+      <CreateLectureHeader onBack={() => router.back()} />
 
       <ScrollView
         style={styles.scrollView}
@@ -196,650 +170,55 @@ const CreateLectureScreen = () => {
           }
           style={[styles.card, { borderColor: colors.surface.glassBorder }]}
         >
-          {/* Class Dropdown */}
-          <View style={[styles.inputGroup, { zIndex: 20 }]}>
-            <Text style={[styles.label, { color: colors.text.secondary }]}>
-              Class Name
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setShowClassDropdown(!showClassDropdown);
-                setShowDurationDropdown(false);
-              }}
-              style={[
-                styles.dropdown,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "rgba(255, 255, 255, 0.5)",
-                  borderColor: colors.surface.glassBorder,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.dropdownText,
-                  {
-                    color: selectedClass
-                      ? colors.text.primary
-                      : colors.text.muted,
-                  },
-                ]}
-              >
-                {selectedClass || "Select a class"}
-              </Text>
-              <Ionicons
-                name={showClassDropdown ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={colors.text.secondary}
-              />
-            </TouchableOpacity>
+          <ClassSelector
+            selectedClass={selectedClass}
+            existingClasses={existingClasses}
+            showDropdown={showClassDropdown}
+            onToggleDropdown={() => {
+              setShowClassDropdown(!showClassDropdown);
+              setShowDurationDropdown(false);
+            }}
+            onSelectClass={(className) => {
+              setSelectedClass(className);
+              setShowClassDropdown(false);
+            }}
+            onAddNewClass={handleAddNewClass}
+          />
 
-            {showClassDropdown && (
-              <View
-                style={[
-                  styles.dropdownMenu,
-                  {
-                    backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
-                    borderColor: colors.surface.glassBorder,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 10 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 20,
-                    elevation: 10,
-                  },
-                ]}
-              >
-                <ScrollView style={styles.dropdownScroll} nestedScrollEnabled>
-                  {existingClasses.map((cls) => (
-                    <TouchableOpacity
-                      key={cls.id}
-                      onPress={() => {
-                        setSelectedClass(cls.name);
-                        setShowClassDropdown(false);
-                      }}
-                      style={[
-                        styles.dropdownItem,
-                        {
-                          backgroundColor:
-                            selectedClass === cls.name
-                              ? isDark
-                                ? "rgba(8, 145, 178, 0.2)"
-                                : "rgba(8, 145, 178, 0.1)"
-                              : "transparent",
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.dropdownItemText,
-                          { color: colors.text.primary },
-                        ]}
-                      >
-                        {cls.name}
-                      </Text>
-                      {selectedClass === cls.name && (
-                        <Ionicons
-                          name="checkmark"
-                          size={18}
-                          color={colors.primary.main}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  ))}
+          <TopicInput value={lectureName} onChangeText={setLectureName} />
 
-                  <TouchableOpacity
-                    onPress={handleAddNewClass}
-                    style={[
-                      styles.addClassButton,
-                      {
-                        borderTopColor: colors.surface.glassBorder,
-                        borderTopWidth: 1,
-                      },
-                    ]}
-                  >
-                    <Ionicons
-                      name="add-circle-outline"
-                      size={20}
-                      color={colors.primary.main}
-                      style={{ marginRight: 8 }}
-                    />
-                    <Text
-                      style={[
-                        styles.addClassButtonText,
-                        { color: colors.primary.main },
-                      ]}
-                    >
-                      Add New Class
-                    </Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              </View>
-            )}
-          </View>
+          <DurationSelector
+            duration={duration}
+            customDuration={customDuration}
+            showDropdown={showDurationDropdown}
+            onToggleDropdown={() => {
+              setShowDurationDropdown(!showDurationDropdown);
+              setShowClassDropdown(false);
+            }}
+            onSelectDuration={(val) => {
+              setDuration(val);
+              setShowDurationDropdown(false);
+            }}
+            onChangeCustomDuration={setCustomDuration}
+            options={DURATION_OPTIONS}
+          />
 
-          {/* Lecture Topic Input */}
-          <View style={[styles.inputGroup, { zIndex: 10 }]}>
-            <Text style={[styles.label, { color: colors.text.secondary }]}>
-              Lecture Topic
-            </Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "rgba(255, 255, 255, 0.5)",
-                  borderColor: colors.surface.glassBorder,
-                  color: colors.text.primary,
-                },
-              ]}
-              placeholder="Enter lecture topic"
-              placeholderTextColor={colors.text.muted}
-              value={lectureName}
-              onChangeText={setLectureName}
-            />
-          </View>
-
-          {/* Duration Dropdown */}
-          <View style={[styles.inputGroupLarge, { zIndex: 15 }]}>
-            <Text style={[styles.label, { color: colors.text.secondary }]}>
-              Duration
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setShowDurationDropdown(!showDurationDropdown);
-                setShowClassDropdown(false);
-              }}
-              style={[
-                styles.dropdown,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "rgba(255, 255, 255, 0.5)",
-                  borderColor: colors.surface.glassBorder,
-                },
-              ]}
-            >
-              <Text
-                style={[styles.dropdownText, { color: colors.text.primary }]}
-              >
-                {selectedDurationLabel}
-              </Text>
-              <Ionicons
-                name={showDurationDropdown ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {showDurationDropdown && (
-              <View
-                style={[
-                  styles.dropdownMenu,
-                  {
-                    backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
-                    borderColor: colors.surface.glassBorder,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 10 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 20,
-                    elevation: 10,
-                  },
-                ]}
-              >
-                {DURATION_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.label}
-                    onPress={() => {
-                      setDuration(option.value);
-                      setShowDurationDropdown(false);
-                    }}
-                    style={[
-                      styles.dropdownItem,
-                      {
-                        backgroundColor:
-                          duration === option.value
-                            ? isDark
-                              ? "rgba(8, 145, 178, 0.2)"
-                              : "rgba(8, 145, 178, 0.1)"
-                            : "transparent",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        { color: colors.text.primary },
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                    {duration === option.value && (
-                      <Ionicons
-                        name="checkmark"
-                        size={18}
-                        color={colors.primary.main}
-                      />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {/* Custom Duration Input */}
-          {duration === -1 && (
-            <View style={[styles.inputGroup, { marginTop: -20 }]}>
-              <Text style={[styles.label, { color: colors.text.secondary }]}>
-                Custom Duration (minutes)
-              </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(0, 0, 0, 0.2)"
-                      : "rgba(255, 255, 255, 0.5)",
-                    borderColor: colors.surface.glassBorder,
-                    color: colors.text.primary,
-                  },
-                ]}
-                placeholder="Enter minutes"
-                placeholderTextColor={colors.text.muted}
-                value={customDuration}
-                onChangeText={setCustomDuration}
-                keyboardType="numeric"
-              />
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={[
-              styles.primaryButton,
-              {
-                backgroundColor: colors.primary.main,
-                opacity: loading ? 0.7 : 1,
-              },
-            ]}
+          <StartLectureButton
+            loading={loading}
             onPress={handleCreateLecture}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Start Lecture</Text>
-            )}
-          </TouchableOpacity>
+          />
         </LinearGradient>
       </ScrollView>
 
-      {/* New Class Modal */}
-      <Modal
+      <NewClassModal
         visible={showNewClassModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowNewClassModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <Animated.View
-            entering={FadeInUp.duration(400)}
-            exiting={FadeOutDown.duration(400)}
-            style={{ width: "100%", maxWidth: 400 }}
-          >
-            <LinearGradient
-              colors={
-                isDark
-                  ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                  : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[
-                styles.modalContent,
-                {
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(255,255,255,0.8)",
-                  borderWidth: 1,
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 20,
-                  elevation: 10,
-                  padding: 0, // Reset padding to handle internal layout
-                  overflow: "hidden",
-                },
-              ]}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: 20,
-                  borderBottomWidth: 1,
-                  borderBottomColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.05)",
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 12,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      fontWeight: "700",
-                      color: colors.text.primary,
-                    }}
-                  >
-                    Add New Class
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => setShowNewClassModal(false)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons
-                    name="close"
-                    size={20}
-                    color={colors.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={{ padding: 24 }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "600",
-                    color: colors.text.secondary,
-                    marginBottom: 12,
-                    marginLeft: 4,
-                  }}
-                >
-                  Class Name
-                </Text>
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: isDark
-                      ? "rgba(0, 0, 0, 0.3)"
-                      : "rgba(255, 255, 255, 0.8)",
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
-                    paddingHorizontal: 16,
-                    height: 56,
-                    marginBottom: 8,
-                  }}
-                >
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      color: colors.text.primary,
-                      fontSize: 16,
-                      fontWeight: "500",
-                    }}
-                    placeholder="e.g., Computer Science 101"
-                    placeholderTextColor={colors.text.muted}
-                    value={newClassName}
-                    onChangeText={setNewClassName}
-                    autoFocus
-                  />
-                </View>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  padding: 20,
-                  paddingTop: 0,
-                  gap: 12,
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    flex: 1,
-                    padding: 16,
-                    borderRadius: 16,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderWidth: 1,
-                    borderColor: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
-                  }}
-                  onPress={() => {
-                    setNewClassName("");
-                    setShowNewClassModal(false);
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: "600",
-                      color: colors.text.secondary,
-                    }}
-                  >
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={handleCreateNewClass}
-                >
-                  <LinearGradient
-                    colors={[colors.primary.main, "#3B82F6"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={{
-                      padding: 16,
-                      borderRadius: 16,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: 16,
-                      }}
-                    >
-                      Create Class
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </Animated.View>
-        </View>
-      </Modal>
+        onClose={() => setShowNewClassModal(false)}
+        newClassName={newClassName}
+        setNewClassName={setNewClassName}
+        onCreateClass={handleCreateNewClass}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  backButton: {
-    padding: 8,
-    marginRight: 16,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  card: {
-    borderRadius: 24,
-    borderWidth: 1,
-    padding: 24,
-    marginBottom: 32,
-    overflow: "visible",
-  },
-  inputGroup: {
-    marginBottom: 20,
-    position: "relative",
-  },
-  inputGroupLarge: {
-    marginBottom: 32,
-    position: "relative",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 10,
-    marginLeft: 4,
-    opacity: 0.9,
-  },
-  dropdown: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  dropdownText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  dropdownMenu: {
-    position: "absolute",
-    top: "110%",
-    left: 0,
-    right: 0,
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: "hidden",
-    zIndex: 1000,
-  },
-  dropdownScroll: {
-    maxHeight: 240,
-  },
-  dropdownItem: {
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  addClassButton: {
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addClassButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  textInput: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  primaryButton: {
-    padding: 18,
-    borderRadius: 16,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-    marginTop: 16,
-  },
-  primaryButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
-    letterSpacing: 0.5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalContent: {
-    width: "100%",
-    borderRadius: 24,
-    padding: 32,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  modalInput: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    fontSize: 16,
-    marginBottom: 24,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  modalButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  modalButtonTextSecondary: {
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  modalButtonTextPrimary: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});
 
 export default CreateLectureScreen;
