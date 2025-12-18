@@ -4,6 +4,7 @@ import { classes, db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { generatePasscode } from "../../utils/passcode";
 import { sendNotification } from "@utils/sendNotification";
+import { scheduleLectureEnd } from "@utils/lecture";
 
 interface AuthRequest extends Request {
   user?: {
@@ -114,6 +115,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
 
     logger.info(`Lecture created: ${newLecture.id} by teacher: ${userId}`);
     await sendNotification(className, lectureName, newLecture.id, duration);
+    await scheduleLectureEnd(newLecture.id, parseInt(duration, 10));
 
     return res.status(201).json({
       success: true,

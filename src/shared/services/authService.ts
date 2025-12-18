@@ -5,7 +5,7 @@ import { secureStore } from "@/src/shared/utils/secureStore";
 import { logger } from "../utils/logger";
 import { showMessage } from "react-native-flash-message";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { subscribeToClassName, unsubscribeFromClassName } from "../utils/fcm";
+import { getDeviceToken, subscribeToClassName, unsubscribeFromClassName } from "../utils/fcm";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -52,6 +52,8 @@ export const authService = {
       }
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+        const token = await getDeviceToken();
+        await this.updateUserToken(token);
       }
       if (role === "student") {
         // Ensure className is subscribed if role is changed to student
@@ -59,6 +61,7 @@ export const authService = {
         if (className) {
           await subscribeToClassName(className);
         }
+        await this.updateUserToken("");
       }
       return response.data;
     } catch (error: any) {
@@ -144,4 +147,26 @@ export const authService = {
       );
     }
   },
+  async updateUserToken(token:string){
+    try {
+      
+      const response = await http.post(
+        BASE_URI + "/api/users/update-device-token",
+        {
+          token,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + useAuthStore.getState().token,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      logger.info("authService:updateUserToken - error", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to update student class"
+      );
+    }
+  }
 };

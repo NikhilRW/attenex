@@ -129,7 +129,7 @@ export default function RootLayout() {
         // Check Firebase initial notification (for data-only messages)
         const remoteMessage = await getInitialNotification(getMessaging());
         console.log("Checking Firebase initial notification...", remoteMessage);
-        if (remoteMessage?.data?.lectureId) {
+        if (remoteMessage?.data?.lectureId && !remoteMessage.data.ended) {
           console.log(
             "✅ Firebase notification caused app to open from quit state:",
             JSON.stringify(remoteMessage)
@@ -137,6 +137,11 @@ export default function RootLayout() {
           console.log("Navigating to lecture:", remoteMessage.data.lectureId);
           router.replace(
             `/attendance?lectureId=${remoteMessage.data.lectureId}`
+          );
+          return;
+        } else if (remoteMessage?.data?.lectureId && remoteMessage.data.ended) {
+          router.replace(
+            `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`
           );
           return;
         }
@@ -166,13 +171,14 @@ export default function RootLayout() {
       async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
         console.log("Message handled in the background!", remoteMessage);
         // Schedule the notification with a null trigger to show immediately
-        await scheduleNotificationAsync({
-          content: {
-            ...buildAttenexNotificationContent(remoteMessage),
-
-          },
-          trigger: null,
-        });
+        if (!remoteMessage.data?.ended) {
+          await scheduleNotificationAsync({
+            content: {
+              ...buildAttenexNotificationContent(remoteMessage),
+            },
+            trigger: null,
+          });
+        }
       }
     );
 
@@ -181,11 +187,6 @@ export default function RootLayout() {
     const handleNotificationClick = async (response: NotificationResponse) => {
       const lectureId =
         response?.notification?.request?.content?.data?.lectureId;
-      console.log(
-        "📲 Notification clicked/opened app:",
-        JSON.stringify(response)
-      );
-      console.log("📍 Action identifier:", response?.actionIdentifier);
       if (lectureId) {
         console.log("✅ Navigating to lecture from notification:", lectureId);
         // Use replace for cold start, navigate for warm start
@@ -251,10 +252,16 @@ export default function RootLayout() {
       remoteMessage: FirebaseMessagingTypes.RemoteMessage
     ) => {
       // Schedule the notification with a null trigger to show immediately
-      await scheduleNotificationAsync({
-        content: buildAttenexNotificationContent(remoteMessage),
-        trigger: null,
-      });
+      if (!remoteMessage.data?.ended) {
+        await scheduleNotificationAsync({
+          content: buildAttenexNotificationContent(remoteMessage),
+          trigger: null,
+        });
+      } else {
+        router.replace(
+          `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`
+        );
+      }
     };
 
     const unsubscribe = onMessage(getMessaging(), handlePushNotification);

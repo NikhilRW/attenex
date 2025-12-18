@@ -1,4 +1,9 @@
-import { getMessaging, subscribeToTopic, unsubscribeFromTopic } from "@react-native-firebase/messaging";
+import {
+  getMessaging,
+  subscribeToTopic,
+  unsubscribeFromTopic,
+  getToken,
+} from "@react-native-firebase/messaging";
 
 export const subscribeToClassName = async (className: string) => {
   await subscribeToTopic(getMessaging(), className);
@@ -6,4 +11,8 @@ export const subscribeToClassName = async (className: string) => {
 
 export const unsubscribeFromClassName = async (className: string) => {
   await unsubscribeFromTopic(getMessaging(), className);
-}
+};
+
+export const getDeviceToken = async () => {
+  return await getToken(getMessaging());
+};

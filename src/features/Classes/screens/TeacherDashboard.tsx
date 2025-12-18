@@ -2,17 +2,14 @@ import { FuturisticBackground } from "@/src/shared/components/FuturisticBackgrou
 import { useTheme } from "@/src/shared/hooks/useTheme";
 import { socketService } from "@/src/shared/services/socketService";
 import { Ionicons } from "@expo/vector-icons";
-import { Canvas, Path, Skia } from "@shopify/react-native-skia";
-import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect, useRouter } from "expo-router";
+import { Skia } from "@shopify/react-native-skia";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   AppState,
   Dimensions,
-  Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -23,9 +20,7 @@ import Animated, {
   Extrapolation,
   FadeInDown,
   FadeInUp,
-  FadeOutDown,
   interpolate,
-  Layout,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -45,14 +40,14 @@ import LectureCard from "../components/LectureCard";
 import StatisticsCard from "../components/StatisticsCard";
 import { HeaderSection } from "../components/HeaderSection";
 import PullIndicator from "../components/PullIndicator";
-
-const { width } = Dimensions.get("screen");
+import { array } from "zod";
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
 
 const TeacherDashboard = () => {
   const router = useRouter();
+  const { ended, lectureId } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
   const [lectures, setLectures] = useState<LectureWithCount[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -109,11 +104,22 @@ const TeacherDashboard = () => {
     }
   }, []);
 
+  console.log("ended param:", ended);
+
   useFocusEffect(
     useCallback(() => {
       fetchActiveLectures();
     }, [fetchActiveLectures])
   );
+
+  useEffect(() => {
+    const main = async () => {
+      if (ended === "true" && lectureId) {
+        fetchActiveLectures();
+      }
+    };
+    main();
+  }, [ended, lectureId]);
 
   // Removed the separate fetchLectureDetails useEffect since it's now integrated into fetchActiveLectures
 
@@ -169,7 +175,7 @@ const TeacherDashboard = () => {
       socketService.offAttendanceSubmitted();
       subscription.remove();
     };
-  }, [lectures, fetchActiveLectures]);
+  }, [lectures, fetchActiveLectures, ended]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
