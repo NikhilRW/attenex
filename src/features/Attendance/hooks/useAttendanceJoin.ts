@@ -11,7 +11,11 @@ import {
   JoinStatus,
   UseAttendanceJoinReturn,
 } from "../types/studentDashboard.types";
-import { showDestructiveAlert, showErrorAlert, showSuccessAlert } from "../utils/alertUtils";
+import {
+  showDestructiveAlert,
+  showErrorAlert,
+  showSuccessAlert,
+} from "../utils/alertUtils";
 import {
   getCurrentLocation,
   requestLocationPermission,
@@ -32,6 +36,10 @@ export const useAttendanceJoin = (
     async (lecture: Lecture, studentRollNo: string) => {
       setLoading(true);
       try {
+        // Persist roll number BEFORE attempting to join
+        // This ensures it's saved even if the join fails
+        updateUser({ rollNo: studentRollNo });
+
         const hasPermission = await requestLocationPermission();
         if (!hasPermission) {
           setLoading(false);
@@ -51,11 +59,6 @@ export const useAttendanceJoin = (
         );
 
         if (res.success) {
-          // Update user in auth store with roll number if returned
-          if (res.user && res.user.rollNo) {
-            updateUser({ rollNo: res.user.rollNo as string });
-          }
-
           setJoinedLecture(lecture);
           setStatus("joined");
           showSuccessAlert(
@@ -92,22 +95,19 @@ export const useAttendanceJoin = (
     [proceedWithJoin, user, onRollNoRequired]
   );
 
-  const handleLeaveLecture = useCallback(
-    async (onLectureLeft: () => void) => {
-      showDestructiveAlert(
-        ALERT_MESSAGES.LEAVE_LECTURE.title,
-        ALERT_MESSAGES.LEAVE_LECTURE.message,
-        "Leave",
-        async () => {
-          await stopBackgroundTracking();
-          setJoinedLecture(null);
-          setStatus("idle");
-          onLectureLeft();
-        }
-      );
-    },
-    []
-  );
+  const handleLeaveLecture = useCallback(async (onLectureLeft: () => void) => {
+    showDestructiveAlert(
+      ALERT_MESSAGES.LEAVE_LECTURE.title,
+      ALERT_MESSAGES.LEAVE_LECTURE.message,
+      "Leave",
+      async () => {
+        await stopBackgroundTracking();
+        setJoinedLecture(null);
+        setStatus("idle");
+        onLectureLeft();
+      }
+    );
+  }, []);
 
   return {
     joinedLecture,

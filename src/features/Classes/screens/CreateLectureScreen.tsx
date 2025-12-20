@@ -4,17 +4,28 @@ import { storage } from "@/src/shared/utils/mmkvStorage";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { ClassSelector } from "../components/ClassSelector";
+import { CreateLectureHeader } from "../components/CreateLectureHeader";
+import { DurationSelector } from "../components/DurationSelector";
+import { NewClassModal } from "../components/NewClassModal";
+import { StartLectureButton } from "../components/StartLectureButton";
+import { TopicInput } from "../components/TopicInput";
 import { createLecture, getTeacherClasses } from "../services/lectureService";
 import { styles } from "../styles/CreateLecture.styles";
 import { ClassItem } from "../types/common";
-import { CreateLectureHeader } from "../components/CreateLectureHeader";
-import { ClassSelector } from "../components/ClassSelector";
-import { TopicInput } from "../components/TopicInput";
-import { DurationSelector } from "../components/DurationSelector";
-import { StartLectureButton } from "../components/StartLectureButton";
-import { NewClassModal } from "../components/NewClassModal";
+import { getMinHeightForScrollView } from "../utils/common";
 
 const DURATION_OPTIONS = [
   { label: "30 min", value: 30 },
@@ -151,64 +162,113 @@ const CreateLectureScreen = () => {
     setShowNewClassModal(false);
   };
 
+  const minHeightScrollView = useMemo(() => getMinHeightForScrollView(), []);
+
   return (
     <View style={styles.container}>
       <FuturisticBackground />
 
       <CreateLectureHeader onBack={() => router.back()} />
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        <LinearGradient
-          colors={
-            isDark
-              ? ["rgba(255, 255, 255, 0.1)", "rgba(255, 255, 255, 0.05)"]
-              : ["rgba(255, 255, 255, 0.9)", "rgba(255, 255, 255, 0.8)"]
-          }
-          style={[styles.card, { borderColor: colors.surface.glassBorder }]}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { minHeight: minHeightScrollView },
+          ]}
+          keyboardShouldPersistTaps="always"
         >
-          <ClassSelector
-            selectedClass={selectedClass}
-            existingClasses={existingClasses}
-            showDropdown={showClassDropdown}
-            onToggleDropdown={() => {
-              setShowClassDropdown(!showClassDropdown);
-              setShowDurationDropdown(false);
-            }}
-            onSelectClass={(className) => {
-              setSelectedClass(className);
-              setShowClassDropdown(false);
-            }}
-            onAddNewClass={handleAddNewClass}
-          />
+          <Animated.View entering={FadeInUp.delay(100).springify()}>
+            <LinearGradient
+              colors={
+                isDark
+                  ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
+                  : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
+              }
+              style={[styles.card, { borderColor: colors.surface.glassBorder }]}
+            >
+              <Text
+                style={{
+                  color: colors.text.secondary,
+                  fontSize: 12,
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  marginBottom: 16,
+                }}
+              >
+                Class Details
+              </Text>
 
-          <TopicInput value={lectureName} onChangeText={setLectureName} />
+              <ClassSelector
+                selectedClass={selectedClass}
+                existingClasses={existingClasses}
+                showDropdown={showClassDropdown}
+                onToggleDropdown={() => {
+                  setShowClassDropdown(!showClassDropdown);
+                  setShowDurationDropdown(false);
+                }}
+                onSelectClass={(className) => {
+                  setSelectedClass(className);
+                  setShowClassDropdown(false);
+                }}
+                onAddNewClass={handleAddNewClass}
+              />
 
-          <DurationSelector
-            duration={duration}
-            customDuration={customDuration}
-            showDropdown={showDurationDropdown}
-            onToggleDropdown={() => {
-              setShowDurationDropdown(!showDurationDropdown);
-              setShowClassDropdown(false);
-            }}
-            onSelectDuration={(val) => {
-              setDuration(val);
-              setShowDurationDropdown(false);
-            }}
-            onChangeCustomDuration={setCustomDuration}
-            options={DURATION_OPTIONS}
-          />
+              <TopicInput value={lectureName} onChangeText={setLectureName} />
 
-          <StartLectureButton
-            loading={loading}
-            onPress={handleCreateLecture}
-          />
-        </LinearGradient>
-      </ScrollView>
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: colors.surface.glassBorder,
+                  marginVertical: 24,
+                }}
+              />
+
+              <Text
+                style={{
+                  color: colors.text.secondary,
+                  fontSize: 12,
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  marginBottom: 16,
+                }}
+              >
+                Time & Duration
+              </Text>
+
+              <DurationSelector
+                duration={duration}
+                customDuration={customDuration}
+                showDropdown={showDurationDropdown}
+                onToggleDropdown={() => {
+                  setShowDurationDropdown(!showDurationDropdown);
+                  setShowClassDropdown(false);
+                }}
+                onSelectDuration={(val) => {
+                  setDuration(val);
+                  setShowDurationDropdown(false);
+                }}
+                onChangeCustomDuration={setCustomDuration}
+                options={DURATION_OPTIONS}
+              />
+
+              <View>
+                <StartLectureButton
+                  loading={loading}
+                  onPress={handleCreateLecture}
+                />
+              </View>
+            </LinearGradient>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <NewClassModal
         visible={showNewClassModal}

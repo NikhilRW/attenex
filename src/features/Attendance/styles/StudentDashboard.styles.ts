@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 20,
     fontWeight: "600",
-    textAlign: "auto",
+    textAlign: "center",
     marginBottom: 20,
   },
   submitButton: {

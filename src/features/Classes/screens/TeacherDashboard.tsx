@@ -30,17 +30,15 @@ import {
   deleteLecture,
   endLecture,
   getAllLectures,
-  getLectureDetails,
+  getTeacherLectureDetails,
   updateLecture,
 } from "../services/lectureService";
 import { styles } from "../styles/TeacherDashboard.styles";
 import { LectureEditModal } from "../components/LectureEditModal";
 import { LectureWithCount } from "../types/common";
 import LectureCard from "../components/LectureCard";
-import StatisticsCard from "../components/StatisticsCard";
 import { HeaderSection } from "../components/HeaderSection";
 import PullIndicator from "../components/PullIndicator";
-import { array } from "zod";
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
@@ -74,7 +72,7 @@ const TeacherDashboard = () => {
         const lecturesWithCount = await Promise.all(
           res.data.map(async (lec: any) => {
             try {
-              const detailsRes = await getLectureDetails(lec.id);
+              const detailsRes = await getTeacherLectureDetails(lec.id);
               return {
                 ...lec,
                 courseName: lec.className,

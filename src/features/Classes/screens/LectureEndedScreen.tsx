@@ -149,65 +149,59 @@ const LectureEndedScreen = () => {
                         style={styles.passcodeSection}
                     >
                         <LinearGradient
-                            colors={["rgba(30, 30, 35, 0.8)", "rgba(10, 10, 12, 0.9)"]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
+                            colors={
+                                isDark
+                                    ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
+                                    : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
+                            }
                             style={[
                                 styles.passcodeCard,
                                 {
-                                    borderColor: "rgba(255, 255, 255, 0.1)",
+                                    borderColor: colors.surface.glassBorder,
                                     borderWidth: 1,
                                 },
                             ]}
                         >
-                            {/* Animated Glow Background */}
-                            <Animated.View
-                                style={[
-                                    styles.glowBackground,
-                                    {
-                                        backgroundColor: "rgba(59, 130, 246, 0.1)",
-                                    },
-                                    glowStyle,
-                                ]}
-                            />
+                            {/* Animated Glow Background - simplified for theme compatibility */}
+                      
 
-                            <View style={[styles.passcodeHeader, { backgroundColor: "rgba(255, 255, 255, 0.05)" }]}>
-                                <Ionicons name="lock-closed" size={20} color="#60A5FA" />
-                                <Text style={[styles.passcodeLabel, { color: "#60A5FA" }]}>
+                            <View style={[styles.passcodeHeader, { backgroundColor: colors.surface.glass }]}>
+                                <Ionicons name="lock-closed" size={20} color={colors.primary.main} />
+                                <Text style={[styles.passcodeLabel, { color: colors.primary.main }]}>
                                     Share This Passcode
                                 </Text>
                             </View>
 
                             {loading ? (
-                                <ActivityIndicator size="large" color="#60A5FA" />
+                                <ActivityIndicator size="large" color={colors.primary.main} />
                             ) : passcode ? (
                                 <>
                                     <View style={styles.passcodeDigits}>
                                         {passcode.split("").map((digit, idx) => (
-                                            <LinearGradient
+                                            <View
                                                 key={idx}
-                                                colors={["rgba(255, 255, 255, 0.08)", "rgba(0, 0, 0, 0.2)"]}
                                                 style={[
                                                     styles.passcodeDigit,
                                                     {
-                                                        borderColor: "rgba(255, 255, 255, 0.1)",
+                                                        backgroundColor: isDark ? "rgba(28, 84, 114, 0.2)" : "rgba(255,255,255,0.5)",
+                                                        borderColor: colors.surface.glassBorder,
                                                     },
                                                 ]}
                                             >
                                                 <Text
                                                     style={[
                                                         styles.passcodeDigitText,
-                                                        { color: "#FFFFFF" },
+                                                        { color: colors.text.primary },
                                                     ]}
                                                 >
                                                     {digit}
                                                 </Text>
-                                            </LinearGradient>
+                                            </View>
                                         ))}
                                     </View>
 
                                     <Text
-                                        style={[styles.passcodeHint, { color: "rgba(255, 255, 255, 0.6)" }]}
+                                        style={[styles.passcodeHint, { color: colors.text.secondary }]}
                                     >
                                         Students need this code to verify attendance
                                     </Text>
@@ -219,33 +213,31 @@ const LectureEndedScreen = () => {
                                     Failed to load passcode
                                 </Text>
                             )}
-                        </LinearGradient>
 
-                        {/* Action Buttons */}
-                        <View style={styles.buttonGroup}>
-                            <TouchableOpacity
-                                style={[
-                                    styles.refreshButton,
-                                    {
-                                        backgroundColor: isDark
-                                            ? "rgba(59, 130, 246, 0.15)"
-                                            : "rgba(59, 130, 246, 0.1)",
-                                    },
-                                ]}
-                                onPress={fetchPasscodeData}
-                                disabled={loading}
-                            >
-                                <Ionicons
-                                    name="refresh"
-                                    size={20}
-                                    color="#3B82F6"
-                                    style={{ marginRight: 8 }}
-                                />
-                                <Text style={[styles.refreshButtonText, { color: "#3B82F6" }]}>
-                                    Refresh
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+                            {/* Action Buttons */}
+                            <View style={styles.buttonGroup}>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.refreshButton,
+                                        {
+                                            backgroundColor: colors.primary.glow,
+                                        },
+                                    ]}
+                                    onPress={fetchPasscodeData}
+                                    disabled={loading}
+                                >
+                                    <Ionicons
+                                        name="refresh"
+                                        size={20}
+                                        color={colors.primary.main}
+                                        style={{ marginRight: 8 }}
+                                    />
+                                    <Text style={[styles.refreshButtonText, { color: colors.primary.main }]}>
+                                        Refresh
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </LinearGradient>
                     </Animated.View>
 
                     {/* Instructions

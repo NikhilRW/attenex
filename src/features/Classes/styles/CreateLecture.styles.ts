@@ -23,13 +23,14 @@ export const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    flexGrow: 1,
   },
   scrollContent: {
     padding: 20,
+    flex: 1,
   },
   card: {
     borderRadius: 24,
-    borderWidth: 1,
     padding: 24,
     marginBottom: 32,
     overflow: "visible",
@@ -39,7 +40,7 @@ export const styles = StyleSheet.create({
     position: "relative",
   },
   inputGroupLarge: {
-    marginBottom: 32,
+    marginBottom: 12,
     position: "relative",
   },
   label: {

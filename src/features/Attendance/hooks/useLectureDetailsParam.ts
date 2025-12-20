@@ -1,4 +1,4 @@
-import { getLectureDetails } from "@/src/features/Classes/services/lectureService";
+import { getStudentLectureDetails } from "@/src/features/Classes/services/lectureService";
 import { Lecture } from "@attendance/types/common";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ export const useLectureDetailsParam = (
           setFetchingLectureDetails(true);
           try {
             console.log(LOG_MESSAGES.FETCHING_DETAILS, lectureId);
-            const res = await getLectureDetails(lectureId as string);
+            const res = await getStudentLectureDetails(lectureId as string);
 
             if (res.success && res.data) {
               console.log(LOG_MESSAGES.DETAILS_FETCHED, res.data);

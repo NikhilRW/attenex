@@ -6,7 +6,6 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FuturisticButton } from "../components/FuturisticButton";
-import { showMessage } from "react-native-flash-message";
 import { sendVerificationEmail } from "../utils/email";
 
 /**

@@ -96,10 +96,24 @@ export const getTeacherClasses = async () => {
   }
 };
 
-export const getLectureDetails = async (lectureId: string) => {
+export const getStudentLectureDetails = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
     const response = await axios.get(`${API_URL}/student/${lectureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getTeacherLectureDetails = async (lectureId: string) => {
+  try {
+    const { token } = useAuthStore.getState();
+    const response = await axios.get(`${API_URL}/${lectureId}/details`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
