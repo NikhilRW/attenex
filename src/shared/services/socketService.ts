@@ -1,6 +1,5 @@
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { io, Socket } from "socket.io-client";
-import { logger } from "../utils/logger";
 class SocketService {
   private socket: Socket | null = null;
 
@@ -51,8 +50,11 @@ class SocketService {
   /**
    * Join a lecture room to receive updates
    */
+  /**
+   * Join a lecture room to receive updates
+   */
   joinLecture(lectureId: string) {
-    if (this.socket?.connected) {
+    if (this.socket) {
       this.socket.emit("joinLecture", lectureId);
       console.log(`Joined lecture room: lecture-${lectureId}`);
     }
@@ -62,7 +64,7 @@ class SocketService {
    * Leave a lecture room
    */
   leaveLecture(lectureId: string) {
-    if (this.socket?.connected) {
+    if (this.socket) {
       this.socket.emit("leaveLecture", lectureId);
       console.log(`Left lecture room: lecture-${lectureId}`);
     }

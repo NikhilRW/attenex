@@ -39,6 +39,7 @@ export const startBackgroundTracking = async (lectureId: string) => {
     storage.set("currentLectureId", lectureId);
 
     const { status } = await Location.requestBackgroundPermissionsAsync();
+    console.log("status : ", status);
     if (status === "granted") {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.Highest,

@@ -210,9 +210,9 @@ export default function RootLayout() {
           remoteMessage?.data?.lectureId
         );
         if (remoteMessage?.data?.lectureId) {
-          router.navigate(
-            `/attendance?lectureId=${remoteMessage.data.lectureId}`
-          );
+          // router.navigate(
+          //   `/attendance?lectureId=${remoteMessage.data.lectureId}`
+          // );
         }
       }
     );
