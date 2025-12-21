@@ -2,12 +2,15 @@ import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import { useLocalSearchParams } from "expo-router";
 import { LINKEDIN_CONFIG } from "../constants/linkedin";
-import { handleLinkedInSuccess, linkedInError } from "../utils/common";
+import {
+  handleLinkedInSuccess,
+  linkedInError,
+  onLinkedInModalClose,
+} from "../utils/common";
 
 export const useLinkedInAuth = () => {
   const params = useLocalSearchParams();
   const { logout } = useAuthStore();
-
   const isLogout = params.logout === "true";
   const isDeleteAccount = params.deleteAccount === "true";
 
@@ -17,6 +20,7 @@ export const useLinkedInAuth = () => {
         isVisible: true,
         logout: true,
         onLogout: logout,
+        onClose: onLinkedInModalClose,
       };
     }
 
@@ -25,6 +29,7 @@ export const useLinkedInAuth = () => {
         isVisible: true,
         logout: true,
         onLogout: authService.deleteUserAccount,
+        onClose: onLinkedInModalClose,
       };
     }
 
@@ -35,6 +40,7 @@ export const useLinkedInAuth = () => {
       redirectUri: LINKEDIN_CONFIG.REDIRECT_URI,
       onSuccess: handleLinkedInSuccess,
       onError: linkedInError,
+      onClose: onLinkedInModalClose,
     };
   };
 

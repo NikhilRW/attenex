@@ -456,3 +456,7 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
     );
   }
 };
+
+export const onLinkedInModalClose = () => {
+  router.back();
+};
