@@ -1,19 +1,14 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React from "react";
+import { Controller } from "react-hook-form";
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   View,
 } from "react-native";
-import { showMessage } from "react-native-flash-message";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthOptions } from "../components/AuthOptions";
@@ -21,66 +16,28 @@ import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
+import { useSignIn } from "../hooks/useSignIn";
 import { styles } from "../styles/SignIn.styles";
 import {
-  handleEmailSignIn,
   handleGoogleSignIn,
   handleLinkedInSignIn,
 } from "../utils/common";
-import { SignInFormData, signInSchema } from "../validation/authSchemas";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
-import { secureStore } from "@/src/shared/utils/secureStore";
-import { useShallow } from "zustand/shallow";
 
 const SignIn = () => {
-  const router = useRouter();
   const { colors, mode } = useTheme();
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const params = useLocalSearchParams();
-
-  // Redirect to main stack if user is already authenticated (prevents seeing signin screen)
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore(
-    useShallow((state) => ({
-      isAuthenticated: state.isAuthenticated,
-      isLoading: state.isLoading,
-      user: state.user,
-    }))
-  );
-
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.replace(getStartingScreenPath());
-      return;
-    }
-    if (params.verified === "true") {
-      // Show success message for email verification
-      showMessage({
-        message: "Email Verified",
-        description: "Your email has been successfully verified.",
-        type: "success",
-        duration: 3000,
-        position: "bottom",
-      });
-    }
-  }, [authLoading, isAuthenticated, params.verified, router]);
-
-  // Initialize react-hook-form with Zod validation
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const handleForgotPassword = () => {
-    router.push("/forgot-password");
-  };
+    errors,
+    isSubmitting,
+    isAuthenticated,
+    showPassword,
+    setShowPassword,
+    rememberMe,
+    setRememberMe,
+    handleForgotPassword,
+    handleSignUp,
+  } = useSignIn();
 
   return (
     <View
@@ -154,10 +111,7 @@ const SignIn = () => {
 
             <FuturisticButton
               title="Sign In "
-              onPress={handleSubmit(async (data) => {
-                Keyboard.dismiss();
-                return await handleEmailSignIn(data);
-              })}
+              onPress={handleSubmit}
               disabled={isSubmitting || isAuthenticated}
               loading={isSubmitting}
             />
@@ -166,7 +120,7 @@ const SignIn = () => {
           <AuthFooter
             text="New to the platform? "
             linkText="Create Account"
-            onLinkPress={() => router.push("/(auth)/sign-up")}
+            onLinkPress={handleSignUp}
           />
         </ScrollView>
       </KeyboardAvoidingView>

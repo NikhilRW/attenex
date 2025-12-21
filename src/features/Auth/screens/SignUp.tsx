@@ -1,17 +1,12 @@
 import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React from "react";
+import { Controller } from "react-hook-form";
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   View,
 } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
@@ -20,42 +15,26 @@ import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
+import { useSignUp } from "../hooks/useSignUp";
+import { styles } from "../styles/SignUp.styles";
 import {
-  handleEmailSignUp,
   handleGoogleSignIn,
   handleLinkedInSignIn,
 } from "../utils/common";
-import { SignUpFormData, signUpSchema } from "../validation/authSchemas";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
 
 const SignUp = () => {
-  const router = useRouter();
   const { colors, mode } = useTheme();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Redirect to main stack if user is already authenticated (prevents showing auth screens)
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.replace(getStartingScreenPath());
-    }
-  }, [authLoading, isAuthenticated]);
-
-  // Initialize react-hook-form with Zod validation
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignUpFormData>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
+    errors,
+    isSubmitting,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    handleSignIn,
+  } = useSignUp();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
@@ -158,10 +137,7 @@ const SignUp = () => {
 
             <FuturisticButton
               title="Create Account"
-              onPress={handleSubmit((data) => {
-                Keyboard.dismiss();
-                return handleEmailSignUp(data);
-              })}
+              onPress={handleSubmit}
               disabled={isSubmitting}
               loading={isSubmitting}
             />
@@ -170,30 +146,12 @@ const SignUp = () => {
           <AuthFooter
             text="Already have an account? "
             linkText="Sign In"
-            onLinkPress={() => router.push("/(auth)/sign-in")}
+            onLinkPress={handleSignIn}
           />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop:60,
-    paddingBottom: 40,
-  },
-  formContainer: {
-    gap: 24,
-  },
-});
 
 export default SignUp;

@@ -27,6 +27,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { handleResetPassword } from "../utils/common";
 import { styles } from "../styles/Settings.styles";
+import { useRouter } from "expo-router";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -151,6 +152,7 @@ const SettingsScreen = () => {
   const [role, setRole] = useState<"teacher" | "student">(
     (user?.role as any) || "teacher"
   );
+  const router = useRouter();
   const [savingRole, setSavingRole] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const userProvider = useAuthStore((state) => state.user?.oauthProvider);
@@ -188,12 +190,18 @@ const SettingsScreen = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: async () => await authService.logout(),
+        onPress: async () => {
+          if (user?.oauthProvider === "linkedin") {
+            router.replace("/linkedin?logout=true");
+            return;
+          }
+          await authService.logout();
+        },
       },
     ]);
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     Alert.alert("Delete Account", "This will remove your account forever.", [
       { text: "Cancel", style: "cancel" },
@@ -201,6 +209,10 @@ const SettingsScreen = () => {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
+          if (user?.oauthProvider === "linkedin") {
+            router.replace("/linkedin?deleteAccount=true");
+            return;
+          }
           await authService.deleteUserAccount();
         },
       },
@@ -410,8 +422,8 @@ const SettingsScreen = () => {
           <View style={styles.roleContainer}>
             {(["light", "dark", "system"] as const).map((m) => {
               const isActive = mode === m;
-              console.log("mode = "+mode);
-              console.log("option = "+m);
+              console.log("mode = " + mode);
+              console.log("option = " + m);
               return (
                 <ThemeOption
                   key={m}
@@ -450,7 +462,7 @@ const SettingsScreen = () => {
               },
             ]}
           >
-            {userProvider === "email" && (
+            {!userProvider && (
               <TouchableOpacity
                 style={styles.dangerRow}
                 onPress={async () => await handleResetPassword()}

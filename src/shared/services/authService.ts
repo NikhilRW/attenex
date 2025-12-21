@@ -5,7 +5,12 @@ import { secureStore } from "@/src/shared/utils/secureStore";
 import { logger } from "../utils/logger";
 import { showMessage } from "react-native-flash-message";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { getDeviceToken, subscribeToClassName, unsubscribeFromClassName } from "../utils/fcm";
+import {
+  getDeviceToken,
+  subscribeToClassName,
+  unsubscribeFromClassName,
+} from "../utils/fcm";
+import { router } from "expo-router";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -20,6 +25,7 @@ export const authService = {
   },
 
   async logout() {
+    const user = useAuthStore.getState().user;
     try {
       await secureStore.removeItem("jwt");
     } catch (err) {
@@ -28,7 +34,7 @@ export const authService = {
     if (GoogleSignin.hasPreviousSignIn()) {
       await GoogleSignin.signOut();
     }
-    unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+    unsubscribeFromClassName(user?.className || "");
     useAuthStore.getState().logout();
   },
 
@@ -147,9 +153,8 @@ export const authService = {
       );
     }
   },
-  async updateUserToken(token:string){
+  async updateUserToken(token: string) {
     try {
-      
       const response = await http.post(
         BASE_URI + "/api/users/update-device-token",
         {
@@ -168,5 +173,5 @@ export const authService = {
         error.response?.data?.message || "Failed to update student class"
       );
     }
-  }
+  },
 };

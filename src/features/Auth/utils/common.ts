@@ -11,6 +11,7 @@ import { showMessage } from "react-native-flash-message";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
 import { subscribeToClassName } from "@/src/shared/utils/fcm";
+import { LinkedInProfile } from "react-native-linkedin-oauth2";
 
 /**
  * Authentication Utility Functions
@@ -196,6 +197,60 @@ export const handleLinkedInSignIn = () => {
   }
 };
 
+export const handleLinkedInSuccess = async ({
+  name,
+  email,
+  sub,
+  picture,
+}: LinkedInProfile) => {
+  logger.info(
+    JSON.stringify({ name, email, sub, picture }),
+    "LinkedInAuth :: LinkedInModal"
+  );
+  try {
+    const response = await http.post(
+      BASE_URI + "/api/users/signin?authType=linkedin",
+      {
+        name: name,
+        sub: sub,
+        email: email,
+        picture: picture,
+      }
+    );
+    authService.login(response.data.user, response.data.token);
+    showMessage({
+      message: `Welcome, ${response.data.user?.name}`,
+      description: `Hi ${response.data.user?.name}, you're all set!`,
+      type: "success",
+      duration: 2500,
+      position: "bottom",
+    });
+  } catch (error) {
+    const e = error as any;
+    showMessage({
+      message: "LinkedIn Sign-in Failed",
+      description: e.message,
+      type: "danger",
+      duration: 3000,
+      position: "bottom",
+      floating: true,
+    });
+    logger.error(JSON.stringify(e), "common.ts :: handleLinkedInSuccess()");
+  }
+};
+
+export const linkedInError = (error: Error) => {
+  logger.error(error.message, "LinkedInAuth :: LinkedInModal");
+  showMessage({
+    message: "Sign-in Failed",
+    description: "Unable to sign in. Please try again.",
+    type: "danger",
+    duration: 3000,
+    position: "bottom",
+  });
+  router.back();
+};
+
 export const handleEmailSignIn = async (data: SignInFormData) => {
   try {
     const {
@@ -292,9 +347,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
 
 export const handleEmailSignUp = async (data: SignUpFormData) => {
   try {
-    const {
-      status,
-    } = await http.post<{
+    const { status } = await http.post<{
       user: User;
       token: string;
     }>(BASE_URI + "/api/users/signup?authType=email", {
