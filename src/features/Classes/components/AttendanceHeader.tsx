@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/AttendanceViewScreen.styles";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { styles } from "../styles/AttendanceViewScreen.styles";
 
 interface AttendanceHeaderProps {
   lectureTitle: string;
@@ -20,8 +20,8 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
   onBack,
   onShowSummary,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   return (
     <LinearGradient

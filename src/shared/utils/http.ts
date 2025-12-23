@@ -1,6 +1,7 @@
 import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import axios from "axios";
+import { router } from "expo-router";
 import { secureStore } from "./secureStore";
 
 /**
@@ -27,7 +28,7 @@ http.interceptors.request.use(async (config) => {
     }
 
     return config;
-  } catch (_) {
+  } catch {
     return config;
   }
 });
@@ -42,6 +43,7 @@ http.interceptors.response.use(
       // Only logout if it's a token issue, not missing credentials
       if (errorMsg?.includes("token") || errorMsg?.includes("authorization")) {
         useAuthStore.getState().logout();
+        router.replace("/sign-in");
       }
     }
 

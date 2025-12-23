@@ -17,14 +17,14 @@ import { styles } from "../styles/VerifyEmail.style";
  * that a verification email has been sent to their inbox.
  */
 const VerifyEmail = () => {
-  const { colors, mode } = useTheme();
+  const { colors, isDark } = useTheme();
   const { handleBackToSignIn } = useVerifyEmail();
 
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 
       <View style={styles.content}>

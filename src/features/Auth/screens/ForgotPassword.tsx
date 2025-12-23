@@ -17,7 +17,7 @@ import BackButton from "../components/BackButton";
  * The link will open the app with the reset password screen.
  */
 const ForgotPassword = () => {
-  const { colors, mode } = useTheme();
+  const { colors, isDark } = useTheme();
   const {
     handleRequestReset,
     email,
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 
       <Animated.ScrollView

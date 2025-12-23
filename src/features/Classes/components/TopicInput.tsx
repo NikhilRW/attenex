@@ -12,8 +12,7 @@ export const TopicInput: React.FC<TopicInputProps> = ({
   value,
   onChangeText,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
 
   return (
     <View style={[styles.inputGroup, { zIndex: 10 }]}>

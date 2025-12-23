@@ -12,6 +12,7 @@ export const useSignUp = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
 
   // Redirect to main stack if user is already authenticated
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
@@ -20,6 +21,7 @@ export const useSignUp = () => {
     if (!authLoading && isAuthenticated) {
       router.replace(getStartingScreenPath());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAuthenticated]);
 
   const {
@@ -55,5 +57,7 @@ export const useSignUp = () => {
     showConfirmPassword,
     setShowConfirmPassword,
     handleSignIn,
+    isLinkedInModalVisible,
+    setIsLinkedInModalVisible,
   };
 };

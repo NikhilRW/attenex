@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/AttendanceViewScreen.styles";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { styles } from "../styles/AttendanceViewScreen.styles";
 import { AttendanceRecord } from "../types/common";
 import { StudentCard } from "./StudentCard";
 
@@ -16,8 +16,8 @@ export const StudentList: React.FC<StudentListProps> = ({
   loading,
   filteredAttendance,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   if (loading) {
     return (

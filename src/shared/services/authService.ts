@@ -2,15 +2,15 @@ import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import http from "@/src/shared/utils/http";
 import { secureStore } from "@/src/shared/utils/secureStore";
-import { logger } from "../utils/logger";
-import { showMessage } from "react-native-flash-message";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { router } from "expo-router";
+import { showMessage } from "react-native-flash-message";
 import {
   getDeviceToken,
   subscribeToClassName,
   unsubscribeFromClassName,
 } from "../utils/fcm";
-import { router } from "expo-router";
+import { logger } from "../utils/logger";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -34,8 +34,11 @@ export const authService = {
     if (GoogleSignin.hasPreviousSignIn()) {
       await GoogleSignin.signOut();
     }
-    unsubscribeFromClassName(user?.className || "");
+    if (user && user.className) {
+      unsubscribeFromClassName(user.className);
+    }
     useAuthStore.getState().logout();
+    router.replace("/sign-in");
   },
 
   async updateUserRole(role: "teacher" | "student") {
@@ -129,8 +132,12 @@ export const authService = {
           duration: 1500,
           position: "bottom",
         });
-        unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+        const user = useAuthStore.getState().user;
+        if (user && user.className) {
+          unsubscribeFromClassName(user.className);
+        }
         useAuthStore.getState().logout();
+        router.replace("/sign-in");
       } else {
         showMessage({
           message: response.data.message || "Failed to delete account",

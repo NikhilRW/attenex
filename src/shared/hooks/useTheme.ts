@@ -1,10 +1,10 @@
+import { useMemo } from "react";
+import { useColorScheme } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { darkTheme, lightTheme} from "../constants/colors";
-import { mmkvStorage } from "../utils/mmkvStorage";
-import { useColorScheme } from "react-native";
 import { useShallow } from "zustand/shallow";
-import { useMemo } from "react";
+import { darkTheme, lightTheme } from "../constants/colors";
+import { mmkvStorage } from "../utils/mmkvStorage";
 
 export type ThemeMode = "dark" | "light" | "system";
 

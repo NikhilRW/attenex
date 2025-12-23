@@ -3,28 +3,21 @@ import { useTheme } from "@/src/shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Controller } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { AuthFooter } from "../components/AuthFooter";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthOptions } from "../components/AuthOptions";
 import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
+import LinkedInAuthComponent from "../components/LinkedInAuthComponent";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import { useSignIn } from "../hooks/useSignIn";
 import { styles } from "../styles/SignIn.styles";
-import {
-  handleGoogleSignIn,
-  handleLinkedInSignIn,
-} from "../utils/common";
+import { handleGoogleSignIn } from "../utils/common";
 
 const SignIn = () => {
-  const { colors, mode } = useTheme();
+  const { colors, isDark } = useTheme();
   const {
     control,
     handleSubmit,
@@ -37,13 +30,16 @@ const SignIn = () => {
     setRememberMe,
     handleForgotPassword,
     handleSignUp,
+    isLinkedInModalVisible,
+    setIsLinkedInModalVisible,
+    authType,
   } = useSignIn();
 
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 
       <KeyboardAvoidingView
@@ -61,7 +57,7 @@ const SignIn = () => {
 
           <SocialLoginButtons
             onGooglePress={handleGoogleSignIn}
-            onLinkedInPress={handleLinkedInSignIn}
+            onLinkedInPress={() => setIsLinkedInModalVisible(true)}
           />
 
           <FuturisticDivider text="OR ACCESS WITH EMAIL" />
@@ -121,6 +117,11 @@ const SignIn = () => {
             text="New to the platform? "
             linkText="Create Account"
             onLinkPress={handleSignUp}
+          />
+          <LinkedInAuthComponent
+            authType={authType}
+            isLinkedInModalVisible={isLinkedInModalVisible}
+            setIsLinkedInModalVisible={setIsLinkedInModalVisible}
           />
         </ScrollView>
       </KeyboardAvoidingView>

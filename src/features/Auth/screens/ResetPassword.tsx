@@ -25,7 +25,7 @@ import ResetPasswordFormHeader from "../components/ResetPasswordFormHeader";
  * Validates the reset token before allowing password change.
  */
 const ResetPassword = () => {
-  const { colors, mode } = useTheme();
+  const { colors, isDark } = useTheme();
   const {
     control,
     handleSubmit,
@@ -54,7 +54,7 @@ const ResetPassword = () => {
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 
       <KeyboardAvoidingView

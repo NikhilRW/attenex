@@ -1,10 +1,10 @@
-import React from "react";
-import { View, Text, TouchableOpacity, Modal } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/AttendanceViewScreen.styles";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { styles } from "../styles/AttendanceViewScreen.styles";
 
 interface RollSummaryModalProps {
   visible: boolean;
@@ -25,8 +25,8 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   absentCount,
   onCopy,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   return (
     <Modal

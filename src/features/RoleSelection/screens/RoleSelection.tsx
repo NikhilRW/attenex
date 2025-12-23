@@ -125,7 +125,7 @@ const RoleSelection = () => {
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 
       {/* Header */}
@@ -141,7 +141,7 @@ const RoleSelection = () => {
           </View>
           <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
             <Ionicons
-              name={mode === "dark" ? "sunny" : "moon"}
+              name={isDark ? "sunny" : "moon"}
               size={24}
               color={colors.text.primary}
             />

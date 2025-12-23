@@ -1,8 +1,8 @@
+import { useTheme } from "@/src/shared/hooks/useTheme";
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { styles } from "../styles/AttendanceViewScreen.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
 import { FilterType } from "../types/common";
 
 interface AttendanceFilterProps {
@@ -14,8 +14,8 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
   filter,
   setFilter,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   return (
     <Animated.View

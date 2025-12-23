@@ -1,11 +1,10 @@
-import React from "react";
-import { View, Text, TouchableOpacity, Modal, TextInput } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/CreateLecture.styles";
 import { useTheme } from "@/src/shared/hooks/useTheme";
-
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { styles } from "../styles/CreateLecture.styles";
 interface NewClassModalProps {
   visible: boolean;
   onClose: () => void;
@@ -21,8 +20,8 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
   setNewClassName,
   onCreateClass,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   return (
     <Modal

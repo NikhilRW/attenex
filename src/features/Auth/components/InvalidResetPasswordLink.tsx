@@ -9,13 +9,13 @@ import { FuturisticButton } from "../components/FuturisticButton";
 import { useRouter } from "expo-router";
 
 const InvalidResetPasswordLink = () => {
-  const { colors, mode } = useTheme();
+  const { colors, isDark } = useTheme();
   const router = useRouter();
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
       <View style={styles.errorContainer}>
         <View

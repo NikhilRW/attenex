@@ -1,46 +1,61 @@
 import { authService } from "@/src/shared/services/authService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { useLocalSearchParams } from "expo-router";
+import { LinkedInProfile } from "react-native-linkedin-oauth2";
 import { LINKEDIN_CONFIG } from "../constants/linkedin";
-import {
-  handleLinkedInSuccess,
-  linkedInError,
-  onLinkedInModalClose,
-} from "../utils/common";
+import { LinkedInAuthProps } from "../types/linkedin";
+import { handleLinkedInSuccess, linkedInError } from "../utils/common";
 
-export const useLinkedInAuth = () => {
-  const params = useLocalSearchParams();
-  const { logout } = useAuthStore();
-  const isLogout = params.logout === "true";
-  const isDeleteAccount = params.deleteAccount === "true";
+export const useLinkedInAuth = ({
+  authType,
+  isLinkedInModalVisible,
+  setIsLinkedInModalVisible,
+}: LinkedInAuthProps) => {
+  const isLogout = authType === "logout";
+  const isDeleteAccount = authType === "deleteAccount";
+
+  const modalCloserWrap =
+    (fn: (data?: LinkedInProfile | null) => void | Promise<void>) =>
+    async (data?: LinkedInProfile | null) => {
+      setIsLinkedInModalVisible(false);
+      await fn(data);
+    };
 
   const getLinkedInProps = () => {
     if (isLogout) {
       return {
-        isVisible: true,
+        isVisible: isLinkedInModalVisible,
         logout: true,
-        onLogout: logout,
-        onClose: onLinkedInModalClose,
+        onLogout: modalCloserWrap(authService.logout),
+        onClose: () => {
+          setIsLinkedInModalVisible(false);
+        },
       };
     }
 
     if (isDeleteAccount) {
       return {
-        isVisible: true,
+        isVisible: isLinkedInModalVisible,
         logout: true,
-        onLogout: authService.deleteUserAccount,
-        onClose: onLinkedInModalClose,
+        onLogout: modalCloserWrap(async () => {
+          await authService.deleteUserAccount();
+        }),
+        onClose: () => {
+          setIsLinkedInModalVisible(false);
+        },
       };
     }
 
     return {
-      isVisible: true,
+      isVisible: isLinkedInModalVisible,
       clientSecret: LINKEDIN_CONFIG.CLIENT_SECRET,
       clientId: LINKEDIN_CONFIG.CLIENT_ID,
       redirectUri: LINKEDIN_CONFIG.REDIRECT_URI,
-      onSuccess: handleLinkedInSuccess,
+      onSuccess: modalCloserWrap(async (data?: LinkedInProfile | null) => {
+        await handleLinkedInSuccess(data!);
+      }),
       onError: linkedInError,
-      onClose: onLinkedInModalClose,
+      onClose: () => {
+        setIsLinkedInModalVisible(false);
+      },
     };
   };
 

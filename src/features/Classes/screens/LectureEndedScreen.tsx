@@ -27,8 +27,8 @@ import { getPasscode } from "../services/lectureService";
 
 const LectureEndedScreen = () => {
     const router = useRouter();
-    const { colors, mode } = useTheme();
-    const isDark = mode === "dark";
+    const { colors, isDark } = useTheme();
+
     const params = useLocalSearchParams();
     const { lectureId, lectureTitle } = params;
 
@@ -163,7 +163,7 @@ const LectureEndedScreen = () => {
                             ]}
                         >
                             {/* Animated Glow Background - simplified for theme compatibility */}
-                      
+
 
                             <View style={[styles.passcodeHeader, { backgroundColor: colors.surface.glass }]}>
                                 <Ionicons name="lock-closed" size={20} color={colors.primary.main} />

@@ -15,6 +15,13 @@ export const useSignIn = () => {
   const params = useLocalSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
+  const authType: "logout" | "login" | "deleteAccount" =
+    params.linkedinLogout === "true"
+      ? "logout"
+      : params.linkedinDeleteAccount === "true"
+        ? "deleteAccount"
+        : "login";
 
   // Redirect to main stack if user is already authenticated
   const { isAuthenticated, isLoading: authLoading } = useAuthStore(
@@ -25,9 +32,22 @@ export const useSignIn = () => {
   );
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.replace(getStartingScreenPath());
-      return;
+    if (
+      !authLoading &&
+      isAuthenticated &&
+      authType !== "logout" &&
+      authType !== "deleteAccount"
+    ) {
+      const path = getStartingScreenPath();
+      if (path !== "/(auth)/sign-in") {
+        router.replace(path);
+      }
+    }
+    if (
+      (authType === "deleteAccount" || authType === "logout") &&
+      isAuthenticated
+    ) {
+      setIsLinkedInModalVisible(true);
     }
     if (params.verified === "true") {
       showMessage({
@@ -38,7 +58,7 @@ export const useSignIn = () => {
         position: "bottom",
       });
     }
-  }, [authLoading, isAuthenticated, params.verified, router]);
+  }, [authLoading, isAuthenticated, params.verified, authType, router]);
 
   const {
     control,
@@ -77,5 +97,8 @@ export const useSignIn = () => {
     setRememberMe,
     handleForgotPassword,
     handleSignUp,
+    isLinkedInModalVisible,
+    setIsLinkedInModalVisible,
+    authType,
   };
 };

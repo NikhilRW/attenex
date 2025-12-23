@@ -1,10 +1,10 @@
-import React from "react";
-import { View, Text } from "react-native";
-import Animated, { FadeInDown, Layout } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/AttendanceViewScreen.styles";
 import { useTheme } from "@/src/shared/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Text, View } from "react-native";
+import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import { styles } from "../styles/AttendanceViewScreen.styles";
 import { AttendanceRecord } from "../types/common";
 
 interface StudentCardProps {
@@ -13,8 +13,7 @@ interface StudentCardProps {
 }
 
 export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,12 +75,15 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         {/* Info */}
         <View style={styles.infoContainer}>
           <View style={styles.nameRow}>
-            <Text style={[styles.studentName, { color: colors.text.primary }]}>
-              {record.studentName}
+            <Text
+              style={[styles.studentName, { color: colors.text.primary }]}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
+              {record.studentName.length > 20
+                ? record.studentName.substr(0, 20) + "..."
+                : record.studentName}
             </Text>
-            {record.checkScore < 50 && record.status === "present" && (
-              <Ionicons name="warning" size={16} color="#FBBF24" />
-            )}
           </View>
 
           <Text style={[styles.rollNo, { color: colors.text.secondary }]}>

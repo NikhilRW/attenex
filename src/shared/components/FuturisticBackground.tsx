@@ -23,8 +23,8 @@ import { useTheme } from "../hooks/useTheme";
 const { width, height } = Dimensions.get("screen");
 
 export const FuturisticBackground = () => {
-    const { colors, mode } = useTheme();
-    const isDark = mode === "dark";
+    const { colors, isDark } = useTheme();
+
     const time1 = useSharedValue(0);
     const time2 = useSharedValue(0);
     const time3 = useSharedValue(0);

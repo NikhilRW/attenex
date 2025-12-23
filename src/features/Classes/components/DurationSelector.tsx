@@ -30,8 +30,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   onChangeCustomDuration,
   options,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
 
   const selectedDurationLabel =
     duration === -1

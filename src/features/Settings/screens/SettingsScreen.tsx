@@ -192,7 +192,7 @@ const SettingsScreen = () => {
         style: "destructive",
         onPress: async () => {
           if (user?.oauthProvider === "linkedin") {
-            router.replace("/linkedin?logout=true");
+            router.replace("/sign-in?linkedinLogout=true");
             return;
           }
           await authService.logout();
@@ -210,7 +210,7 @@ const SettingsScreen = () => {
         style: "destructive",
         onPress: async () => {
           if (user?.oauthProvider === "linkedin") {
-            router.replace("/linkedin?deleteAccount=true");
+            router.replace("/sign-in?linkedinDeleteAccount=true");
             return;
           }
           await authService.deleteUserAccount();

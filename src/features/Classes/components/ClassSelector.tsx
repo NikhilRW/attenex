@@ -24,8 +24,8 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
   onSelectClass,
   onAddNewClass,
 }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === "dark";
+  const { colors, isDark } = useTheme();
+
 
   return (
     <View style={[styles.inputGroup, { zIndex: 20 }]}>
@@ -58,7 +58,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
           name={"add-circle-sharp"}
           size={20}
           color={colors.text.secondary}
-          />
+        />
       </TouchableOpacity>
 
       <Modal
@@ -66,20 +66,20 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
         transparent
         animationType="fade"
         onRequestClose={onToggleDropdown}
-        >
+      >
         <View style={styles.modalOverlay}>
           <TouchableOpacity
             style={{ width: "100%", height: "100%", position: "absolute" }}
             onPress={onToggleDropdown}
-            />
+          />
           <Animated.View
             entering={FadeInUp.springify()}
             style={{ width: "100%", maxWidth: 400 }}
-            >
+          >
             <LinearGradient
               colors={
                 isDark
-                ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
+                  ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
                   : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
               }
               start={{ x: 0, y: 0 }}
