@@ -139,6 +139,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
     opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
     backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
     iconScale.value = withSpring(isActivated ? 1.1 : 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActivated]);
 
   const handlePressIn = () => {

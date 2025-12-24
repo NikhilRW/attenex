@@ -25,9 +25,9 @@ type Role = "teacher" | "student" | null;
 
 const RoleSelection = () => {
   const router = useRouter();
-  const { colors, mode, toggleTheme } = useTheme();
+  const { colors, isDark, toggleTheme } = useTheme();
   const [selectedRole, setSelectedRole] = useState<Role>(null);
-  const [hoveredRole, setHoveredRole] = useState<Role>(null);
+  const [, setHoveredRole] = useState<Role>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const { user } = useAuthStore();
   const insets = useSafeAreaInsets();
@@ -35,15 +35,11 @@ const RoleSelection = () => {
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
 
-  const handleRoleSelect = useCallback((role: Role) => {
-    setSelectedRole(role);
-  }, []);
-
   useEffect(() => {
     if (user && user.role) {
       setSelectedRole(user.role as Role);
     }
-  }, []);
+  }, [user]);
 
   const handleTeacherPress = useCallback(() => {
     if (user && user.role) {
@@ -54,6 +50,7 @@ const RoleSelection = () => {
     setSelectedRole("teacher");
     teacherScale.value = withSpring(1.05, { duration: 1000 });
     studentScale.value = withSpring(1, { duration: 1000 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teacherScale]);
 
   const handleStudentPress = useCallback(() => {
@@ -65,9 +62,10 @@ const RoleSelection = () => {
     setSelectedRole("student");
     teacherScale.value = withSpring(1, { duration: 1000 });
     studentScale.value = withSpring(1.05, { duration: 1000 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentScale]);
 
-  const alreadyHasRoleToast = () => {
+  const alreadyHasRoleToast = useCallback(() => {
     showMessage({
       message: "Role Already Set",
       description: `You are already assigned the role of ${user!.role}.`,
@@ -75,7 +73,7 @@ const RoleSelection = () => {
       duration: 2000,
       position: "bottom",
     });
-  };
+  }, [user]);
 
   const handleConfirm = useCallback(async () => {
     if (user && user.role) {
@@ -136,7 +134,7 @@ const RoleSelection = () => {
               Choose Your Role
             </Text>
             <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-              Select how you'll be using Attenex
+              Select how you&apos;ll be using Attenex
             </Text>
           </View>
           <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>

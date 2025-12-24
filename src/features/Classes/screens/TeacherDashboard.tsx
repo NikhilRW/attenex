@@ -8,14 +8,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   AppState,
-  Dimensions,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
   FadeInDown,
@@ -23,9 +22,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
 } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
 import {
   deleteLecture,
   endLecture,
@@ -56,12 +53,12 @@ const TeacherDashboard = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
+  const [, setRefreshing] = useState(false);
 
   // Animation values
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
-  const context = useSharedValue({ x: 0, y: 0 });
+  // const context = useSharedValue({ x: 0, y: 0 });
   const animatedTranslateY = useSharedValue(0);
 
   const fetchActiveLectures = useCallback(async () => {
@@ -117,6 +114,7 @@ const TeacherDashboard = () => {
       }
     };
     main();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ended, lectureId]);
 
   // Removed the separate fetchLectureDetails useEffect since it's now integrated into fetchActiveLectures
@@ -305,33 +303,33 @@ const TeacherDashboard = () => {
   );
 
   // Gesture Logic
-  const swipeGesture = Gesture.Pan()
-    .onStart((event) => {
-      context.value = { x: event.x, y: event.y };
-    })
-    .onUpdate((event) => {
-      const dy = event.y - context.value.y;
-      if (dy > 0 && scrollY.value <= 0) {
-        const damping = 0.5;
-        const translateY = dy * damping;
-        if (translateY < 150) {
-          animatedTranslateY.value = translateY;
-          pullProgress.value = interpolate(
-            translateY,
-            [0, 100],
-            [0, 1],
-            Extrapolation.CLAMP
-          );
-        }
-      }
-    })
-    .onEnd(() => {
-      if (animatedTranslateY.value > 80) {
-        scheduleOnRN(navigateToCreate);
-      }
-      animatedTranslateY.value = withSpring(0);
-      pullProgress.value = withSpring(0);
-    });
+  // const swipeGesture = Gesture.Pan()
+  //   .onStart((event) => {
+  //     context.value = { x: event.x, y: event.y };
+  //   })
+  //   .onUpdate((event) => {
+  //     const dy = event.y - context.value.y;
+  //     if (dy > 0 && scrollY.value <= 0) {
+  //       const damping = 0.5;
+  //       const translateY = dy * damping;
+  //       if (translateY < 150) {
+  //         animatedTranslateY.value = translateY;
+  //         pullProgress.value = interpolate(
+  //           translateY,
+  //           [0, 100],
+  //           [0, 1],
+  //           Extrapolation.CLAMP
+  //         );
+  //       }
+  //     }
+  //   })
+  //   .onEnd(() => {
+  //     if (animatedTranslateY.value > 80) {
+  //       scheduleOnRN(navigateToCreate);
+  //     }
+  //     animatedTranslateY.value = withSpring(0);
+  //     pullProgress.value = withSpring(0);
+  //   });
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: animatedTranslateY.value }],

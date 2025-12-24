@@ -63,6 +63,7 @@ export const useLectureManagement = (): UseLectureManagementReturn => {
     return () => {
       clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, fetchLectures]);
 
   return {

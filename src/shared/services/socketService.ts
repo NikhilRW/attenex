@@ -28,11 +28,11 @@ class SocketService {
         console.log("Socket disconnected:", reason);
       });
 
-      this.socket.on("connect_error", (error) => {
+      this.socket.on("connect_error", () => {
         // Suppress verbose socket errors in production
         console.log("Socket connection error - Backend may be offline");
       });
-    } catch (error) {
+    } catch (_) {
       console.log("Failed to initialize socket connection");
     }
   }
@@ -74,7 +74,7 @@ class SocketService {
    * Listen for lecture ended events
    */
   onLectureEnded(
-    callback: (data: {
+    callback: (_: {
       lectureId: string;
       status: string;
       endedAt: string;
@@ -98,7 +98,7 @@ class SocketService {
    * Listen for passcode refresh events
    */
   onPasscodeRefresh(
-    callback: (data: {
+    callback: (_: {
       lectureId: string;
       passcode: string;
       updatedAt: string;
@@ -122,7 +122,7 @@ class SocketService {
    * Listen for new student join events
    */
   onStudentJoined(
-    callback: (data: {
+    callback: (_: {
       lectureId: string;
       studentId: string;
       studentName: string;
@@ -146,7 +146,7 @@ class SocketService {
    * Listen for attendance submission events
    */
   onAttendanceSubmitted(
-    callback: (data: {
+    callback: (_: {
       lectureId: string;
       studentId: string;
       status: string;

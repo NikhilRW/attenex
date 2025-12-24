@@ -59,6 +59,7 @@ const ThemeOption = ({
     } else {
       rotation.value = withTiming(0, { duration: 0 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
 
   const animatedIconStyle = useAnimatedStyle(() => {
@@ -163,6 +164,11 @@ const SettingsScreen = () => {
     try {
       await authService.updateUserRole(role);
       Alert.alert("Role updated", `Your role is now set to ${role}.`);
+      if (role === "teacher") {
+        router.replace("/classes");
+      } else {
+        router.replace("/attendance");
+      }
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to update role");
     } finally {

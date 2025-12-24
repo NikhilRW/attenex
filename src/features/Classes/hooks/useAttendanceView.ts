@@ -89,6 +89,7 @@ export const useAttendanceView = () => {
       socketService.offAttendanceSubmitted();
       subscription.remove();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lectureId]);
 
   // Ensure connection when screen regains focus

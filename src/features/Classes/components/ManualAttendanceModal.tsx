@@ -118,7 +118,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                   { color: colors.text.secondary, marginBottom: 12 },
                 ]}
               >
-                Enter the student's roll number to manually mark them present.
+                Enter the student&apos;s roll number to manually mark them present.
               </Text>
 
               <View

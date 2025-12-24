@@ -136,8 +136,8 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                   padding: 20,
                   borderBottomWidth: 1,
                   borderBottomColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.05)",
+                    ? "rgba(255,255,255,0.15)"
+                    : "rgba(0,0,0,0.15)",
                 }}
               >
                 <Text
