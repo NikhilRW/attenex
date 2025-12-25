@@ -38,6 +38,9 @@ export const authService = {
       unsubscribeFromClassName(user.className);
     }
     useAuthStore.getState().logout();
+    if (user && user.oauthProvider === "linkedin") {
+      return;
+    }
     router.replace("/sign-in");
   },
 
@@ -137,6 +140,9 @@ export const authService = {
           unsubscribeFromClassName(user.className);
         }
         useAuthStore.getState().logout();
+        if (user && user.oauthProvider === "linkedin") {
+          return;
+        }
         router.replace("/sign-in");
       } else {
         showMessage({

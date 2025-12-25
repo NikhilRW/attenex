@@ -1,9 +1,4 @@
-export const API_CONFIG = {
-  BASE_URL: __DEV__
-    ? "http://localhost:3000/api"
-    : "https://your-production-api.com/api",
-  TIMEOUT: 10000,
-};
+import { Dimensions } from "react-native";
 
 export const STORAGE_KEYS = {
   AUTH_TOKEN: "auth_token",
@@ -38,3 +33,6 @@ export const COLORS = {
   textSecondary: "#6b7280",
   border: "#e5e7eb",
 };
+
+const { width, height } = Dimensions.get("window");
+export { width, height };

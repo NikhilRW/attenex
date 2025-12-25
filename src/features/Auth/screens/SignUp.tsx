@@ -9,11 +9,10 @@ import { AuthHeader } from "../components/AuthHeader";
 import { FuturisticButton } from "../components/FuturisticButton";
 import { FuturisticDivider } from "../components/FuturisticDivider";
 import { FuturisticInput } from "../components/FuturisticInput";
-import LinkedInAuthComponent from "../components/LinkedInAuthComponent";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import { useSignUp } from "../hooks/useSignUp";
 import { styles } from "../styles/SignUp.styles";
-import { handleGoogleSignIn } from "../utils/common";
+import { handleGoogleSignIn, handleLinkedInSignIn } from "../utils/common";
 
 const SignUp = () => {
   const { colors, isDark } = useTheme();
@@ -27,8 +26,6 @@ const SignUp = () => {
     showConfirmPassword,
     setShowConfirmPassword,
     handleSignIn,
-    isLinkedInModalVisible,
-    setIsLinkedInModalVisible,
   } = useSignUp();
 
   return (
@@ -53,7 +50,7 @@ const SignUp = () => {
 
           <SocialLoginButtons
             onGooglePress={handleGoogleSignIn}
-            onLinkedInPress={() => setIsLinkedInModalVisible(true)}
+            onLinkedInPress={handleLinkedInSignIn}
           />
 
           <FuturisticDivider text="OR REGISTER WITH EMAIL" />
@@ -145,12 +142,12 @@ const SignUp = () => {
             linkText="Sign In"
             onLinkPress={handleSignIn}
           />
-
-          <LinkedInAuthComponent
+          {/* For PCKE Testing */}
+          {/* <LinkedInAuthComponent
             authType="login"
             isLinkedInModalVisible={isLinkedInModalVisible}
             setIsLinkedInModalVisible={setIsLinkedInModalVisible}
-          />
+          /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

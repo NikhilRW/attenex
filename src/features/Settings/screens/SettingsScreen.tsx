@@ -32,7 +32,6 @@ import { useRouter } from "expo-router";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const ThemeOption = ({
-  mode,
   isActive,
   onPress,
   colors,
@@ -198,7 +197,7 @@ const SettingsScreen = () => {
         style: "destructive",
         onPress: async () => {
           if (user?.oauthProvider === "linkedin") {
-            router.replace("/sign-in?linkedinLogout=true");
+            router.replace("/linkedin?logout=true");
             return;
           }
           await authService.logout();
@@ -215,8 +214,8 @@ const SettingsScreen = () => {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
-          if (user?.oauthProvider === "linkedin") {
-            router.replace("/sign-in?linkedinDeleteAccount=true");
+          if (user && user.oauthProvider === "linkedin") {
+            router.replace("/linkedin?deleteAccount=true");
             return;
           }
           await authService.deleteUserAccount();

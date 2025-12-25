@@ -15,7 +15,7 @@ export const useSignIn = () => {
   const params = useLocalSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
+  // const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
   const authType: "logout" | "login" | "deleteAccount" =
     params.linkedinLogout === "true"
       ? "logout"
@@ -47,7 +47,7 @@ export const useSignIn = () => {
       (authType === "deleteAccount" || authType === "logout") &&
       isAuthenticated
     ) {
-      setIsLinkedInModalVisible(true);
+      // setIsLinkedInModalVisible(true);
     }
     if (params.verified === "true") {
       showMessage({
@@ -97,8 +97,8 @@ export const useSignIn = () => {
     setRememberMe,
     handleForgotPassword,
     handleSignUp,
-    isLinkedInModalVisible,
-    setIsLinkedInModalVisible,
+    // isLinkedInModalVisible,
+    // setIsLinkedInModalVisible,
     authType,
   };
 };

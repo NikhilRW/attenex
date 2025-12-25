@@ -25,8 +25,6 @@ export const linkedinAuthService = {
 
       const { user, token } = response.data;
 
-      // Token persistence is handled by the authService/login in the app
-
       return { user, token };
     } catch (err: any) {
       // Log for debugging but let the caller handle user-facing errors
