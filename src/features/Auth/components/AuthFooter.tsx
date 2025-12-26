@@ -16,6 +16,7 @@ export const AuthFooter: React.FC<AuthFooterProps> = ({
 }) => {
     const { colors } = useTheme();
 
+    
     return (
         <View style={styles.footer}>
             <Text style={[styles.footerText, { color: colors.text.secondary }]}>

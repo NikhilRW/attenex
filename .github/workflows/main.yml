@@ -7,6 +7,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_SECRET: ${{ secrets.GOOGLE_SERVICE_API_KEY }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -32,9 +34,25 @@ jobs:
 
       - name: Install NodeJs Dependencies
         run: npm install
-      
+
+      - name: Get google-services.json from secrets
+        run: mkdir personal && echo '$GOOGLE_SECRET' > ./google-services.json
+
       - name: Build APK
         run: npx expo prebuild -p android
-      
+
       - name: Assemble Release APK
         run: cd android && ./gradlew assembleRelease
+
+      - name: Release the apk
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: android/app/build/outputs/apk/release/app-release.apk
+          asset_name: app-release.apk
+          tag: 0.0.1
+          overwrite: true
+          body: "Attenex apk release"
+          prerelease: true
+          make_latest:	true
+          repo_name: "attenex"
