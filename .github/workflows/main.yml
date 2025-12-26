@@ -35,14 +35,11 @@ jobs:
       - name: Install NodeJs Dependencies
         run: npm install
 
-      - name: print vars 1
-        run: echo '$GOOGLE_SECRET'
-
-      - name: print vars 2 
-        run: echo "$GOOGLE_SECRET"
-
       - name: Get google-services.json from secrets
-        run: echo '$GOOGLE_SECRET' && echo '$GOOGLE_SECRET' > ./google-services.json && cat ./google-services.json
+        run: |
+          cat << EOF > ./google-services.json
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
 
       - name: Build APK
         run: npx expo prebuild -p android
