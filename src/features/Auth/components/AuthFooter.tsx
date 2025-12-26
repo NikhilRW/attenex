@@ -6,6 +6,7 @@ interface AuthFooterProps {
     text: string;
     linkText: string;
     onLinkPress: () => void;
+    
 }
 
 export const AuthFooter: React.FC<AuthFooterProps> = ({
