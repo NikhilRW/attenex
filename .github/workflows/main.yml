@@ -36,7 +36,7 @@ jobs:
         run: npm install
 
       - name: Get google-services.json from secrets
-        run: mkdir personal && echo '$GOOGLE_SECRET' > ./google-services.json
+        run: echo '$GOOGLE_SECRET' > ./google-services.json
 
       - name: Build APK
         run: npx expo prebuild -p android

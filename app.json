@@ -11,10 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.attenex.attenex",
-      "googleServicesFile": "./personal/google-services.json"
+      "googleServicesFile": "./google-services.json"
     },
     "android": {
-      "googleServicesFile": "./personal/google-services.json",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
