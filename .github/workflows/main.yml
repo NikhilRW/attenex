@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      GOOGLE_SECRET: ${{ secrets.GOOGLE_SERVICE_KEY }}
+      GOOGLE_SECRET: ${{ vars.GOOGLE_SERVICE_KEY }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -34,6 +34,12 @@ jobs:
 
       - name: Install NodeJs Dependencies
         run: npm install
+
+      - name: print vars 1
+        run: echo '$GOOGLE_SECRET'
+
+      - name: print vars 2 
+        run: echo "$GOOGLE_SECRET"
 
       - name: Get google-services.json from secrets
         run: echo '$GOOGLE_SECRET' && echo '$GOOGLE_SECRET' > ./google-services.json && cat ./google-services.json
