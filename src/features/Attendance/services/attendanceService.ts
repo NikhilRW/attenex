@@ -1,8 +1,7 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import axios from "axios";
 
-const API_URL = `${BASE_URI}/api/attendance`;
+const API_URL = `/api/attendance`;
 
 export const joinLecture = async (
   lectureId: string,

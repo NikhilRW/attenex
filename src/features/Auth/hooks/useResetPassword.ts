@@ -1,4 +1,3 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
 import http from "@/src/shared/utils/http";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -62,13 +61,10 @@ export const useResetPassword = () => {
       setEmail(emailParam);
 
       try {
-        const response = await http.post(
-          BASE_URI + "/api/users/verify-reset-token",
-          {
-            email: emailParam,
-            token: tokenParam,
-          }
-        );
+        const response = await http.post("/api/users/verify-reset-token", {
+          email: emailParam,
+          token: tokenParam,
+        });
 
         setUserName(response.data.userName || "");
         setIsValid(true);
@@ -97,7 +93,7 @@ export const useResetPassword = () => {
     try {
       Keyboard.dismiss();
 
-      await http.post(BASE_URI + "/api/users/reset-password", {
+      await http.post("/api/users/reset-password", {
         email: email,
         token: token,
         newPassword: data.newPassword,

@@ -1,4 +1,3 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
 import { useAuthStore } from "@/src/shared/stores/authStore";
 import http from "@/src/shared/utils/http";
 import { secureStore } from "@/src/shared/utils/secureStore";
@@ -47,7 +46,7 @@ export const authService = {
   async updateUserRole(role: "teacher" | "student") {
     try {
       const response = await http.post(
-        BASE_URI + "/api/users/update-role",
+        "/api/users/update-role",
         {
           role,
         },
@@ -87,7 +86,7 @@ export const authService = {
   async updateStudentClass(className: string) {
     try {
       const response = await http.post(
-        BASE_URI + "/api/users/update-class",
+        "/api/users/update-class",
         {
           className,
         },
@@ -115,14 +114,11 @@ export const authService = {
   },
   async deleteUserAccount() {
     try {
-      const response = await http.delete(
-        BASE_URI + "/api/users/delete-account",
-        {
-          headers: {
-            Authorization: "Bearer " + useAuthStore.getState().token,
-          },
-        }
-      );
+      const response = await http.delete("/api/users/delete-account", {
+        headers: {
+          Authorization: "Bearer " + useAuthStore.getState().token,
+        },
+      });
       if (response.data.success) {
         await secureStore.removeItem("jwt");
         await secureStore.removeItem("is-signup");
@@ -169,7 +165,7 @@ export const authService = {
   async updateUserToken(token: string) {
     try {
       const response = await http.post(
-        BASE_URI + "/api/users/update-device-token",
+        "/api/users/update-device-token",
         {
           token,
         },

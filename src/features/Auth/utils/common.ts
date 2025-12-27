@@ -1,17 +1,16 @@
 import { User } from "@/backend/src/config/database_setup";
-import { BASE_URI } from "@/src/shared/constants/uri";
 import { authService } from "@/src/shared/services/authService";
 import { useAuthStore } from "@/src/shared/stores/authStore";
+import { subscribeToClassName } from "@/src/shared/utils/fcm";
 import { googleAuth } from "@/src/shared/utils/google-auth";
 import http from "@/src/shared/utils/http";
 import { logger } from "@/src/shared/utils/logger";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
+import { LinkedInProfile } from "react-native-linkedin-oauth2";
 import { RegisterGoogleUserResponse } from "../types/request";
 import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
-import { subscribeToClassName } from "@/src/shared/utils/fcm";
-import { LinkedInProfile } from "react-native-linkedin-oauth2";
 
 /**
  * Authentication Utility Functions
@@ -64,7 +63,7 @@ export const handleGoogleSignIn = async () => {
     // Step 2: Send user data to backend for account creation/verification
     // Backend will create user if they don't exist, or return existing user data
     const newUser = await http.post<RegisterGoogleUserResponse>(
-      `${BASE_URI}/api/users/signin?authType=google`, // Google user registration endpoint (http uses BASE_URI)
+      `/api/users/signin?authType=google`, // Google user registration endpoint (http uses BASE_URI)
       {
         name: response.data.user.name,
         email: response.data.user.email,
@@ -208,15 +207,12 @@ export const handleLinkedInSuccess = async ({
     "LinkedInAuth :: LinkedInModal"
   );
   try {
-    const response = await http.post(
-      BASE_URI + "/api/users/signin?authType=linkedin",
-      {
-        name: name,
-        sub: sub,
-        email: email,
-        picture: picture,
-      }
-    );
+    const response = await http.post("/api/users/signin?authType=linkedin", {
+      name: name,
+      sub: sub,
+      email: email,
+      picture: picture,
+    });
     authService.login(response.data.user, response.data.token);
     showMessage({
       message: `Welcome, ${response.data.user?.name}`,
@@ -259,7 +255,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     } = await http.post<{
       user: User;
       token: string;
-    }>(BASE_URI + "/api/users/signin?authType=email", {
+    }>("/api/users/signin?authType=email", {
       email: data.email!,
       password: data.password!,
     });
@@ -350,7 +346,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     const { status } = await http.post<{
       user: User;
       token: string;
-    }>(BASE_URI + "/api/users/signup?authType=email", {
+    }>("/api/users/signup?authType=email", {
       name: data.fullName!,
       email: data.email!,
       password: data.password!,
@@ -418,7 +414,7 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
   try {
     const token = deepLink.queryParams!.token;
     const response = await http.post<{ success: boolean; message: string }>(
-      BASE_URI + "/api/users/verify-user",
+      "/api/users/verify-user",
       {
         token: decodeURIComponent(token as string),
         email: decodeURIComponent(deepLink.queryParams!.email as string),

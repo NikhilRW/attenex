@@ -1,4 +1,3 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
 import { logger } from "@/src/shared/utils/logger";
 import axios from "axios";
 import { router } from "expo-router";
@@ -6,12 +5,9 @@ import { showMessage } from "react-native-flash-message";
 
 export const sendVerificationEmail = async (email: string) => {
   try {
-    const response = await axios.post(
-      `${BASE_URI}/api/users/send-verification-email`,
-      {
-        email,
-      }
-    );
+    const response = await axios.post(`/api/users/send-verification-email`, {
+      email,
+    });
     if (response.data.success) {
       showMessage({
         message: "Verification Email Sent",
@@ -47,8 +43,7 @@ export const sendVerificationEmail = async (email: string) => {
   }
 };
 
-
 export const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};

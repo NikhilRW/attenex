@@ -1,4 +1,3 @@
-import { BASE_URI } from "../constants/uri";
 import { useAuthStore } from "../stores/authStore";
 
 export interface CreateLectureRequest {
@@ -36,7 +35,7 @@ class LectureService {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${BASE_URI}/api/lectures/create`, {
+      const response = await fetch(`/api/lectures/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

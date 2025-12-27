@@ -1,11 +1,10 @@
+import http from "@/src/shared/utils/http";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
-import { BASE_URI } from "@/src/shared/constants/uri";
-import http from "@/src/shared/utils/http";
-import { validateEmail } from "../utils/email";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
-import { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { validateEmail } from "../utils/email";
 
 const useForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -55,7 +54,7 @@ const useForgotPassword = () => {
       setIsLoading(true);
       Keyboard.dismiss();
 
-      await http.post(BASE_URI + "/api/users/forgot-password", {
+      await http.post("/api/users/forgot-password", {
         email: email.trim().toLowerCase(),
       });
 

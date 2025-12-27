@@ -1,5 +1,4 @@
 import { User } from "@/backend/src/config/database_setup";
-import { BASE_URI } from "@/src/shared/constants/uri";
 import http from "@/src/shared/utils/http";
 
 /**
@@ -15,13 +14,10 @@ export const linkedinAuthService = {
     redirectUri: string
   ): Promise<{ user: User; token: string } | null> {
     try {
-      const response = await http.post(
-        `${BASE_URI}/api/users/signin?authType=linkedin`,
-        {
-          code,
-          redirectUri,
-        }
-      );
+      const response = await http.post(`/api/users/signin?authType=linkedin`, {
+        code,
+        redirectUri,
+      });
 
       const { user, token } = response.data;
 
