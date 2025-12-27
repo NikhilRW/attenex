@@ -1,5 +1,5 @@
 import { User } from "@/backend/src/config/database_setup";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "@shared/stores/authStore";
 
 export const getStartingScreenPath = (newUser: User | null = null) => {
   let user = newUser;

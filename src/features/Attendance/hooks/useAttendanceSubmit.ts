@@ -1,12 +1,12 @@
 import { Lecture } from "@attendance/types/common";
 import { useState } from "react";
-import { ALERT_MESSAGES } from "../constants/studentDashboard.constants";
-import { submitAttendance } from "../services/attendanceService";
-import { stopBackgroundTracking } from "../services/backgroundTask";
-import { UseAttendanceSubmitReturn } from "../types/studentDashboard.types";
-import { showErrorAlert, showSuccessAlert } from "../utils/alertUtils";
-import { getCurrentLocationHigh } from "../utils/locationUtils";
-import { validatePasscode } from "../utils/validationUtils";
+import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
+import { submitAttendance } from "@attendance/services/attendanceService";
+import { stopBackgroundTracking } from "@attendance/services/backgroundTask";
+import { UseAttendanceSubmitReturn } from "@attendance/types/studentDashboard.types";
+import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
+import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
+import { validatePasscode } from "@attendance/utils/validationUtils";
 
 /**
  * Custom hook to manage attendance submission

@@ -1,14 +1,14 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
+import { handleEmailSignIn } from "@auth/utils/common";
+import { SignInFormData, signInSchema } from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@shared/stores/authStore";
+import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import { useShallow } from "zustand/shallow";
-import { handleEmailSignIn } from "../utils/common";
-import { SignInFormData, signInSchema } from "../validation/authSchemas";
 
 export const useSignIn = () => {
   const router = useRouter();

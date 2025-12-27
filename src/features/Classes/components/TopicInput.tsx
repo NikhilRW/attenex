@@ -1,12 +1,8 @@
+import { createLectureStyles as styles } from "@classes/styles";
+import { TopicInputProps } from "@classes/types";
+import { useTheme } from "@shared/hooks";
 import React from "react";
-import { View, Text, TextInput } from "react-native";
-import { styles } from "../styles/CreateLecture.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-
-interface TopicInputProps {
-  value: string;
-  onChangeText: (text: string) => void;
-}
+import { Text, TextInput, View } from "react-native";
 
 export const TopicInput: React.FC<TopicInputProps> = ({
   value,

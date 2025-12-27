@@ -1,14 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { lectureEndedStyles as styles } from "@classes/styles";
+import { LectureEndedTitleProps } from "@classes/types";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { styles } from "../styles/LectureEndedScreen.styles";
 
-interface LectureEndedTitleProps {
-    lectureTitle: string | string[];
-}
-
-export const LectureEndedTitle = ({ lectureTitle }: LectureEndedTitleProps) => {
+export const LectureEndedTitle: React.FC<LectureEndedTitleProps> = ({ lectureTitle }) => {
     const { colors } = useTheme();
 
     return (

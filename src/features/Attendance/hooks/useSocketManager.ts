@@ -1,17 +1,17 @@
-import { socketService } from "@/src/shared/services/socketService";
+import {
+  ALERT_DELAY,
+  ALERT_MESSAGES,
+  LOG_MESSAGES,
+} from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
+import {
+  LectureStatus,
+  UseSocketManagerReturn,
+} from "@attendance/types/studentDashboard.types";
+import { showSuccessAlert } from "@attendance/utils/alertUtils";
+import { socketService } from "@shared/services/socketService";
 import { useEffect, useState } from "react";
 import { AppState } from "react-native";
-import {
-    ALERT_DELAY,
-    ALERT_MESSAGES,
-    LOG_MESSAGES,
-} from "../constants/studentDashboard.constants";
-import {
-    LectureStatus,
-    UseSocketManagerReturn,
-} from "../types/studentDashboard.types";
-import { showSuccessAlert } from "../utils/alertUtils";
 
 /**
  * Custom hook to manage socket connections and lecture events

@@ -1,9 +1,9 @@
+import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
+import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";
+import { showErrorAlert } from "@attendance/utils/alertUtils";
+import { validateRollNo } from "@attendance/utils/validationUtils";
 import { useState } from "react";
-import { ALERT_MESSAGES } from "../constants/studentDashboard.constants";
-import { UseRollNoManagementReturn } from "../types/studentDashboard.types";
-import { showErrorAlert } from "../utils/alertUtils";
-import { validateRollNo } from "../utils/validationUtils";
 
 /**
  * Custom hook to manage roll number handling

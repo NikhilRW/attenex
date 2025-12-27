@@ -1,5 +1,5 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import http from "@/src/shared/utils/http";
+import { useAuthStore } from "@shared/stores/authStore";
+import http from "@shared/utils/http";
 import { router } from "expo-router";
 
 export const handleResetPassword = async () => {

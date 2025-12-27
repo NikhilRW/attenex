@@ -1,12 +1,9 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { createLectureStyles as styles } from "@classes/styles";
+import { CreateLectureHeaderProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/CreateLecture.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-
-interface CreateLectureHeaderProps {
-  onBack: () => void;
-}
+import { useTheme } from "@shared/hooks";
+import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export const CreateLectureHeader: React.FC<CreateLectureHeaderProps> = ({
   onBack,

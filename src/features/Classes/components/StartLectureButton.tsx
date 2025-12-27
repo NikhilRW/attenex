@@ -1,12 +1,8 @@
+import { createLectureStyles as styles } from "@classes/styles";
+import { StartLectureButtonProps } from "@classes/types";
+import { useTheme } from "@shared/hooks";
 import React from "react";
-import { Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import { styles } from "../styles/CreateLecture.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-
-interface StartLectureButtonProps {
-  loading: boolean;
-  onPress: () => void;
-}
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 
 export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
   loading,

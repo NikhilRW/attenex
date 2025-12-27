@@ -1,11 +1,12 @@
+import { teacherDashboardStyles as styles } from "@classes/styles";
+import { LectureEditModalProps } from "@classes/types";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { styles } from "../styles/TeacherDashboard.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
 
-export const LectureEditModal = ({
+export const LectureEditModal: React.FC<LectureEditModalProps> = ({
   editModalVisible,
   setEditModalVisible,
   editTitle,
@@ -13,14 +14,6 @@ export const LectureEditModal = ({
   editDuration,
   setEditDuration,
   handleUpdateLecture,
-}: {
-  editModalVisible: boolean;
-  setEditModalVisible: (visible: boolean) => void;
-  editTitle: string;
-  setEditTitle: (title: string) => void;
-  editDuration: string;
-  setEditDuration: (duration: string) => void;
-  handleUpdateLecture: () => void;
 }) => {
   const { colors, isDark } = useTheme();
   return (

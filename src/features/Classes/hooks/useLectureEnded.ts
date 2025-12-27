@@ -1,5 +1,6 @@
-import { socketService } from "@/src/shared/services/socketService";
-import { logger } from "@/src/shared/utils/logger";
+import { getPasscode } from "@classes/services/lectureService";
+import { socketService } from "@shared/services/socketService";
+import { logger } from "@shared/utils/logger";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -8,7 +9,6 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { getPasscode } from "../services/lectureService";
 
 export const useLectureEnded = () => {
   const router = useRouter();

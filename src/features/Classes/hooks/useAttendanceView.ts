@@ -1,12 +1,12 @@
-import { socketService } from "@/src/shared/services/socketService";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, AppState, Clipboard } from "react-native";
 import {
   addManualAttendance,
   fetchLectureAttendance,
-} from "../services/lectureService";
-import { AttendanceRecord, FilterType } from "../types/common";
+} from "@classes/services/lectureService";
+import { AttendanceRecord, FilterType } from "@classes/types";
+import { socketService } from "@shared/services/socketService";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, AppState, Clipboard } from "react-native";
 
 export const useAttendanceView = () => {
   const router = useRouter();

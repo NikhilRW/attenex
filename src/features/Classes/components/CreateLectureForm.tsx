@@ -1,5 +1,7 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { classesStyles as styles } from "@classes/styles";
+import { CreateLectureFormProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import {
     ActivityIndicator,
@@ -9,18 +11,8 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/Classes.styles";
 
-interface CreateLectureFormProps {
-    lectureName: string;
-    setLectureName: (value: string) => void;
-    className: string;
-    setClassName: (value: string) => void;
-    isCreating: boolean;
-    onCreateLecture: () => void;
-}
-
-export const CreateLectureForm = ({
+export const CreateLectureForm: React.FC<CreateLectureFormProps> = ({
     lectureName,
     setLectureName,
     className,

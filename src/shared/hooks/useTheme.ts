@@ -3,8 +3,8 @@ import { useColorScheme } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
-import { darkTheme, lightTheme } from "../constants/colors";
-import { mmkvStorage } from "../utils/mmkvStorage";
+import { darkTheme, lightTheme } from "@shared/constants/colors";
+import { mmkvStorage } from "@shared/utils/mmkvStorage";
 
 export type ThemeMode = "dark" | "light" | "system";
 

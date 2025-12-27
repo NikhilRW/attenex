@@ -18,7 +18,7 @@ import {
     withRepeat,
     withTiming,
 } from "react-native-reanimated";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@shared/hooks/useTheme";
 
 const { width, height } = Dimensions.get("screen");
 

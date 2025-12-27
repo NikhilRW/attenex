@@ -1,22 +1,13 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { lectureEndedStyles as styles } from "@classes/styles";
+import { PasscodeCardProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/LectureEndedScreen.styles";
 
-interface PasscodeCardProps {
-    passcode: string | null;
-    loading: boolean;
-    onRefresh: () => void;
-}
-
-export const PasscodeCard = ({
-    passcode,
-    loading,
-    onRefresh,
-}: PasscodeCardProps) => {
+export const PasscodeCard: React.FC<PasscodeCardProps> = ({ passcode, loading, onRefresh }) => {
     const { colors, isDark } = useTheme();
 
     return (

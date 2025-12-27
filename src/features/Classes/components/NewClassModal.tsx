@@ -1,17 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { createLectureStyles as styles } from "@classes/styles";
+import { NewClassModalProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { styles } from "../styles/CreateLecture.styles";
-interface NewClassModalProps {
-  visible: boolean;
-  onClose: () => void;
-  newClassName: string;
-  setNewClassName: (text: string) => void;
-  onCreateClass: () => void;
-}
 
 export const NewClassModal: React.FC<NewClassModalProps> = ({
   visible,

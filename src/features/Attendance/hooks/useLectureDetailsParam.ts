@@ -1,13 +1,13 @@
 import { getStudentLectureDetails } from "@/src/features/Classes/services/lectureService";
-import { Lecture } from "@attendance/types/common";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
-} from "../constants/studentDashboard.constants";
-import { UseLectureDetailsParamReturn } from "../types/studentDashboard.types";
-import { showErrorAlert } from "../utils/alertUtils";
+} from "@attendance/constants/studentDashboard.constants";
+import { Lecture } from "@attendance/types/common";
+import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard.types";
+import { showErrorAlert } from "@attendance/utils/alertUtils";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)

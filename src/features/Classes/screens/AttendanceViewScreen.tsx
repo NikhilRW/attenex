@@ -1,14 +1,16 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import {
+  AttendanceFilter,
+  AttendanceFloatingButton,
+  AttendanceHeader,
+  ManualAttendanceModal,
+  RollSummaryModal,
+  StudentList,
+} from "@classes/components";
+import { useAttendanceView } from "@classes/hooks";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { AttendanceFilter } from "../components/AttendanceFilter";
-import { AttendanceFloatingButton } from "../components/AttendanceFloatingButton";
-import { AttendanceHeader } from "../components/AttendanceHeader";
-import { ManualAttendanceModal } from "../components/ManualAttendanceModal";
-import { RollSummaryModal } from "../components/RollSummaryModal";
-import { StudentList } from "../components/StudentList";
-import { useAttendanceView } from "../hooks/useAttendanceView";
-import { styles } from "../styles/AttendanceViewScreen.styles";
 
 const AttendanceViewScreen = () => {
   const { colors } = useTheme();

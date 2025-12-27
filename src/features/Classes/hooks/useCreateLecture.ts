@@ -1,4 +1,4 @@
-import { lectureService } from "@/src/shared/services/lectureService";
+import { lectureService } from "@shared/services/lectureService";
 import { useState } from "react";
 import { showMessage } from "react-native-flash-message";
 

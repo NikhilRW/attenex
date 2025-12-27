@@ -1,9 +1,9 @@
 import { User as UserSchema } from "@/backend/src/config/database_setup";
-import { mmkvStorage } from "@/src/shared/utils/mmkvStorage";
-import { secureStore } from "@/src/shared/utils/secureStore";
+import { mmkvStorage } from "@shared/utils/mmkvStorage";
+import { secureStore } from "@shared/utils/secureStore";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useThemeStore } from "../hooks/useTheme";
+import { useThemeStore } from "@shared/hooks/useTheme";
 
 interface User extends UserSchema {
   className: string;

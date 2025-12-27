@@ -1,25 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { createLectureStyles as styles } from "@classes/styles";
+import { DurationSelectorProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/CreateLecture.styles";
-
-interface DurationOption {
-  label: string;
-  value: number;
-}
-
-interface DurationSelectorProps {
-  duration: number;
-  customDuration: string;
-  showDropdown: boolean;
-  onToggleDropdown: () => void;
-  onSelectDuration: (duration: number) => void;
-  onChangeCustomDuration: (text: string) => void;
-  options: DurationOption[];
-}
 
 export const DurationSelector: React.FC<DurationSelectorProps> = ({
   duration,

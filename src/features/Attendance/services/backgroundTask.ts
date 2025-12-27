@@ -1,4 +1,4 @@
-import { storage } from "@/src/shared/utils/mmkvStorage";
+import { storage } from "@shared/utils/mmkvStorage";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { sendPing } from "./attendanceService";
@@ -39,7 +39,6 @@ export const startBackgroundTracking = async (lectureId: string) => {
     storage.set("currentLectureId", lectureId);
 
     const { status } = await Location.requestBackgroundPermissionsAsync();
-    console.log("status : ", status);
     if (status === "granted") {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.Highest,

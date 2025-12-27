@@ -1,16 +1,16 @@
 import { User } from "@/backend/src/config/database_setup";
-import { authService } from "@/src/shared/services/authService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { subscribeToClassName } from "@/src/shared/utils/fcm";
-import { googleAuth } from "@/src/shared/utils/google-auth";
-import http from "@/src/shared/utils/http";
-import { logger } from "@/src/shared/utils/logger";
+import { RegisterGoogleUserResponse } from "@auth/types/request";
+import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
+import { authService } from "@shared/services/authService";
+import { useAuthStore } from "@shared/stores/authStore";
+import { subscribeToClassName } from "@shared/utils/fcm";
+import { googleAuth } from "@shared/utils/google-auth";
+import http from "@shared/utils/http";
+import { logger } from "@shared/utils/logger";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import { LinkedInProfile } from "react-native-linkedin-oauth2";
-import { RegisterGoogleUserResponse } from "../types/request";
-import { SignInFormData, SignUpFormData } from "../validation/authSchemas";
 
 /**
  * Authentication Utility Functions

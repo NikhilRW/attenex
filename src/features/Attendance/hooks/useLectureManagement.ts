@@ -1,12 +1,12 @@
 import { getStudentLectures } from "@/src/features/Classes/services/lectureService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { Lecture } from "@attendance/types/common";
-import { useCallback, useEffect, useState } from "react";
 import {
   LECTURE_AUTO_REFRESH_INTERVAL,
   LOG_MESSAGES,
-} from "../constants/studentDashboard.constants";
-import { UseLectureManagementReturn } from "../types/studentDashboard.types";
+} from "@attendance/constants/studentDashboard.constants";
+import { Lecture } from "@attendance/types/common";
+import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.types";
+import { useAuthStore } from "@shared/stores/authStore";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh

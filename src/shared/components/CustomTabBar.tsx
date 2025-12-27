@@ -11,8 +11,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useTheme } from "../hooks/useTheme";
-import { useAuthStore } from "../stores/authStore";
+import { useTheme } from "@shared/hooks/useTheme";
+import { useAuthStore } from "@shared/stores/authStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 80;
@@ -20,7 +20,6 @@ const BUTTON_WIDTH = 80;
 const CustomTabBar = ({
   state: { index, routeNames },
   navigation,
-  ...props
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
   const { user, isAuthenticated } = useAuthStore();

@@ -1,22 +1,19 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import {
+  FuturisticButton,
+  FuturisticInput,
+  InvalidResetPasswordLink,
+  PasswordRequirements,
+  ResetPasswordFormHeader,
+  VerifyingResetPasswordLink,
+} from "@auth/components";
+import { useResetPassword } from "@auth/hooks";
+import { resetPasswordStyles as styles } from "@auth/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Controller } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
-import { FuturisticButton } from "../components/FuturisticButton";
-import { FuturisticInput } from "../components/FuturisticInput";
-import { PasswordRequirements } from "../components/PasswordRequirements";
-import { useResetPassword } from "../hooks/useResetPassword";
-import { styles } from "../styles/ResetPassword.styles";
-import VerifyingResetPasswordLink from "../components/VerifyingResetPasswordLink";
-import InvalidResetPasswordLink from "../components/InvalidResetPasswordLink";
-import ResetPasswordFormHeader from "../components/ResetPasswordFormHeader";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 /**
  * Reset Password Screen
@@ -39,7 +36,7 @@ const ResetPassword = () => {
     showNewPassword,
     setShowNewPassword,
     showConfirmPassword,
-    setShowConfirmPassword
+    setShowConfirmPassword,
   } = useResetPassword();
 
   if (isVerifying) {

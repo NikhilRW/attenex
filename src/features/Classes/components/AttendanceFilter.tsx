@@ -1,14 +1,9 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { AttendanceFilterProps, FilterType } from "@classes/types";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-import { FilterType } from "../types/common";
-
-interface AttendanceFilterProps {
-  filter: FilterType;
-  setFilter: (filter: FilterType) => void;
-}
 
 export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
   filter,

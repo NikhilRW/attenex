@@ -1,18 +1,15 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { lectureEndedStyles as styles } from "@classes/styles";
+import { LectureEndedDoneButtonProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/LectureEndedScreen.styles";
 
-interface LectureEndedDoneButtonProps {
-    onDone: () => void;
-}
-
-export const LectureEndedDoneButton = ({
+export const LectureEndedDoneButton: React.FC<LectureEndedDoneButtonProps> = ({
     onDone,
-}: LectureEndedDoneButtonProps) => {
+}) => {
     const { colors } = useTheme();
 
     return (

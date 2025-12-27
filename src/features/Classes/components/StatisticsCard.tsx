@@ -1,20 +1,12 @@
-import { View, Text, ScrollView } from "react-native";
-import React from "react";
+import { teacherDashboardStyles as styles } from "@classes/styles";
+import { StatisticsCardProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../styles/TeacherDashboard.styles";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { LectureWithCount } from "../types/common";
+import React from "react";
+import { ScrollView, Text, View } from "react-native";
 
-const StatisticsCard = ({
-  totalActive,
-  totalStudents,
-  lectures,
-}: {
-  totalActive: number;
-  totalStudents: number;
-  lectures: LectureWithCount[];
-}) => {
+const StatisticsCard: React.FC<StatisticsCardProps> = ({ lectures, totalActive, totalStudents }) => {
   const { colors, isDark } = useTheme();
   return (
     <ScrollView

@@ -1,18 +1,20 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import {
+  AuthFooter,
+  AuthHeader,
+  FuturisticButton,
+  FuturisticDivider,
+  FuturisticInput,
+  SocialLoginButtons,
+} from "@auth/components";
+import { useSignUp } from "@auth/hooks";
+import { signUpStyles as styles } from "@auth/styles";
+import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import { AuthFooter } from "../components/AuthFooter";
-import { AuthHeader } from "../components/AuthHeader";
-import { FuturisticButton } from "../components/FuturisticButton";
-import { FuturisticDivider } from "../components/FuturisticDivider";
-import { FuturisticInput } from "../components/FuturisticInput";
-import { SocialLoginButtons } from "../components/SocialLoginButtons";
-import { useSignUp } from "../hooks/useSignUp";
-import { styles } from "../styles/SignUp.styles";
-import { handleGoogleSignIn, handleLinkedInSignIn } from "../utils/common";
 
 const SignUp = () => {
   const { colors, isDark } = useTheme();
@@ -45,7 +47,7 @@ const SignUp = () => {
         >
           <AuthHeader
             title="Create Account"
-            logoSource={require("../../../../assets/images/logo-transparent.png")}
+            logoSource={require("@/assets/images/logo-transparent.png")}
           />
 
           <SocialLoginButtons

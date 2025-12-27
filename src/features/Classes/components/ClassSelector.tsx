@@ -1,20 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { createLectureStyles as styles } from "@classes/styles";
+import { ClassSelectorProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/CreateLecture.styles";
-import { ClassItem } from "../types/common";
-
-interface ClassSelectorProps {
-  selectedClass: string;
-  existingClasses: ClassItem[];
-  showDropdown: boolean;
-  onToggleDropdown: () => void;
-  onSelectClass: (className: string) => void;
-  onAddNewClass: () => void;
-}
 
 export const ClassSelector: React.FC<ClassSelectorProps> = ({
   selectedClass,

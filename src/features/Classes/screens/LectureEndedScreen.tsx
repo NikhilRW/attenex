@@ -1,13 +1,15 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import {
+  LectureEndedDoneButton,
+  LectureEndedHeader,
+  LectureEndedSuccessIcon,
+  LectureEndedTitle,
+  PasscodeCard,
+} from "@classes/components";
+import { useLectureEnded } from "@classes/hooks";
+import { lectureEndedStyles as styles } from "@classes/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { LectureEndedDoneButton } from "../components/LectureEndedDoneButton";
-import { LectureEndedHeader } from "../components/LectureEndedHeader";
-import { LectureEndedSuccessIcon } from "../components/LectureEndedSuccessIcon";
-import { LectureEndedTitle } from "../components/LectureEndedTitle";
-import { PasscodeCard } from "../components/PasscodeCard";
-import { useLectureEnded } from "../hooks/useLectureEnded";
-import { styles } from "../styles/LectureEndedScreen.styles";
 
 const LectureEndedScreen = () => {
   const {

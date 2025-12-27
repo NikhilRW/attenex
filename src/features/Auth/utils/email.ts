@@ -1,4 +1,4 @@
-import { logger } from "@/src/shared/utils/logger";
+import { logger } from "@shared/utils/logger";
 import axios from "axios";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";

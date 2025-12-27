@@ -1,28 +1,21 @@
+import { teacherDashboardStyles as styles } from "@classes/styles";
+import { LectureCardProps } from "@classes/types";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   FadeInDown,
   LinearTransition,
 } from "react-native-reanimated";
-import { styles } from "../styles/TeacherDashboard.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
-import { LectureWithCount } from "../types/common";
 
-const LectureCard = ({
+const LectureCard: React.FC<LectureCardProps> = ({
   lecture,
   index,
+  handleViewAttendance,
   handleEditLecture,
   handleEndLecture,
-  handleViewAttendance,
   handleDeleteLecture,
-}: {
-  lecture: LectureWithCount;
-  index: number;
-  handleViewAttendance: (lecture: LectureWithCount) => void;
-  handleEditLecture: (lecture: LectureWithCount) => void;
-  handleEndLecture: (lectureId: string, lectureTitle: string) => void;
-  handleDeleteLecture: (lecture: LectureWithCount) => void;
 }) => {
   const { colors, isDark } = useTheme();
   return (

@@ -1,16 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { StudentCardProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
 import Animated, { FadeInDown, Layout } from "react-native-reanimated";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-import { AttendanceRecord } from "../types/common";
-
-interface StudentCardProps {
-  record: AttendanceRecord;
-  index: number;
-}
 
 export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
   const { colors, isDark } = useTheme();

@@ -1,15 +1,15 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import http from "@/src/shared/utils/http";
-import { secureStore } from "@/src/shared/utils/secureStore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useAuthStore } from "@shared/stores/authStore";
+import http from "@shared/utils/http";
+import { secureStore } from "@shared/utils/secureStore";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import {
   getDeviceToken,
   subscribeToClassName,
   unsubscribeFromClassName,
-} from "../utils/fcm";
-import { logger } from "../utils/logger";
+} from "@shared/utils/fcm";
+import { logger } from "@shared/utils/logger";
 
 export const authService = {
   async login(user: any, token: string) {

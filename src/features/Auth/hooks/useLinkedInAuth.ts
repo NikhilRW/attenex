@@ -1,8 +1,8 @@
-import { authService } from "@/src/shared/services/authService";
+import { LINKEDIN_CONFIG } from "@auth/constants/linkedin";
+import { LinkedInAuthProps } from "@auth/types/linkedin";
+import { handleLinkedInSuccess, linkedInError } from "@auth/utils/common";
+import { authService } from "@shared/services/authService";
 import { LinkedInProfile } from "react-native-linkedin-oauth2";
-import { LINKEDIN_CONFIG } from "../constants/linkedin";
-import { LinkedInAuthProps } from "../types/linkedin";
-import { handleLinkedInSuccess, linkedInError } from "../utils/common";
 
 export const useLinkedInAuth = ({
   authType,

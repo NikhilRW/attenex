@@ -1,6 +1,4 @@
 import { handleEmailVerification } from "@/src/features/Auth/utils/common";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { useNotificationStore } from "@/src/shared/stores/notificationStore";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import {
   FirebaseMessagingTypes,
@@ -10,6 +8,8 @@ import {
   onNotificationOpenedApp,
   setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
+import { useTheme } from "@shared/hooks/useTheme";
+import { useNotificationStore } from "@shared/stores/notificationStore";
 import * as Linking from "expo-linking";
 import {
   addNotificationResponseReceivedListener,

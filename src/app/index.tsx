@@ -1,6 +1,6 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
+import { useAuthStore } from "@shared/stores/authStore";
 import { Redirect } from "expo-router";
-import { getStartingScreenPath } from "../shared/utils/navigation";
+import { getStartingScreenPath } from "@shared/utils/navigation";
 
 
 export default function Index() {
@@ -16,6 +16,6 @@ export default function Index() {
     return <Redirect href={"/(auth)/sign-in"} />;
   }
 
-  
+
   return <Redirect href={getStartingScreenPath()} />;
 }

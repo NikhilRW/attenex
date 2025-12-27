@@ -1,0 +1,126 @@
+import { StyleSheet } from "react-native";
+
+export const roleSelectionStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  header: {
+    paddingTop: 30,
+    paddingHorizontal: 24,
+    marginBottom: 20,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  themeToggle: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+  },
+  modelsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    gap: 16,
+    alignItems: "center",
+  },
+  modelWrapper: {
+    flex: 1,
+    height: "75%",
+    borderRadius: 24,
+    borderWidth: 2,
+    overflow: "hidden",
+    position: "relative",
+  },
+  canvasContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+  },
+  roleImage: {
+    width: 250,
+    height: 210,
+    zIndex: -2,
+  },
+  labelContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    backdropFilter: "blur(10px)",
+    zIndex: 2,
+    height: 110,
+  },
+  roleLabel: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  roleDescription: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+  selectedIndicator: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  checkmark: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  confirmButton: {
+    marginHorizontal: 24,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  confirmButtonDisabled: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  confirmGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    alignItems: "center",
+  },
+  confirmButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    textTransform: "capitalize",
+  },
+});

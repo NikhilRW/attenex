@@ -1,14 +1,16 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import {
+  AuthHeader,
+  BackButton,
+  EmailSent,
+  ForgotPasswordForm,
+} from "@auth/components";
+import { useForgotPassword } from "@auth/hooks";
+import { forgotPasswordStyles as styles } from "@auth/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
-import { AuthHeader } from "../components/AuthHeader";
-import { styles } from "../styles/ForgotPassword.styles";
-import useForgotPassword from "../hooks/useForgotPassword";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import ForgotPasswordForm from "../components/ForgotPasswordForm";
-import EmailSent from "../components/EmailSent";
-import BackButton from "../components/BackButton";
 
 /**
  * Forgot Password Screen
@@ -48,7 +50,7 @@ const ForgotPassword = () => {
           {emailSent === false && (
             <AuthHeader
               title="Forgot Password"
-              logoSource={require("../../../../assets/images/logo-transparent.png")}
+              logoSource={require("@/assets/images/logo-transparent.png")}
             />
           )}
 

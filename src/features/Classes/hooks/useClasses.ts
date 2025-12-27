@@ -1,5 +1,5 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { lectureService } from "@/src/shared/services/lectureService";
+import { useTheme } from "@shared/hooks";
+import { lectureService } from "@shared/services/lectureService";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { showMessage } from "react-native-flash-message";

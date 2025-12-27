@@ -1,8 +1,8 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
-import { useAuthStore } from "@/src/shared/stores/authStore";
+import { BASE_URI } from "@shared/constants/uri";
+import { useAuthStore } from "@shared/stores/authStore";
 import axios from "axios";
 import { router } from "expo-router";
-import { secureStore } from "./secureStore";
+import { secureStore } from "@shared/utils/secureStore";
 
 /**
  * Centralized axios instance for API calls. Automatically attaches Authorization

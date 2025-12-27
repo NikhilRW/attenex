@@ -1,4 +1,4 @@
-import { BASE_URI } from "@/src/shared/constants/uri";
+import { BASE_URI } from "@shared/constants/uri";
 import { io, Socket } from "socket.io-client";
 class SocketService {
   private socket: Socket | null = null;

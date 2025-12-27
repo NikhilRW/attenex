@@ -1,232 +1,34 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { authService } from "@/src/shared/services/authService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated, {
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
-import { handleResetPassword } from "../utils/common";
-import { styles } from "../styles/Settings.styles";
-import { useRouter } from "expo-router";
+  AppearanceSection,
+  DangerZoneSection,
+  ProfileSection,
+  RoleSection,
+} from "@settings/components";
+import { useSettings } from "@settings/hooks";
+import { settingsStyles as styles } from "@settings/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { ScrollView, Text, View } from "react-native";
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const ThemeOption = ({
-  isActive,
-  onPress,
-  colors,
-  icon,
-  label,
-}: {
-  mode: string;
-  isActive: boolean;
-  onPress: () => void;
-  colors: any;
-  icon: any;
-  label: string;
-}) => {
-  const scale = useSharedValue(1);
-  const rotation = useSharedValue(0);
-
-  useEffect(() => {
-    if (isActive) {
-      // 3D Flip Animation
-      rotation.value = withSequence(
-        // withSpring(180, { duration: 200, dampingRatio: 4 }),
-        withSpring(360, { duration: 200, dampingRatio: 4 })
-      );
-    } else {
-      rotation.value = withTiming(0, { duration: 0 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive]);
-
-  const animatedIconStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotateZ: `${rotation.value}deg` }],
-    };
-  });
-
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
-    };
-  });
-
-  const handlePressIn = () => {
-    scale.value = withSpring(0.95);
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1);
-  };
-
-  return (
-    <AnimatedPressable
-      onPress={() => {
-        Haptics.selectionAsync();
-        onPress();
-      }}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[
-        styles.roleCard,
-        animatedContainerStyle,
-        {
-          backgroundColor: isActive
-            ? "rgba(0, 212, 255, 0.15)"
-            : colors.surface.cardBg,
-          borderColor: isActive
-            ? colors.primary.main
-            : colors.surface.glassBorder,
-        },
-      ]}
-    >
-      <Animated.View
-        style={[
-          styles.roleIcon,
-          animatedIconStyle,
-          {
-            backgroundColor: isActive
-              ? colors.primary.main
-              : colors.surface.glass,
-          },
-        ]}
-      >
-        <Ionicons
-          name={icon}
-          size={24}
-          color={isActive ? "#FFF" : colors.text.muted}
-        />
-      </Animated.View>
-      <Text
-        style={[
-          styles.roleText,
-          {
-            color: isActive ? colors.text.primary : colors.text.secondary,
-          },
-        ]}
-      >
-        {label}
-      </Text>
-      {isActive && (
-        <Animated.View
-          entering={FadeInDown.springify()}
-          style={styles.checkIcon}
-        >
-          <Ionicons
-            name="checkmark-circle"
-            size={20}
-            color={colors.primary.main}
-          />
-        </Animated.View>
-      )}
-    </AnimatedPressable>
-  );
-};
 
 const SettingsScreen = () => {
   const { colors, isDark, mode, setTheme } = useTheme();
-  const { user, updateUser } = useAuthStore();
-  const [displayName, setDisplayName] = useState(user?.name || "");
-  const [role, setRole] = useState<"teacher" | "student">(
-    (user?.role as any) || "teacher"
-  );
-  const router = useRouter();
-  const [savingRole, setSavingRole] = useState(false);
-  const [savingName, setSavingName] = useState(false);
-  const userProvider = useAuthStore((state) => state.user?.oauthProvider);
-
-  const handleRoleUpdate = async () => {
-    setSavingRole(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    try {
-      await authService.updateUserRole(role);
-      Alert.alert("Role updated", `Your role is now set to ${role}.`);
-      if (role === "teacher") {
-        router.replace("/classes");
-      } else {
-        router.replace("/attendance");
-      }
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to update role");
-    } finally {
-      setSavingRole(false);
-    }
-  };
-
-  const handleNameUpdate = async () => {
-    setSavingName(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    try {
-      updateUser({ name: displayName } as any);
-      Alert.alert("Saved", "Name updated locally.");
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to update name");
-    } finally {
-      setSavingName(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          if (user?.oauthProvider === "linkedin") {
-            router.replace("/linkedin?logout=true");
-            return;
-          }
-          await authService.logout();
-        },
-      },
-    ]);
-  };
-
-  const handleDeleteAccount = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    Alert.alert("Delete Account", "This will remove your account forever.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          if (user && user.oauthProvider === "linkedin") {
-            router.replace("/linkedin?deleteAccount=true");
-            return;
-          }
-          await authService.deleteUserAccount();
-        },
-      },
-    ]);
-  };
-
-  const getInitials = (name: string) => {
-    return (name || "User").slice(0, 2).toUpperCase();
-  };
+  const {
+    displayName,
+    setDisplayName,
+    role,
+    setRole,
+    savingRole,
+    savingName,
+    user,
+    handleRoleUpdate,
+    handleNameUpdate,
+    handleLogout,
+    handleDeleteAccount,
+    handleResetPassword,
+  } = useSettings();
 
   return (
     <View style={styles.container}>
@@ -254,350 +56,32 @@ const SettingsScreen = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Section */}
-        <Animated.View
-          entering={FadeInDown.delay(100).springify()}
-          style={styles.section}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
-            PROFILE
-          </Text>
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: colors.surface.cardBg,
-                borderColor: colors.surface.glassBorder,
-              },
-            ]}
-          >
-            <LinearGradient
-              colors={[
-                isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-                "transparent",
-              ]}
-              style={styles.profileHeader}
-            >
-              <View style={styles.avatarContainer}>
-                {user?.photoUrl ? (
-                  <Image
-                    source={{ uri: user.photoUrl }}
-                    style={styles.avatarImage}
-                  />
-                ) : (
-                  <LinearGradient
-                    colors={[colors.primary.main, colors.accent.purple]}
-                    style={styles.avatar}
-                  >
-                    <Text style={styles.avatarText}>
-                      {getInitials(displayName)}
-                    </Text>
-                  </LinearGradient>
-                )}
-                <View
-                  style={[
-                    styles.onlineBadge,
-                    { borderColor: colors.surface.cardBg },
-                  ]}
-                />
-              </View>
+        <ProfileSection
+          displayName={displayName}
+          onDisplayNameChange={setDisplayName}
+          onNameUpdate={handleNameUpdate}
+          savingName={savingName}
+          userPhotoUrl={user?.photoUrl}
+          userEmail={user?.email}
+          userName={user?.name}
+        />
 
-              <View style={styles.profileInfo}>
-                <Text style={[styles.label, { color: colors.text.secondary }]}>
-                  Display Name
-                </Text>
-                <View
-                  style={[
-                    styles.inputContainer,
-                    {
-                      backgroundColor: colors.surface.glass,
-                      borderColor: colors.surface.glassBorder,
-                    },
-                  ]}
-                >
-                  <TextInput
-                    value={displayName}
-                    onChangeText={setDisplayName}
-                    style={[styles.input, { color: colors.text.primary }]}
-                    placeholder="Enter name"
-                    placeholderTextColor={colors.text.muted}
-                  />
-                  {displayName !== user?.name && (
-                    <TouchableOpacity
-                      onPress={handleNameUpdate}
-                      disabled={savingName}
-                    >
-                      {savingName ? (
-                        <ActivityIndicator
-                          size="small"
-                          color={colors.primary.main}
-                        />
-                      ) : (
-                        <Ionicons
-                          name="checkmark-circle"
-                          size={24}
-                          color={colors.primary.main}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-            </LinearGradient>
+        <RoleSection
+          role={role}
+          userRole={user?.role}
+          onRoleChange={setRole}
+          onRoleUpdate={handleRoleUpdate}
+          savingRole={savingRole}
+        />
 
-            {/* User Email */}
-            <View
-              style={[
-                styles.statsRow,
-                {
-                  borderTopColor: colors.surface.glassBorder,
-                  justifyContent: "center",
-                  gap: 8,
-                },
-              ]}
-            >
-              <Ionicons
-                name="mail-outline"
-                size={16}
-                color={colors.text.muted}
-              />
-              <Text
-                style={{
-                  color: colors.text.secondary,
-                  fontSize: 14,
-                  fontWeight: "500",
-                }}
-              >
-                {user?.email || "No email connected"}
-              </Text>
-            </View>
-          </View>
-        </Animated.View>
+        <AppearanceSection mode={mode} onThemeChange={setTheme} />
 
-        {/* Role Section */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={styles.section}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
-            ROLE
-          </Text>
-          <View style={styles.roleContainer}>
-            {(["teacher", "student"] as const).map((r) => {
-              const isActive = role === r;
-              return (
-                <ThemeOption
-                  key={r}
-                  mode={r}
-                  isActive={isActive}
-                  onPress={() => setRole(r)}
-                  colors={colors}
-                  icon={r === "teacher" ? "school" : "people"}
-                  label={r.charAt(0).toUpperCase() + r.slice(1)}
-                />
-              );
-            })}
-          </View>
-          {role !== user?.role && (
-            <Animated.View entering={FadeInDown.springify()}>
-              <TouchableOpacity
-                style={[
-                  styles.updateButton,
-                  { backgroundColor: colors.primary.main },
-                ]}
-                onPress={handleRoleUpdate}
-                disabled={savingRole}
-              >
-                <Text style={styles.updateButtonText}>
-                  {savingRole ? "Updating..." : "Confirm Role Change"}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </Animated.View>
-
-        {/* Appearance */}
-        <Animated.View
-          entering={FadeInDown.delay(300).springify()}
-          style={styles.section}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
-            APPEARANCE
-          </Text>
-          <View style={styles.roleContainer}>
-            {(["light", "dark", "system"] as const).map((m) => {
-              const isActive = mode === m;
-              console.log("mode = " + mode);
-              console.log("option = " + m);
-              return (
-                <ThemeOption
-                  key={m}
-                  mode={m}
-                  isActive={isActive}
-                  onPress={() => setTheme(m)}
-                  colors={colors}
-                  icon={
-                    m === "light"
-                      ? "sunny"
-                      : m === "dark"
-                        ? "moon"
-                        : "settings-outline"
-                  }
-                  label={m.charAt(0).toUpperCase() + m.slice(1)}
-                />
-              );
-            })}
-          </View>
-        </Animated.View>
-
-        {/* Danger Zone */}
-        <Animated.View
-          entering={FadeInDown.delay(400).springify()}
-          style={styles.section}
-        >
-          <Text style={[styles.sectionTitle, { color: colors.accent.red }]}>
-            DANGER ZONE
-          </Text>
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: "rgba(239, 68, 68, 0.05)",
-                borderColor: "rgba(239, 68, 68, 0.2)",
-              },
-            ]}
-          >
-            {!userProvider && (
-              <TouchableOpacity
-                style={styles.dangerRow}
-                onPress={async () => await handleResetPassword()}
-              >
-                <View style={styles.rowLeft}>
-                  <View
-                    style={[
-                      styles.iconBox,
-                      { backgroundColor: "rgba(239, 68, 68, 0.1)" },
-                    ]}
-                  >
-                    <Ionicons
-                      name="key-outline"
-                      size={20}
-                      color={colors.accent.red}
-                    />
-                  </View>
-                  <View>
-                    <Text
-                      style={[
-                        styles.dangerLabel,
-                        { color: colors.text.primary },
-                      ]}
-                    >
-                      Change Password
-                    </Text>
-                    <Text
-                      style={[styles.dangerSub, { color: colors.text.muted }]}
-                    >
-                      Change your account password
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={colors.text.muted}
-                />
-              </TouchableOpacity>
-            )}
-
-            <View
-              style={[
-                styles.divider,
-                { backgroundColor: colors.surface.glassBorder },
-              ]}
-            />
-
-            <TouchableOpacity
-              style={styles.dangerRow}
-              onPress={async () => await handleLogout()}
-            >
-              <View style={styles.rowLeft}>
-                <View
-                  style={[
-                    styles.iconBox,
-                    { backgroundColor: "rgba(239, 68, 68, 0.1)" },
-                  ]}
-                >
-                  <Ionicons
-                    name="log-out"
-                    size={20}
-                    color={colors.accent.red}
-                  />
-                </View>
-                <View>
-                  <Text
-                    style={[styles.dangerLabel, { color: colors.text.primary }]}
-                  >
-                    Logout
-                  </Text>
-                  <Text
-                    style={[styles.dangerSub, { color: colors.text.muted }]}
-                  >
-                    Sign out of account
-                  </Text>
-                </View>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.text.muted}
-              />
-            </TouchableOpacity>
-
-            <View
-              style={[
-                styles.divider,
-                { backgroundColor: colors.surface.glassBorder },
-              ]}
-            />
-
-            <TouchableOpacity
-              style={styles.dangerRow}
-              onPress={handleDeleteAccount}
-            >
-              <View style={styles.rowLeft}>
-                <View
-                  style={[
-                    styles.iconBox,
-                    { backgroundColor: "rgba(239, 68, 68, 0.1)" },
-                  ]}
-                >
-                  <Ionicons
-                    name="warning"
-                    size={20}
-                    color={colors.accent.red}
-                  />
-                </View>
-                <View>
-                  <Text
-                    style={[styles.dangerLabel, { color: colors.text.primary }]}
-                  >
-                    Delete Account
-                  </Text>
-                  <Text
-                    style={[styles.dangerSub, { color: colors.text.muted }]}
-                  >
-                    Permanently delete data
-                  </Text>
-                </View>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.text.muted}
-              />
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
+        <DangerZoneSection
+          userProvider={user?.oauthProvider}
+          onResetPassword={handleResetPassword}
+          onLogout={handleLogout}
+          onDeleteAccount={handleDeleteAccount}
+        />
 
         <View style={{ height: 50 }} />
       </ScrollView>

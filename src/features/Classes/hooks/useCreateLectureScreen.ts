@@ -1,19 +1,13 @@
-import { storage } from "@/src/shared/utils/mmkvStorage";
+import { createLecture, getTeacherClasses } from "@classes/services";
+import { ClassItem } from "@classes/types";
+import { getMinHeightForScrollView } from "@classes/utils/common";
+import { storage } from "@shared/utils/mmkvStorage";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
-import { createLecture, getTeacherClasses } from "../services/lectureService";
-import { ClassItem } from "../types/common";
-import { getMinHeightForScrollView } from "../utils/common";
 
-export const DURATION_OPTIONS = [
-  { label: "30 min", value: 30 },
-  { label: "1 hour", value: 60 },
-  { label: "1.5 hours", value: 90 },
-  { label: "2 hours", value: 120 },
-  { label: "Custom", value: -1 },
-];
+
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();

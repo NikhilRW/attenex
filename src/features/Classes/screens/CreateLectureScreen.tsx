@@ -1,20 +1,15 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
+import {
+  CreateLectureFormCard,
+  CreateLectureHeader,
+  NewClassModal,
+} from "@classes/components";
+import { useCreateLectureScreen } from "@classes/hooks";
+import { DURATION_OPTIONS } from "@classes/constants";
+import { createLectureStyles as styles } from "@classes/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { CreateLectureFormCard } from "../components/CreateLectureFormCard";
-import { CreateLectureHeader } from "../components/CreateLectureHeader";
-import { NewClassModal } from "../components/NewClassModal";
-import {
-  DURATION_OPTIONS,
-  useCreateLectureScreen,
-} from "../hooks/useCreateLectureScreen";
-import { styles } from "../styles/CreateLecture.styles";
 
 const CreateLectureScreen = () => {
   const {

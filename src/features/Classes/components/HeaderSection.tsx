@@ -1,21 +1,16 @@
+import { StatisticsCard } from "@classes/components";
+import { teacherDashboardStyles as styles } from "@classes/styles";
+import { HeaderSectionProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import StatisticsCard from "./StatisticsCard";
-import { styles } from "../styles/TeacherDashboard.styles";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { LectureWithCount } from "../types/common";
 
-export const HeaderSection = ({
-  navigateToCreate,
+export const HeaderSection: React.FC<HeaderSectionProps> = ({
+  lectures,
   totalActive,
   totalStudents,
-  lectures,
-}: {
-  navigateToCreate: () => void;
-  totalActive: number;
-  totalStudents: number;
-  lectures: LectureWithCount[];
+  navigateToCreate,
 }) => {
   const { colors } = useTheme();
   return (

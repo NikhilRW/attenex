@@ -1,14 +1,16 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import {
+  FuturisticButton,
+  VerifyEmailHelp,
+  VerifyEmailIcon,
+  VerifyEmailMessage,
+} from "@auth/components";
+import { useVerifyEmail } from "@auth/hooks";
+import { verifyEmailStyles as styles } from "@auth/styles";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View } from "react-native";
-import { FuturisticButton } from "../components/FuturisticButton";
-import { VerifyEmailHelp } from "../components/VerifyEmailHelp";
-import { VerifyEmailIcon } from "../components/VerifyEmailIcon";
-import { VerifyEmailMessage } from "../components/VerifyEmailMessage";
-import { useVerifyEmail } from "../hooks/useVerifyEmail";
-import { styles } from "../styles/VerifyEmail.style";
 
 /**
  * Verify Email Screen

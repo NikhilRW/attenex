@@ -1,4 +1,4 @@
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "@shared/stores/authStore";
 
 export interface CreateLectureRequest {
   className: string;

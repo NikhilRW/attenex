@@ -1,47 +1,15 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { createLectureStyles as styles } from "@classes/styles";
+import { CreateLectureFormCardProps } from "@classes/types";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { styles } from "../styles/CreateLecture.styles";
-import { ClassItem } from "../types/common";
 import { ClassSelector } from "./ClassSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
 import { TopicInput } from "./TopicInput";
 
-interface DurationOption {
-    label: string;
-    value: number;
-}
-
-interface CreateLectureFormCardProps {
-    // Class selection
-    selectedClass: string;
-    existingClasses: ClassItem[];
-    showClassDropdown: boolean;
-    onToggleClassDropdown: () => void;
-    onSelectClass: (className: string) => void;
-    onAddNewClass: () => void;
-
-    // Topic input
-    lectureName: string;
-    onLectureNameChange: (value: string) => void;
-
-    // Duration selection
-    duration: number;
-    customDuration: string;
-    showDurationDropdown: boolean;
-    onToggleDurationDropdown: () => void;
-    onSelectDuration: (val: number) => void;
-    onChangeCustomDuration: (value: string) => void;
-    durationOptions: DurationOption[];
-
-    // Submit
-    loading: boolean;
-    onCreateLecture: () => void;
-}
-
-export const CreateLectureFormCard = ({
+export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
     selectedClass,
     existingClasses,
     showClassDropdown,

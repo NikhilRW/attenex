@@ -1,19 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { ManualAttendanceModalProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-
-interface ManualAttendanceModalProps {
-  visible: boolean;
-  onClose: () => void;
-  manualRollNo: string;
-  setManualRollNo: (text: string) => void;
-  onSubmit: () => void;
-  isSubmitting: boolean;
-}
 
 export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   visible,

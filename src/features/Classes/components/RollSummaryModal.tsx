@@ -1,20 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { RollSummaryModalProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-
-interface RollSummaryModalProps {
-  visible: boolean;
-  onClose: () => void;
-  presentRollNumbers: string;
-  presentCount: number;
-  incompleteCount: number;
-  absentCount: number;
-  onCopy: () => void;
-}
 
 export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   visible,

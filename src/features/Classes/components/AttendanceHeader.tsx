@@ -1,17 +1,10 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { AttendanceHeaderProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-
-interface AttendanceHeaderProps {
-  lectureTitle: string;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onBack: () => void;
-  onShowSummary: () => void;
-}
 
 export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
   lectureTitle,

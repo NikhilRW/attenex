@@ -1,6 +1,6 @@
+import { sendVerificationEmail } from "@auth/utils/email";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { sendVerificationEmail } from "../utils/email";
 
 export const useVerifyEmail = () => {
   const router = useRouter();

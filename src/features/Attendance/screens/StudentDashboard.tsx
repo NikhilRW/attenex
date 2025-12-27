@@ -1,27 +1,29 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { socketService } from "@/src/shared/services/socketService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
+import {
+  ClassUpdateModal,
+  LectureEnded,
+  LectureOngoing,
+  LoadingScreen,
+  NoClassSelected,
+  NoLectureFound,
+  OnGoingLecture,
+  RollnoModal,
+  StudentDashboardHeader,
+} from "@attendance/components";
+import {
+  useAttendanceJoin,
+  useAttendanceSubmit,
+  useClassManagement,
+  useLectureDetailsParam,
+  useLectureManagement,
+  useRollNoManagement,
+  useSocketManager,
+} from "@attendance/hooks";
+import { styles } from "@attendance/styles";
+import { useTheme } from "@shared/hooks/useTheme";
+import { socketService } from "@shared/services/socketService";
+import { useAuthStore } from "@shared/stores/authStore";
 import React, { useCallback } from "react";
 import { ScrollView } from "react-native";
-import ClassUpdateModal from "../components/ClassUpdateModal";
-import LectureEnded from "../components/LectureEnded";
-import LectureOngoing from "../components/LectureOngoing";
-import LoadingScreen from "../components/LoadingScreen";
-import NoClassSelected from "../components/NoClassSelected";
-import NoLectureFound from "../components/NoLectureFound";
-import OnGoingLecture from "../components/OnGoingLecture";
-import RollnoModal from "../components/RollnoModal";
-import StudentDashboardHeader from "../components/StudentDashboardHeader";
-import styles from "../styles/StudentDashboard.styles";
-
-// Import custom hooks
-import { useAttendanceJoin } from "../hooks/useAttendanceJoin";
-import { useAttendanceSubmit } from "../hooks/useAttendanceSubmit";
-import { useClassManagement } from "../hooks/useClassManagement";
-import { useLectureDetailsParam } from "../hooks/useLectureDetailsParam";
-import { useLectureManagement } from "../hooks/useLectureManagement";
-import { useRollNoManagement } from "../hooks/useRollNoManagement";
-import { useSocketManager } from "../hooks/useSocketManager";
 
 const StudentDashboard = () => {
   const { colors } = useTheme();

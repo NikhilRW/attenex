@@ -1,5 +1,5 @@
 import { User } from "@/backend/src/config/database_setup";
-import http from "@/src/shared/utils/http";
+import http from "@shared/utils/http";
 
 /**
  * Service for handling LinkedIn OAuth related operations.

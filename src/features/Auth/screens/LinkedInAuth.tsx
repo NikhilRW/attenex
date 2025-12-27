@@ -1,6 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { logger } from "@/src/shared/utils/logger";
+import { useTheme } from "@shared/hooks/useTheme";
+import { logger } from "@shared/utils/logger";
 // axios not required here; use linkedinAuthService
+import { linkedinAuthService } from "@auth/services/linkedinAuthService";
+import { authService } from "@shared/services/authService";
+import { useAuthStore } from "@shared/stores/authStore";
+import { subscribeToClassName } from "@shared/utils/fcm";
+import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
@@ -10,11 +15,6 @@ import {
   ShouldStartLoadRequest,
   WebViewNavigation,
 } from "react-native-webview/lib/WebViewTypes";
-import { linkedinAuthService } from "../services/linkedinAuthService";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
-import { authService } from "@/src/shared/services/authService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { subscribeToClassName } from "@/src/shared/utils/fcm";
 /**
  * LinkedIn OAuth Configuration
  * These values must match your LinkedIn Developer App settings

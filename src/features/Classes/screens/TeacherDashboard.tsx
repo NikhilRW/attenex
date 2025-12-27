@@ -1,7 +1,22 @@
-import { FuturisticBackground } from "@/src/shared/components/FuturisticBackground";
-import { useTheme } from "@/src/shared/hooks/useTheme";
-import { socketService } from "@/src/shared/services/socketService";
+import {
+  HeaderSection,
+  LectureCard,
+  LectureEditModal,
+  PullIndicator,
+} from "@classes/components";
+import {
+  deleteLecture,
+  endLecture,
+  getAllLectures,
+  getTeacherLectureDetails,
+  updateLecture,
+} from "@classes/services/lectureService";
+import { teacherDashboardStyles as styles } from "@classes/styles";
+import { LectureWithCount } from "@classes/types/common";
 import { Ionicons } from "@expo/vector-icons";
+import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { useTheme } from "@shared/hooks";
+import { socketService } from "@shared/services/socketService";
 import { Skia } from "@shopify/react-native-skia";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -14,7 +29,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
   FadeInDown,
@@ -23,19 +37,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import {
-  deleteLecture,
-  endLecture,
-  getAllLectures,
-  getTeacherLectureDetails,
-  updateLecture,
-} from "../services/lectureService";
-import { styles } from "../styles/TeacherDashboard.styles";
-import { LectureEditModal } from "../components/LectureEditModal";
-import { LectureWithCount } from "../types/common";
-import LectureCard from "../components/LectureCard";
-import { HeaderSection } from "../components/HeaderSection";
-import PullIndicator from "../components/PullIndicator";
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
@@ -59,7 +60,7 @@ const TeacherDashboard = () => {
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
   // const context = useSharedValue({ x: 0, y: 0 });
-  const animatedTranslateY = useSharedValue(0);
+  // const animatedTranslateY = useSharedValue(0);
 
   const fetchActiveLectures = useCallback(async () => {
     try {
@@ -331,9 +332,9 @@ const TeacherDashboard = () => {
   //     pullProgress.value = withSpring(0);
   //   });
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: animatedTranslateY.value }],
-  }));
+  // const animatedContainerStyle = useAnimatedStyle(() => ({
+  //   transform: [{ translateY: animatedTranslateY.value }],
+  // }));
 
   const pullIndicatorStyle = useAnimatedStyle(() => ({
     opacity: pullProgress.value,
@@ -350,121 +351,115 @@ const TeacherDashboard = () => {
     ],
   }));
 
+  // TODO: What To Do With Pull Indicator To Create Lecture.
+
   return (
     <View style={styles.container}>
       {isDark && <FuturisticBackground />}
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        {/* <GestureDetector gesture={swipeGesture}> */}
-        <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}>
-          <PullIndicator
-            animatedContainerStyle={animatedContainerStyle}
-            pullIndicatorStyle={pullIndicatorStyle}
-            pullProgress={pullProgress.value}
-            circlePath={circlePath}
+      {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
+      {/* <GestureDetector gesture={swipeGesture}> */}
+      {/* <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}> */}
+      <PullIndicator
+        pullIndicatorStyle={pullIndicatorStyle}
+        pullProgress={pullProgress.value}
+        circlePath={circlePath}
+      />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        onScroll={(e) => {
+          scrollY.value = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
+      >
+        {/* Header Section */}
+        <HeaderSection
+          totalActive={totalActive}
+          totalStudents={totalStudents}
+          lectures={lectures}
+          navigateToCreate={navigateToCreate}
+        />
+
+        {/* Search Bar */}
+        <Animated.View
+          entering={FadeInDown.delay(200).springify()}
+          style={[
+            styles.searchContainer,
+            {
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.03)",
+              borderColor: colors.surface.glassBorder,
+            },
+          ]}
+        >
+          <Ionicons name="search" size={20} color={colors.text.muted} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text.primary }]}
+            placeholder="Search lectures..."
+            placeholderTextColor={colors.text.muted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
-
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            onScroll={(e) => {
-              scrollY.value = e.nativeEvent.contentOffset.y;
-            }}
-            scrollEventThrottle={16}
-          >
-            {/* Header Section */}
-            <HeaderSection
-              totalActive={totalActive}
-              totalStudents={totalStudents}
-              lectures={lectures}
-              navigateToCreate={navigateToCreate}
-            />
-
-            {/* Search Bar */}
-            <Animated.View
-              entering={FadeInDown.delay(200).springify()}
-              style={[
-                styles.searchContainer,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)",
-                  borderColor: colors.surface.glassBorder,
-                },
-              ]}
-            >
-              <Ionicons name="search" size={20} color={colors.text.muted} />
-              <TextInput
-                style={[styles.searchInput, { color: colors.text.primary }]}
-                placeholder="Search lectures..."
-                placeholderTextColor={colors.text.muted}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={colors.text.muted}
               />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Ionicons
-                    name="close-circle"
-                    size={20}
-                    color={colors.text.muted}
-                  />
-                </TouchableOpacity>
-              )}
-            </Animated.View>
-
-            {/* Lectures List */}
-            <View style={styles.listContainer}>
-              <Text
-                style={[styles.sectionTitle, { color: colors.text.primary }]}
-              >
-                {searchQuery ? "Search Results" : "Recent Lectures"}
-              </Text>
-
-              {filteredLectures.length === 0 ? (
-                <Animated.View
-                  entering={FadeInUp.springify()}
-                  style={styles.emptyState}
-                >
-                  <Ionicons
-                    name="search-outline"
-                    size={48}
-                    color={colors.text.muted}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text
-                    style={[styles.emptyText, { color: colors.text.muted }]}
-                  >
-                    {searchQuery ? "No lectures found" : "No lectures yet"}
-                  </Text>
-                  {!searchQuery && (
-                    <Text
-                      style={[
-                        styles.emptySubText,
-                        { color: colors.text.muted },
-                      ]}
-                    >
-                      Pull down to create one
-                    </Text>
-                  )}
-                </Animated.View>
-              ) : (
-                filteredLectures.map((lecture, index) => (
-                  <LectureCard
-                    key={lecture.id}
-                    lecture={lecture}
-                    index={index}
-                    handleViewAttendance={handleViewAttendance}
-                    handleEditLecture={handleEditLecture}
-                    handleEndLecture={handleEndLecture}
-                    handleDeleteLecture={handleDeleteLecture}
-                  />
-                ))
-              )}
-            </View>
-          </ScrollView>
+            </TouchableOpacity>
+          )}
         </Animated.View>
-        {/* </GestureDetector> */}
-      </GestureHandlerRootView>
+
+        {/* Lectures List */}
+        <View style={styles.listContainer}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
+            {searchQuery ? "Search Results" : "Recent Lectures"}
+          </Text>
+
+          {filteredLectures.length === 0 ? (
+            <Animated.View
+              entering={FadeInUp.springify()}
+              style={styles.emptyState}
+            >
+              <Ionicons
+                name="search-outline"
+                size={48}
+                color={colors.text.muted}
+                style={{ opacity: 0.5 }}
+              />
+              <Text style={[styles.emptyText, { color: colors.text.muted }]}>
+                {searchQuery ? "No lectures found" : "No lectures yet"}
+              </Text>
+              {/* {!searchQuery && (
+                <Text
+                  style={[styles.emptySubText, { color: colors.text.muted }]}
+                >
+                  Pull down to create one
+                </Text>
+              )} */}
+            </Animated.View>
+          ) : (
+            filteredLectures.map((lecture, index) => (
+              <LectureCard
+                key={lecture.id}
+                lecture={lecture}
+                index={index}
+                handleViewAttendance={handleViewAttendance}
+                handleEditLecture={handleEditLecture}
+                handleEndLecture={handleEndLecture}
+                handleDeleteLecture={handleDeleteLecture}
+              />
+            ))
+          )}
+        </View>
+      </ScrollView>
+      {/* </Animated.View> */}
+      {/* </GestureDetector> */}
+      {/* </GestureHandlerRootView> */}
 
       {/* Edit Modal */}
 

@@ -1,14 +1,14 @@
-import http from "@/src/shared/utils/http";
+import {
+  ResetPasswordFormData,
+  resetPasswordSchema,
+} from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import http from "@shared/utils/http";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
-import {
-  ResetPasswordFormData,
-  resetPasswordSchema,
-} from "../validation/authSchemas";
 
 export const useResetPassword = () => {
   const router = useRouter();

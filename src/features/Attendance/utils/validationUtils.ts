@@ -1,4 +1,4 @@
-import { PASSCODE_LENGTH } from "../constants/studentDashboard.constants";
+import { PASSCODE_LENGTH } from "@attendance/constants/studentDashboard.constants";
 
 /**
  * Validate passcode format

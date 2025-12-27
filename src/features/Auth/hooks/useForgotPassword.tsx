@@ -1,12 +1,12 @@
-import http from "@/src/shared/utils/http";
+import { validateEmail } from "@auth/utils/email";
+import http from "@shared/utils/http";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
-import { validateEmail } from "../utils/email";
 
-const useForgotPassword = () => {
+export const useForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -94,5 +94,3 @@ const useForgotPassword = () => {
     setEmailSent,
   };
 };
-
-export default useForgotPassword;

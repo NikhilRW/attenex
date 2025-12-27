@@ -1,16 +1,11 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { attendanceViewStyles as styles } from "@classes/styles";
+import { StudentListProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { styles } from "../styles/AttendanceViewScreen.styles";
-import { AttendanceRecord } from "../types/common";
 import { StudentCard } from "./StudentCard";
-
-interface StudentListProps {
-  loading: boolean;
-  filteredAttendance: AttendanceRecord[];
-}
 
 export const StudentList: React.FC<StudentListProps> = ({
   loading,

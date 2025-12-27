@@ -1,15 +1,12 @@
-import { useTheme } from "@/src/shared/hooks/useTheme";
+import { lectureEndedStyles as styles } from "@classes/styles";
+import { LectureEndedHeaderProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { styles } from "../styles/LectureEndedScreen.styles";
 
-interface LectureEndedHeaderProps {
-    onDone: () => void;
-}
-
-export const LectureEndedHeader = ({ onDone }: LectureEndedHeaderProps) => {
+export const LectureEndedHeader: React.FC<LectureEndedHeaderProps> = ({ onDone }) => {
     const { colors } = useTheme();
 
     return (

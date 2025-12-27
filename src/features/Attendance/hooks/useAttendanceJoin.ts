@@ -1,25 +1,25 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { Lecture } from "@attendance/types/common";
-import { useCallback, useState } from "react";
-import { ALERT_MESSAGES } from "../constants/studentDashboard.constants";
-import { joinLecture } from "../services/attendanceService";
+import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
+import { joinLecture } from "@attendance/services/attendanceService";
 import {
   startBackgroundTracking,
   stopBackgroundTracking,
-} from "../services/backgroundTask";
+} from "@attendance/services/backgroundTask";
+import { Lecture } from "@attendance/types/common";
 import {
   JoinStatus,
   UseAttendanceJoinReturn,
-} from "../types/studentDashboard.types";
+} from "@attendance/types/studentDashboard.types";
 import {
   showDestructiveAlert,
   showErrorAlert,
   showSuccessAlert,
-} from "../utils/alertUtils";
+} from "@attendance/utils/alertUtils";
 import {
   getCurrentLocation,
   requestLocationPermission,
-} from "../utils/locationUtils";
+} from "@attendance/utils/locationUtils";
+import { useAuthStore } from "@shared/stores/authStore";
+import { useCallback, useState } from "react";
 
 /**
  * Custom hook to manage joining and leaving lectures

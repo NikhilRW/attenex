@@ -1,6 +1,6 @@
-import React from "react";
+import CustomTabBar from "@shared/components/CustomTabBar";
 import { Tabs } from "expo-router";
-import CustomTabBar from "@/src/shared/components/CustomTabBar";
+import React from "react";
 
 const _layout = () => {
   return (

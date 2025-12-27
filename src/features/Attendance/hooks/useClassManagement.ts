@@ -1,11 +1,11 @@
-import { authService } from "@/src/shared/services/authService";
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { storage } from "@/src/shared/utils/mmkvStorage";
+import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
+import { UseClassManagementReturn } from "@attendance/types/studentDashboard.types";
+import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
+import { validateClassName } from "@attendance/utils/validationUtils";
+import { authService } from "@shared/services/authService";
+import { useAuthStore } from "@shared/stores/authStore";
+import { storage } from "@shared/utils/mmkvStorage";
 import { useState } from "react";
-import { ALERT_MESSAGES } from "../constants/studentDashboard.constants";
-import { UseClassManagementReturn } from "../types/studentDashboard.types";
-import { showErrorAlert, showSuccessAlert } from "../utils/alertUtils";
-import { validateClassName } from "../utils/validationUtils";
 
 /**
  * Custom hook to manage class updates

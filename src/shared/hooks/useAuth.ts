@@ -1,4 +1,4 @@
-import { authService } from "@/src/shared/services/authService";
+import { authService } from "@shared/services/authService";
 import { useCallback } from "react";
 
 /**

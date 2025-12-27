@@ -1,12 +1,12 @@
-import { useAuthStore } from "@/src/shared/stores/authStore";
-import { getStartingScreenPath } from "@/src/shared/utils/navigation";
+import { handleEmailSignUp } from "@auth/utils/common";
+import { SignUpFormData, signUpSchema } from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@shared/stores/authStore";
+import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
-import { handleEmailSignUp } from "../utils/common";
-import { SignUpFormData, signUpSchema } from "../validation/authSchemas";
 
 export const useSignUp = () => {
   const router = useRouter();
