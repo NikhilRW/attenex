@@ -11,8 +11,6 @@ jobs:
     permissions:
       contents: write
       discussions: write
-    env:
-      GOOGLE_SECRET: ${{ vars.GOOGLE_SERVICE_KEY }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -57,3 +55,4 @@ jobs:
         with:
           files: ./android/app/build/outputs/apk/release/app-release.apk
           body: Latest Version Of Attenex {{ github.ref_name }} 
+          token: ${{ secrets.PAT }}
