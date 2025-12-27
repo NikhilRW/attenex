@@ -7,6 +7,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: write
     env:
       GOOGLE_SECRET: ${{ vars.GOOGLE_SERVICE_KEY }}
     steps:
@@ -45,17 +48,14 @@ jobs:
       - name: Build APK
         run: npx expo prebuild -p android
 
-      - name: Assemble Release APK
-        run: cd android && ./gradlew assembleRelease
+      # - name: Assemble Release APK
+      #   run: cd android && ./gradlew assembleRelease
 
-      - name: Release the apk
-        uses: svenstaro/upload-release-action@v2
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: android/app/build/outputs/apk/release/app-release.apk
-          asset_name: Attenex.apk
-          overwrite: true
-          body: "Attenex apk release"
+          files: app.json
+          release_name: "Testing"
           prerelease: true
-          make_latest:	true
-          repo_name: "NikhilRW/attenex"
+          make_latest: true
