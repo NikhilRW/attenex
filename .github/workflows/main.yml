@@ -59,4 +59,4 @@ jobs:
           body: "Attenex apk release"
           prerelease: true
           make_latest:	true
-          repo_name: "attenex"
+          repo_name: "NikhilRW/attenex"
