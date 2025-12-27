@@ -11,10 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.attenex.attenex",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./personal/google-services.json"
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
+      "googleServicesFile": "./personal/google-services.json",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -93,7 +93,8 @@
           "icon": "./assets/images/notification_icon.png",
           "color": "#000000"
         }
-      ]
+      ],
+      "./plugins/android.manifest.plugin.js"
     ],
     "experiments": {
       "typedRoutes": true,
