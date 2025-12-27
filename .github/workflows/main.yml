@@ -56,3 +56,4 @@ jobs:
           files: ./android/app/build/outputs/apk/release/app-release.apk
           body: Latest Version Of Attenex {{ github.ref_name }} 
           token: ${{ secrets.PAT }}
+          
