@@ -53,9 +53,7 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
           files: app.json
-          prerelease: true
-          make_latest: true
-          tag_name: v0.0.1
-          body: First Release.
+          body: New Release Of Attenex
