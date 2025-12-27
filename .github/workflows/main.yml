@@ -37,7 +37,8 @@ jobs:
 
       - name: Get google-services.json from secrets
         run: |
-          cat << EOF > ./google-services.json
+          mkdir personal
+          cat << EOF > ./personal/google-services.json
           ${{ secrets.GOOGLE_SERVICES_JSON }}
           EOF
 
