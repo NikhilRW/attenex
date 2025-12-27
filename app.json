@@ -94,7 +94,7 @@
           "color": "#000000"
         }
       ],
-      "./plugins/android.manifest.plugin.js"
+      "./plugins/androidManifestPlugin.js"
     ],
     "experiments": {
       "typedRoutes": true,
