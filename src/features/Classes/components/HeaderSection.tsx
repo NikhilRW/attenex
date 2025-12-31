@@ -1,4 +1,4 @@
-import { StatisticsCard } from "@classes/components";
+import StatisticsCard from "@classes/components/StatisticsCard";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { HeaderSectionProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";

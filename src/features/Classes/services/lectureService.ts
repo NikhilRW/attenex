@@ -1,5 +1,5 @@
 import { useAuthStore } from "@shared/stores/authStore";
-import axios from "axios";
+import http from "@shared/utils/http";
 
 const API_URL = `/api/lectures`;
 
@@ -12,7 +12,7 @@ export const createLecture = async (
 ) => {
   const { token } = useAuthStore.getState();
   try {
-    const response = await axios.post(
+    const response = await http.post(
       `${API_URL}/create`,
       {
         lectureName,
@@ -38,7 +38,7 @@ export const createLecture = async (
 export const endLecture = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.put(
+    const response = await http.put(
       `${API_URL}/${lectureId}/end`,
       {},
       {
@@ -56,7 +56,7 @@ export const endLecture = async (lectureId: string) => {
 export const getAllLectures = async () => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/all`, {
+    const response = await http.get(`${API_URL}/all`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ export const getAllLectures = async () => {
 export const getActiveLectures = async () => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/active`, {
+    const response = await http.get(`${API_URL}/active`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -84,7 +84,7 @@ export const getActiveLectures = async () => {
 export const getTeacherClasses = async () => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/classes`, {
+    const response = await http.get(`${API_URL}/classes`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -98,7 +98,7 @@ export const getTeacherClasses = async () => {
 export const getStudentLectureDetails = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/student/${lectureId}`, {
+    const response = await http.get(`${API_URL}/student/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -112,7 +112,7 @@ export const getStudentLectureDetails = async (lectureId: string) => {
 export const getTeacherLectureDetails = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/${lectureId}/details`, {
+    const response = await http.get(`${API_URL}/${lectureId}/details`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -134,7 +134,7 @@ export const updateLecture = async (
 ) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.put(
+    const response = await http.put(
       `${API_URL}/${lectureId}/update`,
       updateData,
       {
@@ -152,7 +152,7 @@ export const updateLecture = async (
 export const deleteLecture = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.delete(`${API_URL}/${lectureId}`, {
+    const response = await http.delete(`${API_URL}/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -166,7 +166,7 @@ export const deleteLecture = async (lectureId: string) => {
 export const fetchLectureAttendance = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/${lectureId}/attendance`, {
+    const response = await http.get(`${API_URL}/${lectureId}/attendance`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -183,7 +183,7 @@ export const addManualAttendance = async (
 ) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.post(
+    const response = await http.post(
       `${API_URL}/${lectureId}/attendance/manual`,
       {
         studentRollNo,
@@ -204,7 +204,7 @@ export const getStudentLectures = async (className: string) => {
   try {
     const { token } = useAuthStore.getState();
     console.log("className : " + className);
-    const response = await axios.get(
+    const response = await http.get(
       `${API_URL}/student/lectures?class=${encodeURI(className)}`,
       {
         headers: {
@@ -221,7 +221,7 @@ export const getStudentLectures = async (className: string) => {
 export const getPasscode = async (lectureId: string) => {
   try {
     const { token } = useAuthStore.getState();
-    const response = await axios.get(`${API_URL}/${lectureId}/passcode`, {
+    const response = await http.get(`${API_URL}/${lectureId}/passcode`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -235,7 +235,7 @@ export const getPasscode = async (lectureId: string) => {
 export const getAllClasses = async () => {
   const { token } = useAuthStore.getState();
   try {
-    const response = await axios.get(`${API_URL}/classes/all`, {
+    const response = await http.get(`${API_URL}/classes/all`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

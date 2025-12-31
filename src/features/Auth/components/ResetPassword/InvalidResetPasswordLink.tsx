@@ -1,4 +1,4 @@
-import { FuturisticButton } from "@auth/components";
+import FuturisticButton from "@auth/components/common/FuturisticButton";
 import { resetPasswordStyles as styles } from "@auth/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";

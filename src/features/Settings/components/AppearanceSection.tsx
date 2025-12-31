@@ -1,4 +1,4 @@
-import { ThemeOption } from "@settings/components";
+import { ThemeOption } from "@settings/components/ThemeOption";
 import { settingsStyles as styles } from "@settings/styles";
 import { AppearanceSectionProps } from "@settings/types";
 import { useTheme } from "@shared/hooks";

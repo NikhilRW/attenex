@@ -1,11 +1,11 @@
+import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
-import axios from "axios";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 
 export const sendVerificationEmail = async (email: string) => {
   try {
-    const response = await axios.post(`/api/users/send-verification-email`, {
+    const response = await http.post(`/api/users/send-verification-email`, {
       email,
     });
     if (response.data.success) {

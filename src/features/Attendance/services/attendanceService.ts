@@ -1,5 +1,5 @@
 import { useAuthStore } from "@shared/stores/authStore";
-import axios from "axios";
+import http from "@shared/utils/http";
 
 const API_URL = `/api/attendance`;
 
@@ -11,7 +11,7 @@ export const joinLecture = async (
 ) => {
   try {
     const token = useAuthStore.getState().token;
-    const response = await axios.post(
+    const response = await http.post(
       `${API_URL}/join`,
       {
         lectureId,
@@ -39,7 +39,7 @@ export const submitAttendance = async (
 ) => {
   try {
     const token = useAuthStore.getState().token;
-    const response = await axios.post(
+    const response = await http.post(
       `${API_URL}/submit`,
       {
         lectureId,
@@ -67,7 +67,7 @@ export const sendPing = async (
   try {
     const token = useAuthStore.getState().token;
     // Silent ping, no error throwing usually
-    await axios.post(
+    await http.post(
       `${API_URL}/ping`,
       {
         lectureId,
