@@ -1,4 +1,5 @@
 import { createMMKV } from "react-native-mmkv";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 
 // Initialize MMKV instance
 export const storage = createMMKV({
@@ -19,3 +20,7 @@ export const mmkvStorage = {
     storage.remove(name);
   },
 };
+
+export const clientPersister = createAsyncStoragePersister({
+  storage: mmkvStorage,
+});

@@ -1,5 +1,6 @@
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
@@ -8,26 +9,10 @@ import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 export const useForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const emailParam = useLocalSearchParams().email;
 
-  const keyboard = useAnimatedKeyboard();
-
-  // Animated style to add padding when keyboard is open
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      paddingBottom: keyboard.height.value + 50,
-    };
-  });
-
-  useEffect(() => {
-    if (emailParam) {
-      setEmail(emailParam as string);
-      setEmailSent(true);
-    }
-  }, [emailParam]);
-  const handleRequestReset = async () => {
+  const sendEmail = async () => {
     if (!email.trim()) {
       showMessage({
         message: "Email Required",
@@ -51,12 +36,13 @@ export const useForgotPassword = () => {
     }
 
     try {
-      setIsLoading(true);
       Keyboard.dismiss();
 
-      await http.post("/api/users/forgot-password", {
+      const res = await http.post("/api/users/forgot-password", {
         email: email.trim().toLowerCase(),
       });
+
+      console.log(res.data);
 
       setEmailSent(true);
 
@@ -67,6 +53,8 @@ export const useForgotPassword = () => {
         duration: 4000,
         position: "bottom",
       });
+
+      return true;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
@@ -79,10 +67,36 @@ export const useForgotPassword = () => {
         duration: 3000,
         position: "bottom",
       });
-    } finally {
-      setIsLoading(false);
+      return undefined;
     }
   };
+
+  const { isLoading, isSuccess, refetch } = useQuery({
+    queryKey: ["forgot-password"] as any,
+    enabled: false,
+    queryFn: sendEmail,
+  });
+
+  const keyboard = useAnimatedKeyboard();
+
+  // Animated style to add padding when keyboard is open
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingBottom: keyboard.height.value + 50,
+    };
+  });
+
+  useEffect(() => {
+    if (emailParam) {
+      setEmail(emailParam as string);
+      setEmailSent(isSuccess);
+    }
+  }, [emailParam, isSuccess]);
+
+  const handleRequestReset = async () => {
+    await refetch();
+  };
+
   return {
     handleRequestReset,
     email,

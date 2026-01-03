@@ -36,6 +36,10 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { setupTanstackForReactNative } from "../shared/utils/tanstack";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { clientPersister } from "../shared/utils";
+import { QueryClient } from "@tanstack/react-query";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -48,6 +52,8 @@ configureReanimatedLogger({
 });
 
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const router = useRouter();
@@ -266,11 +272,14 @@ export default function RootLayout() {
 
     const unsubscribe = onMessage(getMessaging(), handlePushNotification);
 
+    const tanstackCleanUp = setupTanstackForReactNative();
+
     return () => {
       subscription.remove();
       notificationClickSubscription.remove();
       unsubscribe();
       onNotificationOpenedAppListener();
+      tanstackCleanUp();
     };
     // eslint-disable-next-line
   }, []);
@@ -307,11 +316,21 @@ export default function RootLayout() {
         <SafeAreaView
           style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
         >
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(main)" />
-          </Stack>
-          <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+          <PersistQueryClientProvider
+            client={queryClient}
+            onSuccess={() =>
+              queryClient
+                .resumePausedMutations()
+                .then(() => queryClient.invalidateQueries())
+            }
+            persistOptions={{ persister: clientPersister }}
+          >
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(main)" />
+            </Stack>
+            <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+          </PersistQueryClientProvider>
         </SafeAreaView>
       </SafeAreaProvider>
     </>
