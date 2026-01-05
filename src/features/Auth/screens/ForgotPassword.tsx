@@ -24,7 +24,7 @@ const ForgotPassword = () => {
     handleRequestReset,
     email,
     setEmail,
-    isLoading,
+    isPending,
     emailSent,
     animatedStyle,
     emailParam,
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
             <ForgotPasswordForm
               email={email}
               setEmail={setEmail}
-              isLoading={isLoading}
+              isLoading={isPending}
               handleRequestReset={handleRequestReset}
             />
           )}

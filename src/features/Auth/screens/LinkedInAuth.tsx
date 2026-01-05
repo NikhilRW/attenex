@@ -15,6 +15,7 @@ import {
   ShouldStartLoadRequest,
   WebViewNavigation,
 } from "react-native-webview/lib/WebViewTypes";
+import { useMutation } from "@tanstack/react-query";
 /**
  * LinkedIn OAuth Configuration
  * These values must match your LinkedIn Developer App settings
@@ -44,57 +45,6 @@ const LinkedInAuth = () => {
   const { colors } = useTheme();
   const isLogout = useLocalSearchParams().logout === "true";
   const isDeleteAccount = useLocalSearchParams().deleteAccount === "true";
-  /**
-   * Constructs the LinkedIn OAuth authorization URL
-   * This URL opens LinkedIn's login page with our app's configuration
-   *
-   * URL Parameters:
-   * - response_type=code: Requests authorization code (not access token)
-   * - client_id: Our LinkedIn app's client identifier
-   * - redirect_uri: Where LinkedIn redirects after authorization
-   * - scope: Permissions we're requesting (profile, email, openid)
-   */
-  const linkedInAuthUrl =
-    `https://www.linkedin.com/oauth/v2/authorization?` +
-    `response_type=code&` +
-    `client_id=${LINKEDIN_CLIENT_ID}&` +
-    `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-    `scope=${encodeURIComponent(LINKEDIN_SCOPE)}`;
-
-  /**
-   * Handles navigation state changes in the WebView
-   * This is crucial for intercepting the OAuth redirect and preventing
-   * the WebView from navigating to external URLs
-   *
-   * @param event - WebView navigation event containing the target URL
-   * @returns boolean - Whether to allow the navigation
-   */
-
-  const handleNavigationStateChange = (event: ShouldStartLoadRequest) => {
-    const { url } = event;
-
-    // Check if this is our redirect URL containing the authorization code
-    if (url.startsWith(REDIRECT_URI) && url.includes("code=")) {
-      handleAuthCallback(url);
-      return false; // Block navigation to keep user in app
-    }
-
-    // Check for OAuth errors (user denied access, invalid request, etc.)
-    if (url.includes("error=")) {
-      const error = new URL(url).searchParams.get("error_description");
-      showMessage({
-        message: "Sign-in Cancelled",
-        description: error || "You cancelled the LinkedIn sign-in",
-        type: "warning",
-        duration: 3000,
-        position: "bottom",
-      });
-      router.back(); // Return to sign-in screen
-      return false;
-    }
-
-    return true; // Allow normal navigation within LinkedIn's domain
-  };
 
   /**
    * Processes the authorization code from LinkedIn's redirect
@@ -127,8 +77,6 @@ const LinkedInAuth = () => {
   const LINKEDIN_LOGOUT_REDIRECT_URI = "https://www.linkedin.com/m/logout";
   const handleAuthCallback = async (url: string) => {
     try {
-      setIsLoading(true);
-
       // Extract the authorization code from URL query parameters
       const authCode = new URL(url).searchParams.get("code");
 
@@ -223,9 +171,66 @@ const LinkedInAuth = () => {
 
       // Return to sign-in screen on any error
       router.back();
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  /**
+   * Constructs the LinkedIn OAuth authorization URL
+   * This URL opens LinkedIn's login page with our app's configuration
+   *
+   * URL Parameters:
+   * - response_type=code: Requests authorization code (not access token)
+   * - client_id: Our LinkedIn app's client identifier
+   * - redirect_uri: Where LinkedIn redirects after authorization
+   * - scope: Permissions we're requesting (profile, email, openid)
+   */
+  const linkedInAuthUrl =
+    `https://www.linkedin.com/oauth/v2/authorization?` +
+    `response_type=code&` +
+    `client_id=${LINKEDIN_CLIENT_ID}&` +
+    `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+    `scope=${encodeURIComponent(LINKEDIN_SCOPE)}`;
+  const { mutate, isPending } = useMutation({
+    mutationFn: handleAuthCallback,
+  });
+
+  useEffect(() => {
+    setIsLoading(isPending);
+  }, [isPending]);
+
+  /**
+   * Handles navigation state changes in the WebView
+   * This is crucial for intercepting the OAuth redirect and preventing
+   * the WebView from navigating to external URLs
+   *
+   * @param event - WebView navigation event containing the target URL
+   * @returns boolean - Whether to allow the navigation
+   */
+
+  const handleNavigationStateChange = (event: ShouldStartLoadRequest) => {
+    const { url } = event;
+
+    // Check if this is our redirect URL containing the authorization code
+    if (url.startsWith(REDIRECT_URI) && url.includes("code=")) {
+      mutate(url);
+      return false; // Block navigation to keep user in app
+    }
+
+    // Check for OAuth errors (user denied access, invalid request, etc.)
+    if (url.includes("error=")) {
+      const error = new URL(url).searchParams.get("error_description");
+      showMessage({
+        message: "Sign-in Cancelled",
+        description: error || "You cancelled the LinkedIn sign-in",
+        type: "warning",
+        duration: 3000,
+        position: "bottom",
+      });
+      router.back(); // Return to sign-in screen
+      return false;
+    }
+
+    return true; // Allow normal navigation within LinkedIn's domain
   };
 
   const handleLinkedInLogout = async (event: WebViewNavigation) => {

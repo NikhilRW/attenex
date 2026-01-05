@@ -1,6 +1,6 @@
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
@@ -71,10 +71,8 @@ export const useForgotPassword = () => {
     }
   };
 
-  const { isLoading, isSuccess, refetch } = useQuery({
-    queryKey: ["forgot-password"] as any,
-    enabled: false,
-    queryFn: sendEmail,
+  const { mutateAsync, isSuccess, isPending } = useMutation({
+    mutationFn: sendEmail,
   });
 
   const keyboard = useAnimatedKeyboard();
@@ -94,14 +92,14 @@ export const useForgotPassword = () => {
   }, [emailParam, isSuccess]);
 
   const handleRequestReset = async () => {
-    await refetch();
+    await mutateAsync();
   };
 
   return {
     handleRequestReset,
     email,
     setEmail,
-    isLoading,
+    isPending,
     emailSent,
     animatedStyle,
     emailParam,
