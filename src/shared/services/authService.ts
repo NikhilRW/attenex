@@ -38,6 +38,7 @@ export const authService = {
     }
     useAuthStore.getState().logout();
     if (user && user.oauthProvider === "linkedin") {
+      // queryClient.invalidateQueries({queryKey:"})
       return;
     }
     router.replace("/sign-in");

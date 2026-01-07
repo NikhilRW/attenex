@@ -1,11 +1,14 @@
+import { queryKeys } from "@/src/shared/constants/queryKeys";
+import { StaleTime } from "@/src/shared/constants/staleTime";
 import {
   ResetPasswordFormData,
   resetPasswordSchema,
 } from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import http from "@shared/utils/http";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
@@ -20,9 +23,6 @@ export const useResetPassword = () => {
 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [isVerifying, setIsVerifying] = useState(true);
-  const [isValid, setIsValid] = useState(false);
 
   const {
     control,
@@ -40,54 +40,53 @@ export const useResetPassword = () => {
   const newPassword = watch("newPassword");
   const confirmPassword = watch("confirmPassword");
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      const tokenParam = params.token as string;
-      const emailParam = params.email as string;
+  const verifyToken = async () => {
+    const tokenParam = params.token as string;
+    const emailParam = params.email as string;
 
-      if (!tokenParam || !emailParam) {
-        showMessage({
-          message: "Invalid Link",
-          description: "The reset link is invalid or incomplete",
-          type: "danger",
-          duration: 3000,
-          position: "bottom",
-        });
-        setIsVerifying(false);
-        return;
-      }
+    if (!tokenParam || !emailParam) {
+      showMessage({
+        message: "Invalid Link",
+        description: "The reset link is invalid or incomplete",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      return false;
+    }
 
-      setToken(tokenParam);
-      setEmail(emailParam);
+    setToken(tokenParam);
+    setEmail(emailParam);
 
-      try {
-        const response = await http.post("/api/users/verify-reset-token", {
-          email: emailParam,
-          token: tokenParam,
-        });
+    try {
+      const response = await http.post("/api/users/verify-reset-token", {
+        email: emailParam,
+        token: tokenParam,
+      });
 
-        setUserName(response.data.userName || "");
-        setIsValid(true);
-      } catch (error: any) {
-        const errorMessage =
-          error.response?.data?.error ||
-          "This reset link is invalid or has expired";
+      setUserName(response.data.userName || "");
+      return true;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error ||
+        "This reset link is invalid or has expired";
 
-        showMessage({
-          message: "Invalid Link",
-          description: errorMessage,
-          type: "danger",
-          duration: 4000,
-          position: "bottom",
-        });
-        setIsValid(false);
-      } finally {
-        setIsVerifying(false);
-      }
-    };
+      showMessage({
+        message: "Invalid Link",
+        description: errorMessage,
+        type: "danger",
+        duration: 4000,
+        position: "bottom",
+      });
+      return false;
+    }
+  };
 
-    verifyToken();
-  }, [params.token, params.email]);
+  const { data: isValid, isFetching: isVerifying } = useQuery({
+    queryFn: verifyToken,
+    queryKey: queryKeys.resetPassword,
+    staleTime: StaleTime.SECONDS_7,
+  });
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {

@@ -39,7 +39,7 @@ import {
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { clientPersister } from "../shared/utils";
-import { QueryClient } from "@tanstack/react-query";
+import { queryClient } from "../shared/constants/tanstack";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -52,8 +52,6 @@ configureReanimatedLogger({
 });
 
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const router = useRouter();

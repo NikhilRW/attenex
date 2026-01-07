@@ -15,7 +15,7 @@ const InvalidResetPasswordLink = () => {
     <View
       style={[styles.container, { backgroundColor: colors.background.primary }]}
     >
-      <StatusBar style={isDark ? "light" : "dark"} />
+      <StatusBar style={isDark ? "dark" : "dark"} />
       <FuturisticBackground />
       <View style={styles.errorContainer}>
         <View

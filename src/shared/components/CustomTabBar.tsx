@@ -84,7 +84,7 @@ const CustomTabBar = ({
         styles.container,
         {
           display: isEmptyTabBar ? "none" : isAuthenticated ? "flex" : "none",
-          bottom: bottom,
+          bottom: bottom - 20,
           backgroundColor: colors.surface.cardBg,
           borderColor: colors.surface.glassBorder,
         },

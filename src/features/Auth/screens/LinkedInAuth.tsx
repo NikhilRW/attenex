@@ -104,8 +104,6 @@ const LinkedInAuth = () => {
 
       const { user, token } = exchange;
 
-      console.log("linkedin token : " + token);
-
       // Store user data and JWT token using the auth hook
       await authService.login(user, token);
 
