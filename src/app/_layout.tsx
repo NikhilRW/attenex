@@ -309,28 +309,26 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
+      >
+        <PersistQueryClientProvider
+          client={queryClient}
+          onSuccess={() =>
+            queryClient
+              .resumePausedMutations()
+              .then(() => queryClient.invalidateQueries())
+          }
+          persistOptions={{ persister: clientPersister }}
         >
-          <PersistQueryClientProvider
-            client={queryClient}
-            onSuccess={() =>
-              queryClient
-                .resumePausedMutations()
-                .then(() => queryClient.invalidateQueries())
-            }
-            persistOptions={{ persister: clientPersister }}
-          >
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(main)" />
-            </Stack>
-            <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
-          </PersistQueryClientProvider>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(main)" />
+          </Stack>
+          <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+        </PersistQueryClientProvider>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

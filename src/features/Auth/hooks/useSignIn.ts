@@ -15,13 +15,15 @@ export const useSignIn = () => {
   const params = useLocalSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  // const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
-  const authType: "logout" | "login" | "deleteAccount" =
-    params.linkedinLogout === "true"
-      ? "logout"
-      : params.linkedinDeleteAccount === "true"
-        ? "deleteAccount"
-        : "login";
+  let authType: "logout" | "login" | "deleteAccount";
+
+  if (params.linkedinLogout === "true") {
+    authType = "logout";
+  } else if (params.linkedinDeleteAccount === "true") {
+    authType = "deleteAccount";
+  } else {
+    authType = "logout";
+  }
 
   // Redirect to main stack if user is already authenticated
   const { isAuthenticated, isLoading: authLoading } = useAuthStore(
@@ -42,12 +44,6 @@ export const useSignIn = () => {
       if (path !== "/(auth)/sign-in") {
         router.replace(path);
       }
-    }
-    if (
-      (authType === "deleteAccount" || authType === "logout") &&
-      isAuthenticated
-    ) {
-      // setIsLinkedInModalVisible(true);
     }
     if (params.verified === "true") {
       showMessage({
@@ -97,8 +93,6 @@ export const useSignIn = () => {
     setRememberMe,
     handleForgotPassword,
     handleSignUp,
-    // isLinkedInModalVisible,
-    // setIsLinkedInModalVisible,
     authType,
   };
 };

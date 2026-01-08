@@ -1,4 +1,5 @@
 import { User } from "@/backend/src/config/database_setup";
+import { getStartingScreenPath } from "@/src/shared/utils";
 import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
 import { authService } from "@shared/services/authService";
@@ -260,8 +261,6 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
       password: data.password!,
     });
 
-    console.log("user : " + JSON.stringify(user));
-
     if (user.isVerified === false) {
       showMessage({
         message: "Email Not Verified",
@@ -300,19 +299,18 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
 
     // // Replace to main stack after successful signin
-    // useAuthStore.subscribe((newState, prevState) => {
-    //   console.log("I am here");
-    //   if (newState.user && prevState.user === null) {
-    //     router.replace(getStartingScreenPath());
-    //   }
-    // });
+    useAuthStore.subscribe((newState, prevState) => {
+      if (newState.user && prevState.user === null) {
+        router.replace(getStartingScreenPath());
+      }
+    });
   } catch (err) {
     const e = err as any;
 
     // Parse user-friendly error message
     let errorMessage = "Unable to sign in. Please check your credentials.";
 
-    if (e.response?.status === 401) {
+    if (e.response!.status === 401) {
       errorMessage = "Invalid email or password. Please try again.";
     } else if (e.response?.status === 400) {
       errorMessage =
@@ -325,6 +323,8 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
         "Unable to connect. Please check your internet connection.";
     } else if (e.response?.data?.error) {
       errorMessage = e.response.data.error;
+    } else if (e.response.status === 429) {
+      errorMessage = e.response.data;
     }
 
     showMessage({

@@ -14,4 +14,5 @@ export const queryKeys = {
     withId: (id: string) => ["lectures", id] as const,
   },
   resetPassword: ["reset-password"],
+  verifyEmail: ["verify-email"],
 };

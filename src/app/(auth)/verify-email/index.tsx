@@ -1,5 +1,5 @@
 import React from "react";
-import VerifyEmail from "@/src/features/Auth/screens/VerifyEmail";
+import VerifyEmail from "@auth/screens/VerifyEmail";
 
 const index = () => {
   return <VerifyEmail />;

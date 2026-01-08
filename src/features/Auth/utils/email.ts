@@ -1,13 +1,19 @@
 import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
+import { AxiosResponse } from "axios";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 
-export const sendVerificationEmail = async (email: string) => {
+export const sendVerificationEmailRequest = async (email: string) => {
+  return await http.post(`/api/users/send-verification-email`, {
+    email,
+  });
+};
+
+export const handleVerificationEmailResponse = async (
+  response: AxiosResponse<any, any>
+) => {
   try {
-    const response = await http.post(`/api/users/send-verification-email`, {
-      email,
-    });
     if (response.data.success) {
       showMessage({
         message: "Verification Email Sent",

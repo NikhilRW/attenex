@@ -117,7 +117,7 @@ const SignIn = () => {
             linkText="Create Account"
             onLinkPress={handleSignUp}
           />
-          {/* Implementing PCKE For Now. */}
+          {/* Not Implementing PCKE For Now. */}
           {/* <LinkedInAuthComponent
             authType={authType}
             isLinkedInModalVisible={isLinkedInModalVisible}

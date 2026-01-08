@@ -13,7 +13,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "@shared/hooks/useTheme";
 import { useAuthStore } from "@shared/stores/authStore";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 80;
@@ -72,8 +71,6 @@ const CustomTabBar = ({
     };
   });
 
-  const { bottom } = useSafeAreaInsets();
-
   if (user === null) {
     return null;
   }
@@ -84,8 +81,8 @@ const CustomTabBar = ({
         styles.container,
         {
           display: isEmptyTabBar ? "none" : isAuthenticated ? "flex" : "none",
-          bottom: bottom - 20,
           backgroundColor: colors.surface.cardBg,
+          bottom: 0,
           borderColor: colors.surface.glassBorder,
         },
       ]}
