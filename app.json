@@ -1,6 +1,5 @@
 {
   "expo": {
-
     "name": "Attenex",
     "slug": "attenex",
     "version": "1.0.0",
@@ -36,7 +35,10 @@
               "pathPrefix": "/auth"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "package": "com.attenex.attenex",
@@ -54,7 +56,6 @@
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },
-    
     "plugins": [
       "expo-router",
       [
@@ -73,7 +74,6 @@
           "dark": {
             "backgroundColor": "#000000"
           }
-          
         }
       ],
       "@react-native-google-signin/google-signin",
@@ -97,7 +97,8 @@
           "color": "#000000"
         }
       ],
-      "./plugins/androidManifestPlugin.js"
+      "./plugins/androidManifestPlugin.js",
+      "react-native-edge-to-edge"
     ],
     "experiments": {
       "typedRoutes": true,

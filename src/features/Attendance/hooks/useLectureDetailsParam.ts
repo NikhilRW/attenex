@@ -1,4 +1,5 @@
 import { getStudentLectureDetails } from "@/src/features/Classes/services/lectureService";
+import { queryKeys } from "@/src/shared/constants/queryKeys";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
@@ -6,8 +7,8 @@ import {
 import { Lecture } from "@attendance/types/common";
 import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert } from "@attendance/utils/alertUtils";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -17,59 +18,60 @@ export const useLectureDetailsParam = (
   onJoinLecture: (lecture: any) => Promise<void>
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
-  const [fetchingLectureDetails, setFetchingLectureDetails] = useState(false);
 
-  useEffect(() => {
-    const fetchAndJoinLecture = async () => {
-      if (lectureId) {
-        // First check if we already have the lecture in our list
-        const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
+  const fetchAndJoinLecture = async () => {
+    if (lectureId) {
+      // First check if we already have the lecture in our list
+      const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
 
-        if (lectureToJoin) {
-          await onJoinLecture(lectureToJoin);
-        } else {
-          // Fetch lecture details from API if not in list
-          setFetchingLectureDetails(true);
-          try {
-            console.log(LOG_MESSAGES.FETCHING_DETAILS, lectureId);
-            const res = await getStudentLectureDetails(lectureId as string);
+      if (lectureToJoin) {
+        await onJoinLecture(lectureToJoin);
+      } else {
+        // Fetch lecture details from API if not in list
+        try {
+          console.log(LOG_MESSAGES.FETCHING_DETAILS, lectureId);
+          const res = await getStudentLectureDetails(lectureId as string);
 
-            if (res.success && res.data) {
-              console.log(LOG_MESSAGES.DETAILS_FETCHED, res.data);
-              const lectureData = {
-                id: res.data.id,
-                title: res.data.title,
-                className: res.data.classname,
-                startedAt: res.data.startedAt,
-              };
-              await onJoinLecture(lectureData);
-            } else {
-              console.log(LOG_MESSAGES.DETAILS_FAILED);
-              showErrorAlert(
-                ALERT_MESSAGES.LECTURE_DETAILS_FAILED.title,
-                ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
-              );
-              // Still try to join with minimal data
-              await onJoinLecture({ id: lectureId });
-            }
-          } catch (error: any) {
-            console.error(LOG_MESSAGES.DETAILS_ERROR, error);
+          if (res.success && res.data) {
+            console.log(LOG_MESSAGES.DETAILS_FETCHED, res.data);
+            const lectureData = {
+              id: res.data.id,
+              title: res.data.title,
+              className: res.data.classname,
+              startedAt: res.data.startedAt,
+            };
+            await onJoinLecture(lectureData);
+          } else {
+            console.log(LOG_MESSAGES.DETAILS_FAILED);
             showErrorAlert(
               ALERT_MESSAGES.LECTURE_DETAILS_FAILED.title,
-              error.message || ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
+              ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
             );
-            // Fallback: try to join with just the ID
+            // Still try to join with minimal data
             await onJoinLecture({ id: lectureId });
-          } finally {
-            setFetchingLectureDetails(false);
           }
+          return true;
+        } catch (error: any) {
+          console.error(LOG_MESSAGES.DETAILS_ERROR, error);
+          showErrorAlert(
+            ALERT_MESSAGES.LECTURE_DETAILS_FAILED.title,
+            error.message || ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
+          );
+          // Fallback: try to join with just the ID
+          await onJoinLecture({ id: lectureId });
+          return false;
         }
       }
-    };
+    }
+    return false;
+  };
 
-    fetchAndJoinLecture();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lectureId]);
+  const { isFetching: fetchingLectureDetails } = useQuery({
+    queryFn: fetchAndJoinLecture,
+    queryKey: queryKeys.joinLectureWithNotification,
+    enabled: true,
+    retry: false,
+  });
 
   return {
     fetchingLectureDetails,

@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/src/shared/constants/mutationKeys";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { joinLecture } from "@attendance/services/attendanceService";
 import {
@@ -19,6 +20,7 @@ import {
   requestLocationPermission,
 } from "@attendance/utils/locationUtils";
 import { useAuthStore } from "@shared/stores/authStore";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
 /**
@@ -30,20 +32,20 @@ export const useAttendanceJoin = (
   const { user, updateUser } = useAuthStore();
   const [joinedLecture, setJoinedLecture] = useState<Lecture | null>(null);
   const [status, setStatus] = useState<JoinStatus>("idle");
-  const [loading, setLoading] = useState(false);
-
-  const proceedWithJoin = useCallback(
-    async (lecture: Lecture, studentRollNo: string) => {
-      setLoading(true);
+  const proceedWithJoinMutation = useCallback(
+    async ({
+      lecture,
+      studentRollNo,
+    }: {
+      lecture: Lecture;
+      studentRollNo: string;
+    }) => {
       try {
-        // Persist roll number BEFORE attempting to join
-        // This ensures it's saved even if the join fails
         updateUser({ rollNo: studentRollNo });
 
         const hasPermission = await requestLocationPermission();
         if (!hasPermission) {
-          setLoading(false);
-          return;
+          return false;
         }
 
         const location = await getCurrentLocation();
@@ -69,18 +71,23 @@ export const useAttendanceJoin = (
           // Start Background Task
           await startBackgroundTracking(lecture.id);
         }
+        return true;
       } catch (error: any) {
         console.log(error);
         showErrorAlert(
           ALERT_MESSAGES.JOIN_FAILED.title,
           error.message || ALERT_MESSAGES.JOIN_FAILED.message
         );
-      } finally {
-        setLoading(false);
+        return false;
       }
     },
     [updateUser]
   );
+
+  const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
+    mutationFn: proceedWithJoinMutation,
+    mutationKey: mutationKeys.lectureJoin,
+  });
 
   const handleJoin = useCallback(
     async (lecture: Lecture) => {
@@ -90,7 +97,7 @@ export const useAttendanceJoin = (
         return;
       }
 
-      await proceedWithJoin(lecture, user.rollNo);
+      await proceedWithJoin({ lecture, studentRollNo: user.rollNo });
     },
     [proceedWithJoin, user, onRollNoRequired]
   );

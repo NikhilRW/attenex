@@ -4,8 +4,24 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     env: {
       production: {
-        plugins: ["transform-remove-console"],
+        plugins: [
+          "transform-remove-console",
+          [
+            "react-native-unistyles/plugin",
+            {
+              root: "src",
+            },
+          ],
+        ],
       },
     },
+    plugins: [
+      [
+        "react-native-unistyles/plugin",
+        {
+          root: "src",
+        },
+      ],
+    ],
   };
 };

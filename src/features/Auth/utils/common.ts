@@ -99,6 +99,13 @@ export const handleGoogleSignIn = async () => {
         `Google sign-in successful for user: ${newUser.data.user?.email}`,
         "common.ts :: handleGoogleSignIn()"
       );
+
+      // Navigate to the main stack (replace to avoid back navigation to auth)
+      useAuthStore.subscribe((newState, prevState) => {
+        if (newState.user && prevState.user === null) {
+          router.replace(getStartingScreenPath());
+        }
+      });
     } else {
       showMessage({
         message: "Sign-in Failed",
@@ -109,12 +116,6 @@ export const handleGoogleSignIn = async () => {
       });
       return;
     }
-    // Navigate to the main stack (replace to avoid back navigation to auth)
-    // useAuthStore.subscribe((newState, prevState) => {
-    //   if (newState.user && prevState.user === null) {
-    //     router.replace(getStartingScreenPath());
-    //   }
-    // });
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;

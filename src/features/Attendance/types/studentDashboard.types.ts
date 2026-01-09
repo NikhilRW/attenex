@@ -30,7 +30,10 @@ export interface UseAttendanceJoinReturn {
   handleLeaveLecture: (onLectureLeft: () => void) => Promise<void>;
   setJoinedLecture: Dispatch<SetStateAction<Lecture | null>>;
   setStatus: Dispatch<SetStateAction<JoinStatus>>;
-  proceedWithJoin: (lecture: Lecture, studentRollNo: string) => Promise<void>;
+  proceedWithJoin: (data: {
+    lecture: Lecture;
+    studentRollNo: string;
+  }) => Promise<boolean>;
 }
 
 export interface UseAttendanceSubmitReturn {
@@ -64,7 +67,9 @@ export interface UseRollNoManagementReturn {
   setRollNo: Dispatch<SetStateAction<string>>;
   setShowRollNoModal: Dispatch<SetStateAction<boolean>>;
   setPendingLecture: Dispatch<SetStateAction<Lecture | null>>;
-  handleRollNoSubmit: (onSubmit: (rollNo: string) => Promise<void>) => Promise<void>;
+  handleRollNoSubmit: (
+    onSubmit: (rollNo: string) => Promise<void>
+  ) => Promise<void>;
   requestRollNo: (lecture: Lecture) => void;
 }
 

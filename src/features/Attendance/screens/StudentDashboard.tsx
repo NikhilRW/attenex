@@ -90,7 +90,10 @@ const StudentDashboard = () => {
   const onRollNoSubmit = useCallback(
     async (studentRollNo: string) => {
       if (pendingLecture) {
-        await proceedWithJoin(pendingLecture, studentRollNo);
+        await proceedWithJoin({
+          lecture: pendingLecture,
+          studentRollNo: studentRollNo,
+        });
       }
     },
     [pendingLecture, proceedWithJoin]
