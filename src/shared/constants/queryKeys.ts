@@ -16,4 +16,5 @@ export const queryKeys = {
   resetPassword: ["reset-password"],
   verifyEmail: ["verify-email"],
   joinLectureWithNotification: ["join-lecture-using-notification"],
+  sendForgotPasswordEmail: ["send-forgot-password-email"],
 };

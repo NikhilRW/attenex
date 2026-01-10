@@ -12,7 +12,6 @@ export const useForgotPassword = () => {
   const [emailSent, setEmailSent] = useState(false);
   const emailParam = useLocalSearchParams().email;
 
-  // TODO: Implement Rate Limiting In The Backend.
   const sendEmail = async () => {
     if (!email.trim()) {
       showMessage({
