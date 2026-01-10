@@ -40,6 +40,7 @@ import { setupTanstackForReactNative } from "../shared/utils/tanstack";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { clientPersister } from "../shared/utils";
 import { queryClient } from "../shared/constants/tanstack";
+import { queryKeys } from "../shared/constants/queryKeys";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -256,6 +257,9 @@ export default function RootLayout() {
       remoteMessage: FirebaseMessagingTypes.RemoteMessage
     ) => {
       // Schedule the notification with a null trigger to show immediately
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fetctLectureForStudent,
+      });
       if (!remoteMessage.data?.ended) {
         await scheduleNotificationAsync({
           content: buildAttenexNotificationContent(remoteMessage),

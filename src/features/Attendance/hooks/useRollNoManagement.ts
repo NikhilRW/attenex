@@ -1,8 +1,11 @@
+import { GarbageTime } from "@/src/shared/constants/tanstackConfig";
+import { logger } from "@/src/shared/utils";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { validateRollNo } from "@attendance/utils/validationUtils";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 /**
@@ -13,22 +16,37 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
 
-  const handleRollNoSubmit = async (
+  const handleRollNoSubmitMutateFn = async (
     onSubmit: (rollNo: string) => Promise<void>
   ) => {
     if (!validateRollNo(rollNo)) {
-      showErrorAlert(
-        ALERT_MESSAGES.ROLLNO_REQUIRED.title,
-        ALERT_MESSAGES.ROLLNO_REQUIRED.message
-      );
-      return;
+      return false;
     }
-
     setShowRollNoModal(false);
     await onSubmit(rollNo.trim());
-    setPendingLecture(null);
-    setRollNo("");
+    return true;
   };
+
+  const { mutate: handleRollNoSubmit } = useMutation({
+    mutationFn: handleRollNoSubmitMutateFn,
+    gcTime: GarbageTime.SECONDS_30,
+    onSuccess: () => {
+      setPendingLecture(null);
+      setRollNo("");
+    },
+    onSettled: (data) => {
+      if (data === false) {
+        showErrorAlert(
+          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.title,
+          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.message
+        );
+      }
+    },
+    onError: (error) => {
+      logger.error(error.message);
+      showErrorAlert("Roll no not updated successfully", "Kindly try again");
+    },
+  });
 
   const requestRollNo = (lecture: Lecture) => {
     setPendingLecture(lecture);

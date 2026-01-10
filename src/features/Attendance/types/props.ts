@@ -18,6 +18,7 @@ export interface LectureEndedProps {
 export interface LectureOngoingProps {
   handleLeaveLecture: () => Promise<void>;
   joinedLecture: Lecture;
+  loading: boolean;
 }
 
 // MainScreen Components

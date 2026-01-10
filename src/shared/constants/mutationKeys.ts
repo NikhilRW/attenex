@@ -1,3 +1,4 @@
 export const mutationKeys = {
-    lectureJoin:["lecture-join"]
-}
+  lectureJoin: ["lecture-join"],
+  studentAttendanceSubmit: ["student-attendance-submit"],
+};

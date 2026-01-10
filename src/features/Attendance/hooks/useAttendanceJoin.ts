@@ -29,9 +29,10 @@ import { useCallback, useState } from "react";
 export const useAttendanceJoin = (
   onRollNoRequired: (lecture: Lecture) => void
 ): UseAttendanceJoinReturn => {
-  const { user, updateUser } = useAuthStore();
+  const { user } = useAuthStore();
   const [joinedLecture, setJoinedLecture] = useState<Lecture | null>(null);
   const [status, setStatus] = useState<JoinStatus>("idle");
+
   const proceedWithJoinMutation = useCallback(
     async ({
       lecture,
@@ -40,53 +41,76 @@ export const useAttendanceJoin = (
       lecture: Lecture;
       studentRollNo: string;
     }) => {
-      try {
-        updateUser({ rollNo: studentRollNo });
-
-        const hasPermission = await requestLocationPermission();
-        if (!hasPermission) {
-          return false;
-        }
-
-        const location = await getCurrentLocation();
-        if (!location) {
-          throw new Error("Could not get current location");
-        }
-
-        const res = await joinLecture(
-          lecture.id,
-          location.latitude,
-          location.longitude,
-          studentRollNo
-        );
-
-        if (res.success) {
-          setJoinedLecture(lecture);
-          setStatus("joined");
-          showSuccessAlert(
-            ALERT_MESSAGES.JOINED.title,
-            ALERT_MESSAGES.JOINED.message
-          );
-
-          // Start Background Task
-          await startBackgroundTracking(lecture.id);
-        }
-        return true;
-      } catch (error: any) {
-        console.log(error);
-        showErrorAlert(
-          ALERT_MESSAGES.JOIN_FAILED.title,
-          error.message || ALERT_MESSAGES.JOIN_FAILED.message
-        );
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
         return false;
       }
+
+      const location = await getCurrentLocation();
+      if (!location) {
+        throw new Error("Could not get current location");
+      }
+      console.log("Optimistic Update For lecture Join");
+
+      const res = await joinLecture(
+        lecture.id,
+        location.latitude,
+        location.longitude,
+        studentRollNo
+      );
+      return {
+        res,
+        lecture,
+      };
     },
-    [updateUser]
+    []
   );
 
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
     mutationFn: proceedWithJoinMutation,
     mutationKey: mutationKeys.lectureJoin,
+    onMutate: ({ lecture }) => {
+      setJoinedLecture(lecture);
+      setStatus("joined");
+    },
+    onSuccess: async (data) => {
+      if (data === false) {
+        return false;
+      }
+      const { res, lecture } = data;
+      if (res.success) {
+        setJoinedLecture(lecture);
+        showSuccessAlert(
+          ALERT_MESSAGES.JOINED.title,
+          ALERT_MESSAGES.JOINED.message
+        );
+        // Start Background Task
+        await startBackgroundTracking(lecture.id);
+      } else {
+        setJoinedLecture(null);
+      }
+      return true;
+    },
+    onSettled(data) {
+      if (data === false) {
+        setJoinedLecture(null);
+        setStatus("idle");
+        showErrorAlert(
+          ALERT_MESSAGES.JOIN_FAILED.title,
+          ALERT_MESSAGES.JOIN_FAILED.message
+        );
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+      setJoinedLecture(null);
+      setStatus("idle");
+      showErrorAlert(
+        ALERT_MESSAGES.JOIN_FAILED.title,
+        error.message || ALERT_MESSAGES.JOIN_FAILED.message
+      );
+      return false;
+    },
   });
 
   const handleJoin = useCallback(

@@ -30,7 +30,7 @@ const StudentDashboard = () => {
   const { user } = useAuthStore();
 
   // Lecture management
-  const { lectures, fetchLectures } = useLectureManagement();
+  const { lectures, fetchLectures, refreshLectures } = useLectureManagement();
 
   // Roll number management
   const {
@@ -62,7 +62,7 @@ const StudentDashboard = () => {
     loading: submitLoading,
     setPasscode,
     handleSubmit,
-  } = useAttendanceSubmit();
+  } = useAttendanceSubmit(proceedWithJoin);
 
   // Socket manager
   const { lectureStatus, setLectureStatus } = useSocketManager(
@@ -118,6 +118,7 @@ const StudentDashboard = () => {
     fetchLectures();
   }, [joinedLecture, setJoinedLecture, setStatus, fetchLectures]);
 
+
   // Show loading screen while fetching lecture details
   if (fetchingLectureDetails) {
     return <LoadingScreen />;
@@ -129,6 +130,7 @@ const StudentDashboard = () => {
       <LectureOngoing
         joinedLecture={joinedLecture!}
         handleLeaveLecture={() => handleLeaveLecture(onLeaveLecture)}
+        loading={joinLoading}
       />
     );
   }
@@ -141,7 +143,10 @@ const StudentDashboard = () => {
         passcode={passcode}
         setPasscode={setPasscode}
         handleSubmit={() =>
-          handleSubmit(joinedLecture!, onAttendanceSubmitSuccess)
+          handleSubmit({
+            joinedLecture: joinedLecture!,
+            onSuccess: onAttendanceSubmitSuccess,
+          })
         }
         loading={submitLoading}
       />
@@ -163,8 +168,8 @@ const StudentDashboard = () => {
 
       {!user?.className ? (
         <NoClassSelected setShowClassModal={setShowClassModal} />
-      ) : lectures.length === 0 ? (
-        <NoLectureFound fetchLectures={fetchLectures} />
+      ) : !lectures || lectures.length === 0 ? (
+        <NoLectureFound fetchLectures={refreshLectures} />
       ) : (
         lectures.map((lecture) => (
           <OnGoingLecture

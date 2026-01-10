@@ -1,5 +1,5 @@
-import { StaleTime } from "@/src/shared/constants/tanstackConfig";
 import { queryKeys } from "@/src/shared/constants/queryKeys";
+import { StaleTime } from "@/src/shared/constants/tanstackConfig";
 import {
   ResetPasswordFormData,
   resetPasswordSchema,
@@ -85,7 +85,7 @@ export const useResetPassword = () => {
   const { data: isValid, isFetching: isVerifying } = useQuery({
     queryFn: verifyToken,
     queryKey: queryKeys.resetPassword,
-    staleTime: StaleTime.SECONDS_7,
+    staleTime: StaleTime.SECONDS_3,
   });
 
   const onSubmit = async (data: ResetPasswordFormData) => {

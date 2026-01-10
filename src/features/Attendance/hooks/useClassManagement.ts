@@ -5,6 +5,7 @@ import { validateClassName } from "@attendance/utils/validationUtils";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { storage } from "@shared/utils/mmkvStorage";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 /**
@@ -13,14 +14,13 @@ import { useState } from "react";
 export const useClassManagement = (
   onClassUpdated: () => void
 ): UseClassManagementReturn => {
-  const { user } = useAuthStore();
-  const [className, setClassName] = useState(
-    (user as any)?.className || storage.getString("userClassName") || ""
-  );
+  const { user, updateUser } = useAuthStore();
+  const defaultClassName =
+    (user as any)?.className || storage.getString("userClassName") || "";
+  const [className, setClassName] = useState(defaultClassName);
   const [showClassModal, setShowClassModal] = useState(false);
-  const [classUpdateLoading, setClassUpdateLoading] = useState(false);
 
-  const handleUpdateClass = async () => {
+  const handleUpdateClassMutateFn = async () => {
     if (!validateClassName(className)) {
       showErrorAlert(
         ALERT_MESSAGES.CLASS_REQUIRED.title,
@@ -28,29 +28,44 @@ export const useClassManagement = (
       );
       return;
     }
+    const response = await authService.updateStudentClass(className.trim());
+    return response;
+  };
 
-    setClassUpdateLoading(true);
-    try {
-      const response = await authService.updateStudentClass(className.trim());
-      if (response.success) {
-        // Save to storage for persistence
-        storage.set("userClassName", className.trim());
-        showSuccessAlert(
-          ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.title,
-          ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.message
-        );
+  const { mutateAsync: handleUpdateClass, isPending: classUpdateLoading } =
+    useMutation({
+      mutationFn: handleUpdateClassMutateFn,
+      mutationKey: ["update-student-class"],
+      onMutate: () => {
         setShowClassModal(false);
         onClassUpdated();
-      }
-    } catch (error: any) {
-      showErrorAlert(
-        ALERT_MESSAGES.CLASS_UPDATE_FAILED.title,
-        error.message || ALERT_MESSAGES.CLASS_UPDATE_FAILED.message
-      );
-    } finally {
-      setClassUpdateLoading(false);
-    }
-  };
+        let contextClassName = user?.className;
+        updateUser({ className: className.trim() });
+        return contextClassName;
+      },
+      onSuccess(response) {
+        if (response && response.success) {
+          storage.set("userClassName", className.trim());
+          showSuccessAlert(
+            ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.title,
+            ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.message
+          );
+          setShowClassModal(false);
+          onClassUpdated();
+        }
+      },
+      onSettled(data, error, _, contextClassName) {
+        if (!data?.success || error) {
+          updateUser({ className: contextClassName });
+          setClassName(contextClassName);
+          showErrorAlert(
+            ALERT_MESSAGES.CLASS_UPDATE_FAILED.title,
+            (error && error.message) ||
+              ALERT_MESSAGES.CLASS_UPDATE_FAILED.message
+          );
+        }
+      },
+    });
 
   return {
     className,

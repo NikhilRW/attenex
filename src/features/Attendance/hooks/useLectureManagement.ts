@@ -1,19 +1,20 @@
 import { getStudentLectures } from "@/src/features/Classes/services/lectureService";
+import { queryKeys } from "@/src/shared/constants/queryKeys";
+import { GarbageTime, StaleTime } from "@/src/shared/constants/tanstackConfig";
 import {
   LECTURE_AUTO_REFRESH_INTERVAL,
   LOG_MESSAGES,
 } from "@attendance/constants/studentDashboard.constants";
-import { Lecture } from "@attendance/types/common";
 import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.types";
 import { useAuthStore } from "@shared/stores/authStore";
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh
  */
 export const useLectureManagement = (): UseLectureManagementReturn => {
   const { user } = useAuthStore();
-  const [lectures, setLectures] = useState<Lecture[]>([]);
 
   const fetchLectures = useCallback(async () => {
     try {
@@ -26,45 +27,32 @@ export const useLectureManagement = (): UseLectureManagementReturn => {
 
       if (!userClassName) {
         console.log(LOG_MESSAGES.NO_CLASSNAME);
-        setLectures([]);
-        return;
+        return [];
       }
 
       const res = await getStudentLectures(userClassName);
       console.log(LOG_MESSAGES.LECTURES_RESPONSE, res);
 
       if (res.success) {
-        setLectures(res.data || []);
         console.log(LOG_MESSAGES.LECTURES_SET, res.data?.length || 0);
+        return res.data || [];
       } else {
         console.log(LOG_MESSAGES.API_FAILED, res.message);
-        setLectures([]);
+        return [];
       }
     } catch (error) {
       console.log(LOG_MESSAGES.FETCH_ERROR, error);
-      setLectures([]);
+      return [];
     }
   }, [user]);
 
-  const refreshLectures = useCallback(() => {
-    console.log(LOG_MESSAGES.AUTO_REFRESH);
-    fetchLectures();
-  }, [fetchLectures]);
-
-  // Auto-reload lectures when user changes and every 30 seconds
-  useEffect(() => {
-    fetchLectures();
-
-    const intervalId = setInterval(
-      refreshLectures,
-      LECTURE_AUTO_REFRESH_INTERVAL
-    );
-
-    return () => {
-      clearInterval(intervalId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, fetchLectures]);
+  const { data: lectures, refetch: refreshLectures } = useQuery({
+    queryFn: fetchLectures,
+    queryKey: queryKeys.fetctLectureForStudent,
+    refetchInterval: LECTURE_AUTO_REFRESH_INTERVAL,
+    staleTime: StaleTime.SECONDS_30,
+    gcTime: GarbageTime.SECONDS_30,
+  });
 
   return {
     lectures,

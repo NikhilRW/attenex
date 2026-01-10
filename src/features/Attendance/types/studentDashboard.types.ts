@@ -1,3 +1,4 @@
+import { User } from "@/backend/src/config/database_setup";
 import { Lecture } from "@attendance/types/common";
 import { Dispatch, SetStateAction } from "react";
 
@@ -33,17 +34,17 @@ export interface UseAttendanceJoinReturn {
   proceedWithJoin: (data: {
     lecture: Lecture;
     studentRollNo: string;
-  }) => Promise<boolean>;
+  }) => Promise<false | { res: any; lecture: Lecture }>;
 }
 
 export interface UseAttendanceSubmitReturn {
   passcode: string;
   loading: boolean;
   setPasscode: Dispatch<SetStateAction<string>>;
-  handleSubmit: (
-    joinedLecture: Lecture,
-    onSuccess: () => void
-  ) => Promise<void>;
+  handleSubmit: (obj: {
+    joinedLecture: Lecture;
+    onSuccess: () => void;
+  }) => Promise<{ res: any; onSuccess: () => void } | null>;
 }
 
 export interface UseSocketManagerReturn {
@@ -57,7 +58,9 @@ export interface UseClassManagementReturn {
   classUpdateLoading: boolean;
   setClassName: Dispatch<SetStateAction<string>>;
   setShowClassModal: Dispatch<SetStateAction<boolean>>;
-  handleUpdateClass: () => Promise<void>;
+  handleUpdateClass: () => Promise<
+    { success: boolean; user: Partial<User> } | undefined
+  >;
 }
 
 export interface UseRollNoManagementReturn {
@@ -67,9 +70,7 @@ export interface UseRollNoManagementReturn {
   setRollNo: Dispatch<SetStateAction<string>>;
   setShowRollNoModal: Dispatch<SetStateAction<boolean>>;
   setPendingLecture: Dispatch<SetStateAction<Lecture | null>>;
-  handleRollNoSubmit: (
-    onSubmit: (rollNo: string) => Promise<void>
-  ) => Promise<void>;
+  handleRollNoSubmit: (fn: (rollNo: string) => Promise<void>) => void;
   requestRollNo: (lecture: Lecture) => void;
 }
 

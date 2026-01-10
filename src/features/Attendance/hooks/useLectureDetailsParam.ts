@@ -1,5 +1,6 @@
 import { getStudentLectureDetails } from "@/src/features/Classes/services/lectureService";
 import { queryKeys } from "@/src/shared/constants/queryKeys";
+import { GarbageTime, StaleTime } from "@/src/shared/constants/tanstackConfig";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
@@ -19,6 +20,24 @@ export const useLectureDetailsParam = (
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
 
+  const {
+    data: lectureDetails,
+    refetch,
+    isFetching: fetchingLectureDetails,
+  } = useQuery({
+    queryFn: async () => {
+      if (lectureId) {
+        return await getStudentLectureDetails(lectureId as string);
+      }
+      return null;
+    },
+    queryKey: lectureId
+      ? queryKeys.getStudentLectureDetails.withId(lectureId as string)
+      : queryKeys.getStudentLectureDetails.all,
+    staleTime: StaleTime.SECONDS_30,
+    gcTime: GarbageTime.SECONDS_30,
+  });
+
   const fetchAndJoinLecture = async () => {
     if (lectureId) {
       // First check if we already have the lecture in our list
@@ -30,8 +49,11 @@ export const useLectureDetailsParam = (
         // Fetch lecture details from API if not in list
         try {
           console.log(LOG_MESSAGES.FETCHING_DETAILS, lectureId);
-          const res = await getStudentLectureDetails(lectureId as string);
-
+          let res = lectureDetails;
+          if (res === null) {
+            refetch();
+          }
+          res = lectureDetails;
           if (res.success && res.data) {
             console.log(LOG_MESSAGES.DETAILS_FETCHED, res.data);
             const lectureData = {
@@ -66,7 +88,7 @@ export const useLectureDetailsParam = (
     return false;
   };
 
-  const { isFetching: fetchingLectureDetails } = useQuery({
+  useQuery({
     queryFn: fetchAndJoinLecture,
     queryKey: queryKeys.joinLectureWithNotification,
     enabled: true,

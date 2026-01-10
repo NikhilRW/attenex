@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const LectureOngoing = ({
   handleLeaveLecture,
   joinedLecture,
+  loading,
 }: LectureOngoingProps) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -78,6 +79,7 @@ const LectureOngoing = ({
         <TouchableOpacity
           onPress={handleLeaveLecture}
           style={styles.leaveButtonWrapper}
+          disabled={loading}
         >
           <LinearGradient
             colors={["#EF4444", "#DC2626"]}

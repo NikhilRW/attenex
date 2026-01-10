@@ -7,40 +7,68 @@ import { UseAttendanceSubmitReturn } from "@attendance/types/studentDashboard.ty
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
 import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
 import { validatePasscode } from "@attendance/utils/validationUtils";
+import { useMutation } from "@tanstack/react-query";
+import { mutationKeys } from "@/src/shared/constants/mutationKeys";
+import { useAuthStore } from "@/src/shared/stores/authStore";
 
 /**
  * Custom hook to manage attendance submission
  */
-export const useAttendanceSubmit = (): UseAttendanceSubmitReturn => {
+export const useAttendanceSubmit = (
+  proceedWithJoin: (data: {
+    lecture: Lecture;
+    studentRollNo: string;
+  }) => Promise<
+    | false
+    | {
+        res: any;
+        lecture: Lecture;
+      }
+  >
+): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const rollNo = useAuthStore((state) => state.user?.rollNo);
 
-  const handleSubmit = async (
-    joinedLecture: Lecture,
-    onSuccess: () => void
-  ) => {
+  const handleSubmitMutateFn = async ({
+    joinedLecture,
+    onSuccess,
+  }: {
+    joinedLecture: Lecture;
+    onSuccess: () => void;
+  }) => {
     if (!validatePasscode(passcode)) {
       showErrorAlert(
         ALERT_MESSAGES.INVALID_PASSCODE.title,
         ALERT_MESSAGES.INVALID_PASSCODE.message
       );
-      return;
+      return null;
+    }
+    const location = await getCurrentLocationHigh();
+    if (!location) {
+      throw new Error("Could not get current location");
     }
 
-    setLoading(true);
-    try {
-      const location = await getCurrentLocationHigh();
-      if (!location) {
-        throw new Error("Could not get current location");
+    const res = await submitAttendance(
+      joinedLecture.id,
+      passcode,
+      location.latitude,
+      location.longitude
+    );
+
+    return { res, onSuccess };
+  };
+
+  const { mutateAsync: handleSubmit, isPending: loading } = useMutation({
+    mutationFn: handleSubmitMutateFn,
+    mutationKey: mutationKeys.studentAttendanceSubmit,
+    onMutate({ onSuccess }) {
+      onSuccess();
+    },
+    onSuccess: async (data) => {
+      if (data === null) {
+        return;
       }
-
-      const res = await submitAttendance(
-        joinedLecture.id,
-        passcode,
-        location.latitude,
-        location.longitude
-      );
-
+      const { res, onSuccess } = data;
       if (res.success) {
         showSuccessAlert(
           ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
@@ -51,15 +79,24 @@ export const useAttendanceSubmit = (): UseAttendanceSubmitReturn => {
         await stopBackgroundTracking();
         onSuccess();
       }
-    } catch (error: any) {
+    },
+    onSettled(data, error, { joinedLecture }) {
+      if (!data || error) {
+        if (rollNo) {
+          proceedWithJoin({
+            lecture: joinedLecture,
+            studentRollNo: rollNo!,
+          });
+        }
+      }
+    },
+    onError(error) {
       showErrorAlert(
         ALERT_MESSAGES.SUBMISSION_FAILED.title,
         error.message || ALERT_MESSAGES.SUBMISSION_FAILED.message
       );
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   return {
     passcode,
