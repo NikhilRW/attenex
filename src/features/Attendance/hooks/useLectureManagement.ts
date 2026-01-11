@@ -1,6 +1,6 @@
-import { getStudentLectures } from "@/src/features/Classes/services/lectureService";
-import { queryKeys } from "@/src/shared/constants/queryKeys";
-import { GarbageTime, StaleTime } from "@/src/shared/constants/tanstackConfig";
+import { getStudentLectures } from "@/features/Classes/services/lectureService";
+import { queryKeys } from "@/shared/constants/queryKeys";
+import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   LECTURE_AUTO_REFRESH_INTERVAL,
   LOG_MESSAGES,
@@ -9,11 +9,14 @@ import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.t
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { Lecture } from "../types";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh
  */
-export const useLectureManagement = (): UseLectureManagementReturn => {
+export const useLectureManagement = (
+  joinedLecture: Lecture | null
+): UseLectureManagementReturn => {
   const { user } = useAuthStore();
 
   const fetchLectures = useCallback(async () => {
@@ -46,17 +49,19 @@ export const useLectureManagement = (): UseLectureManagementReturn => {
     }
   }, [user]);
 
+  const shouldQueryBeEnabled = joinedLecture !== null ? false : true;
+
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
     queryKey: queryKeys.fetctLectureForStudent,
     refetchInterval: LECTURE_AUTO_REFRESH_INTERVAL,
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,
+    enabled: shouldQueryBeEnabled,
   });
 
   return {
     lectures,
-    fetchLectures,
     refreshLectures,
   };
 };

@@ -60,7 +60,7 @@ const CreateLectureScreen = () => {
           <Animated.View entering={FadeInUp.delay(100).springify()}>
             <CreateLectureFormCard
               selectedClass={selectedClass}
-              existingClasses={existingClasses}
+              existingClasses={existingClasses || []}
               showClassDropdown={showClassDropdown}
               onToggleClassDropdown={handleToggleClassDropdown}
               onSelectClass={handleSelectClass}

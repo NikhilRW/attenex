@@ -1,3 +1,4 @@
+import { User } from "@backend/middleware/auth";
 import { BASE_URI } from "@shared/constants/uri";
 import { io, Socket } from "socket.io-client";
 class SocketService {
@@ -63,9 +64,9 @@ class SocketService {
   /**
    * Leave a lecture room
    */
-  leaveLecture(lectureId: string) {
+  leaveLecture(lectureId: string, role?: User["role"]) {
     if (this.socket) {
-      this.socket.emit("leaveLecture", lectureId);
+      this.socket.emit("leaveLecture", lectureId, role);
       console.log(`Left lecture room: lecture-${lectureId}`);
     }
   }
@@ -134,11 +135,29 @@ class SocketService {
   }
 
   /**
+   * Listen for new student leave events
+   */
+  onStudentLeaved(callback: (data: any) => void) {
+    if (this.socket) {
+      this.socket.on("studentLeavedLecture", callback);
+    }
+  }
+
+  /**
    * Remove student joined listener
    */
   offStudentJoined() {
     if (this.socket) {
       this.socket.off("studentJoined");
+    }
+  }
+
+  /**
+   * Remove student joined listener
+   */
+  offStudentLeaved() {
+    if (this.socket) {
+      this.socket.off("leaveLecture");
     }
   }
 

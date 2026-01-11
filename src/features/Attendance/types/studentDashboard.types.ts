@@ -1,5 +1,5 @@
-import { User } from "@/backend/src/config/database_setup";
 import { Lecture } from "@attendance/types/common";
+import { User } from "@backend/config/database_setup";
 import { Dispatch, SetStateAction } from "react";
 
 /**
@@ -19,7 +19,6 @@ export interface LocationCoords {
 // Hook return types
 export interface UseLectureManagementReturn {
   lectures: Lecture[];
-  fetchLectures: () => Promise<void>;
   refreshLectures: () => void;
 }
 

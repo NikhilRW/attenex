@@ -1,5 +1,4 @@
-import AttendanceViewScreen from '@/src/features/Classes/screens/AttendanceViewScreen'
-import React from 'react'
+import AttendanceViewScreen from '@classes/screens/AttendanceViewScreen'
 
 const Attendance = () => {
     return <AttendanceViewScreen />

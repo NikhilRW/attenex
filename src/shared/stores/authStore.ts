@@ -1,4 +1,4 @@
-import { User as UserSchema } from "@/backend/src/config/database_setup";
+import { User as UserSchema } from "@backend/config/database_setup";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
 import { create } from "zustand";

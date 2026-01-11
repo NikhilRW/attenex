@@ -50,7 +50,7 @@ const ForgotPassword = () => {
           {emailSent === false && (
             <AuthHeader
               title="Forgot Password"
-              logoSource={require("@/assets/images/logo-transparent.png")}
+              logoSource={require("@assets/images/logo-transparent.png")}
             />
           )}
 

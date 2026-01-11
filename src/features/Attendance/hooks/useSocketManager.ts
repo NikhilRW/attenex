@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/shared/stores/authStore";
 import {
   ALERT_DELAY,
   ALERT_MESSAGES,
@@ -21,6 +22,7 @@ export const useSocketManager = (
   onAppForeground: () => void
 ): UseSocketManagerReturn => {
   const [lectureStatus, setLectureStatus] = useState<LectureStatus>("active");
+  const { user } = useAuthStore();
 
   // Connect to socket on mount
   useEffect(() => {
@@ -84,11 +86,11 @@ export const useSocketManager = (
 
     return () => {
       if (joinedLecture) {
-        socketService.leaveLecture(joinedLecture.id);
+        socketService.leaveLecture(joinedLecture.id, user?.role || undefined);
         console.log(`${LOG_MESSAGES.LEFT_ROOM} ${joinedLecture.id}`);
       }
     };
-  }, [joinedLecture]);
+  }, [joinedLecture, user?.role]);
 
   return {
     lectureStatus,

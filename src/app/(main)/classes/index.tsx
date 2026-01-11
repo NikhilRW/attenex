@@ -1,4 +1,4 @@
-import TeacherDashboard from '@/src/features/Classes/screens/TeacherDashboard'
+import TeacherDashboard from '@/features/Classes/screens/TeacherDashboard'
 import React from 'react'
 
 const index = () => {

@@ -1,5 +1,5 @@
-import { GarbageTime } from "@/src/shared/constants/tanstackConfig";
-import { logger } from "@/src/shared/utils";
+import { GarbageTime } from "@/shared/constants/tanstackConfig";
+import { logger } from "@/shared/utils";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";

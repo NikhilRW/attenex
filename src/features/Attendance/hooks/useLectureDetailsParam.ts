@@ -1,6 +1,6 @@
-import { getStudentLectureDetails } from "@/src/features/Classes/services/lectureService";
-import { queryKeys } from "@/src/shared/constants/queryKeys";
-import { GarbageTime, StaleTime } from "@/src/shared/constants/tanstackConfig";
+import { getStudentLectureDetails } from "@/features/Classes/services/lectureService";
+import { queryKeys } from "@/shared/constants/queryKeys";
+import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,

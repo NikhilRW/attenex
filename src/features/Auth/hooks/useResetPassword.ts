@@ -1,5 +1,5 @@
-import { queryKeys } from "@/src/shared/constants/queryKeys";
-import { StaleTime } from "@/src/shared/constants/tanstackConfig";
+import { queryKeys } from "@/shared/constants/queryKeys";
+import { StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   ResetPasswordFormData,
   resetPasswordSchema,

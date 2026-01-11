@@ -23,4 +23,13 @@ export const queryKeys = {
     all: ["get-student-lecture-details"],
     withId: (id: string) => ["et-student-lecture-details", id],
   },
+  fetchAttendanceForTeacher: {
+    all: ["fetch-attendance-for-teacher"],
+    withLectureId: (lectureId: string) => [
+      "fetch-attendance-for-teacher",
+      lectureId,
+    ],
+  },
+  existingClassesForTeacher: ["existing-classes-for-teacher"],
+  socketAttendanceViewTeacher: ["socket-attendance-view-teacher"],
 };

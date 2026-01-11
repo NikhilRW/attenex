@@ -1,4 +1,4 @@
-import { mutationKeys } from "@/src/shared/constants/mutationKeys";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { joinLecture } from "@attendance/services/attendanceService";
 import {
@@ -50,7 +50,6 @@ export const useAttendanceJoin = (
       if (!location) {
         throw new Error("Could not get current location");
       }
-      console.log("Optimistic Update For lecture Join");
 
       const res = await joinLecture(
         lecture.id,
@@ -79,7 +78,6 @@ export const useAttendanceJoin = (
       }
       const { res, lecture } = data;
       if (res.success) {
-        setJoinedLecture(lecture);
         showSuccessAlert(
           ALERT_MESSAGES.JOINED.title,
           ALERT_MESSAGES.JOINED.message

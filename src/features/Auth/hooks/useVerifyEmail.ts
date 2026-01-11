@@ -1,4 +1,4 @@
-import { GarbageTime, StaleTime } from "@/src/shared/constants/tanstackConfig";
+import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   handleVerificationEmailResponse,
   sendVerificationEmailRequest,

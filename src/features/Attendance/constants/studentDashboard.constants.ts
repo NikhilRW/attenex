@@ -3,7 +3,7 @@
  */
 
 // Timing constants
-export const LECTURE_AUTO_REFRESH_INTERVAL = 30000; // 30 seconds
+export const LECTURE_AUTO_REFRESH_INTERVAL = 30000; // 30 Seconds
 export const ALERT_DELAY = 100; // Delay before showing alerts
 
 // Validation constants

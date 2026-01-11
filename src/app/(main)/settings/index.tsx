@@ -1,4 +1,4 @@
-import SettingsScreen from "@/src/features/Settings/screens/SettingsScreen";
+import SettingsScreen from "@/features/Settings/screens/SettingsScreen";
 import React from "react";
 
 const SettingsIndex = () => {

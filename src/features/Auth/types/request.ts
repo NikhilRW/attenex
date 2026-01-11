@@ -1,4 +1,4 @@
-import { User } from "@/backend/src/config/database_setup";
+import { User } from "@backend/config/database_setup";
 
 export type RegisterGoogleUserResponse = {
   success: boolean;

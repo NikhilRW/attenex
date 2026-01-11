@@ -29,9 +29,6 @@ const StudentDashboard = () => {
   const { colors } = useTheme();
   const { user } = useAuthStore();
 
-  // Lecture management
-  const { lectures, fetchLectures, refreshLectures } = useLectureManagement();
-
   // Roll number management
   const {
     rollNo,
@@ -56,6 +53,9 @@ const StudentDashboard = () => {
     proceedWithJoin,
   } = useAttendanceJoin(requestRollNo);
 
+  // Lecture management
+  const { lectures, refreshLectures } = useLectureManagement(joinedLecture);
+
   // Attendance submit management
   const {
     passcode,
@@ -67,7 +67,7 @@ const StudentDashboard = () => {
   // Socket manager
   const { lectureStatus, setLectureStatus } = useSocketManager(
     joinedLecture,
-    fetchLectures
+    refreshLectures
   );
 
   // Class management
@@ -78,7 +78,7 @@ const StudentDashboard = () => {
     setClassName,
     setShowClassModal,
     handleUpdateClass,
-  } = useClassManagement(fetchLectures);
+  } = useClassManagement(refreshLectures);
 
   // Handle lecture details from URL params (notification join)
   const { fetchingLectureDetails } = useLectureDetailsParam(
@@ -102,27 +102,28 @@ const StudentDashboard = () => {
   // Leave lecture handler
   const onLeaveLecture = useCallback(() => {
     if (joinedLecture) {
-      socketService.leaveLecture(joinedLecture.id);
+      socketService.leaveLecture(joinedLecture.id, user?.role || "student");
     }
     setLectureStatus("active");
-    fetchLectures();
-  }, [joinedLecture, setLectureStatus, fetchLectures]);
+    refreshLectures();
+  }, [joinedLecture, refreshLectures, setLectureStatus, user?.role]);
 
   // Attendance submit success handler
   const onAttendanceSubmitSuccess = useCallback(() => {
     if (joinedLecture) {
-      socketService.leaveLecture(joinedLecture.id);
+      socketService.leaveLecture(joinedLecture.id, user?.role || "student");
     }
     setJoinedLecture(null);
     setStatus("idle");
-    fetchLectures();
-  }, [joinedLecture, setJoinedLecture, setStatus, fetchLectures]);
-
+    refreshLectures();
+  }, [joinedLecture, setJoinedLecture, setStatus, refreshLectures, user?.role]);
 
   // Show loading screen while fetching lecture details
   if (fetchingLectureDetails) {
     return <LoadingScreen />;
   }
+
+  console.log("Student Dashboard Rendered.");
 
   // If joined and lecture is still active - show ongoing status
   if (status === "joined" && lectureStatus === "active") {

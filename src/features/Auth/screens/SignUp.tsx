@@ -47,7 +47,7 @@ const SignUp = () => {
         >
           <AuthHeader
             title="Create Account"
-            logoSource={require("@/assets/images/logo-transparent.png")}
+            logoSource={require("@assets/images/logo-transparent.png")}
           />
 
           <SocialLoginButtons

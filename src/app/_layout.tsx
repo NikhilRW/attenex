@@ -1,4 +1,4 @@
-import { handleEmailVerification } from "@/src/features/Auth/utils/common";
+import { handleEmailVerification } from "@auth/utils/common";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import {
   FirebaseMessagingTypes,
@@ -10,6 +10,7 @@ import {
 } from "@react-native-firebase/messaging";
 import { useTheme } from "@shared/hooks/useTheme";
 import { useNotificationStore } from "@shared/stores/notificationStore";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import * as Linking from "expo-linking";
 import {
   addNotificationResponseReceivedListener,
@@ -36,11 +37,10 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { setupTanstackForReactNative } from "../shared/utils/tanstack";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { clientPersister } from "../shared/utils";
-import { queryClient } from "../shared/constants/tanstack";
 import { queryKeys } from "../shared/constants/queryKeys";
+import { queryClient } from "../shared/constants/tanstackConfig";
+import { clientPersister } from "../shared/utils";
+import { setupTanstackForReactNative } from "../shared/utils/tanstack";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";

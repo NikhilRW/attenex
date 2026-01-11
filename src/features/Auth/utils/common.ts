@@ -1,7 +1,7 @@
-import { User } from "@/backend/src/config/database_setup";
-import { getStartingScreenPath } from "@/src/shared/utils";
+import { getStartingScreenPath } from "@/shared/utils";
 import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
+import { User } from "@backend/config/database_setup";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";

@@ -13,8 +13,7 @@ import {
   ShouldStartLoadRequest,
   WebViewNavigation,
 } from "react-native-webview/lib/WebViewTypes";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/src/shared/constants/tanstack";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const LINKEDIN_CLIENT_ID = process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID || "";
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
@@ -26,6 +25,7 @@ export const useLinkedInAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { colors } = useTheme();
   const { logout, deleteAccount } = useLocalSearchParams();
+  const queryClient = useQueryClient();
 
   // Logout And DeleteAccount Part.
   const isLogout = logout === "true";

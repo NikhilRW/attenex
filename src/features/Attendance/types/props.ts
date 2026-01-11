@@ -1,4 +1,4 @@
-import { User } from "@/backend/src/config/database_setup";
+import { User } from "@backend/config/database_setup";
 import { Dispatch, SetStateAction } from "react";
 import { Lecture } from "./common";
 

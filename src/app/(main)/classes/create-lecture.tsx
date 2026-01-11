@@ -1,4 +1,4 @@
-import CreateLectureScreen from '@/src/features/Classes/screens/CreateLectureScreen'
+import CreateLectureScreen from '@/features/Classes/screens/CreateLectureScreen'
 import React from 'react'
 
 const CreateLecture = () => {
