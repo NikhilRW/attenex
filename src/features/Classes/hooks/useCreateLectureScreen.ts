@@ -1,6 +1,7 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { createLecture, getTeacherClasses } from "@classes/services";
-import { ClassItem } from "@classes/types";
+import { ClassItem, LectureWithCount } from "@classes/types";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,13 +17,16 @@ export const useCreateLectureScreen = () => {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [duration, setDuration] = useState(60);
   const [customDuration, setCustomDuration] = useState("");
-  const [loading, setLoading] = useState(false);
 
   // Dropdown states
   const [showClassDropdown, setShowClassDropdown] = useState(false);
   const [showDurationDropdown, setShowDurationDropdown] = useState(false);
   const [showNewClassModal, setShowNewClassModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+
+  const navigateToTeacherDashboard = () => {
+    router.navigate("/classes?fromCreateLecture=true");
+  };
 
   const fetchTeacherClasses: () => Promise<ClassItem[]> =
     useCallback(async () => {
@@ -58,7 +62,7 @@ export const useCreateLectureScreen = () => {
     queryKey: queryKeys.existingClassesForTeacher,
   });
 
-  const handleCreateLecture = async () => {
+  const handleCreateLectureMutateFn = async () => {
     if (!lectureName || !selectedClass) {
       Alert.alert("Missing Information", "Please fill in all fields.");
       return;
@@ -72,42 +76,85 @@ export const useCreateLectureScreen = () => {
       );
       return;
     }
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission denied",
+        "Location is required to start a lecture."
+      );
+      return;
+    }
 
-    setLoading(true);
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission denied",
-          "Location is required to start a lecture."
-        );
-        setLoading(false);
-        return;
-      }
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+    });
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-      });
+    const res = await createLecture(
+      lectureName,
+      selectedClass,
+      finalDuration,
+      location.coords.latitude,
+      location.coords.longitude
+    );
 
-      const res = await createLecture(
-        lectureName,
-        selectedClass,
-        finalDuration,
-        location.coords.latitude,
-        location.coords.longitude
+    return res;
+  };
+
+  const { mutateAsync: handleCreateLecture, isPending: loading } = useMutation({
+    mutationFn: handleCreateLectureMutateFn,
+    onMutate: async (_, context) => {
+      // Snapshot the previous value
+      const previousLetures = context.client.getQueryData(
+        queryKeys.teacherLectures
       );
 
-      if (res.success) {
+      const newLecture = {
+        id: "",
+        title: lectureName,
+        courseName: selectedClass,
+        createdAt: "",
+        studentCount: 0,
+        absentCount: 0,
+        totalClassStudents: 1,
+        status: "active" as const,
+        duration: "10",
+      };
+
+      // Optimistically update to the new value
+      context.client.setQueryData<LectureWithCount[]>(
+        queryKeys.teacherLectures,
+        (old) => {
+          if (old) {
+            return [...old, newLecture];
+          } else {
+            return [newLecture];
+          }
+        }
+      );
+
+      navigateToTeacherDashboard();
+      return { previousLetures };
+    },
+    onSuccess: async (data, _, onMutateResult, context) => {
+      if (data.success) {
         Alert.alert("Success", "Lecture created successfully!", [
-          { text: "OK", onPress: () => router.back() },
+          { text: "OK" },
         ]);
+        await context.client.invalidateQueries({
+          queryKey: queryKeys.teacherLectures,
+        });
+      } else {
+        context.client.setQueryData(
+          queryKeys.teacherLectures,
+          onMutateResult.previousLetures
+        );
       }
-    } catch (error: any) {
+    },
+    onError(error) {
       Alert.alert("Error", error.message || "Failed to create lecture");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    mutationKey: mutationKeys.createLecture,
+  });
 
   const handleAddNewClass = () => {
     setShowClassDropdown(false);

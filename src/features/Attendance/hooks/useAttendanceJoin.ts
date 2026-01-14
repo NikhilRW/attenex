@@ -111,7 +111,7 @@ export const useAttendanceJoin = (
     },
   });
 
-  const handleJoin = useCallback(
+  const handleJoinMutateFn = useCallback(
     async (lecture: Lecture) => {
       // Check if user has a roll number set
       if (!user?.rollNo) {
@@ -123,6 +123,10 @@ export const useAttendanceJoin = (
     },
     [proceedWithJoin, user, onRollNoRequired]
   );
+  const { mutateAsync: handleJoin } = useMutation({
+    mutationFn: handleJoinMutateFn,
+    mutationKey: mutationKeys.handleClassJoin,
+  });
 
   const handleLeaveLecture = useCallback(async (onLectureLeft: () => void) => {
     showDestructiveAlert(

@@ -1,3 +1,5 @@
+import { queryKeys } from "@/shared/constants/queryKeys";
+import { StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   HeaderSection,
   LectureCard,
@@ -18,7 +20,12 @@ import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useTheme } from "@shared/hooks";
 import { socketService } from "@shared/services/socketService";
 import { Skia } from "@shopify/react-native-skia";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
@@ -45,7 +52,6 @@ const TeacherDashboard = () => {
   const router = useRouter();
   const { ended, lectureId } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
-  const [lectures, setLectures] = useState<LectureWithCount[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
@@ -54,7 +60,7 @@ const TeacherDashboard = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [, setRefreshing] = useState(false);
+  const { fromCreateLecture } = useLocalSearchParams();
 
   // Animation values
   const scrollY = useSharedValue(0);
@@ -62,50 +68,60 @@ const TeacherDashboard = () => {
   // const context = useSharedValue({ x: 0, y: 0 });
   // const animatedTranslateY = useSharedValue(0);
 
-  const fetchActiveLectures = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      const res = await getAllLectures();
-      if (res.success) {
-        const lecturesWithCount = await Promise.all(
-          res.data.map(async (lec: any) => {
-            try {
-              const detailsRes = await getTeacherLectureDetails(lec.id);
-              return {
-                ...lec,
-                courseName: lec.className,
-                studentCount: detailsRes.data.studentCount || 0,
-                absentCount: detailsRes.data.absentCount || 0,
-                totalClassStudents: detailsRes.data.totalClassStudents || 0,
-              };
-            } catch {
-              return {
-                ...lec,
-                courseName: lec.className,
-                studentCount: 0,
-                absentCount: 0,
-                totalClassStudents: 0,
-              };
-            }
-          })
-        );
+  const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
+    useCallback(async () => {
+      try {
+        const res = await getAllLectures();
+        if (res.success) {
+          const lecturesWithCount = await Promise.all(
+            res.data.map(async (lec: LectureWithCount) => {
+              try {
+                const detailsRes = await getTeacherLectureDetails(lec.id);
+                return {
+                  ...lec,
+                  courseName: (lec as any).className,
+                  studentCount: detailsRes.data.studentCount || 0,
+                  absentCount: detailsRes.data.absentCount || 0,
+                  totalClassStudents: detailsRes.data.totalClassStudents || 0,
+                };
+              } catch {
+                return {
+                  ...lec,
+                  courseName: (lec as any).className,
+                  studentCount: 0,
+                  absentCount: 0,
+                  totalClassStudents: 0,
+                };
+              }
+            })
+          );
 
-        // Already sorted by most recent first from backend (desc order)
-        setLectures(lecturesWithCount);
+          return lecturesWithCount as LectureWithCount[];
+        }
+        return [];
+      } catch (error) {
+        console.log("Error fetching lectures", error);
+        return [];
       }
-    } catch (error) {
-      console.log("Error fetching lectures", error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
+    }, []);
 
-  console.log("ended param:", ended);
+  const { data: lectures, refetch: fetchActiveLectures } = useQuery({
+    queryKey: queryKeys.teacherLectures,
+    queryFn: fetchActiveLecturesQueryFn,
+    refetchInterval: StaleTime.SECONDS_30,
+    enabled: false,
+  });
 
   useFocusEffect(
     useCallback(() => {
-      fetchActiveLectures();
-    }, [fetchActiveLectures])
+      if (fromCreateLecture === "true") {
+        setTimeout(() => {
+          fetchActiveLectures();
+        }, 5000);
+      } else {
+        fetchActiveLectures();
+      }
+    }, [fetchActiveLectures, fromCreateLecture])
   );
 
   useEffect(() => {
@@ -126,7 +142,7 @@ const TeacherDashboard = () => {
     socketService.connect();
 
     // Join all lecture rooms
-    lectures.forEach((lecture) => {
+    (lectures || []).forEach((lecture) => {
       socketService.joinLecture(lecture.id);
     });
 
@@ -153,26 +169,32 @@ const TeacherDashboard = () => {
         // App came back to foreground - reconnect socket and refresh
         if (!socketService.isConnected()) {
           socketService.connect();
-          lectures.forEach((lecture) => {
+          (lectures || []).forEach((lecture) => {
             socketService.joinLecture(lecture.id);
           });
           socketService.onStudentJoined(handleStudentJoined);
           socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
         }
-        fetchActiveLectures();
+        if (fromCreateLecture === "true") {
+          setTimeout(() => {
+            fetchActiveLectures();
+          }, 5000);
+        } else {
+          fetchActiveLectures();
+        }
       }
     });
 
     // Cleanup
     return () => {
-      lectures.forEach((lecture) => {
+      (lectures || []).forEach((lecture) => {
         socketService.leaveLecture(lecture.id);
       });
       socketService.offStudentJoined();
       socketService.offAttendanceSubmitted();
       subscription.remove();
     };
-  }, [lectures, fetchActiveLectures, ended]);
+  }, [lectures, fetchActiveLectures, ended, fromCreateLecture]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
@@ -290,15 +312,22 @@ const TeacherDashboard = () => {
   };
 
   // Filter logic
-  const filteredLectures = lectures.filter(
-    (l) =>
+  const filteredLectures = (lectures || []).filter((l) => {
+    console.log(l.courseName.toLowerCase().includes(searchQuery.toLowerCase()));
+    console.log(l.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    return (
       l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    );
+  });
+
+  console.log(JSON.stringify(filteredLectures));
 
   // Stats
-  const totalActive = lectures.filter((l) => l.status === "active").length;
-  const totalStudents = lectures.reduce(
+  const totalActive = (lectures || []).filter(
+    (l) => l.status === "active"
+  ).length;
+  const totalStudents = (lectures || []).reduce(
     (acc, curr) => acc + Number(curr.studentCount),
     0
   );
@@ -378,7 +407,7 @@ const TeacherDashboard = () => {
         <HeaderSection
           totalActive={totalActive}
           totalStudents={totalStudents}
-          lectures={lectures}
+          lectures={lectures || []}
           navigateToCreate={navigateToCreate}
         />
 
