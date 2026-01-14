@@ -21,11 +21,7 @@ import { useTheme } from "@shared/hooks";
 import { socketService } from "@shared/services/socketService";
 import { Skia } from "@shopify/react-native-skia";
 import { useQuery } from "@tanstack/react-query";
-import {
-  useFocusEffect,
-  useLocalSearchParams,
-  useRouter,
-} from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
@@ -117,7 +113,7 @@ const TeacherDashboard = () => {
       if (fromCreateLecture === "true") {
         setTimeout(() => {
           fetchActiveLectures();
-        }, 5000);
+        }, 7000);
       } else {
         fetchActiveLectures();
       }
@@ -178,7 +174,7 @@ const TeacherDashboard = () => {
         if (fromCreateLecture === "true") {
           setTimeout(() => {
             fetchActiveLectures();
-          }, 5000);
+          }, 7000);
         } else {
           fetchActiveLectures();
         }
