@@ -4,7 +4,6 @@
 
 export { useAttendanceView } from "./useAttendanceView";
 export { useClasses } from "./useClasses";
-export { useCreateLecture } from "./useCreateLecture";
 export {
   useCreateLectureScreen,
 } from "./useCreateLectureScreen";

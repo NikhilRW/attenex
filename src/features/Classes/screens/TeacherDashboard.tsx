@@ -1,380 +1,52 @@
-import { queryKeys } from "@/shared/constants/queryKeys";
-import { StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   HeaderSection,
   LectureCard,
   LectureEditModal,
   PullIndicator,
 } from "@classes/components";
-import {
-  deleteLecture,
-  endLecture,
-  getAllLectures,
-  getTeacherLectureDetails,
-  updateLecture,
-} from "@classes/services/lectureService";
 import { teacherDashboardStyles as styles } from "@classes/styles";
-import { LectureWithCount } from "@classes/types/common";
 import { Ionicons } from "@expo/vector-icons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useTheme } from "@shared/hooks";
-import { socketService } from "@shared/services/socketService";
 import { Skia } from "@shopify/react-native-skia";
-import { useQuery } from "@tanstack/react-query";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  AppState,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  Extrapolation,
-  FadeInDown,
-  FadeInUp,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
 
 const TeacherDashboard = () => {
-  const router = useRouter();
-  const { ended, lectureId } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
-    null
-  );
-  const [editTitle, setEditTitle] = useState("");
-  const [editDuration, setEditDuration] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const { fromCreateLecture } = useLocalSearchParams();
-
-  // Animation values
-  const scrollY = useSharedValue(0);
-  const pullProgress = useSharedValue(0);
-  // const context = useSharedValue({ x: 0, y: 0 });
-  // const animatedTranslateY = useSharedValue(0);
-
-  const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
-    useCallback(async () => {
-      try {
-        const res = await getAllLectures();
-        if (res.success) {
-          const lecturesWithCount = await Promise.all(
-            res.data.map(async (lec: LectureWithCount) => {
-              try {
-                const detailsRes = await getTeacherLectureDetails(lec.id);
-                return {
-                  ...lec,
-                  courseName: (lec as any).className,
-                  studentCount: detailsRes.data.studentCount || 0,
-                  absentCount: detailsRes.data.absentCount || 0,
-                  totalClassStudents: detailsRes.data.totalClassStudents || 0,
-                };
-              } catch {
-                return {
-                  ...lec,
-                  courseName: (lec as any).className,
-                  studentCount: 0,
-                  absentCount: 0,
-                  totalClassStudents: 0,
-                };
-              }
-            })
-          );
-
-          return lecturesWithCount as LectureWithCount[];
-        }
-        return [];
-      } catch (error) {
-        console.log("Error fetching lectures", error);
-        return [];
-      }
-    }, []);
-
-  const { data: lectures, refetch: fetchActiveLectures } = useQuery({
-    queryKey: queryKeys.teacherLectures,
-    queryFn: fetchActiveLecturesQueryFn,
-    refetchInterval: StaleTime.SECONDS_30,
-    enabled: false,
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      if (fromCreateLecture === "true") {
-        setTimeout(() => {
-          fetchActiveLectures();
-        }, 7000);
-      } else {
-        fetchActiveLectures();
-      }
-    }, [fetchActiveLectures, fromCreateLecture])
-  );
-
-  useEffect(() => {
-    const main = async () => {
-      if (ended === "true" && lectureId) {
-        fetchActiveLectures();
-      }
-    };
-    main();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ended, lectureId]);
-
-  // Removed the separate fetchLectureDetails useEffect since it's now integrated into fetchActiveLectures
-
-  // Setup socket listeners for real-time updates
-  useEffect(() => {
-    // Connect to socket immediately
-    socketService.connect();
-
-    // Join all lecture rooms
-    (lectures || []).forEach((lecture) => {
-      socketService.joinLecture(lecture.id);
-    });
-
-    // Listen for student join events (use stable callback)
-    const handleStudentJoined = (data: any) => {
-      console.log("Student joined event:", data);
-      // Refresh lecture list to update student count
-      fetchActiveLectures();
-    };
-
-    // Listen for attendance submission events (use stable callback)
-    const handleAttendanceSubmitted = (data: any) => {
-      console.log("Attendance submitted event:", data);
-      // Refresh lecture list to update student count
-      fetchActiveLectures();
-    };
-
-    socketService.onStudentJoined(handleStudentJoined);
-    socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-
-    // Handle app state changes (background/foreground)
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        // App came back to foreground - reconnect socket and refresh
-        if (!socketService.isConnected()) {
-          socketService.connect();
-          (lectures || []).forEach((lecture) => {
-            socketService.joinLecture(lecture.id);
-          });
-          socketService.onStudentJoined(handleStudentJoined);
-          socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-        }
-        if (fromCreateLecture === "true") {
-          setTimeout(() => {
-            fetchActiveLectures();
-          }, 7000);
-        } else {
-          fetchActiveLectures();
-        }
-      }
-    });
-
-    // Cleanup
-    return () => {
-      (lectures || []).forEach((lecture) => {
-        socketService.leaveLecture(lecture.id);
-      });
-      socketService.offStudentJoined();
-      socketService.offAttendanceSubmitted();
-      subscription.remove();
-    };
-  }, [lectures, fetchActiveLectures, ended, fromCreateLecture]);
-
-  const handleEndLecture = async (id: string, lectureTitle: string) => {
-    Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "End",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const res = await endLecture(id);
-            if (res.success) {
-              fetchActiveLectures();
-              // Navigate to lecture ended screen
-              router.push({
-                pathname: "/(main)/classes/lecture-ended",
-                params: {
-                  lectureId: id,
-                  lectureTitle: lectureTitle,
-                },
-              });
-            }
-          } catch (error: any) {
-            Alert.alert("Error", error.message || "Failed to end lecture");
-          }
-        },
-      },
-    ]);
-  };
-
-  const handleDeleteLecture = async (lecture: LectureWithCount) => {
-    if (lecture.status !== "ended") {
-      Alert.alert(
-        "Cannot Delete",
-        "Only ended lectures can be deleted. Please end the lecture first."
-      );
-      return;
-    }
-
-    Alert.alert(
-      "Delete Lecture",
-      `Are you sure you want to delete "${lecture.title}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const res = await deleteLecture(lecture.id);
-              if (res.success) {
-                fetchActiveLectures();
-              }
-            } catch (error: any) {
-              Alert.alert("Error", error.message || "Failed to delete lecture");
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleEditLecture = (lecture: LectureWithCount) => {
-    if (lecture.status !== "active") {
-      Alert.alert("Cannot Edit", "Only active lectures can be edited.");
-      return;
-    }
-    setEditingLecture(lecture);
-    setEditTitle(lecture.title);
-    setEditDuration(lecture.duration);
-    setEditModalVisible(true);
-  };
-
-  const handleUpdateLecture = async () => {
-    if (!editingLecture) return;
-    if (!editTitle.trim()) {
-      Alert.alert("Error", "Title cannot be empty");
-      return;
-    }
-    const durationNum = parseInt(editDuration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      Alert.alert("Error", "Duration must be a positive number");
-      return;
-    }
-
-    try {
-      const res = await updateLecture(editingLecture.id, {
-        title: editTitle.trim(),
-        duration: durationNum,
-      });
-      if (res.success) {
-        setEditModalVisible(false);
-        fetchActiveLectures();
-      }
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to update lecture");
-    }
-  };
-
-  const handleViewAttendance = (lecture: LectureWithCount) => {
-    router.push({
-      pathname: "/(main)/classes/attendance",
-      params: {
-        lectureId: lecture.id,
-        lectureTitle: lecture.title,
-      },
-    });
-  };
-
-  const navigateToCreate = () => {
-    if (!isNavigating) {
-      setIsNavigating(true);
-      router.push("/(main)/classes/create-lecture");
-      setTimeout(() => setIsNavigating(false), 1000);
-    }
-  };
-
-  // Filter logic
-  const filteredLectures = (lectures || []).filter((l) => {
-    console.log(l.courseName.toLowerCase().includes(searchQuery.toLowerCase()));
-    console.log(l.title.toLowerCase().includes(searchQuery.toLowerCase()));
-    return (
-      l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-
-  console.log(JSON.stringify(filteredLectures));
-
-  // Stats
-  const totalActive = (lectures || []).filter(
-    (l) => l.status === "active"
-  ).length;
-  const totalStudents = (lectures || []).reduce(
-    (acc, curr) => acc + Number(curr.studentCount),
-    0
-  );
-
-  // Gesture Logic
-  // const swipeGesture = Gesture.Pan()
-  //   .onStart((event) => {
-  //     context.value = { x: event.x, y: event.y };
-  //   })
-  //   .onUpdate((event) => {
-  //     const dy = event.y - context.value.y;
-  //     if (dy > 0 && scrollY.value <= 0) {
-  //       const damping = 0.5;
-  //       const translateY = dy * damping;
-  //       if (translateY < 150) {
-  //         animatedTranslateY.value = translateY;
-  //         pullProgress.value = interpolate(
-  //           translateY,
-  //           [0, 100],
-  //           [0, 1],
-  //           Extrapolation.CLAMP
-  //         );
-  //       }
-  //     }
-  //   })
-  //   .onEnd(() => {
-  //     if (animatedTranslateY.value > 80) {
-  //       scheduleOnRN(navigateToCreate);
-  //     }
-  //     animatedTranslateY.value = withSpring(0);
-  //     pullProgress.value = withSpring(0);
-  //   });
-
-  // const animatedContainerStyle = useAnimatedStyle(() => ({
-  //   transform: [{ translateY: animatedTranslateY.value }],
-  // }));
-
-  const pullIndicatorStyle = useAnimatedStyle(() => ({
-    opacity: pullProgress.value,
-    transform: [
-      { scale: interpolate(pullProgress.value, [0, 1], [0.8, 1.2]) },
-      {
-        translateY: interpolate(
-          pullProgress.value,
-          [0, 1],
-          [0, -70],
-          Extrapolation.CLAMP
-        ),
-      },
-    ],
-  }));
+  const {
+    editDuration,
+    editModalVisible,
+    editTitle,
+    filteredLectures,
+    handleDeleteLecture,
+    handleEditLecture,
+    handleEndLecture,
+    handleUpdateLecture,
+    handleViewAttendance,
+    lectures,
+    navigateToCreate,
+    pullIndicatorStyle,
+    pullProgress,
+    scrollY,
+    searchQuery,
+    setEditDuration,
+    setEditModalVisible,
+    setEditTitle,
+    setSearchQuery,
+    totalActive,
+    totalStudents,
+  } = useTeacherDashboard();
 
   // TODO: What To Do With Pull Indicator To Create Lecture.
 
@@ -487,7 +159,6 @@ const TeacherDashboard = () => {
       {/* </GestureHandlerRootView> */}
 
       {/* Edit Modal */}
-
       <LectureEditModal
         editModalVisible={editModalVisible}
         setEditModalVisible={setEditModalVisible}

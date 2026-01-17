@@ -33,4 +33,5 @@ export const queryKeys = {
   existingClassesForTeacher: ["existing-classes-for-teacher"],
   socketAttendanceViewTeacher: ["socket-attendance-view-teacher"],
   teacherLectures: ["teacher-lectures"],
+  teacherDashboardSocketUpdates: ["teacher-dashboard-socket-updates"],
 };

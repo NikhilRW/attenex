@@ -1,4 +1,4 @@
-import { getPasscode } from "@classes/services/lectureService";
+import { lectureService } from "@classes/services/lectureService";
 import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -30,7 +30,7 @@ export const useLectureEnded = () => {
   const fetchPasscodeData = async () => {
     try {
       setLoading(true);
-      const res = await getPasscode(lectureId as string);
+      const res = await lectureService.getPasscode(lectureId as string);
       if (res.success) {
         setPasscode(res.data.passcode);
         setLastUpdated(new Date(res.data.updatedAt));

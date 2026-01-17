@@ -57,7 +57,7 @@ class SocketService {
   joinLecture(lectureId: string) {
     if (this.socket) {
       this.socket.emit("joinLecture", lectureId);
-      console.log(`Joined lecture room: lecture-${lectureId}`);
+      // console.log(`Joined lecture room: lecture-${lectureId}`);
     }
   }
 
@@ -67,7 +67,7 @@ class SocketService {
   leaveLecture(lectureId: string, role?: User["role"]) {
     if (this.socket) {
       this.socket.emit("leaveLecture", lectureId, role);
-      console.log(`Left lecture room: lecture-${lectureId}`);
+      // console.log(`Left lecture room: lecture-${lectureId}`);
     }
   }
 

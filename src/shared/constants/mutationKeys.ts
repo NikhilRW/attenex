@@ -3,4 +3,5 @@ export const mutationKeys = {
   studentAttendanceSubmit: ["student-attendance-submit"],
   handleClassJoin: ["handle-class-join"],
   createLecture: ["create-lecture"],
+  updateLectureByTeacher: ["update-lecuture-by-teacher"],
 };

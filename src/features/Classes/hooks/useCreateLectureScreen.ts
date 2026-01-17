@@ -1,6 +1,6 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
-import { createLecture, getTeacherClasses } from "@classes/services";
+import { lectureService } from "@classes/services";
 import { ClassItem, LectureWithCount } from "@classes/types";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 import { storage } from "@shared/utils/mmkvStorage";
@@ -31,7 +31,7 @@ export const useCreateLectureScreen = () => {
   const fetchTeacherClasses: () => Promise<ClassItem[]> =
     useCallback(async () => {
       try {
-        const res = await getTeacherClasses();
+        const res = await lectureService.getTeacherClasses();
         let currentClasses: ClassItem[] = [];
         if (res.success) {
           currentClasses = [...res.data];
@@ -72,7 +72,7 @@ export const useCreateLectureScreen = () => {
     if (isNaN(finalDuration) || finalDuration <= 0) {
       Alert.alert(
         "Invalid Duration",
-        "Please enter a valid duration in minutes."
+        "Please enter a valid duration in minutes.",
       );
       return;
     }
@@ -80,7 +80,7 @@ export const useCreateLectureScreen = () => {
     if (status !== "granted") {
       Alert.alert(
         "Permission denied",
-        "Location is required to start a lecture."
+        "Location is required to start a lecture.",
       );
       return;
     }
@@ -89,12 +89,12 @@ export const useCreateLectureScreen = () => {
       accuracy: Location.Accuracy.Highest,
     });
 
-    const res = await createLecture(
+    const res = await lectureService.createLecture(
       lectureName,
       selectedClass,
       finalDuration,
       location.coords.latitude,
-      location.coords.longitude
+      location.coords.longitude,
     );
 
     return res;
@@ -105,7 +105,7 @@ export const useCreateLectureScreen = () => {
     onMutate: async (_, context) => {
       // Snapshot the previous value
       const previousLetures = context.client.getQueryData(
-        queryKeys.teacherLectures
+        queryKeys.teacherLectures,
       );
 
       const newLecture = {
@@ -129,7 +129,7 @@ export const useCreateLectureScreen = () => {
           } else {
             return [newLecture];
           }
-        }
+        },
       );
 
       navigateToTeacherDashboard();
@@ -146,7 +146,7 @@ export const useCreateLectureScreen = () => {
       } else {
         context.client.setQueryData(
           queryKeys.teacherLectures,
-          onMutateResult.previousLetures
+          onMutateResult.previousLetures,
         );
       }
     },

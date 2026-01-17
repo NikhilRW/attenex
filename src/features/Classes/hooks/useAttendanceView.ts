@@ -1,9 +1,6 @@
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
-import {
-  addManualAttendance,
-  fetchLectureAttendance,
-} from "@classes/services/lectureService";
+import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -27,7 +24,7 @@ export const useAttendanceView = () => {
   const fetchAttendance: () => Promise<AttendanceRecord[]> =
     useCallback(async () => {
       try {
-        const res = await fetchLectureAttendance(lectureId);
+        const res = await lectureService.fetchLectureAttendance(lectureId);
         if (res.success) {
           return res.data.attendance || [];
         }
@@ -97,7 +94,7 @@ export const useAttendanceView = () => {
             }
             refetchAttendance();
           }
-        }
+        },
       );
       return "data-fetched";
     },
@@ -124,7 +121,7 @@ export const useAttendanceView = () => {
         socketService.joinLecture(lectureId);
       }
       return () => {};
-    }, [lectureId, refetchAttendance])
+    }, [lectureId, refetchAttendance]),
   );
 
   const filteredAttendance = (attendance || []).filter((record) => {
@@ -146,13 +143,13 @@ export const useAttendanceView = () => {
   });
 
   const presentCount = (attendance || []).filter(
-    (r) => r.status === "present"
+    (r) => r.status === "present",
   ).length;
   const incompleteCount = (attendance || []).filter(
-    (r) => r.status === "incomplete"
+    (r) => r.status === "incomplete",
   ).length;
   const absentCount = (attendance || []).filter(
-    (r) => r.status === "absent"
+    (r) => r.status === "absent",
   ).length;
 
   const getPresentRollNumbers = () => {
@@ -186,7 +183,10 @@ export const useAttendanceView = () => {
       Alert.alert("Error", "Please enter student roll number");
       return;
     }
-    const res = await addManualAttendance(lectureId, manualRollNo.trim());
+    const res = await lectureService.addManualAttendance(
+      lectureId,
+      manualRollNo.trim(),
+    );
     return res;
   };
 
@@ -204,7 +204,7 @@ export const useAttendanceView = () => {
       onError: (error) => {
         Alert.alert(
           "Error",
-          error.message || "Failed to add manual attendance"
+          error.message || "Failed to add manual attendance",
         );
       },
     });
