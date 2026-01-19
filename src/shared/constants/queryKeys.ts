@@ -34,4 +34,5 @@ export const queryKeys = {
   socketAttendanceViewTeacher: ["socket-attendance-view-teacher"],
   teacherLectures: ["teacher-lectures"],
   teacherDashboardSocketUpdates: ["teacher-dashboard-socket-updates"],
+  fetchPasscodedForLectureEnded: ["fetch-passcode-for-lecture-ended"],
 };

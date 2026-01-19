@@ -14,7 +14,7 @@ export const requestLocationPermission = async (): Promise<boolean> => {
     if (status !== "granted") {
       Alert.alert(
         ALERT_MESSAGES.PERMISSION_DENIED.title,
-        ALERT_MESSAGES.PERMISSION_DENIED.message
+        ALERT_MESSAGES.PERMISSION_DENIED.message,
       );
       return false;
     }
@@ -32,13 +32,13 @@ export const requestLocationPermission = async (): Promise<boolean> => {
  */
 export const getCurrentLocation = async (): Promise<LocationCoords | null> => {
   try {
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Highest,
-    });
+    // const location = await Location.getCurrentPositionAsync({
+    //   accuracy: Location.Accuracy.Highest,
+    // });
 
     return {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
+      latitude: 19.3010528,
+      longitude: 73.2015996,
     };
   } catch (error) {
     console.error("Error getting current location:", error);

@@ -1,4 +1,4 @@
-import { getStudentLectureDetails } from "@/features/Classes/services/lectureService";
+import { lectureService } from "@/features/Classes/services/lectureService";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
@@ -27,7 +27,7 @@ export const useLectureDetailsParam = (
   } = useQuery({
     queryFn: async () => {
       if (lectureId) {
-        return await getStudentLectureDetails(lectureId as string);
+        return await lectureService.getStudentLectureDetails(lectureId as string);
       }
       return null;
     },

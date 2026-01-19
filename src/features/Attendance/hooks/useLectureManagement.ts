@@ -1,4 +1,4 @@
-import { getStudentLectures } from "@/features/Classes/services/lectureService";
+import { lectureService } from "@/features/Classes/services/lectureService";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
@@ -33,7 +33,7 @@ export const useLectureManagement = (
         return [];
       }
 
-      const res = await getStudentLectures(userClassName);
+      const res = await lectureService.getStudentLectures(userClassName);
       console.log(LOG_MESSAGES.LECTURES_RESPONSE, res);
 
       if (res.success) {

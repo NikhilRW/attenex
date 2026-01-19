@@ -1,6 +1,8 @@
+import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services/lectureService";
 import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -10,14 +12,14 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
+// TODO: Think about adding the password feature
 export const useLectureEnded = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { lectureId, lectureTitle } = params;
 
   const [passcode, setPasscode] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [, setLastUpdated] = useState<Date | null>(null);
+  // const [, setLastUpdated] = useState<Date | null>(null);
 
   // Animation for passcode glow effect
   const glowOpacity = useSharedValue(0.3);
@@ -27,25 +29,26 @@ export const useLectureEnded = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchPasscodeData = async () => {
+  const fetchPasscodeDataQueryFn = async () => {
     try {
-      setLoading(true);
       const res = await lectureService.getPasscode(lectureId as string);
       if (res.success) {
         setPasscode(res.data.passcode);
-        setLastUpdated(new Date(res.data.updatedAt));
       }
+      return res.success;
     } catch (error: any) {
       logger.error("Failed to fetch passcode:", error);
       Alert.alert("Error", error.message || "Failed to fetch passcode");
-    } finally {
-      setLoading(false);
+      return false;
     }
   };
 
-  useEffect(() => {
-    fetchPasscodeData();
+  const { refetch: fetchPasscodeData, isFetching: loading } = useQuery({
+    queryFn: fetchPasscodeDataQueryFn,
+    queryKey: queryKeys.fetchPasscodedForLectureEnded,
+  });
 
+  useEffect(() => {
     // Connect to socket and join lecture room
     socketService.connect();
     socketService.joinLecture(lectureId as string);
@@ -55,7 +58,7 @@ export const useLectureEnded = () => {
       logger.info("Passcode refresh event received:", data);
       if (data.lectureId === lectureId) {
         setPasscode(data.passcode);
-        setLastUpdated(new Date(data.updatedAt));
+        // setLastUpdated(new Date(data.updatedAt));
       }
     });
 
@@ -64,7 +67,6 @@ export const useLectureEnded = () => {
       socketService.leaveLecture(lectureId as string);
       socketService.offPasscodeRefresh();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lectureId]);
 
   const handleDone = () => {
