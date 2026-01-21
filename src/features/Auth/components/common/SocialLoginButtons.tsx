@@ -4,13 +4,8 @@ import { useTheme } from "@shared/hooks/useTheme";
 import { useAuthStore } from "@shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 
 const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({

@@ -1,7 +1,9 @@
 import { Entypo, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import Animated, {
   Easing,
   FadeOut,

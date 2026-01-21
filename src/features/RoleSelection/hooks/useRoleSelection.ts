@@ -2,6 +2,7 @@ import { Role } from "@role-selection/types";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { showMessage } from "react-native-flash-message";
@@ -11,7 +12,6 @@ export const useRoleSelection = () => {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [, setHoveredRole] = useState<Role>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
   const { user } = useAuthStore();
 
   const teacherScale = useSharedValue(1);
@@ -37,33 +37,36 @@ export const useRoleSelection = () => {
     studentScale.value = withSpring(1.05, { duration: 1000 });
   }, [teacherScale, studentScale]);
 
-  const handleConfirm = useCallback(async () => {
-    if (!selectedRole || isUpdating) return;
+  const handleConfirmMutateFn = useCallback(async () => {
+    if (!selectedRole) return;
+    // Call backend API to update user role
+    const res = await authService.updateUserRole(selectedRole);
+    return res;
+  }, [selectedRole]);
 
-    setIsUpdating(true);
-
-    try {
-      // Call backend API to update user role
-      await authService.updateUserRole(selectedRole);
-
-      showMessage({
-        message: "Role Updated",
-        description: `You are now a ${selectedRole}!`,
-        type: "success",
-        duration: 2000,
-        position: "bottom",
-      });
-
-      // Navigate based on selected role
-      if (selectedRole === "teacher") {
-        router.replace("/(main)/classes");
-      } else {
-        router.replace("/(main)/attendance");
+  const { mutateAsync: handleConfirm, isPending: isUpdating } = useMutation({
+    mutationFn: handleConfirmMutateFn,
+    onSuccess(data) {
+      if (data.user) {
+        showMessage({
+          message: "Role Updated",
+          description: `You are now a ${selectedRole}!`,
+          type: "success",
+          duration: 2000,
+          position: "bottom",
+        });
+        // Navigate based on selected role
+        if (selectedRole === "teacher") {
+          router.replace("/(main)/classes");
+        } else {
+          router.replace("/(main)/attendance");
+        }
       }
-    } catch (error: any) {
+    },
+    onError(error) {
       logger.error(
         "User update failed : handleConfirm() RoleSelection.tsx",
-        error
+        error,
       );
       showMessage({
         message: "Update Failed",
@@ -73,9 +76,8 @@ export const useRoleSelection = () => {
         duration: 3000,
         position: "bottom",
       });
-      setIsUpdating(false);
-    }
-  }, [selectedRole, isUpdating, router]);
+    },
+  });
 
   return {
     selectedRole,

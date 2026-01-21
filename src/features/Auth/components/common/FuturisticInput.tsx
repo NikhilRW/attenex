@@ -4,12 +4,12 @@ import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 const FuturisticInput: React.FC<FuturisticInputProps> = ({
   label,

@@ -2,7 +2,8 @@ import { AuthHeaderProps } from "@auth/types/props";
 import { useTheme } from "@shared/hooks/useTheme";
 import { Image } from "expo-image";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 const AuthHeader: React.FC<AuthHeaderProps> = ({ title, logoSource }) => {
     const { colors } = useTheme();

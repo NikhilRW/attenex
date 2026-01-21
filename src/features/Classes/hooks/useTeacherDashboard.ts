@@ -113,56 +113,62 @@ export const useTeacherDashboard = () => {
   useQuery({
     queryKey: queryKeys.teacherDashboardSocketUpdates,
     queryFn: () => {
-      socketService.connect();
+      try {
+        socketService.connect();
 
-      // Join all lecture rooms
-      (lectures || []).forEach((lecture) => {
-        socketService.joinLecture(lecture.id);
-      });
+        // Join all lecture rooms
+        (lectures || []).forEach((lecture) => {
+          socketService.joinLecture(lecture.id);
+        });
 
-      // Listen for student join events (use stable callback)
-      const handleStudentJoined = (data: any) => {
-        console.log("Student joined event:", data);
-        // Refresh lecture list to update student count
-        fetchActiveLectures();
-      };
+        // Listen for student join events (use stable callback)
+        const handleStudentJoined = (data: any) => {
+          console.log("Student joined event:", data);
+          // Refresh lecture list to update student count
+          fetchActiveLectures();
+        };
 
-      // Listen for attendance submission events (use stable callback)
-      const handleAttendanceSubmitted = (data: any) => {
-        console.log("Attendance submitted event:", data);
-        // Refresh lecture list to update student count
-        fetchActiveLectures();
-      };
+        // Listen for attendance submission events (use stable callback)
+        const handleAttendanceSubmitted = (data: any) => {
+          console.log("Attendance submitted event:", data);
+          // Refresh lecture list to update student count
+          fetchActiveLectures();
+        };
 
-      socketService.onStudentJoined(handleStudentJoined);
-      socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+        socketService.onStudentJoined(handleStudentJoined);
+        socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
 
-      // Handle app state changes (background/foreground)
-      subscriptionRef.current = AppState.addEventListener(
-        "change",
-        (nextAppState) => {
-          if (nextAppState === "active") {
-            // App came back to foreground - reconnect socket and refresh
-            if (!socketService.isConnected()) {
-              socketService.connect();
-              (lectures || []).forEach((lecture) => {
-                socketService.joinLecture(lecture.id);
-              });
-              socketService.onStudentJoined(handleStudentJoined);
-              socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+        // Handle app state changes (background/foreground)
+        subscriptionRef.current = AppState.addEventListener(
+          "change",
+          (nextAppState) => {
+            if (nextAppState === "active") {
+              // App came back to foreground - reconnect socket and refresh
+              if (!socketService.isConnected()) {
+                socketService.connect();
+                (lectures || []).forEach((lecture) => {
+                  socketService.joinLecture(lecture.id);
+                });
+                socketService.onStudentJoined(handleStudentJoined);
+                socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+              }
+              if (
+                !(
+                  fromCreateLecture !== "true" &&
+                  latestCreateLectureMutation &&
+                  latestCreateLectureMutation.status === "pending"
+                )
+              ) {
+                fetchActiveLectures();
+              }
             }
-            if (
-              !(
-                fromCreateLecture !== "true" &&
-                latestCreateLectureMutation &&
-                latestCreateLectureMutation.status === "pending"
-              )
-            ) {
-              fetchActiveLectures();
-            }
-          }
-        },
-      );
+          },
+        );
+        return true;
+      } catch (error) {
+        console.log("Error Updating Screen With Sokcet  Updates.", error);
+        return false;
+      }
     },
   });
 

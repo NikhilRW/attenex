@@ -1,7 +1,8 @@
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {  Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { FuturisticDividerProps } from "@auth/types/props";
 
 const FuturisticDivider: React.FC<FuturisticDividerProps> = ({ text }) => {
