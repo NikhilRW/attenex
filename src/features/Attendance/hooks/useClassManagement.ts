@@ -1,8 +1,8 @@
+import { userService } from "@/shared/services/userService";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { UseClassManagementReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
 import { validateClassName } from "@attendance/utils/validationUtils";
-import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { useState } from "react";
  * Custom hook to manage class updates
  */
 export const useClassManagement = (
-  onClassUpdated: () => void
+  onClassUpdated: () => void,
 ): UseClassManagementReturn => {
   const { user, updateUser } = useAuthStore();
   const defaultClassName =
@@ -24,11 +24,11 @@ export const useClassManagement = (
     if (!validateClassName(className)) {
       showErrorAlert(
         ALERT_MESSAGES.CLASS_REQUIRED.title,
-        ALERT_MESSAGES.CLASS_REQUIRED.message
+        ALERT_MESSAGES.CLASS_REQUIRED.message,
       );
       return;
     }
-    const response = await authService.updateStudentClass(className.trim());
+    const response = await userService.updateStudentClass(className.trim());
     return response;
   };
 
@@ -48,7 +48,7 @@ export const useClassManagement = (
           storage.set("userClassName", className.trim());
           showSuccessAlert(
             ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.title,
-            ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.message
+            ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.message,
           );
           setShowClassModal(false);
           onClassUpdated();
@@ -61,7 +61,7 @@ export const useClassManagement = (
           showErrorAlert(
             ALERT_MESSAGES.CLASS_UPDATE_FAILED.title,
             (error && error.message) ||
-              ALERT_MESSAGES.CLASS_UPDATE_FAILED.message
+              ALERT_MESSAGES.CLASS_UPDATE_FAILED.message,
           );
         }
       },

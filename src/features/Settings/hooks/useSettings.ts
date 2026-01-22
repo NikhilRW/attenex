@@ -1,7 +1,9 @@
+import { userService } from "@/shared/services/userService";
 import { UserRole } from "@settings/types";
 import { handleResetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
+import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -13,13 +15,12 @@ export const useSettings = () => {
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<UserRole>((user?.role as any) || "teacher");
   const [savingRole, setSavingRole] = useState(false);
-  const [savingName, setSavingName] = useState(false);
 
   const handleRoleUpdate = useCallback(async () => {
     setSavingRole(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     try {
-      await authService.updateUserRole(role);
+      await userService.updateUserRole(role);
       Alert.alert("Role updated", `Your role is now set to ${role}.`);
       if (role === "teacher") {
         router.replace("/classes");
@@ -33,18 +34,32 @@ export const useSettings = () => {
     }
   }, [role, router]);
 
-  const handleNameUpdate = useCallback(async () => {
-    setSavingName(true);
+  const handleNameUpdateMutateFn = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    try {
-      updateUser({ name: displayName } as any);
-      Alert.alert("Saved", "Name updated locally.");
-    } catch (error: any) {
+    const res = await userService.updateUserFullName(displayName);
+    return res;
+  }, [displayName]);
+
+  const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation({
+    mutationFn: handleNameUpdateMutateFn,
+    onMutate() {
+      const prevName = user?.name || "";
+      updateUser({ name: displayName });
+      return { prevName };
+    },
+    onSuccess(data, _, onMutateResult) {
+      if (data.success) {
+        Alert.alert("Your full name updated");
+      } else {
+        updateUser({ name: onMutateResult.prevName });
+        Alert.alert("Error", data.message || "Failed to update name");
+      }
+    },
+    onError: (error, _, onMutateResult) => {
       Alert.alert("Error", error.message || "Failed to update name");
-    } finally {
-      setSavingName(false);
-    }
-  }, [displayName, updateUser]);
+      updateUser({ name: onMutateResult?.prevName });
+    },
+  });
 
   const handleLogout = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);

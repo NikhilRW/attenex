@@ -1,5 +1,5 @@
+import { userService } from "@/shared/services/userService";
 import { Role } from "@role-selection/types";
-import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ export const useRoleSelection = () => {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [, setHoveredRole] = useState<Role>(null);
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
 
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
@@ -40,14 +40,24 @@ export const useRoleSelection = () => {
   const handleConfirmMutateFn = useCallback(async () => {
     if (!selectedRole) return;
     // Call backend API to update user role
-    const res = await authService.updateUserRole(selectedRole);
+    const res = await userService.updateUserRole(selectedRole);
     return res;
   }, [selectedRole]);
 
   const { mutateAsync: handleConfirm, isPending: isUpdating } = useMutation({
     mutationFn: handleConfirmMutateFn,
-    onSuccess(data) {
-      if (data.user) {
+    onMutate() {
+      updateUser({ role: selectedRole });
+      if (selectedRole === "teacher") {
+        router.replace("/(main)/classes");
+      } else {
+        router.replace("/(main)/attendance");
+      }
+      return { user };
+    },
+    onSuccess(data, _, onMutateResult) {
+      console.log(JSON.stringify(data));
+      if (data?.user) {
         showMessage({
           message: "Role Updated",
           description: `You are now a ${selectedRole}!`,
@@ -61,9 +71,11 @@ export const useRoleSelection = () => {
         } else {
           router.replace("/(main)/attendance");
         }
+      } else {
+        updateUser(onMutateResult?.user!);
       }
     },
-    onError(error) {
+    onError(error, _, onMutateResult) {
       logger.error(
         "User update failed : handleConfirm() RoleSelection.tsx",
         error,
@@ -76,6 +88,7 @@ export const useRoleSelection = () => {
         duration: 3000,
         position: "bottom",
       });
+      updateUser(onMutateResult?.user!);
     },
   });
 
