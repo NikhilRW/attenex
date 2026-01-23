@@ -1,3 +1,8 @@
+import {
+  AlertButton,
+  AlertsOptions,
+} from "react-native-paper-alerts/lib/typescript/type";
+
 export type Lecture = {
   id: string;
   title: string;
@@ -9,3 +14,10 @@ export type Lecture = {
   teacherLatitude: string;
   teacherLongitude: string;
 };
+
+export type AlertFunc = (
+  title: string,
+  message?: string,
+  button?: AlertButton[],
+  options?: AlertsOptions,
+) => void;

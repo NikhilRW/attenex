@@ -8,7 +8,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Alert } from "react-native";
+
+import { useAlerts } from "react-native-paper-alerts";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
@@ -23,6 +24,8 @@ export const useCreateLectureScreen = () => {
   const [showDurationDropdown, setShowDurationDropdown] = useState(false);
   const [showNewClassModal, setShowNewClassModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  
+  const { alert } = useAlerts();
 
   const navigateToTeacherDashboard = () => {
     router.navigate("/classes?fromCreateLecture=true");
@@ -64,13 +67,13 @@ export const useCreateLectureScreen = () => {
 
   const handleCreateLectureMutateFn = async () => {
     if (!lectureName || !selectedClass) {
-      Alert.alert("Missing Information", "Please fill in all fields.");
+      alert("Missing Information", "Please fill in all fields.");
       return;
     }
 
     const finalDuration = duration === -1 ? parseInt(customDuration) : duration;
     if (isNaN(finalDuration) || finalDuration <= 0) {
-      Alert.alert(
+      alert(
         "Invalid Duration",
         "Please enter a valid duration in minutes.",
       );
@@ -78,7 +81,7 @@ export const useCreateLectureScreen = () => {
     }
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
+      alert(
         "Permission denied",
         "Location is required to start a lecture.",
       );
@@ -137,7 +140,7 @@ export const useCreateLectureScreen = () => {
     },
     onSuccess: async (data, _, onMutateResult, context) => {
       if (data.success) {
-        Alert.alert("Success", "Lecture created successfully!", [
+        alert("Success", "Lecture created successfully!", [
           { text: "OK" },
         ]);
         await context.client.invalidateQueries({
@@ -151,7 +154,7 @@ export const useCreateLectureScreen = () => {
       }
     },
     onError(error) {
-      Alert.alert("Error", error.message || "Failed to create lecture");
+      alert("Error", error.message || "Failed to create lecture");
     },
     mutationKey: mutationKeys.createLecture,
   });
@@ -163,7 +166,7 @@ export const useCreateLectureScreen = () => {
 
   const handleCreateNewClassMutateFN = async () => {
     if (!newClassName.trim()) {
-      Alert.alert("Error", "Please enter a class name");
+      alert("Error", "Please enter a class name");
       return;
     }
 

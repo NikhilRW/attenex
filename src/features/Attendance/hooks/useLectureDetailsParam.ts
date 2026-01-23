@@ -16,7 +16,7 @@ import { useLocalSearchParams } from "expo-router";
  */
 export const useLectureDetailsParam = (
   lectures: Lecture[],
-  onJoinLecture: (lecture: any) => Promise<void>
+  onJoinLecture: (lecture: any) => Promise<void>,
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
 
@@ -27,7 +27,9 @@ export const useLectureDetailsParam = (
   } = useQuery({
     queryFn: async () => {
       if (lectureId) {
-        return await lectureService.getStudentLectureDetails(lectureId as string);
+        return await lectureService.getStudentLectureDetails(
+          lectureId as string,
+        );
       }
       return null;
     },
@@ -67,7 +69,8 @@ export const useLectureDetailsParam = (
             console.log(LOG_MESSAGES.DETAILS_FAILED);
             showErrorAlert(
               ALERT_MESSAGES.LECTURE_DETAILS_FAILED.title,
-              ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
+              ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message,
+              alert,
             );
             // Still try to join with minimal data
             await onJoinLecture({ id: lectureId });
@@ -77,7 +80,8 @@ export const useLectureDetailsParam = (
           console.error(LOG_MESSAGES.DETAILS_ERROR, error);
           showErrorAlert(
             ALERT_MESSAGES.LECTURE_DETAILS_FAILED.title,
-            error.message || ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message
+            error.message || ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message,
+            alert,
           );
           // Fallback: try to join with just the ID
           await onJoinLecture({ id: lectureId });

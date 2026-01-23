@@ -24,7 +24,7 @@ export const useAttendanceSubmit = (
         res: any;
         lecture: Lecture;
       }
-  >
+  >,
 ): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");
   const rollNo = useAuthStore((state) => state.user?.rollNo);
@@ -39,7 +39,8 @@ export const useAttendanceSubmit = (
     if (!validatePasscode(passcode)) {
       showErrorAlert(
         ALERT_MESSAGES.INVALID_PASSCODE.title,
-        ALERT_MESSAGES.INVALID_PASSCODE.message
+        ALERT_MESSAGES.INVALID_PASSCODE.message,
+        alert,
       );
       return null;
     }
@@ -52,7 +53,7 @@ export const useAttendanceSubmit = (
       joinedLecture.id,
       passcode,
       location.latitude,
-      location.longitude
+      location.longitude,
     );
 
     return { res, onSuccess };
@@ -72,7 +73,8 @@ export const useAttendanceSubmit = (
       if (res.success) {
         showSuccessAlert(
           ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
-          ALERT_MESSAGES.ATTENDANCE_SUCCESS.message
+          ALERT_MESSAGES.ATTENDANCE_SUCCESS.message,
+          alert
         );
 
         setPasscode("");
@@ -93,7 +95,8 @@ export const useAttendanceSubmit = (
     onError(error) {
       showErrorAlert(
         ALERT_MESSAGES.SUBMISSION_FAILED.title,
-        error.message || ALERT_MESSAGES.SUBMISSION_FAILED.message
+        error.message || ALERT_MESSAGES.SUBMISSION_FAILED.message,
+        alert,
       );
     },
   });

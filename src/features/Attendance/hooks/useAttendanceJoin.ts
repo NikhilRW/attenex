@@ -22,16 +22,19 @@ import {
 import { useAuthStore } from "@shared/stores/authStore";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
+import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage joining and leaving lectures
  */
 export const useAttendanceJoin = (
-  onRollNoRequired: (lecture: Lecture) => void
+  onRollNoRequired: (lecture: Lecture) => void,
 ): UseAttendanceJoinReturn => {
   const { user } = useAuthStore();
   const [joinedLecture, setJoinedLecture] = useState<Lecture | null>(null);
   const [status, setStatus] = useState<JoinStatus>("idle");
+
+  const { alert } = useAlerts();
 
   const proceedWithJoinMutation = useCallback(
     async ({
@@ -41,7 +44,7 @@ export const useAttendanceJoin = (
       lecture: Lecture;
       studentRollNo: string;
     }) => {
-      const hasPermission = await requestLocationPermission();
+      const hasPermission = await requestLocationPermission(alert);
       if (!hasPermission) {
         return false;
       }
@@ -55,14 +58,14 @@ export const useAttendanceJoin = (
         lecture.id,
         location.latitude,
         location.longitude,
-        studentRollNo
+        studentRollNo,
       );
       return {
         res,
         lecture,
       };
     },
-    []
+    [alert],
   );
 
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
@@ -80,7 +83,8 @@ export const useAttendanceJoin = (
       if (res.success) {
         showSuccessAlert(
           ALERT_MESSAGES.JOINED.title,
-          ALERT_MESSAGES.JOINED.message
+          ALERT_MESSAGES.JOINED.message,
+          alert
         );
         // Start Background Task
         await startBackgroundTracking(lecture.id);
@@ -95,7 +99,8 @@ export const useAttendanceJoin = (
         setStatus("idle");
         showErrorAlert(
           ALERT_MESSAGES.JOIN_FAILED.title,
-          ALERT_MESSAGES.JOIN_FAILED.message
+          ALERT_MESSAGES.JOIN_FAILED.message,
+          alert,
         );
       }
     },
@@ -105,7 +110,8 @@ export const useAttendanceJoin = (
       setStatus("idle");
       showErrorAlert(
         ALERT_MESSAGES.JOIN_FAILED.title,
-        error.message || ALERT_MESSAGES.JOIN_FAILED.message
+        error.message || ALERT_MESSAGES.JOIN_FAILED.message,
+        alert,
       );
       return false;
     },
@@ -121,7 +127,7 @@ export const useAttendanceJoin = (
 
       await proceedWithJoin({ lecture, studentRollNo: user.rollNo });
     },
-    [proceedWithJoin, user, onRollNoRequired]
+    [proceedWithJoin, user, onRollNoRequired],
   );
   const { mutateAsync: handleJoin } = useMutation({
     mutationFn: handleJoinMutateFn,
@@ -132,15 +138,16 @@ export const useAttendanceJoin = (
     showDestructiveAlert(
       ALERT_MESSAGES.LEAVE_LECTURE.title,
       ALERT_MESSAGES.LEAVE_LECTURE.message,
+      alert,
       "Leave",
       async () => {
         await stopBackgroundTracking();
         setJoinedLecture(null);
         setStatus("idle");
         onLectureLeft();
-      }
+      },
     );
-  }, []);
+  }, [alert]);
 
   return {
     joinedLecture,

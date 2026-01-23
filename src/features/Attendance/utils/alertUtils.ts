@@ -1,17 +1,25 @@
-import { Alert } from "react-native";
+import { AlertFunc } from "../types";
 
 /**
  * Show a success alert
  */
-export const showSuccessAlert = (title: string, message: string) => {
-  Alert.alert(title, message);
+export const showSuccessAlert = (
+  title: string,
+  message: string,
+  alert: AlertFunc,
+) => {
+  alert(title, message);
 };
 
 /**
  * Show an error alert
  */
-export const showErrorAlert = (title: string, message: string) => {
-  Alert.alert(title, message);
+export const showErrorAlert = (
+  title: string,
+  message: string,
+  alert: AlertFunc,
+) => {
+  alert(title, message);
 };
 
 /**
@@ -20,10 +28,11 @@ export const showErrorAlert = (title: string, message: string) => {
 export const showConfirmationAlert = (
   title: string,
   message: string,
+  alert: AlertFunc,
   onConfirm: () => void,
-  onCancel?: () => void
+  onCancel?: () => void,
 ) => {
-  Alert.alert(title, message, [
+  alert(title, message, [
     {
       text: "Cancel",
       style: "cancel",
@@ -42,10 +51,11 @@ export const showConfirmationAlert = (
 export const showDestructiveAlert = (
   title: string,
   message: string,
+  alert: AlertFunc,
   confirmText: string,
-  onConfirm: () => void
+  onConfirm: () => void,
 ) => {
-  Alert.alert(title, message, [
+  alert(title, message, [
     { text: "Cancel", style: "cancel" },
     {
       text: confirmText,

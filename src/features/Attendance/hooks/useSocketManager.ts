@@ -19,7 +19,7 @@ import { AppState } from "react-native";
  */
 export const useSocketManager = (
   joinedLecture: Lecture | null,
-  onAppForeground: () => void
+  onAppForeground: () => void,
 ): UseSocketManagerReturn => {
   const [lectureStatus, setLectureStatus] = useState<LectureStatus>("active");
   const { user } = useAuthStore();
@@ -64,7 +64,8 @@ export const useSocketManager = (
         setTimeout(() => {
           showSuccessAlert(
             ALERT_MESSAGES.LECTURE_ENDED.title,
-            ALERT_MESSAGES.LECTURE_ENDED.message
+            ALERT_MESSAGES.LECTURE_ENDED.message,
+            alert,
           );
         }, ALERT_DELAY);
       }

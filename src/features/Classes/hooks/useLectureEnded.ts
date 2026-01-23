@@ -5,19 +5,19 @@ import { logger } from "@shared/utils/logger";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 import {
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { useAlerts } from "react-native-paper-alerts";
 
 // TODO: Think about adding the password feature
 export const useLectureEnded = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { lectureId, lectureTitle } = params;
-
+  const { alert } = useAlerts();
   const [passcode, setPasscode] = useState<string | null>(null);
   // const [, setLastUpdated] = useState<Date | null>(null);
 
@@ -38,7 +38,7 @@ export const useLectureEnded = () => {
       return res.success;
     } catch (error: any) {
       logger.error("Failed to fetch passcode:", error);
-      Alert.alert("Error", error.message || "Failed to fetch passcode");
+      alert("Error", error.message || "Failed to fetch passcode");
       return false;
     }
   };

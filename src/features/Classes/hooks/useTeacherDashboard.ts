@@ -7,17 +7,19 @@ import { socketService } from "@shared/services/socketService";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, AppState, NativeEventSubscription } from "react-native";
+import { AppState, NativeEventSubscription } from "react-native";
 import {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useAlerts } from "react-native-paper-alerts";
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
   const { ended, lectureId } = useLocalSearchParams();
+  const { alert } = useAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
@@ -33,7 +35,6 @@ export const useTeacherDashboard = () => {
   });
   const latestCreateLectureMutation = data[data.length - 1];
   const subscriptionRef = useRef<NativeEventSubscription>(null);
-
   // Animation values
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
@@ -190,7 +191,7 @@ export const useTeacherDashboard = () => {
   ]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
-    Alert.alert("End Lecture", "Are you sure you want to end this lecture?", [
+    alert("End Lecture", "Are you sure you want to end this lecture?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "End",
@@ -210,7 +211,7 @@ export const useTeacherDashboard = () => {
               });
             }
           } catch (error: any) {
-            Alert.alert("Error", error.message || "Failed to end lecture");
+            alert("Error", error.message || "Failed to end lecture");
           }
         },
       },
@@ -219,14 +220,14 @@ export const useTeacherDashboard = () => {
 
   const handleDeleteLecture = async (lecture: LectureWithCount) => {
     if (lecture.status !== "ended") {
-      Alert.alert(
+      alert(
         "Cannot Delete",
         "Only ended lectures can be deleted. Please end the lecture first.",
       );
       return;
     }
 
-    Alert.alert(
+    alert(
       "Delete Lecture",
       `Are you sure you want to delete "${lecture.title}"?`,
       [
@@ -241,7 +242,7 @@ export const useTeacherDashboard = () => {
                 fetchActiveLectures();
               }
             } catch (error: any) {
-              Alert.alert("Error", error.message || "Failed to delete lecture");
+              alert("Error", error.message || "Failed to delete lecture");
             }
           },
         },
@@ -251,7 +252,7 @@ export const useTeacherDashboard = () => {
 
   const handleEditLecture = (lecture: LectureWithCount) => {
     if (lecture.status !== "active") {
-      Alert.alert("Cannot Edit", "Only active lectures can be edited.");
+      alert("Cannot Edit", "Only active lectures can be edited.");
       return;
     }
     setEditingLecture(lecture);
@@ -263,12 +264,12 @@ export const useTeacherDashboard = () => {
   const handleUpdateLectureMutateFn = async () => {
     if (!editingLecture) return;
     if (!editTitle.trim()) {
-      Alert.alert("Error", "Title cannot be empty");
+      alert("Error", "Title cannot be empty");
       return;
     }
     const durationNum = parseInt(editDuration);
     if (isNaN(durationNum) || durationNum <= 0) {
-      Alert.alert("Error", "Duration must be a positive number");
+      alert("Error", "Duration must be a positive number");
       return;
     }
     const res = await lectureService.updateLecture(editingLecture.id, {
@@ -333,7 +334,7 @@ export const useTeacherDashboard = () => {
           queryKeys.teacherLectures,
           onMutateResult.previousLetures,
         );
-        Alert.alert("Error", "Failed to update lecture");
+        alert("Error", "Failed to update lecture");
       }
     },
     onError(error, _, onMutateResult, context) {
@@ -343,7 +344,7 @@ export const useTeacherDashboard = () => {
           onMutateResult.previousLetures,
         );
       }
-      Alert.alert("Error", error.message || "Failed to update lecture");
+      alert("Error", error.message || "Failed to update lecture");
     },
   });
 

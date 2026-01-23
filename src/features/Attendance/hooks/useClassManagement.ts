@@ -25,6 +25,7 @@ export const useClassManagement = (
       showErrorAlert(
         ALERT_MESSAGES.CLASS_REQUIRED.title,
         ALERT_MESSAGES.CLASS_REQUIRED.message,
+        alert,
       );
       return;
     }
@@ -49,6 +50,7 @@ export const useClassManagement = (
           showSuccessAlert(
             ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.title,
             ALERT_MESSAGES.CLASS_UPDATE_SUCCESS.message,
+            alert,
           );
           setShowClassModal(false);
           onClassUpdated();
@@ -62,6 +64,7 @@ export const useClassManagement = (
             ALERT_MESSAGES.CLASS_UPDATE_FAILED.title,
             (error && error.message) ||
               ALERT_MESSAGES.CLASS_UPDATE_FAILED.message,
+            alert,
           );
         }
       },

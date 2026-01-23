@@ -17,7 +17,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
 
   const handleRollNoSubmitMutateFn = async (
-    onSubmit: (rollNo: string) => Promise<void>
+    onSubmit: (rollNo: string) => Promise<void>,
   ) => {
     if (!validateRollNo(rollNo)) {
       return false;
@@ -38,13 +38,18 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
       if (data === false) {
         showErrorAlert(
           ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.title,
-          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.message
+          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.message,
+          alert,
         );
       }
     },
     onError: (error) => {
       logger.error(error.message);
-      showErrorAlert("Roll no not updated successfully", "Kindly try again");
+      showErrorAlert(
+        "Roll no not updated successfully",
+        "Kindly try again",
+        alert,
+      );
     },
   });
 

@@ -26,7 +26,7 @@ import {
 } from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import FlashMessage from "react-native-flash-message";
 import {
   configureReanimatedLogger,
@@ -41,6 +41,8 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
+import { AlertsProvider } from "react-native-paper-alerts";
+import { MD3LightTheme, MD3DarkTheme, PaperProvider } from "react-native-paper";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -77,7 +79,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const buildAttenexNotificationContent = (
-      remoteMessage: FirebaseMessagingTypes.RemoteMessage
+      remoteMessage: FirebaseMessagingTypes.RemoteMessage,
     ): NotificationContentInput => {
       const title = remoteMessage.notification?.title ?? "Attenex";
       const body = remoteMessage.notification?.body ?? "";
@@ -137,16 +139,16 @@ export default function RootLayout() {
         if (remoteMessage?.data?.lectureId && !remoteMessage.data.ended) {
           console.log(
             "✅ Firebase notification caused app to open from quit state:",
-            JSON.stringify(remoteMessage)
+            JSON.stringify(remoteMessage),
           );
           console.log("Navigating to lecture:", remoteMessage.data.lectureId);
           router.replace(
-            `/attendance?lectureId=${remoteMessage.data.lectureId}`
+            `/attendance?lectureId=${remoteMessage.data.lectureId}`,
           );
           return;
         } else if (remoteMessage?.data?.lectureId && remoteMessage.data.ended) {
           router.replace(
-            `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`
+            `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`,
           );
           return;
         }
@@ -184,7 +186,7 @@ export default function RootLayout() {
             trigger: null,
           });
         }
-      }
+      },
     );
 
     // Handle user clicking on a notification and open the screen
@@ -212,14 +214,14 @@ export default function RootLayout() {
       (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
         console.log(
           "Notification caused app to open from background state:",
-          remoteMessage?.data?.lectureId
+          remoteMessage?.data?.lectureId,
         );
         if (remoteMessage?.data?.lectureId) {
           // router.navigate(
           //   `/attendance?lectureId=${remoteMessage.data.lectureId}`
           // );
         }
-      }
+      },
     );
 
     // Listen for user clicking on a notification (both foreground and background)
@@ -235,7 +237,7 @@ export default function RootLayout() {
         if (response) {
           console.log(
             "📱 Found last notification response (app was killed):",
-            JSON.stringify(response)
+            JSON.stringify(response),
           );
           const lectureId =
             response?.notification?.request?.content?.data?.lectureId;
@@ -243,7 +245,7 @@ export default function RootLayout() {
           if (lectureId) {
             console.log(
               "✅ Navigating to lecture from notification:",
-              lectureId
+              lectureId,
             );
             // Use replace for cold start to set up the navigation stack correctly
             router.replace(`/attendance?lectureId=${lectureId}`);
@@ -254,7 +256,7 @@ export default function RootLayout() {
       });
     }
     const handlePushNotification = async (
-      remoteMessage: FirebaseMessagingTypes.RemoteMessage
+      remoteMessage: FirebaseMessagingTypes.RemoteMessage,
     ) => {
       // Schedule the notification with a null trigger to show immediately
       queryClient.invalidateQueries({
@@ -267,7 +269,7 @@ export default function RootLayout() {
         });
       } else {
         router.replace(
-          `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`
+          `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`,
         );
       }
     };
@@ -308,6 +310,11 @@ export default function RootLayout() {
     }
   };
 
+  const ActualTheme = useMemo(
+    () => (isDark ? MD3DarkTheme : MD3LightTheme),
+    [isDark],
+  );
+
   if (!loaded && !error) {
     return null;
   }
@@ -317,21 +324,37 @@ export default function RootLayout() {
       <SafeAreaView
         style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
       >
-        <PersistQueryClientProvider
-          client={queryClient}
-          onSuccess={() =>
-            queryClient
-              .resumePausedMutations()
-              .then(() => queryClient.invalidateQueries())
-          }
-          persistOptions={{ persister: clientPersister }}
+        <PaperProvider
+          theme={{
+            ...ActualTheme,
+            colors: {
+              ...ActualTheme.colors,
+              primary: colors.primary.main, // Button Text
+              backdrop: "#00000053",
+            },
+          }}
         >
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(main)" />
-          </Stack>
-          <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
-        </PersistQueryClientProvider>
+          <AlertsProvider>
+            <PersistQueryClientProvider
+              client={queryClient}
+              onSuccess={() =>
+                queryClient
+                  .resumePausedMutations()
+                  .then(() => queryClient.invalidateQueries())
+              }
+              persistOptions={{ persister: clientPersister }}
+            >
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(main)" />
+              </Stack>
+              <FlashMessage
+                position="bottom"
+                style={{ marginBottom: bottom }}
+              />
+            </PersistQueryClientProvider>
+          </AlertsProvider>
+        </PaperProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   );

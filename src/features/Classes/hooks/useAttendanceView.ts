@@ -6,8 +6,9 @@ import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, AppState, NativeEventSubscription } from "react-native";
+import { AppState, NativeEventSubscription } from "react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { useAlerts } from "react-native-paper-alerts";
 
 export const useAttendanceView = () => {
   const router = useRouter();
@@ -21,6 +22,8 @@ export const useAttendanceView = () => {
   const [manualRollNo, setManualRollNo] = useState("");
   const appStateSubsription = useRef<NativeEventSubscription>(null);
 
+  const { alert } = useAlerts();
+
   const fetchAttendance: () => Promise<AttendanceRecord[]> =
     useCallback(async () => {
       try {
@@ -30,7 +33,7 @@ export const useAttendanceView = () => {
         }
         return [];
       } catch (error: any) {
-        Alert.alert("Error", error.message || "Failed to fetch attendance");
+        alert("Error", error.message || "Failed to fetch attendance");
         return [];
       }
     }, [lectureId]);
@@ -172,15 +175,15 @@ export const useAttendanceView = () => {
     const rollNumbers = getPresentRollNumbers();
     if (rollNumbers) {
       Clipboard.setString(rollNumbers);
-      Alert.alert("Copied!", "Roll numbers copied to clipboard");
+      alert("Copied!", "Roll numbers copied to clipboard");
     } else {
-      Alert.alert("No Data", "No present students with roll numbers");
+      alert("No Data", "No present students with roll numbers");
     }
   };
 
   const manualAttendance = async () => {
     if (!manualRollNo.trim()) {
-      Alert.alert("Error", "Please enter student roll number");
+      alert("Error", "Please enter student roll number");
       return;
     }
     const res = await lectureService.addManualAttendance(
@@ -195,14 +198,14 @@ export const useAttendanceView = () => {
       mutationFn: manualAttendance,
       onSuccess: async (data) => {
         if (data.success) {
-          Alert.alert("Success", data.message);
+          alert("Success", data.message);
           setManualRollNo("");
           setShowManualAttendance(false);
           await refetchAttendance();
         }
       },
       onError: (error) => {
-        Alert.alert(
+        alert(
           "Error",
           error.message || "Failed to add manual attendance",
         );
