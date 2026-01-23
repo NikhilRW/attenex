@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
 import { logger } from "@/shared/utils";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
@@ -30,6 +31,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const { mutate: handleRollNoSubmit } = useMutation({
     mutationFn: handleRollNoSubmitMutateFn,
     gcTime: GarbageTime.SECONDS_30,
+    mutationKey: mutationKeys.rollNoSubmitStudent,
     onSuccess: () => {
       setPendingLecture(null);
       setRollNo("");

@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
 import { Role } from "@role-selection/types";
 import { useAuthStore } from "@shared/stores/authStore";
@@ -7,6 +8,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { showMessage } from "react-native-flash-message";
 import { useSharedValue, withSpring } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 
 export const useRoleSelection = () => {
   const router = useRouter();
@@ -40,39 +42,37 @@ export const useRoleSelection = () => {
   const handleConfirmMutateFn = useCallback(async () => {
     if (!selectedRole) return;
     // Call backend API to update user role
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const res = await userService.updateUserRole(selectedRole);
     return res;
   }, [selectedRole]);
 
   const { mutateAsync: handleConfirm, isPending: isUpdating } = useMutation({
     mutationFn: handleConfirmMutateFn,
+    mutationKey: mutationKeys.updateUserRole,
     onMutate() {
+      const prevUser = { ...user };
       updateUser({ role: selectedRole });
       if (selectedRole === "teacher") {
         router.replace("/(main)/classes");
       } else {
         router.replace("/(main)/attendance");
       }
-      return { user };
+      return { user: prevUser };
     },
-    onSuccess(data, _, onMutateResult) {
-      console.log(JSON.stringify(data));
-      if (data?.user) {
-        showMessage({
-          message: "Role Updated",
-          description: `You are now a ${selectedRole}!`,
-          type: "success",
-          duration: 2000,
-          position: "bottom",
-        });
-        // Navigate based on selected role
-        if (selectedRole === "teacher") {
-          router.replace("/(main)/classes");
-        } else {
-          router.replace("/(main)/attendance");
-        }
+    onSuccess() {
+      showMessage({
+        message: "Role Updated",
+        description: `You are now a ${selectedRole}!`,
+        type: "success",
+        duration: 2000,
+        position: "bottom",
+      });
+      // Navigate based on selected role
+      if (selectedRole === "teacher") {
+        router.replace("/(main)/classes");
       } else {
-        updateUser(onMutateResult?.user!);
+        router.replace("/(main)/attendance");
       }
     },
     onError(error, _, onMutateResult) {
@@ -89,6 +89,7 @@ export const useRoleSelection = () => {
         position: "bottom",
       });
       updateUser(onMutateResult?.user!);
+      router.replace("/role-selection");
     },
   });
 

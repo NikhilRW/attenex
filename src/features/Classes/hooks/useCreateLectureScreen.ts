@@ -24,7 +24,7 @@ export const useCreateLectureScreen = () => {
   const [showDurationDropdown, setShowDurationDropdown] = useState(false);
   const [showNewClassModal, setShowNewClassModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
-  
+
   const { alert } = useAlerts();
 
   const navigateToTeacherDashboard = () => {
@@ -73,18 +73,12 @@ export const useCreateLectureScreen = () => {
 
     const finalDuration = duration === -1 ? parseInt(customDuration) : duration;
     if (isNaN(finalDuration) || finalDuration <= 0) {
-      alert(
-        "Invalid Duration",
-        "Please enter a valid duration in minutes.",
-      );
+      alert("Invalid Duration", "Please enter a valid duration in minutes.");
       return;
     }
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      alert(
-        "Permission denied",
-        "Location is required to start a lecture.",
-      );
+      alert("Permission denied", "Location is required to start a lecture.");
       return;
     }
 
@@ -140,9 +134,7 @@ export const useCreateLectureScreen = () => {
     },
     onSuccess: async (data, _, onMutateResult, context) => {
       if (data.success) {
-        alert("Success", "Lecture created successfully!", [
-          { text: "OK" },
-        ]);
+        alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
           queryKey: queryKeys.teacherLectures,
         });
@@ -180,6 +172,7 @@ export const useCreateLectureScreen = () => {
 
   const { mutateAsync: handleCreateNewClass } = useMutation({
     mutationFn: handleCreateNewClassMutateFN,
+    mutationKey: mutationKeys.handleCreateNewClass,
     onSuccess() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.existingClassesForTeacher,

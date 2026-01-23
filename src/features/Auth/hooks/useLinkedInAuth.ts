@@ -14,6 +14,7 @@ import {
   WebViewNavigation,
 } from "react-native-webview/lib/WebViewTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 
 const LINKEDIN_CLIENT_ID = process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID || "";
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
@@ -32,6 +33,7 @@ export const useLinkedInAuth = () => {
   const isDeleteAccount = deleteAccount === "true";
 
   const logoutDeleteAccountMutation = useMutation({
+    mutationKey: mutationKeys.logoutDeleteAccountLinkedin,
     mutationFn: async (action: "logout" | "delete-account") => {
       if (action === "logout") {
         await authService.logout();
@@ -69,7 +71,7 @@ export const useLinkedInAuth = () => {
     ) {
       if (isLogout || isDeleteAccount) {
         await logoutDeleteAccountMutation.mutateAsync(
-          isLogout ? "logout" : "delete-account"
+          isLogout ? "logout" : "delete-account",
         );
         router.replace("/sign-in");
       }
@@ -84,6 +86,7 @@ export const useLinkedInAuth = () => {
     `scope=${encodeURIComponent(LINKEDIN_SCOPE)}`;
 
   const authMutation = useMutation({
+    mutationKey: mutationKeys.signInLinkedIn,
     mutationFn: async (url: string) => {
       setIsLoading(true);
       // Extract the authorization code from URL query parameters
@@ -97,7 +100,7 @@ export const useLinkedInAuth = () => {
 
       const exchange = await linkedinAuthService.exchangeCodeForUser(
         authCode,
-        REDIRECT_URI
+        REDIRECT_URI,
       );
 
       if (!exchange)
@@ -127,7 +130,7 @@ export const useLinkedInAuth = () => {
 
       logger.info(
         `LinkedIn sign-in successful for user: ${user.email}`,
-        "LinkedInAuth"
+        "LinkedInAuth",
       );
 
       // Navigate to role selection screen (next step in user onboarding)
@@ -173,7 +176,7 @@ export const useLinkedInAuth = () => {
 
       logger.error(
         JSON.stringify(err.response?.data || err.message),
-        "LinkedInAuth :: handleAuthCallback()"
+        "LinkedInAuth :: handleAuthCallback()",
       );
 
       // Return to sign-in screen on any error

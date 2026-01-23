@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useAlerts } from "react-native-paper-alerts";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 
 export const useAttendanceView = () => {
   const router = useRouter();
@@ -195,6 +196,7 @@ export const useAttendanceView = () => {
 
   const { mutateAsync: handleManualAttendance, isPending: isSubmittingManual } =
     useMutation({
+      mutationKey: mutationKeys.manualAttendanceTeacher,
       mutationFn: manualAttendance,
       onSuccess: async (data) => {
         if (data.success) {
@@ -205,10 +207,7 @@ export const useAttendanceView = () => {
         }
       },
       onError: (error) => {
-        alert(
-          "Error",
-          error.message || "Failed to add manual attendance",
-        );
+        alert("Error", error.message || "Failed to add manual attendance");
       },
     });
 

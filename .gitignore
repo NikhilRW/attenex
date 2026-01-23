@@ -52,4 +52,4 @@ assets/models/*.gltf
 assets/models/*.bin
 
 backend/personal/
-backend
+# backend

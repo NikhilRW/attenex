@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
 import { useMutation } from "@tanstack/react-query";
@@ -71,6 +72,7 @@ export const useForgotPassword = () => {
 
   const { mutateAsync, isSuccess, isPending } = useMutation({
     mutationFn: sendEmail,
+    mutationKey: mutationKeys.sendForgotPasswordEmail,
   });
 
   const keyboard = useAnimatedKeyboard();

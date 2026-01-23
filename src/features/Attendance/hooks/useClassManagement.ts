@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { UseClassManagementReturn } from "@attendance/types/studentDashboard.types";
@@ -36,7 +37,7 @@ export const useClassManagement = (
   const { mutateAsync: handleUpdateClass, isPending: classUpdateLoading } =
     useMutation({
       mutationFn: handleUpdateClassMutateFn,
-      mutationKey: ["update-student-class"],
+      mutationKey: mutationKeys.updateStudentClass,
       onMutate: () => {
         setShowClassModal(false);
         onClassUpdated();

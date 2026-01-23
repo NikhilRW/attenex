@@ -1,3 +1,4 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
 import { UserRole } from "@settings/types";
 import { handleResetPassword } from "@settings/utils/common";
@@ -13,27 +14,39 @@ export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
   const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.name || "");
-  const [role, setRole] = useState<UserRole>((user?.role as any) || "teacher");
-  const [savingRole, setSavingRole] = useState(false);
+  const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
 
-  const handleRoleUpdate = useCallback(async () => {
-    setSavingRole(true);
+  const handleRoleUpdateMutateFn = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    try {
-      await userService.updateUserRole(role);
-      alert("Role updated", `Your role is now set to ${role}.`);
+    const res = await userService.updateUserRole(role);
+    return res;
+  }, [role]);
+
+  const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation({
+    mutationKey: mutationKeys.updateUserRole,
+    mutationFn: handleRoleUpdateMutateFn,
+    onMutate() {
+      const prevUser = { ...user };
+      updateUser({ role });
       if (role === "teacher") {
-        router.replace("/classes");
+        router.replace("/(main)/classes");
       } else {
-        router.replace("/attendance");
+        router.replace("/(main)/attendance");
       }
-    } catch (error: any) {
+      return { user: prevUser };
+    },
+    onSuccess() {
+      alert("Role updated", `Your role is now set to ${role}.`);
+    },
+    onError: (error, _, onMutateResult) => {
       alert("Error", error.message || "Failed to update role");
-    } finally {
-      setSavingRole(false);
-    }
-  }, [role, router, alert]);
+      updateUser({ role: onMutateResult?.user.role });
+      setRole(
+        onMutateResult?.user.role || role === "teacher" ? "student" : "teacher",
+      );
+    },
+  });
 
   const handleNameUpdateMutateFn = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -62,6 +75,17 @@ export const useSettings = () => {
     },
   });
 
+  const { mutateAsync: logoutUser } = useMutation({
+    mutationKey: mutationKeys.logoutUser,
+    mutationFn: async () => {
+      if (user?.oauthProvider === "linkedin") {
+        router.replace("/linkedin?logout=true");
+        return;
+      }
+      await authService.logout();
+    },
+  });
+
   const handleLogout = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     alert("Logout", "Are you sure you want to logout?", [
@@ -69,16 +93,21 @@ export const useSettings = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: async () => {
-          if (user?.oauthProvider === "linkedin") {
-            router.replace("/linkedin?logout=true");
-            return;
-          }
-          await authService.logout();
-        },
+        onPress: logoutUser,
       },
     ]);
-  }, [alert, user?.oauthProvider, router]);
+  }, [alert, logoutUser]);
+
+  const { mutateAsync: deleteUserAccount } = useMutation({
+    mutationKey: mutationKeys.deleteAccountSettings,
+    mutationFn: async () => {
+      if (user && user.oauthProvider === "linkedin") {
+        router.replace("/linkedin?deleteAccount=true");
+        return;
+      }
+      await authService.deleteUserAccount();
+    },
+  });
 
   const handleDeleteAccount = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -87,16 +116,10 @@ export const useSettings = () => {
       {
         text: "Delete",
         style: "destructive",
-        onPress: async () => {
-          if (user && user.oauthProvider === "linkedin") {
-            router.replace("/linkedin?deleteAccount=true");
-            return;
-          }
-          await authService.deleteUserAccount();
-        },
+        onPress: deleteUserAccount,
       },
     ]);
-  }, [alert, user, router]);
+  }, [alert, deleteUserAccount]);
 
   return {
     displayName,
