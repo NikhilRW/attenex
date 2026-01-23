@@ -4,11 +4,11 @@ import { Role } from "@role-selection/types";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils";
 import { useMutation } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { showMessage } from "react-native-flash-message";
 import { useSharedValue, withSpring } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
 
 export const useRoleSelection = () => {
   const router = useRouter();
@@ -49,7 +49,7 @@ export const useRoleSelection = () => {
 
   const { mutateAsync: handleConfirm, isPending: isUpdating } = useMutation({
     mutationFn: handleConfirmMutateFn,
-    mutationKey: mutationKeys.updateUserRole,
+    mutationKey: mutationKeys.user.updateRole,
     onMutate() {
       const prevUser = { ...user };
       updateUser({ role: selectedRole });

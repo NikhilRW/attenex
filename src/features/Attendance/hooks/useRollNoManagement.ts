@@ -8,6 +8,7 @@ import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { validateRollNo } from "@attendance/utils/validationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage roll number handling
@@ -16,6 +17,8 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const [rollNo, setRollNo] = useState("");
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
+  
+  const { alert } = useAlerts();
 
   const handleRollNoSubmitMutateFn = async (
     onSubmit: (rollNo: string) => Promise<void>,
@@ -31,7 +34,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const { mutate: handleRollNoSubmit } = useMutation({
     mutationFn: handleRollNoSubmitMutateFn,
     gcTime: GarbageTime.SECONDS_30,
-    mutationKey: mutationKeys.rollNoSubmitStudent,
+    mutationKey: mutationKeys.user.submitRollNo,
     onSuccess: () => {
       setPendingLecture(null);
       setRollNo("");

@@ -1,15 +1,15 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
-import Clipboard from "@react-native-clipboard/clipboard";
 import { useAlerts } from "react-native-paper-alerts";
-import { mutationKeys } from "@/shared/constants/mutationKeys";
 
 export const useAttendanceView = () => {
   const router = useRouter();
@@ -37,7 +37,7 @@ export const useAttendanceView = () => {
         alert("Error", error.message || "Failed to fetch attendance");
         return [];
       }
-    }, [lectureId]);
+    }, [lectureId, alert]);
 
   const {
     data: attendance,
@@ -45,7 +45,7 @@ export const useAttendanceView = () => {
     refetch: refetchAttendance,
   } = useQuery({
     queryFn: fetchAttendance,
-    queryKey: queryKeys.fetchAttendanceForTeacher.withLectureId(lectureId),
+    queryKey: queryKeys.attendance.teacher(lectureId),
     staleTime: StaleTime.DAYS_5,
     gcTime: GarbageTime.SECONDS_30,
   });
@@ -102,7 +102,7 @@ export const useAttendanceView = () => {
       );
       return "data-fetched";
     },
-    queryKey: queryKeys.socketAttendanceViewTeacher,
+    queryKey: queryKeys.socket.attendanceView(lectureId),
   });
 
   // Clean up on unmount
@@ -128,35 +128,41 @@ export const useAttendanceView = () => {
     }, [lectureId, refetchAttendance]),
   );
 
-  const filteredAttendance = (attendance || []).filter((record) => {
-    const matchesFilter =
-      filter === "all"
-        ? true
-        : filter === "present"
-          ? record.status === "present"
-          : filter === "incomplete"
-            ? record.status === "incomplete"
-            : record.status === "absent";
+  const filteredAttendance = useMemo(() => {
+    return (attendance || []).filter((record) => {
+      const matchesFilter =
+        filter === "all"
+          ? true
+          : filter === "present"
+            ? record.status === "present"
+            : filter === "incomplete"
+              ? record.status === "incomplete"
+              : record.status === "absent";
 
-    const matchesSearch =
-      record.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (record.studentRollNo &&
-        record.studentRollNo.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesSearch =
+        record.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (record.studentRollNo &&
+          record.studentRollNo
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
 
-    return matchesFilter && matchesSearch;
-  });
+      return matchesFilter && matchesSearch;
+    });
+  }, [attendance, filter, searchQuery]);
 
-  const presentCount = (attendance || []).filter(
-    (r) => r.status === "present",
-  ).length;
-  const incompleteCount = (attendance || []).filter(
-    (r) => r.status === "incomplete",
-  ).length;
-  const absentCount = (attendance || []).filter(
-    (r) => r.status === "absent",
-  ).length;
+  const presentCount = useMemo(() => {
+    return (attendance || []).filter((r) => r.status === "present").length;
+  }, [attendance]);
 
-  const getPresentRollNumbers = () => {
+  const incompleteCount = useMemo(() => {
+    return (attendance || []).filter((r) => r.status === "incomplete").length;
+  }, [attendance]);
+
+  const absentCount = useMemo(() => {
+    return (attendance || []).filter((r) => r.status === "absent").length;
+  }, [attendance]);
+
+  const getPresentRollNumbers = useCallback(() => {
     return (attendance || [])
       .filter((r) => r.status === "present")
       .map((r) => r.studentRollNo)
@@ -170,9 +176,9 @@ export const useAttendanceView = () => {
         return a!.localeCompare(b!);
       })
       .join(", ");
-  };
+  }, [attendance]);
 
-  const handleCopyRollNumbers = () => {
+  const handleCopyRollNumbers = useCallback(() => {
     const rollNumbers = getPresentRollNumbers();
     if (rollNumbers) {
       Clipboard.setString(rollNumbers);
@@ -180,7 +186,7 @@ export const useAttendanceView = () => {
     } else {
       alert("No Data", "No present students with roll numbers");
     }
-  };
+  }, [getPresentRollNumbers, alert]);
 
   const manualAttendance = async () => {
     if (!manualRollNo.trim()) {
@@ -196,7 +202,7 @@ export const useAttendanceView = () => {
 
   const { mutateAsync: handleManualAttendance, isPending: isSubmittingManual } =
     useMutation({
-      mutationKey: mutationKeys.manualAttendanceTeacher,
+      mutationKey: mutationKeys.attendance.manual,
       mutationFn: manualAttendance,
       onSuccess: async (data) => {
         if (data.success) {

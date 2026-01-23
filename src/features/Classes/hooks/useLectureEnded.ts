@@ -5,18 +5,18 @@ import { logger } from "@shared/utils/logger";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { useAlerts } from "react-native-paper-alerts";
 import {
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { useAlerts } from "react-native-paper-alerts";
 
 // TODO: Think about adding the password feature
 export const useLectureEnded = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { lectureId, lectureTitle } = params;
+  const { lectureId, lectureTitle } = params as Record<string, string>;
   const { alert } = useAlerts();
   const [passcode, setPasscode] = useState<string | null>(null);
   // const [, setLastUpdated] = useState<Date | null>(null);
@@ -45,7 +45,7 @@ export const useLectureEnded = () => {
 
   const { refetch: fetchPasscodeData, isFetching: loading } = useQuery({
     queryFn: fetchPasscodeDataQueryFn,
-    queryKey: queryKeys.fetchPasscodedForLectureEnded,
+    queryKey: queryKeys.lectures.passcode(lectureId || ""),
   });
 
   useEffect(() => {

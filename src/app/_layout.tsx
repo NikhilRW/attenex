@@ -28,6 +28,8 @@ import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useMemo } from "react";
 import FlashMessage from "react-native-flash-message";
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
+import { AlertsProvider } from "react-native-paper-alerts";
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
@@ -41,8 +43,6 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
-import { AlertsProvider } from "react-native-paper-alerts";
-import { MD3LightTheme, MD3DarkTheme, PaperProvider } from "react-native-paper";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -260,7 +260,7 @@ export default function RootLayout() {
     ) => {
       // Schedule the notification with a null trigger to show immediately
       queryClient.invalidateQueries({
-        queryKey: queryKeys.fetctLectureForStudent,
+        queryKey: queryKeys.lectures.student,
       });
       if (!remoteMessage.data?.ended) {
         await scheduleNotificationAsync({
@@ -348,13 +348,10 @@ export default function RootLayout() {
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="(main)" />
               </Stack>
-              <FlashMessage
-                position="bottom"
-                style={{ marginBottom: bottom }}
-              />
             </PersistQueryClientProvider>
           </AlertsProvider>
         </PaperProvider>
+        <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
       </SafeAreaView>
     </SafeAreaProvider>
   );

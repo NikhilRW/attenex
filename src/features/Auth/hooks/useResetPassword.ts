@@ -84,7 +84,7 @@ export const useResetPassword = () => {
 
   const { data: isValid, isFetching: isVerifying } = useQuery({
     queryFn: verifyToken,
-    queryKey: queryKeys.resetPassword,
+    queryKey: queryKeys.auth.resetPassword(token),
     staleTime: StaleTime.SECONDS_3,
   });
 

@@ -6,15 +6,15 @@ import { LectureWithCount } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
+import { useAlerts } from "react-native-paper-alerts";
 import {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { useAlerts } from "react-native-paper-alerts";
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
@@ -28,10 +28,9 @@ export const useTeacherDashboard = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { fromCreateLecture } = useLocalSearchParams();
   const data = useMutationState({
-    filters: { mutationKey: mutationKeys.createLecture, status: "pending" },
-    select: (mutation) => mutation.state,
+    filters: { mutationKey: mutationKeys.lectures.create },
+    select: (mutation) => mutation.state.status,
   });
   const latestCreateLectureMutation = data[data.length - 1];
   const subscriptionRef = useRef<NativeEventSubscription>(null);
@@ -80,24 +79,18 @@ export const useTeacherDashboard = () => {
     }, []);
 
   const { data: lectures, refetch: fetchActiveLectures } = useQuery({
-    queryKey: queryKeys.teacherLectures,
+    queryKey: queryKeys.lectures.teacher,
     queryFn: fetchActiveLecturesQueryFn,
-    refetchInterval: StaleTime.SECONDS_30,
+    refetchInterval: StaleTime.MINUTES_2,
     enabled: false,
   });
 
   useFocusEffect(
     useCallback(() => {
-      if (
-        !(
-          fromCreateLecture !== "true" &&
-          latestCreateLectureMutation &&
-          latestCreateLectureMutation.status === "pending"
-        )
-      ) {
+      if (latestCreateLectureMutation !== "pending") {
         fetchActiveLectures();
       }
-    }, [fetchActiveLectures, fromCreateLecture, latestCreateLectureMutation]),
+    }, [fetchActiveLectures, latestCreateLectureMutation]),
   );
 
   useEffect(() => {
@@ -112,7 +105,7 @@ export const useTeacherDashboard = () => {
 
   // Setup socket listeners for real-time updates
   useQuery({
-    queryKey: queryKeys.teacherDashboardSocketUpdates,
+    queryKey: queryKeys.socket.teacherDashboard,
     queryFn: () => {
       try {
         socketService.connect();
@@ -153,13 +146,7 @@ export const useTeacherDashboard = () => {
                 socketService.onStudentJoined(handleStudentJoined);
                 socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
               }
-              if (
-                !(
-                  fromCreateLecture !== "true" &&
-                  latestCreateLectureMutation &&
-                  latestCreateLectureMutation.status === "pending"
-                )
-              ) {
+              if (latestCreateLectureMutation !== "pending") {
                 fetchActiveLectures();
               }
             }
@@ -182,13 +169,7 @@ export const useTeacherDashboard = () => {
       socketService.offAttendanceSubmitted();
       subscriptionRef.current?.remove();
     };
-  }, [
-    lectures,
-    fetchActiveLectures,
-    ended,
-    fromCreateLecture,
-    latestCreateLectureMutation,
-  ]);
+  }, [lectures, fetchActiveLectures, ended, latestCreateLectureMutation]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     alert("End Lecture", "Are you sure you want to end this lecture?", [
@@ -281,11 +262,11 @@ export const useTeacherDashboard = () => {
 
   const { mutateAsync: handleUpdateLecture } = useMutation({
     mutationFn: handleUpdateLectureMutateFn,
-    mutationKey: mutationKeys.updateLectureByTeacher,
+    mutationKey: mutationKeys.lectures.update,
     onMutate: async (_, context) => {
       // Snapshot the previous value
       const previousLetures = (await context.client.getQueryData(
-        queryKeys.teacherLectures,
+        queryKeys.lectures.teacher,
       )) as LectureWithCount[];
 
       if (!previousLetures) {
@@ -308,7 +289,7 @@ export const useTeacherDashboard = () => {
 
       // Optimistically update to the new value
       context.client.setQueryData<LectureWithCount[]>(
-        queryKeys.teacherLectures,
+        queryKeys.lectures.teacher,
         (old) => {
           if (old) {
             return [
@@ -331,7 +312,7 @@ export const useTeacherDashboard = () => {
         fetchActiveLectures();
       } else if (onMutateResult) {
         context.client.setQueryData(
-          queryKeys.teacherLectures,
+          queryKeys.lectures.teacher,
           onMutateResult.previousLetures,
         );
         alert("Error", "Failed to update lecture");
@@ -340,7 +321,7 @@ export const useTeacherDashboard = () => {
     onError(error, _, onMutateResult, context) {
       if (onMutateResult) {
         context.client.setQueryData(
-          queryKeys.teacherLectures,
+          queryKeys.lectures.teacher,
           onMutateResult.previousLetures,
         );
       }
@@ -366,22 +347,27 @@ export const useTeacherDashboard = () => {
     }
   };
 
-  // Filter logic
-  const filteredLectures = (lectures || []).filter((l) => {
-    return (
-      l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  // Filter logic - memoized to prevent recalculation on every render
+  const filteredLectures = useMemo(() => {
+    return (lectures || []).filter((l) => {
+      return (
+        l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
+  }, [lectures, searchQuery]);
 
-  // Stats
-  const totalActive = (lectures || []).filter(
-    (l) => l.status === "active",
-  ).length;
-  const totalStudents = (lectures || []).reduce(
-    (acc, curr) => acc + Number(curr.studentCount),
-    0,
-  );
+  // Stats - memoized to prevent recalculation on every render
+  const totalActive = useMemo(() => {
+    return (lectures || []).filter((l) => l.status === "active").length;
+  }, [lectures]);
+
+  const totalStudents = useMemo(() => {
+    return (lectures || []).reduce(
+      (acc, curr) => acc + Number(curr.studentCount),
+      0,
+    );
+  }, [lectures]);
 
   // Gesture Logic
   // const swipeGesture = Gesture.Pan()

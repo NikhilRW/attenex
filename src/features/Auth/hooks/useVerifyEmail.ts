@@ -21,7 +21,7 @@ export const useVerifyEmail = () => {
 
   const { data } = useQuery({
     queryFn: sendEmail,
-    queryKey: queryKeys.verifyEmail,
+    queryKey: queryKeys.auth.verifyEmail(params.email as string | undefined),
     enabled: true,
     staleTime: StaleTime.SECONDS_25,
     gcTime: GarbageTime.SECONDS_25,

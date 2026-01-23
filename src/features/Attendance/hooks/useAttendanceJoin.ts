@@ -70,7 +70,7 @@ export const useAttendanceJoin = (
 
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
     mutationFn: proceedWithJoinMutation,
-    mutationKey: mutationKeys.lectureJoin,
+    mutationKey: mutationKeys.lectures.join,
     onMutate: ({ lecture }) => {
       setJoinedLecture(lecture);
       setStatus("joined");
@@ -84,7 +84,7 @@ export const useAttendanceJoin = (
         showSuccessAlert(
           ALERT_MESSAGES.JOINED.title,
           ALERT_MESSAGES.JOINED.message,
-          alert
+          alert,
         );
         // Start Background Task
         await startBackgroundTracking(lecture.id);
@@ -131,23 +131,26 @@ export const useAttendanceJoin = (
   );
   const { mutateAsync: handleJoin } = useMutation({
     mutationFn: handleJoinMutateFn,
-    mutationKey: mutationKeys.handleClassJoin,
+    mutationKey: mutationKeys.classes.join,
   });
 
-  const handleLeaveLecture = useCallback(async (onLectureLeft: () => void) => {
-    showDestructiveAlert(
-      ALERT_MESSAGES.LEAVE_LECTURE.title,
-      ALERT_MESSAGES.LEAVE_LECTURE.message,
-      alert,
-      "Leave",
-      async () => {
-        await stopBackgroundTracking();
-        setJoinedLecture(null);
-        setStatus("idle");
-        onLectureLeft();
-      },
-    );
-  }, [alert]);
+  const handleLeaveLecture = useCallback(
+    async (onLectureLeft: () => void) => {
+      showDestructiveAlert(
+        ALERT_MESSAGES.LEAVE_LECTURE.title,
+        ALERT_MESSAGES.LEAVE_LECTURE.message,
+        alert,
+        "Leave",
+        async () => {
+          await stopBackgroundTracking();
+          setJoinedLecture(null);
+          setStatus("idle");
+          onLectureLeft();
+        },
+      );
+    },
+    [alert],
+  );
 
   return {
     joinedLecture,

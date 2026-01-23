@@ -15,7 +15,7 @@ import { Lecture } from "../types";
  * Custom hook to manage lecture fetching and auto-refresh
  */
 export const useLectureManagement = (
-  joinedLecture: Lecture | null
+  joinedLecture: Lecture | null,
 ): UseLectureManagementReturn => {
   const { user } = useAuthStore();
 
@@ -53,7 +53,7 @@ export const useLectureManagement = (
 
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
-    queryKey: queryKeys.fetctLectureForStudent,
+    queryKey: queryKeys.lectures.student,
     refetchInterval: LECTURE_AUTO_REFRESH_INTERVAL,
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,

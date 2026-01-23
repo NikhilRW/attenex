@@ -72,7 +72,7 @@ export const useForgotPassword = () => {
 
   const { mutateAsync, isSuccess, isPending } = useMutation({
     mutationFn: sendEmail,
-    mutationKey: mutationKeys.sendForgotPasswordEmail,
+    mutationKey: mutationKeys.auth.sendForgotPasswordEmail,
   });
 
   const keyboard = useAnimatedKeyboard();

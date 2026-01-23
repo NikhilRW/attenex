@@ -1,10 +1,12 @@
-import { useTheme } from "@shared/hooks/useTheme";
-import { logger } from "@shared/utils/logger";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { linkedinAuthService } from "@auth/services/linkedinAuthService";
+import { useTheme } from "@shared/hooks/useTheme";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
+import { logger } from "@shared/utils/logger";
 import { getStartingScreenPath } from "@shared/utils/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { showMessage } from "react-native-flash-message";
@@ -13,8 +15,6 @@ import {
   ShouldStartLoadRequest,
   WebViewNavigation,
 } from "react-native-webview/lib/WebViewTypes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { mutationKeys } from "@/shared/constants/mutationKeys";
 
 const LINKEDIN_CLIENT_ID = process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID || "";
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
@@ -33,7 +33,7 @@ export const useLinkedInAuth = () => {
   const isDeleteAccount = deleteAccount === "true";
 
   const logoutDeleteAccountMutation = useMutation({
-    mutationKey: mutationKeys.logoutDeleteAccountLinkedin,
+    mutationKey: mutationKeys.auth.logoutDeleteLinkedin,
     mutationFn: async (action: "logout" | "delete-account") => {
       if (action === "logout") {
         await authService.logout();
@@ -86,7 +86,7 @@ export const useLinkedInAuth = () => {
     `scope=${encodeURIComponent(LINKEDIN_SCOPE)}`;
 
   const authMutation = useMutation({
-    mutationKey: mutationKeys.signInLinkedIn,
+    mutationKey: mutationKeys.auth.signInLinkedIn,
     mutationFn: async (url: string) => {
       setIsLoading(true);
       // Extract the authorization code from URL query parameters

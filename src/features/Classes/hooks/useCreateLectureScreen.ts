@@ -28,7 +28,7 @@ export const useCreateLectureScreen = () => {
   const { alert } = useAlerts();
 
   const navigateToTeacherDashboard = () => {
-    router.navigate("/classes?fromCreateLecture=true");
+    router.navigate("/classes");
   };
 
   const fetchTeacherClasses: () => Promise<ClassItem[]> =
@@ -62,7 +62,7 @@ export const useCreateLectureScreen = () => {
 
   const { data: existingClasses } = useQuery({
     queryFn: fetchTeacherClasses,
-    queryKey: queryKeys.existingClassesForTeacher,
+    queryKey: queryKeys.classes.teacher,
   });
 
   const handleCreateLectureMutateFn = async () => {
@@ -101,8 +101,8 @@ export const useCreateLectureScreen = () => {
     mutationFn: handleCreateLectureMutateFn,
     onMutate: async (_, context) => {
       // Snapshot the previous value
-      const previousLetures = context.client.getQueryData(
-        queryKeys.teacherLectures,
+      const previousLetures = await context.client.getQueryData(
+        queryKeys.lectures.teacher,
       );
 
       const newLecture = {
@@ -118,8 +118,8 @@ export const useCreateLectureScreen = () => {
       };
 
       // Optimistically update to the new value
-      context.client.setQueryData<LectureWithCount[]>(
-        queryKeys.teacherLectures,
+      await context.client.setQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
         (old) => {
           if (old) {
             return [...old, newLecture];
@@ -133,14 +133,14 @@ export const useCreateLectureScreen = () => {
       return { previousLetures };
     },
     onSuccess: async (data, _, onMutateResult, context) => {
-      if (data.success) {
+      if (data && data.success) {
         alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
-          queryKey: queryKeys.teacherLectures,
+          queryKey: queryKeys.lectures.teacher,
         });
       } else {
         context.client.setQueryData(
-          queryKeys.teacherLectures,
+          queryKeys.lectures.teacher,
           onMutateResult.previousLetures,
         );
       }
@@ -148,7 +148,7 @@ export const useCreateLectureScreen = () => {
     onError(error) {
       alert("Error", error.message || "Failed to create lecture");
     },
-    mutationKey: mutationKeys.createLecture,
+    mutationKey: mutationKeys.lectures.create,
   });
 
   const handleAddNewClass = () => {
@@ -172,10 +172,10 @@ export const useCreateLectureScreen = () => {
 
   const { mutateAsync: handleCreateNewClass } = useMutation({
     mutationFn: handleCreateNewClassMutateFN,
-    mutationKey: mutationKeys.handleCreateNewClass,
+    mutationKey: mutationKeys.classes.create,
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.existingClassesForTeacher,
+        queryKey: queryKeys.classes.teacher,
       });
     },
     onError(error) {

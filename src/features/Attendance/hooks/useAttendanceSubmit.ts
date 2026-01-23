@@ -10,6 +10,7 @@ import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
 import { validatePasscode } from "@attendance/utils/validationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage attendance submission
@@ -28,6 +29,7 @@ export const useAttendanceSubmit = (
 ): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");
   const rollNo = useAuthStore((state) => state.user?.rollNo);
+  const { alert } = useAlerts();
 
   const handleSubmitMutateFn = async ({
     joinedLecture,
@@ -61,7 +63,7 @@ export const useAttendanceSubmit = (
 
   const { mutateAsync: handleSubmit, isPending: loading } = useMutation({
     mutationFn: handleSubmitMutateFn,
-    mutationKey: mutationKeys.studentAttendanceSubmit,
+    mutationKey: mutationKeys.attendance.submit,
     onMutate({ onSuccess }) {
       onSuccess();
     },
@@ -74,7 +76,7 @@ export const useAttendanceSubmit = (
         showSuccessAlert(
           ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
           ALERT_MESSAGES.ATTENDANCE_SUCCESS.message,
-          alert
+          alert,
         );
 
         setPasscode("");

@@ -24,7 +24,7 @@ export const useSettings = () => {
   }, [role]);
 
   const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation({
-    mutationKey: mutationKeys.updateUserRole,
+    mutationKey: mutationKeys.user.updateRole,
     mutationFn: handleRoleUpdateMutateFn,
     onMutate() {
       const prevUser = { ...user };
@@ -76,7 +76,7 @@ export const useSettings = () => {
   });
 
   const { mutateAsync: logoutUser } = useMutation({
-    mutationKey: mutationKeys.logoutUser,
+    mutationKey: mutationKeys.auth.logout,
     mutationFn: async () => {
       if (user?.oauthProvider === "linkedin") {
         router.replace("/linkedin?logout=true");
@@ -99,7 +99,7 @@ export const useSettings = () => {
   }, [alert, logoutUser]);
 
   const { mutateAsync: deleteUserAccount } = useMutation({
-    mutationKey: mutationKeys.deleteAccountSettings,
+    mutationKey: mutationKeys.auth.deleteAccount,
     mutationFn: async () => {
       if (user && user.oauthProvider === "linkedin") {
         router.replace("/linkedin?deleteAccount=true");

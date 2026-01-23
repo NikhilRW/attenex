@@ -10,6 +10,7 @@ import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard
 import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -19,6 +20,8 @@ export const useLectureDetailsParam = (
   onJoinLecture: (lecture: any) => Promise<void>,
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
+  
+    const { alert } = useAlerts();
 
   const {
     data: lectureDetails,
@@ -34,8 +37,8 @@ export const useLectureDetailsParam = (
       return null;
     },
     queryKey: lectureId
-      ? queryKeys.getStudentLectureDetails.withId(lectureId as string)
-      : queryKeys.getStudentLectureDetails.all,
+      ? queryKeys.lectures.studentDetail(lectureId as string)
+      : queryKeys.lectures.all,
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,
   });
@@ -94,7 +97,7 @@ export const useLectureDetailsParam = (
 
   useQuery({
     queryFn: fetchAndJoinLecture,
-    queryKey: queryKeys.joinLectureWithNotification,
+    queryKey: queryKeys.lectures.joinWithNotification,
     enabled: true,
     retry: false,
   });
