@@ -145,8 +145,12 @@ export const useCreateLectureScreen = () => {
         );
       }
     },
-    onError(error) {
+    onError(error, _, onMutateResult, context) {
       alert("Error", error.message || "Failed to create lecture");
+      context.client.setQueryData(
+        queryKeys.lectures.teacher,
+        onMutateResult!.previousLetures,
+      );
     },
     mutationKey: mutationKeys.lectures.create,
   });
