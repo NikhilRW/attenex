@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -15,7 +16,7 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
     const { title, duration } = req.body;
 
     // Verify user is authenticated

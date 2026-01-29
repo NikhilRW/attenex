@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { attendance, db, lectures, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -13,12 +14,12 @@ interface AuthRequest extends Request {
 
 export const fetchLectureAttendance = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
 
     // Verify user is authenticated
     if (!userId) {
@@ -102,7 +103,7 @@ export const fetchLectureAttendance = async (
 
     // Create a map of attendance by studentId for quick lookup
     const attendanceMap = new Map(
-      attendanceRecords.map((record) => [record.studentId, record])
+      attendanceRecords.map((record) => [record.studentId, record]),
     );
 
     // Merge all students with their attendance status
@@ -145,7 +146,7 @@ export const fetchLectureAttendance = async (
     logger.info(
       `Fetched attendance for lecture ${lectureId}: ${attendanceRecords.length} present/incomplete, ${
         allStudentsInClass.length - attendanceRecords.length
-      } absent`
+      } absent`,
     );
 
     return res.status(200).json({

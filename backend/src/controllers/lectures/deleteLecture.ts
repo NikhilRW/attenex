@@ -9,6 +9,7 @@ import {
   lectures,
 } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -22,7 +23,7 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
 
     // Verify user is authenticated
     if (!userId) {
@@ -94,7 +95,7 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
     await db.delete(lectures).where(eq(lectures.id, lectureId));
 
     logger.info(
-      `Lecture and all related records deleted: ${lectureId} by teacher: ${userId}`
+      `Lecture and all related records deleted: ${lectureId} by teacher: ${userId}`,
     );
 
     return res.status(200).json({

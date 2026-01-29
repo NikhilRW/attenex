@@ -5,7 +5,7 @@ import morgan from "morgan";
 
 admin.initializeApp({
   credential: admin.credential.cert(
-    JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount
+    JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
   ),
 });
 
@@ -169,7 +169,7 @@ app.get(
   asyncHandler(async (req, res) => {
     await Promise.reject(new Error("boom - wrapped"));
     res.json({ ok: true });
-  })
+  }),
 );
 
 /**

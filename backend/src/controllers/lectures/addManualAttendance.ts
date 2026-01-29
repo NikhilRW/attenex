@@ -8,6 +8,7 @@ import {
   users,
 } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -21,7 +22,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
     const { studentRollNo } = req.body;
 
     // Verify user is authenticated
@@ -75,8 +76,8 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
         and(
           eq(users.rollNo, studentRollNo),
           eq(users.className, lectureClass),
-          eq(users.role, "student")
-        )
+          eq(users.role, "student"),
+        ),
       )
       .limit(1);
 
@@ -96,8 +97,8 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       .where(
         and(
           eq(attendance.lectureId, lectureId),
-          eq(attendance.studentId, studentId)
-        )
+          eq(attendance.studentId, studentId),
+        ),
       )
       .limit(1);
 
@@ -113,13 +114,13 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
         .where(
           and(
             eq(attendance.lectureId, lectureId),
-            eq(attendance.studentId, studentId)
-          )
+            eq(attendance.studentId, studentId),
+          ),
         )
         .returning();
 
       logger.info(
-        `Updated manual attendance for student: ${studentId} in lecture: ${lectureId}`
+        `Updated manual attendance for student: ${studentId} in lecture: ${lectureId}`,
       );
 
       return res.status(200).json({
@@ -153,7 +154,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       .returning();
 
     logger.info(
-      `Added manual attendance for student: ${studentId} in lecture: ${lectureId}`
+      `Added manual attendance for student: ${studentId} in lecture: ${lectureId}`,
     );
 
     return res.status(201).json({

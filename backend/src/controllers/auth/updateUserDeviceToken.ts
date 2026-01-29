@@ -5,7 +5,7 @@ import { Response } from "express";
 
 export const updateUserDeviceToken = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ) => {
   const { token } = req.body;
   const user = req.user;

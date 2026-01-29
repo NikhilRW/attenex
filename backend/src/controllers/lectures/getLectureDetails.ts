@@ -2,6 +2,7 @@ import { and, eq, notInArray, sql } from "drizzle-orm";
 import { Request, Response } from "express";
 import { attendance, db, lectures, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -18,7 +19,7 @@ export const getLectureDetails = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
 
     // Get lecture details with class information
     const lecture = await db.query.lectures.findFirst({
@@ -49,7 +50,7 @@ export const getLectureDetails = async (req: AuthRequest, res: Response) => {
       .select({ count: sql<number>`count(*)` })
       .from(users)
       .where(
-        and(eq(users.className, className || ""), eq(users.role, "student"))
+        and(eq(users.className, className || ""), eq(users.role, "student")),
       );
 
     const totalClassStudents = totalStudentsInClass[0]?.count || 0;
@@ -79,8 +80,8 @@ export const getLectureDetails = async (req: AuthRequest, res: Response) => {
             and(
               eq(users.className, className),
               eq(users.role, "student"),
-              notInArray(users.id, attendedIds)
-            )
+              notInArray(users.id, attendedIds),
+            ),
           );
       } else {
         // If no one attended, all students are absent
@@ -93,7 +94,7 @@ export const getLectureDetails = async (req: AuthRequest, res: Response) => {
           })
           .from(users)
           .where(
-            and(eq(users.className, className), eq(users.role, "student"))
+            and(eq(users.className, className), eq(users.role, "student")),
           );
       }
     }

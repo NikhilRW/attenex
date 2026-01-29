@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { generatePasscode, needsPasscodeRefresh } from "../../utils/passcode";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -15,7 +16,7 @@ interface AuthRequest extends Request {
 export const getPasscode = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
 
     if (!userId) {
       return res.status(401).json({
@@ -89,7 +90,7 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
           updatedAt: passcodeUpdatedAt.toISOString(),
         });
         logger.info(
-          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`
+          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`,
         );
       }
     }

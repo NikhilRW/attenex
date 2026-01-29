@@ -3,11 +3,12 @@ import { Request, Response } from "express";
 import { classes, db, lectures, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { AuthRequest } from "@middleware/auth";
+import { LectureParams } from "../../types/params";
 
 export const getStudentLecture = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   const userRole = req.user?.role;
-  const lectureId = req.params.lectureId;
+  const { lectureId } = req.params as unknown as LectureParams;
 
   // Verify user is authenticated
   if (!userId) {
@@ -58,7 +59,7 @@ export const getStudentLecture = async (req: AuthRequest, res: Response) => {
     .where(eq(classes.name, studentClassName));
 
   logger.info(
-    `Found ${matchingClasses.length} matching classes for name: ${studentClassName}`
+    `Found ${matchingClasses.length} matching classes for name: ${studentClassName}`,
   );
 
   if (matchingClasses.length === 0) {
@@ -88,8 +89,8 @@ export const getStudentLecture = async (req: AuthRequest, res: Response) => {
       and(
         eq(classes.name, studentClassName),
         eq(lectures.status, "active"),
-        eq(lectures.id, lectureId)
-      )
+        eq(lectures.id, lectureId),
+      ),
     )
     .orderBy(lectures.createdAt);
 

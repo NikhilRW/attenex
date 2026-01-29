@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { attendance, db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import { LectureParams } from "../../types/params";
 
 interface AuthRequest extends Request {
   user?: {
@@ -15,7 +16,7 @@ export const endLecture = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { lectureId } = req.params;
+    const { lectureId } = req.params as unknown as LectureParams;
 
     // Verify user is authenticated
     if (!userId) {
@@ -83,8 +84,8 @@ export const endLecture = async (req: AuthRequest, res: Response) => {
       .where(
         and(
           eq(attendance.lectureId, lectureId),
-          eq(attendance.status, "incomplete")
-        )
+          eq(attendance.status, "incomplete"),
+        ),
       );
 
     logger.info(`Lecture ended: ${lectureId} by teacher: ${userId}`);
@@ -98,7 +99,7 @@ export const endLecture = async (req: AuthRequest, res: Response) => {
         endedAt: updatedLecture[0].endedAt,
       });
       logger.info(
-        `Socket event emitted: lectureEnded for lecture-${lectureId}`
+        `Socket event emitted: lectureEnded for lecture-${lectureId}`,
       );
     }
 

@@ -1,10 +1,11 @@
 import db, { users } from "@config/database_setup";
 import { AuthRequest } from "@middleware/auth";
-import { Request, Response } from "express";
+import { eq } from "drizzle-orm";
+import { Response } from "express";
 
 export const updateUserFullName = async (req: AuthRequest, res: Response) => {
   const { fullName } = req.body;
-  const userId = req.user.id;
+  const userId = req?.user?.id;
 
   if (!fullName) {
     return res
@@ -15,9 +16,12 @@ export const updateUserFullName = async (req: AuthRequest, res: Response) => {
       .status(401);
   }
 
-  const dbResponse = await db.update(users).set({
-    name: fullName,
-  });
+  const dbResponse = await db
+    .update(users)
+    .set({
+      name: fullName,
+    })
+    .where(eq(users.id, userId));
 
   if (dbResponse.rowCount > 0) {
     return res
