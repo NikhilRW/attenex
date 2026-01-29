@@ -5,6 +5,7 @@ import { AuthFooterProps } from "@auth/types/props";
 import { StyleSheet } from "react-native-unistyles";
 
 const AuthFooter: React.FC<AuthFooterProps> = ({
+  
   text,
   linkText,
   onLinkPress,
