@@ -12,7 +12,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 
-
 const SettingsScreen = () => {
   const { colors, isDark, mode, setTheme } = useTheme();
   const {

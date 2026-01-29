@@ -7,15 +7,20 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
-
+import { useNetInfo } from "@react-native-community/netinfo";
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
+  const isNotSynced = useAuthStore((state) => state.isNotSynced);
+  const setIsNotSynced = useAuthStore((state) => state.setIsNotSynced);
   const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
+  const { isConnected } = useNetInfo();
+
+  console.log("isNotSynced:" + isNotSynced);
 
   const handleRoleUpdateMutateFn = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -50,22 +55,30 @@ export const useSettings = () => {
 
   const handleNameUpdateMutateFn = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setIsNotSynced(true);
     const res = await userService.updateUserFullName(displayName);
     return res;
-  }, [displayName]);
+  }, [displayName, setIsNotSynced]);
 
   const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation({
     mutationFn: handleNameUpdateMutateFn,
+    gcTime: Infinity, // Keep mutation in cache for offline retry
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    networkMode: "offlineFirst", // Queue mutations when offline
     onMutate() {
       const prevName = user?.name || "";
       updateUser({ name: displayName });
       return { prevName };
     },
     onSuccess(data, _, onMutateResult) {
+      console.log("data : " + JSON.stringify(data));
       if (data.success) {
+        setIsNotSynced(false);
         alert("Your Fullname updated");
       } else {
         updateUser({ name: onMutateResult.prevName });
+        setIsNotSynced(false);
         alert("Error", data.message || "Failed to update name");
       }
     },
@@ -74,6 +87,12 @@ export const useSettings = () => {
       updateUser({ name: onMutateResult?.prevName });
     },
   });
+
+  useEffect(() => {
+    if (isNotSynced && isConnected) {
+      handleNameUpdate();
+    }
+  }, [isNotSynced, handleNameUpdate, isConnected]);
 
   const { mutateAsync: logoutUser } = useMutation({
     mutationKey: mutationKeys.auth.logout,

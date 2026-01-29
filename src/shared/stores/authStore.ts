@@ -7,6 +7,7 @@ import { useThemeStore } from "@shared/hooks/useTheme";
 
 interface User extends UserSchema {
   className: string;
+  synced?: boolean;
 }
 
 interface AuthState {
@@ -14,15 +15,17 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isNotSynced: boolean;
   setAuth: (
     user: User | null,
     token: string | null,
-    isSignUp?: boolean
+    isSignUp?: boolean,
   ) => void;
 
   updateUser: (user: Partial<User>) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  setIsNotSynced: (isNotSynced: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -30,6 +33,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      isNotSynced: false,
       isAuthenticated: false,
       isLoading: true,
       setAuth: (user, token) => {
@@ -45,6 +49,11 @@ export const useAuthStore = create<AuthState>()(
           user: state.user
             ? ({ ...state.user, ...updatedFields } as User)
             : null,
+        }));
+      },
+      setIsNotSynced: (isNotSynced: boolean) => {
+        set(() => ({
+          isNotSynced: isNotSynced,
         }));
       },
       logout: () => {
@@ -70,19 +79,21 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         isLoading: state.isLoading,
+        isNotSynced: state.isNotSynced,
       }),
       onRehydrateStorage: () => (state) => {
         (async () => {
           // After rehydration, load token from secure storage (if any) into runtime store
           const token = await secureStore.getItem("jwt");
           if (token) {
-            (state as any)?.setAuth?.((state as any).user, token);
+            state?.setAuth?.(state.user, token);
+            state?.setIsNotSynced?.(state.isNotSynced);
           } else {
             // No token found; set loading to false
             (state as any)?.setLoading?.(false);
           }
         })();
       },
-    }
-  )
+    },
+  ),
 );

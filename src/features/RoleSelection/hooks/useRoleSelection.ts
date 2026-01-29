@@ -68,12 +68,6 @@ export const useRoleSelection = () => {
         duration: 2000,
         position: "bottom",
       });
-      // Navigate based on selected role
-      if (selectedRole === "teacher") {
-        router.replace("/(main)/classes");
-      } else {
-        router.replace("/(main)/attendance");
-      }
     },
     onError(error, _, onMutateResult) {
       logger.error(
