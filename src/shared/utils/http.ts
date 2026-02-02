@@ -1,8 +1,8 @@
 import { BASE_URI } from "@shared/constants/uri";
 import { useAuthStore } from "@shared/stores/authStore";
+import { secureStore } from "@shared/utils/secureStore";
 import axios from "axios";
 import { router } from "expo-router";
-import { secureStore } from "@shared/utils/secureStore";
 
 /**
  * Centralized axios instance for API calls. Automatically attaches Authorization
@@ -27,6 +27,10 @@ http.interceptors.request.use(async (config) => {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 
+    if (__DEV__) {
+      console.log("[HTTP Request]", config.method?.toUpperCase(), config.url);
+    }
+
     return config;
   } catch {
     return config;
@@ -35,8 +39,17 @@ http.interceptors.request.use(async (config) => {
 
 // Response interceptor to handle errors and 401 unauthorized
 http.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (__DEV__) {
+      console.log("[HTTP Response]", response.status, response.config.url);
+    }
+    return response;
+  },
   async (error) => {
+    if (__DEV__) {
+      console.error("[HTTP Error]", error.response?.status, error.config?.url);
+    }
+
     // Only logout on 401 Unauthorized (invalid/expired token)
     if (error.response?.status === 401) {
       const errorMsg = error.response?.data?.error;
@@ -58,7 +71,7 @@ http.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default http;

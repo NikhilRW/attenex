@@ -1,11 +1,11 @@
 import { storage } from "@shared/utils/mmkvStorage";
-import * as Location from "expo-location";
-import * as TaskManager from "expo-task-manager";
+import { Accuracy, requestBackgroundPermissionsAsync, startLocationUpdatesAsync, stopLocationUpdatesAsync, } from "expo-location";
+import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import { sendPing } from "./attendanceService";
 
 export const LOCATION_TASK_NAME = "background-location-task";
 
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error) {
     console.error("Background location task error:", error);
     return;
@@ -24,7 +24,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           await sendPing(
             lectureId,
             location.coords.latitude,
-            location.coords.longitude
+            location.coords.longitude,
           );
         }
       } catch (err) {
@@ -38,10 +38,10 @@ export const startBackgroundTracking = async (lectureId: string) => {
   try {
     storage.set("currentLectureId", lectureId);
 
-    const { status } = await Location.requestBackgroundPermissionsAsync();
+    const { status } = await requestBackgroundPermissionsAsync();
     if (status === "granted") {
-      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.Highest,
+      await startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Accuracy.Highest,
         timeInterval: 3 * 60 * 1000, // Check every 3 minutes
         distanceInterval: 1,
         foregroundService: {
@@ -61,9 +61,9 @@ export const startBackgroundTracking = async (lectureId: string) => {
 export const stopBackgroundTracking = async () => {
   try {
     const isRegistered =
-      await TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
+      await isTaskRegisteredAsync(LOCATION_TASK_NAME);
     if (isRegistered) {
-      await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+      await stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       storage.remove("currentLectureId");
       console.log("Background tracking stopped");
     }

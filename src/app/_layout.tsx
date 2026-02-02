@@ -77,6 +77,31 @@ export default function RootLayout() {
     }
   }, [loaded, error]);
 
+  /**
+   * Validates deep link URLs against allowed schemes and domains
+   */
+  const isValidDeepLink = (url: string): boolean => {
+    try {
+      const parsedUrl = new URL(url);
+      // Whitelist of allowed schemes and domains
+      const allowedSchemes = ['attenex', 'exp+attenex', 'https'];
+      const allowedDomains = ['attenex.vercel.app'];
+
+      if (!allowedSchemes.includes(parsedUrl.protocol.replace(':', ''))) {
+        return false;
+      }
+
+      // For https URLs, verify domain is whitelisted
+      if (parsedUrl.protocol === 'https:' && !allowedDomains.includes(parsedUrl.hostname)) {
+        return false;
+      }
+
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     const buildAttenexNotificationContent = (
       remoteMessage: FirebaseMessagingTypes.RemoteMessage,
@@ -110,7 +135,11 @@ export default function RootLayout() {
 
     // Handle deep link when app is already running (foreground or background)
     const subscription = Linking.addEventListener("url", ({ url }) => {
-      handleDeepLink(url);
+      if (isValidDeepLink(url)) {
+        handleDeepLink(url);
+      } else {
+        console.warn('Blocked invalid deep link:', url);
+      }
     });
 
     handleInitialURL();

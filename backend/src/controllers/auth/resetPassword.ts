@@ -1,10 +1,10 @@
 import { db, users } from "@config/database_setup";
+import axios from "axios";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import axios from "axios";
 import { EMAIL_SERVER_ENDPOINT } from "../../constants/endpoints";
 
 /**
@@ -109,12 +109,18 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     },\n\nWe received a request to reset your password for your Attenex account.\n\nClick this link to reset your password (expires in 1 hour):\n${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nThe Attenex Team`;
 
     // Send reset email
-    const response = await axios.post(EMAIL_SERVER_ENDPOINT, {
-      to: email,
-      subject: "Reset Your Password - Attenex",
-      text,
-      html,
-    });
+    const response = await axios.post(
+      EMAIL_SERVER_ENDPOINT,
+      {
+        to: email,
+        subject: "Reset Your Password - Attenex",
+        text,
+        html,
+      },
+      {
+        timeout: 30000, // 30 second timeout
+      },
+    );
 
     return res.status(200).json({
       message: "If that email exists, a reset link has been sent",

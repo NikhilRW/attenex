@@ -55,3 +55,6 @@ assets/models/*.bin
 .github/skills
 backend/personal/
 backend/
+
+rnsec-report.html
+rnsec-report.json

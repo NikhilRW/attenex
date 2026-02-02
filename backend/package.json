@@ -56,5 +56,9 @@
     "@middleware": "./src/middleware",
     "@models": "./src/models",
     "@utils": "./src/utils"
-  }
+  },
+  "trustedDependencies": [
+    "@firebase/util",
+    "protobufjs"
+  ]
 }

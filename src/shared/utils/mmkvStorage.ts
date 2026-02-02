@@ -23,4 +23,7 @@ export const mmkvStorage = {
 
 export const clientPersister = createAsyncStoragePersister({
   storage: mmkvStorage,
+  serialize: JSON.stringify,
+  deserialize: JSON.parse,
+  key: "attenex-tanstack-persist-storage",
 });
