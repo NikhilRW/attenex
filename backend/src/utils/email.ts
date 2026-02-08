@@ -1,8 +1,8 @@
-import axios from "axios";
 import "dotenv/config";
-import jwt from "jsonwebtoken";
-import { EMAIL_SERVER_ENDPOINT } from "../constants/endpoints";
 import { logger } from "./logger";
+import jwt from "jsonwebtoken";
+import axios from "axios";
+import { EMAIL_SERVER_ENDPOINT } from "../constants/endpoints";
 
 export const sendVerificationEmail = async ({
   email,
@@ -71,18 +71,12 @@ export const sendVerificationEmail = async ({
 
   // Send email (do not block signup; log error if sending fails)
   try {
-    await axios.post(
-      EMAIL_SERVER_ENDPOINT,
-      {
-        to: email,
-        subject: "Verify your email for Attenex",
-        text,
-        html,
-      },
-      {
-        timeout: 30000, // 30 second timeout
-      },
-    );
+    await axios.post(EMAIL_SERVER_ENDPOINT, {
+      to: email,
+      subject: "Verify your email for Attenex",
+      text,
+      html,
+    });
   } catch (sendError) {
     logger.error("Failed to send verification email:", sendError);
   }

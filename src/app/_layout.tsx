@@ -43,6 +43,7 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
+import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -84,15 +85,18 @@ export default function RootLayout() {
     try {
       const parsedUrl = new URL(url);
       // Whitelist of allowed schemes and domains
-      const allowedSchemes = ['attenex', 'exp+attenex', 'https'];
-      const allowedDomains = ['attenex.vercel.app'];
+      const allowedSchemes = ["attenex", "exp+attenex", "https"];
+      const allowedDomains = ["attenex.vercel.app"];
 
-      if (!allowedSchemes.includes(parsedUrl.protocol.replace(':', ''))) {
+      if (!allowedSchemes.includes(parsedUrl.protocol.replace(":", ""))) {
         return false;
       }
 
       // For https URLs, verify domain is whitelisted
-      if (parsedUrl.protocol === 'https:' && !allowedDomains.includes(parsedUrl.hostname)) {
+      if (
+        parsedUrl.protocol === "https:" &&
+        !allowedDomains.includes(parsedUrl.hostname)
+      ) {
         return false;
       }
 
@@ -138,7 +142,7 @@ export default function RootLayout() {
       if (isValidDeepLink(url)) {
         handleDeepLink(url);
       } else {
-        console.warn('Blocked invalid deep link:', url);
+        console.warn("Blocked invalid deep link:", url);
       }
     });
 
@@ -353,34 +357,38 @@ export default function RootLayout() {
       <SafeAreaView
         style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
       >
-        <PaperProvider
-          theme={{
-            ...ActualTheme,
-            colors: {
-              ...ActualTheme.colors,
-              primary: colors.primary.main, // Button Text
-              backdrop: "#00000053",
-            },
-          }}
-        >
-          <AlertsProvider>
-            <PersistQueryClientProvider
-              client={queryClient}
-              onSuccess={() =>
-                queryClient
-                  .resumePausedMutations()
-                  .then(() => queryClient.invalidateQueries())
-              }
-              persistOptions={{ persister: clientPersister }}
+        <ApolloGraphQLProvider>
+          <>
+            <PaperProvider
+              theme={{
+                ...ActualTheme,
+                colors: {
+                  ...ActualTheme.colors,
+                  primary: colors.primary.main, // Button Text
+                  backdrop: "#00000053",
+                },
+              }}
             >
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(auth)" />
-                <Stack.Screen name="(main)" />
-              </Stack>
-            </PersistQueryClientProvider>
-          </AlertsProvider>
-        </PaperProvider>
-        <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+              <AlertsProvider>
+                <PersistQueryClientProvider
+                  client={queryClient}
+                  onSuccess={() =>
+                    queryClient
+                      .resumePausedMutations()
+                      .then(() => queryClient.invalidateQueries())
+                  }
+                  persistOptions={{ persister: clientPersister }}
+                >
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(main)" />
+                  </Stack>
+                </PersistQueryClientProvider>
+              </AlertsProvider>
+            </PaperProvider>
+            <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+          </>
+        </ApolloGraphQLProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   );
