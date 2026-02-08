@@ -10,34 +10,19 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { defineTask, getRegisteredTasksAsync } from "expo-task-manager";
-import { mmkvStorage } from "@/shared/utils";
 import {
   registerTaskAsync,
   triggerTaskWorkerForTestingAsync,
 } from "expo-background-task";
+import { AppState } from "react-native";
+import {
+  getLocalStorageDisplayName,
+  setLocalStorageDisplayName,
+  setupBackgroundNameUpdateTask,
+} from "../utils/offlineFirstBehaviour";
+import { BACKGROUND_TASK_IDENTIFIER } from "../constants/common";
 
-const BACKGROUND_TASK_IDENTIFIER = "background-display-name-change";
-
-let resolver: ((value: unknown) => void) | null;
-
-const promise = new Promise((res) => {
-  resolver = res;
-});
-
-defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
-  console.log("Background Task Started");
-  await promise;
-  const newDisplayName = mmkvStorage.getItem("new-display-name");
-  if (newDisplayName) {
-    const response = await userService.updateUserFullName(newDisplayName);
-    console.log("Background Task Response  : " + response.success);
-    if (response.success) {
-      mmkvStorage.setItem("new-display-name", "");
-      mmkvStorage.setItem("name-updated-flag", "true");
-    }
-  }
-});
+setupBackgroundNameUpdateTask();
 
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
@@ -48,24 +33,23 @@ export const useSettings = () => {
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
   const { isConnected } = useNetInfo();
-  const nameUpdatedFlag = mmkvStorage.getItem("name-updated-flag");
-  const newDisplayName = mmkvStorage.getItem("new-display-name");
-
-  console.log("nameUpdatedFlag", " : ", nameUpdatedFlag);
-  console.log("newDisplayName", " : ", newDisplayName);
-
-  useEffect(() => {
-    if (resolver) {
-      resolver("Resolve It");
-      console.log("Resolver Resolved.");
-    }
-  }, []);
 
   const handleRoleUpdateMutateFn = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const res = await userService.updateUserRole(role);
     return res;
   }, [role]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", async (state) => {
+      if (state === "background" && getLocalStorageDisplayName()) {
+        await triggerTaskWorkerForTestingAsync();
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation({
     mutationKey: mutationKeys.user.updateRole,
@@ -95,22 +79,19 @@ export const useSettings = () => {
   const handleNameUpdateMutateFn = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsNotSynced(true);
-    mmkvStorage.setItem("new-display-name", displayName);
-    if (!isConnected) {
-      // await registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, {
-      //   minimumInterval: 15,
-      // });
-      console.log("Task Registered :  " + JSON.stringify(await getRegisteredTasksAsync()));
-      await triggerTaskWorkerForTestingAsync();
-    }
-    if (nameUpdatedFlag === "true") {
+    setLocalStorageDisplayName(displayName);
+    if (!isConnected && getLocalStorageDisplayName() != null) {
+      await registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, {
+        minimumInterval: 15,
+      });
       return {
-        success: true,
+        success: false,
       };
+    } else {
+      const res = await userService.updateUserFullName(displayName);
+      return res;
     }
-    const res = await userService.updateUserFullName(displayName);
-    return res;
-  }, [displayName, isConnected, nameUpdatedFlag, setIsNotSynced]);
+  }, [displayName, isConnected, setIsNotSynced]);
 
   const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation({
     mutationFn: handleNameUpdateMutateFn,
@@ -127,6 +108,7 @@ export const useSettings = () => {
       console.log("data : " + JSON.stringify(data));
       if (data.success) {
         setIsNotSynced(false);
+        setLocalStorageDisplayName("");
         alert("Your Fullname updated");
       } else {
         updateUser({ name: onMutateResult.prevName });
