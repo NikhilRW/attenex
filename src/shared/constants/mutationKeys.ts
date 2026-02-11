@@ -40,6 +40,7 @@ export const mutationKeys = {
     updateRole: ["user", "update-role"] as const,
     updateClass: ["user", "update-class"] as const,
     submitRollNo: ["user", "submit-roll-no"] as const,
+    updateName: ["user", "update-name"] as const,
   },
 } as const;
 

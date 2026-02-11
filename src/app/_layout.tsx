@@ -1,3 +1,4 @@
+import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
 import { handleEmailVerification } from "@auth/utils/common";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import {
@@ -43,7 +44,7 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
-import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
+import { useNetworkState } from "expo-network";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -60,6 +61,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const { isDark, colors } = useTheme();
+  const { isConnected } = useNetworkState();
   const { bottom } = useSafeAreaInsets();
 
   // Track if we've already handled the killed-state notification to prevent infinite loop
@@ -309,7 +311,7 @@ export default function RootLayout() {
 
     const unsubscribe = onMessage(getMessaging(), handlePushNotification);
 
-    const tanstackCleanUp = setupTanstackForReactNative();
+    const tanstackCleanUp = setupTanstackForReactNative(queryClient);
 
     return () => {
       subscription.remove();
@@ -372,12 +374,23 @@ export default function RootLayout() {
               <AlertsProvider>
                 <PersistQueryClientProvider
                   client={queryClient}
-                  onSuccess={() =>
-                    queryClient
-                      .resumePausedMutations()
-                      .then(() => queryClient.invalidateQueries())
-                  }
-                  persistOptions={{ persister: clientPersister }}
+                  onSuccess={() => {
+                    if (isConnected) {
+                      queryClient
+                        .resumePausedMutations()
+                        .then(() => queryClient.invalidateQueries());
+                    }
+                  }}
+                  persistOptions={{
+                    persister: clientPersister,
+                    maxAge: Infinity, // Keep mutations indefinitely for offline-first
+                    dehydrateOptions: {
+                      shouldDehydrateMutation: (mutation) => {
+                        // Persist pending/paused mutations (offline mutations)
+                        return mutation.state.status === "pending";
+                      },
+                    },
+                  }}
                 >
                   <Stack screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="(auth)" />

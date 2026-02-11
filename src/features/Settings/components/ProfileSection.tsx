@@ -98,7 +98,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 placeholderTextColor={colors.text.muted}
               />
               {displayName !== userName && (
-                <TouchableOpacity onPress={onNameUpdate} disabled={savingName}>
+                <TouchableOpacity
+                  onPress={() => onNameUpdate()}
+                  disabled={savingName}
+                >
                   {savingName ? (
                     <ActivityIndicator
                       size="small"

@@ -93,6 +93,26 @@ export const lectureService = {
       throw error.response?.data || error.message;
     }
   },
+  addTeacherClass: async (newClassName: string) => {
+    try {
+      // TODO: create modular functions for this repeitive token fetching.
+      const { token } = useAuthStore.getState();
+      const response = await http.post(
+        `${API_URL}/classes`,
+        {
+          className: newClassName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error.message;
+    }
+  },
   getStudentLectureDetails: async (lectureId: string) => {
     try {
       const { token } = useAuthStore.getState();

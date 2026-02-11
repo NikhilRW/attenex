@@ -4,7 +4,12 @@ import { StaleTime } from "@/shared/constants/tanstackConfig";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
-import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useMutationState,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
@@ -18,6 +23,7 @@ import {
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { ended, lectureId } = useLocalSearchParams();
   const { alert } = useAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -39,6 +45,16 @@ export const useTeacherDashboard = () => {
   const pullProgress = useSharedValue(0);
   // const context = useSharedValue({ x: 0, y: 0 });
   // const animatedTranslateY = useSharedValue(0);
+
+  const printTheMutationCache = () => {
+    const cache = queryClient.getMutationCache();
+    const createClassCache = cache;
+    console.log("cache : " + JSON.stringify(createClassCache));
+  };
+
+  useEffect(() => {
+    printTheMutationCache();
+  }, []);
 
   const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
     useCallback(async () => {

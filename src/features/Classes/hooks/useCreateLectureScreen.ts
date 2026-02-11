@@ -2,8 +2,10 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services";
 import { ClassItem, LectureWithCount } from "@classes/types";
-import { getMinHeightForScrollView } from "@classes/utils/common";
-import { storage } from "@shared/utils/mmkvStorage";
+import {
+  getExistingClassesFromLocalStorage,
+  getMinHeightForScrollView,
+} from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
@@ -33,30 +35,26 @@ export const useCreateLectureScreen = () => {
 
   const fetchTeacherClasses: () => Promise<ClassItem[]> =
     useCallback(async () => {
+      let parsedClasses;
       try {
         const res = await lectureService.getTeacherClasses();
         let currentClasses: ClassItem[] = [];
         if (res.success) {
           currentClasses = [...res.data];
         }
-
         // Load user-created classes from local storage
-        const savedClasses = storage.getString("user_created_classes");
-        if (savedClasses) {
-          const parsedClasses = JSON.parse(savedClasses);
-          // Merge with existing classes, avoiding duplicates
-          const allClasses = [...currentClasses];
-          parsedClasses.forEach((saved: ClassItem) => {
-            if (!allClasses.find((c) => c.name === saved.name)) {
-              allClasses.push(saved);
-            }
-          });
-          return allClasses;
-        }
-        return currentClasses;
+        parsedClasses = getExistingClassesFromLocalStorage();
+        // Merge with existing classes, avoiding duplicates
+        const allClasses = [...currentClasses];
+        parsedClasses.forEach((saved: ClassItem) => {
+          if (!allClasses.find((c) => c.name === saved.name)) {
+            allClasses.push(saved);
+          }
+        });
+        return allClasses;
       } catch (error) {
         console.log("Error fetching classes", error);
-        return [];
+        return getExistingClassesFromLocalStorage() || [];
       }
     }, []);
 
@@ -118,7 +116,7 @@ export const useCreateLectureScreen = () => {
       };
 
       // Optimistically update to the new value
-      await context.client.setQueryData<LectureWithCount[]>(
+      context.client.setQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
         (old) => {
           if (old) {
@@ -160,30 +158,60 @@ export const useCreateLectureScreen = () => {
     setShowNewClassModal(true);
   };
 
-  const handleCreateNewClassMutateFN = async () => {
+  const handleCreateNewClassMutateFN = useCallback(async () => {
     if (!newClassName.trim()) {
       alert("Error", "Please enter a class name");
       return;
     }
-
-    const newClass = { id: Date.now().toString(), name: newClassName.trim() };
-    // Save user-created classes to MMKV
-    const savedClasses = storage.getString("user_created_classes");
-    const parsedClasses = savedClasses ? JSON.parse(savedClasses) : [];
-    parsedClasses.push(newClass);
-    storage.set("user_created_classes", JSON.stringify(parsedClasses));
-  };
+    const res = await lectureService.addTeacherClass(newClassName.trim());
+    return res;
+  }, [alert, newClassName]);
 
   const { mutateAsync: handleCreateNewClass } = useMutation({
     mutationFn: handleCreateNewClassMutateFN,
     mutationKey: mutationKeys.classes.create,
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.classes.teacher,
-      });
+    networkMode: "offlineFirst",
+    gcTime: Infinity,
+    retry: 3,
+    retryDelay: (failureCount) => {
+      return Math.min(1000 * 2 * failureCount, 30000);
+    },
+    onMutate: async (_, context) => {
+      const previousClasses = await context.client.getQueryData<ClassItem[]>(
+        queryKeys.classes.teacher,
+      );
+      context.client.setQueryData<ClassItem[]>(
+        queryKeys.classes.teacher,
+        (old) => {
+          if (old) {
+            return [
+              ...old,
+              { id: "temp" + new Date(), name: newClassName.trim() },
+            ];
+          } else {
+            return [{ id: "temp" + new Date(), name: newClassName.trim() }];
+          }
+        },
+      );
+      return {
+        previousClasses,
+      };
+    },
+    onSuccess: (res, _, onMutateResult, context) => {
+      if (res.success) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.classes.teacher,
+        });
+      } else {
+        context.client.setQueryData<ClassItem[]>(
+          queryKeys.classes.teacher,
+          onMutateResult.previousClasses,
+        );
+        alert("Class not Added sucessfully");
+      }
     },
     onError(error) {
-      console.log("Error saving class to storage", error);
+      console.log("Error saving class", error);
     },
     onSettled() {
       setNewClassName("");

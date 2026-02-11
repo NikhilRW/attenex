@@ -3,6 +3,7 @@ import { Dimensions } from "react-native";
 export const STORAGE_KEYS = {
   AUTH_TOKEN: "auth_token",
   USER: "user",
+  TANSTACK_CACHE: "TANSTACK_OFFLINE_CACHE", // For TanStack Query offline persistence
 };
 
 export const GEOFENCE = {
@@ -35,4 +36,4 @@ export const COLORS = {
 };
 
 const { width, height } = Dimensions.get("window");
-export { width, height };
+export { height, width };
