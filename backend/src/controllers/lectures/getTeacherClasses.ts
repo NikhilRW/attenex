@@ -2,14 +2,7 @@ import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { classes, db } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-}
+import { AuthRequest } from "@middleware/auth";
 
 export const getTeacherClasses = async (req: AuthRequest, res: Response) => {
   try {

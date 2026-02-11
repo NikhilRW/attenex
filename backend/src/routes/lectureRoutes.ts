@@ -15,6 +15,7 @@ import { updateLecture } from "../controllers/lectures/updateLecture";
 import { authenticate } from "../middleware/auth";
 import { getStudentLecture } from "@controllers/lectures/getStudentLecture";
 import asyncHandler from "@utils/asyncHandler";
+import { addTeacherClass } from "@controllers/lectures/addTeacherClass";
 
 const router = express.Router();
 
@@ -26,10 +27,11 @@ router.get("/student/lectures", authenticate, getStudentLectures);
 router.get(
   "/student/:lectureId",
   authenticate,
-  asyncHandler(getStudentLecture)
+  asyncHandler(getStudentLecture),
 );
 router.get("/classes/all", authenticate, getAllClasses);
 router.get("/classes", authenticate, getTeacherClasses);
+router.post("/classes", authenticate, addTeacherClass);
 router.get("/:lectureId/details", authenticate, getLectureDetails);
 router.get("/:lectureId/passcode", authenticate, getPasscode);
 router.put("/:lectureId/end", authenticate, endLecture);

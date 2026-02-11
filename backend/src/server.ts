@@ -2,6 +2,7 @@ import "tsconfig-paths/register";
 import admin, { ServiceAccount } from "firebase-admin";
 import "dotenv/config";
 import morgan from "morgan";
+
 import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import express from "express";
