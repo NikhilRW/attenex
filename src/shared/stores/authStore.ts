@@ -5,7 +5,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useThemeStore } from "@shared/hooks/useTheme";
 
-interface User extends UserSchema {
+export interface User extends UserSchema {
   className: string;
   synced?: boolean;
 }

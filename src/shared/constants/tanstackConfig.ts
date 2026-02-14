@@ -1,7 +1,5 @@
 import { logger } from "@shared/utils/logger";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
-import { mutationKeys } from "./mutationKeys";
-import { handleNameUpdateMutateFn } from "../utils/offlineMutationFuncs";
 
 export enum StaleTime {
   SECONDS_3 = 3000,
@@ -80,16 +78,5 @@ export const queryClient = new QueryClient({
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     },
-  },
-});
-
-// TODO: for now writing here.
-queryClient.setMutationDefaults(mutationKeys.user.updateName, {
-  mutationFn: handleNameUpdateMutateFn,
-  networkMode: "offlineFirst",
-  gcTime: Infinity,
-  retry: 3,
-  retryDelay: (failureCount) => {
-    return Math.min(1000 * 2 * failureCount, 30000);
   },
 });

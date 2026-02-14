@@ -47,12 +47,13 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
     const updatedUser = updatedUsers[0];
 
     return res.status(200).json({
+      success: true,
       message: "Role updated successfully",
-      user: updatedUser,
     });
   } catch (error) {
     console.error("Error updating user role:", error);
     return res.status(500).json({
+      success: false,
       error: "Failed to update user role. Please try again.",
     });
   }

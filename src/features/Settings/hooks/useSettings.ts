@@ -1,9 +1,8 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
-import { userService } from "@/shared/services/userService";
 import { UserRole } from "@settings/types";
 import { handleResetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
-import { useAuthStore } from "@shared/stores/authStore";
+import { useAuthStore, User } from "@shared/stores/authStore";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -17,16 +16,14 @@ export const useSettings = () => {
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
 
-  const handleRoleUpdateMutateFn = useCallback(async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const res = await userService.updateUserRole(role);
-    return res;
-  }, [role]);
-
-  const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation({
+  const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation<
+    { success: boolean; message: string },
+    any,
+    UserRole,
+    { user: Partial<User> }
+  >({
     mutationKey: mutationKeys.user.updateRole,
-    mutationFn: handleRoleUpdateMutateFn,
-    onMutate() {
+    onMutate: () => {
       const prevUser = { ...user };
       updateUser({ role });
       if (role === "teacher") {
@@ -36,8 +33,10 @@ export const useSettings = () => {
       }
       return { user: prevUser };
     },
-    onSuccess() {
-      alert("Role updated", `Your role is now set to ${role}.`);
+    onSuccess({ success }) {
+      if (success) {
+        alert("Role updated", `Your role is now set to ${role}.`);
+      }
     },
     onError: (error, _, onMutateResult) => {
       alert("Error", error.message || "Failed to update role");
@@ -51,7 +50,7 @@ export const useSettings = () => {
   const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation<
     { success: boolean; message: string },
     any,
-    any,
+    string,
     { prevName: string }
   >({
     mutationKey: mutationKeys.user.updateName, // Static key with displayName for deduplication
@@ -60,7 +59,7 @@ export const useSettings = () => {
       updateUser({ name: displayName });
       return { prevName };
     },
-    onSuccess(data, _, onMutateResult) {
+    async onSuccess(data, _, onMutateResult) {
       console.log("✅ Name update succeeded:", data);
       if (data?.success) {
         alert("Success", "Your name has been updated");
