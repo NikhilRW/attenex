@@ -5,7 +5,7 @@ import { useAuthStore } from "../stores/authStore";
 export const handleNameUpdateMutateFn = async () => {
   impactAsync(ImpactFeedbackStyle.Medium);
   const res = await userService.updateUserFullName(
-    useAuthStore.getState().user.name || "",
+    useAuthStore.getState().user!.name || "",
   );
   return res;
 };

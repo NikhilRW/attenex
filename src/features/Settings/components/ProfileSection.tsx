@@ -99,14 +99,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               />
               {displayName !== userName && (
                 <TouchableOpacity
-                  onPress={() => onNameUpdate()}
+                  onPress={() => onNameUpdate(displayName)}
                   disabled={savingName}
                 >
                   {savingName ? (
-                    <ActivityIndicator
-                      size="small"
-                      color={colors.primary.main}
-                    />
+                    <ActivityIndicator size="small" color={"#000"} />
                   ) : (
                     <Ionicons
                       name="checkmark-circle"

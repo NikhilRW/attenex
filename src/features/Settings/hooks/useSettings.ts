@@ -4,7 +4,7 @@ import { UserRole } from "@settings/types";
 import { handleResetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
-import { useMutation, useMutationState } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -16,19 +16,6 @@ export const useSettings = () => {
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
-
-  // Track if name update mutation is pending/paused (for offline-first sync indicator)
-  const nameUpdateStates = useMutationState({
-    filters: {
-      mutationKey: mutationKeys.user.updateName,
-      status: "pending",
-    },
-  });
-
-  // Check if any name update mutation is pending or paused (offline)
-  const isNotSynced = nameUpdateStates.some(
-    (mutation) => mutation.status === "pending" || mutation.isPaused,
-  );
 
   const handleRoleUpdateMutateFn = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -152,6 +139,5 @@ export const useSettings = () => {
     handleLogout,
     handleDeleteAccount,
     handleResetPassword,
-    isNotSynced, // Expose sync status for UI
   };
 };

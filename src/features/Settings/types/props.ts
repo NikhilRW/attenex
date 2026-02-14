@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { ThemeMode, UserRole } from "./common";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 export interface ThemeOptionProps {
   mode: ThemeMode | UserRole;
@@ -12,7 +13,17 @@ export interface ThemeOptionProps {
 export interface ProfileSectionProps {
   displayName: string;
   onDisplayNameChange: Dispatch<SetStateAction<string>>;
-  onNameUpdate: () => Promise<void>;
+  onNameUpdate: UseMutateAsyncFunction<
+    {
+      success: boolean;
+      message: string;
+    },
+    any,
+    any,
+    {
+      prevName: string;
+    }
+  >;
   savingName: boolean;
   userPhotoUrl?: string | null;
   userEmail?: string | null;

@@ -189,7 +189,7 @@ export const useLinkedInAuth = () => {
 
     // Check if this is our redirect URL containing the authorization code
     if (url.startsWith(REDIRECT_URI) && url.includes("code=")) {
-      authMutation.mutate(url);
+      authMutation.mutateAsync(url);
       return false; // Block navigation to keep user in app
     }
 
