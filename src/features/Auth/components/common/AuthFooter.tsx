@@ -1,11 +1,10 @@
 import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
-import {  Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { AuthFooterProps } from "@auth/types/props";
 import { StyleSheet } from "react-native-unistyles";
 
 const AuthFooter: React.FC<AuthFooterProps> = ({
-  
   text,
   linkText,
   onLinkPress,
@@ -40,6 +39,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
-
 
 export default AuthFooter;
