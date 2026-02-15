@@ -1,11 +1,11 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useAuthStore } from "@shared/stores/authStore";
+import { unsubscribeFromClassName } from "@shared/utils/fcm";
 import http from "@shared/utils/http";
+import { logger } from "@shared/utils/logger";
 import { secureStore } from "@shared/utils/secureStore";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
-import { unsubscribeFromClassName } from "@shared/utils/fcm";
-import { logger } from "@shared/utils/logger";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -40,11 +40,7 @@ export const authService = {
   },
   async deleteUserAccount() {
     try {
-      const response = await http.delete("/api/users/delete-account", {
-        headers: {
-          Authorization: "Bearer " + useAuthStore.getState().token,
-        },
-      });
+      const response = await http.delete("/api/users/delete-account");
       if (response.data.success) {
         await secureStore.removeItem("jwt");
         await secureStore.removeItem("is-signup");

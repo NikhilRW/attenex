@@ -62,7 +62,6 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {/* TODO: solve below error */}
       {error && (
         <Text style={[styles.errorText, { color: colors.accent.red }]}>
           {error}

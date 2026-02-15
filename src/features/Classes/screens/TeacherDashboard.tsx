@@ -48,8 +48,7 @@ const TeacherDashboard = () => {
     totalStudents,
   } = useTeacherDashboard();
 
-  // TODO: What To Do With Pull Indicator To Create Lecture.
-
+  // TODO: Research How Both Pull Indication And The List Is Handled.
   return (
     <View style={styles.container}>
       {isDark && <FuturisticBackground />}

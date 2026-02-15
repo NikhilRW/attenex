@@ -1,4 +1,3 @@
-import { useAuthStore } from "@shared/stores/authStore";
 import http from "@shared/utils/http";
 
 const API_URL = `/api/lectures`;
@@ -11,23 +10,14 @@ export const lectureService = {
     latitude: number,
     longitude: number,
   ) => {
-    const { token } = useAuthStore.getState();
     try {
-      const response = await http.post(
-        `${API_URL}/create`,
-        {
-          lectureName,
-          className,
-          duration,
-          latitude,
-          longitude,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await http.post(`${API_URL}/create`, {
+        lectureName,
+        className,
+        duration,
+        latitude,
+        longitude,
+      });
 
       return response.data;
     } catch (error: any) {
@@ -37,16 +27,7 @@ export const lectureService = {
   },
   endLecture: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.put(
-        `${API_URL}/${lectureId}/end`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await http.put(`${API_URL}/${lectureId}/end`, {});
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -55,12 +36,7 @@ export const lectureService = {
 
   getAllLectures: async () => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/all`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -69,12 +45,7 @@ export const lectureService = {
 
   getActiveLectures: async () => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/active`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/active`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -82,12 +53,7 @@ export const lectureService = {
   },
   getTeacherClasses: async () => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/classes`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/classes`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -95,19 +61,9 @@ export const lectureService = {
   },
   addTeacherClass: async (newClassName: string) => {
     try {
-      // TODO: create modular functions for this repeitive token fetching.
-      const { token } = useAuthStore.getState();
-      const response = await http.post(
-        `${API_URL}/classes`,
-        {
-          className: newClassName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await http.post(`${API_URL}/classes`, {
+        className: newClassName,
+      });
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -115,12 +71,7 @@ export const lectureService = {
   },
   getStudentLectureDetails: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/student/${lectureId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/student/${lectureId}`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -128,12 +79,7 @@ export const lectureService = {
   },
   getTeacherLectureDetails: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/${lectureId}/details`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/${lectureId}/details`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -149,15 +95,9 @@ export const lectureService = {
     },
   ) => {
     try {
-      const { token } = useAuthStore.getState();
       const response = await http.put(
         `${API_URL}/${lectureId}/update`,
         updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       );
       return response.data;
     } catch (error: any) {
@@ -166,12 +106,7 @@ export const lectureService = {
   },
   deleteLecture: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.delete(`${API_URL}/${lectureId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.delete(`${API_URL}/${lectureId}`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -180,12 +115,7 @@ export const lectureService = {
 
   fetchLectureAttendance: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/${lectureId}/attendance`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/${lectureId}/attendance`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -193,16 +123,10 @@ export const lectureService = {
   },
   addManualAttendance: async (lectureId: string, studentRollNo: string) => {
     try {
-      const { token } = useAuthStore.getState();
       const response = await http.post(
         `${API_URL}/${lectureId}/attendance/manual`,
         {
           studentRollNo,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         },
       );
       return response.data;
@@ -212,15 +136,8 @@ export const lectureService = {
   },
   getStudentLectures: async (className: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      console.log("className : " + className);
       const response = await http.get(
         `${API_URL}/student/lectures?class=${encodeURI(className)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       );
       return response.data;
     } catch (error: any) {
@@ -229,23 +146,15 @@ export const lectureService = {
   },
   getPasscode: async (lectureId: string) => {
     try {
-      const { token } = useAuthStore.getState();
-      const response = await http.get(`${API_URL}/${lectureId}/passcode`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await http.get(`${API_URL}/${lectureId}/passcode`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
   },
   getAllClasses: async () => {
-    const { token } = useAuthStore.getState();
     try {
-      const response = await http.get(`${API_URL}/classes/all`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await http.get(`${API_URL}/classes/all`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;

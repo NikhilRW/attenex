@@ -1,27 +1,18 @@
 import { useAuthStore } from "@shared/stores/authStore";
-import http from "@shared/utils/http";
 import {
   getDeviceToken,
   subscribeToClassName,
   unsubscribeFromClassName,
 } from "@shared/utils/fcm";
+import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 
 export const userService = {
-  token: useAuthStore.getState().token,
   async updateUserRole(role: "teacher" | "student") {
     try {
-      const response = await http.post(
-        "/api/users/update-role",
-        {
-          role,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-        },
-      );
+      const response = await http.post("/api/users/update-role", {
+        role,
+      });
 
       // Update the user in the auth store with the new role
       if (response.data.user) {
@@ -51,17 +42,9 @@ export const userService = {
 
   async updateStudentClass(className: string) {
     try {
-      const response = await http.post(
-        "/api/users/update-class",
-        {
-          className,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-        },
-      );
+      const response = await http.post("/api/users/update-class", {
+        className,
+      });
       unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
       await subscribeToClassName(className);
       // Update the user in the auth store with the new class
@@ -80,17 +63,9 @@ export const userService = {
   },
   async updateUserToken(token: string) {
     try {
-      const response = await http.post(
-        "/api/users/update-device-token",
-        {
-          token,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-        },
-      );
+      const response = await http.post("/api/users/update-device-token", {
+        token,
+      });
       return response.data;
     } catch (error: any) {
       logger.info("authService:updateUserToken - error", error);
@@ -101,15 +76,7 @@ export const userService = {
   },
   async updateUserFullName(fullName: string) {
     try {
-      const response = await http.patch(
-        "/api/users/full-name",
-        { fullName },
-        {
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-        },
-      );
+      const response = await http.patch("/api/users/full-name", { fullName });
       return response.data;
     } catch (error: any) {
       logger.info("authService:updateUserFullName - error", error.message);

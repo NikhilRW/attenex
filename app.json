@@ -96,8 +96,7 @@
       ],
       "./plugins/androidManifestPlugin.js",
       "react-native-edge-to-edge",
-      "expo-background-task",
-      "@rnrepo/expo-config-plugin"
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true,
