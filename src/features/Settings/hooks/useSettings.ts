@@ -13,7 +13,7 @@ export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
   const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.name || "");
-  const [role, setRole] = useState<UserRole>(user?.role || "teacher");
+  const [role, setRole] = useState<UserRole>(user?.role || "teacher");``
   const { alert } = useAlerts();
 
   const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation<

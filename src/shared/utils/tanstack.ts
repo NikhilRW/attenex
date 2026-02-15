@@ -10,11 +10,11 @@ export const setupTanstackForReactNative = (queryClient: QueryClient) => {
   // Set up online/offline detection for React Native
 
   onlineManager.setEventListener((setOnline) => {
-    const eventSubscription = Network.addNetworkStateListener((state) => {
+    const eventSubscription = Network.addNetworkStateListener(async (state) => {
       const isOnline = !!state.isConnected;
       setOnline(isOnline);
       if (isOnline) {
-        queryClient.resumePausedMutations();
+        await queryClient.resumePausedMutations();
       }
     });
     return eventSubscription.remove;

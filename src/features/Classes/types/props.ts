@@ -193,7 +193,7 @@ export interface NewClassModalProps {
   onClose: () => void;
   newClassName: string;
   setNewClassName: (text: string) => void;
-  onCreateClass: () => void;
+  onCreateClass: (className: string) => Promise<{ success: boolean }>;
 }
 
 /**

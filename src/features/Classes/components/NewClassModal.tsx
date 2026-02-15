@@ -16,6 +16,9 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
 }) => {
   const { colors, isDark } = useTheme();
 
+  const handleCreateClass = async () => {
+    await onCreateClass(newClassName);
+  };
 
   return (
     <Modal
@@ -182,7 +185,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={{ flex: 1 }} onPress={onCreateClass}>
+              <TouchableOpacity style={{ flex: 1 }} onPress={handleCreateClass}>
                 <LinearGradient
                   colors={[colors.primary.main, "#3B82F6"]}
                   start={{ x: 0, y: 0 }}

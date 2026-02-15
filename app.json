@@ -35,10 +35,7 @@
               "pathPrefix": "/auth"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "package": "com.attenex.attenex",
@@ -99,7 +96,8 @@
       ],
       "./plugins/androidManifestPlugin.js",
       "react-native-edge-to-edge",
-      "expo-background-task"
+      "expo-background-task",
+      "@rnrepo/expo-config-plugin"
     ],
     "experiments": {
       "typedRoutes": true,

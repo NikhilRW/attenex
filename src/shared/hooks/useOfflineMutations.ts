@@ -1,13 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { mutationKeys } from "../constants/mutationKeys";
 import {
+  createNewClassMutateFN,
   nameUpdateMutateFn,
   roleUpdateMutateFn,
 } from "../utils/offlineMutationFuncs";
 
 export const useOfflineMutations = () => {
   const queryClient = useQueryClient();
-
   /**
    * For making the name update feature offline first.
    */
@@ -29,6 +29,19 @@ export const useOfflineMutations = () => {
     networkMode: "offlineFirst",
     gcTime: Infinity,
     retry: 3,
+    retryDelay: (failureCount) => {
+      return Math.min(1000 * 2 * failureCount, 30000);
+    },
+  });
+
+  /**
+   * For able to add new class in an offline first way.
+   */
+  queryClient.setMutationDefaults(mutationKeys.classes.create, {
+    mutationFn: createNewClassMutateFN,
+    networkMode: "offlineFirst",
+    gcTime: Infinity,
+    retry: 1,
     retryDelay: (failureCount) => {
       return Math.min(1000 * 2 * failureCount, 30000);
     },

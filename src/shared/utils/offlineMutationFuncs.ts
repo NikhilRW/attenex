@@ -2,6 +2,7 @@ import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import { userService } from "../services/userService";
 import * as Haptics from "expo-haptics";
 import { UserRole } from "@/features/Settings/types";
+import { lectureService } from "@/features/Classes";
 
 export const nameUpdateMutateFn = async (username: string) => {
   impactAsync(ImpactFeedbackStyle.Medium);
@@ -12,5 +13,13 @@ export const nameUpdateMutateFn = async (username: string) => {
 export const roleUpdateMutateFn = async (role: UserRole) => {
   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   const res = await userService.updateUserRole(role);
+  return res;
+};
+
+export const createNewClassMutateFN = async (className: string) => {
+  if (!className.trim()) {
+    return;
+  }
+  const res = await lectureService.addTeacherClass(className.trim());
   return res;
 };

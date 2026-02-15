@@ -2,10 +2,7 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services";
 import { ClassItem, LectureWithCount } from "@classes/types";
-import {
-  getExistingClassesFromLocalStorage,
-  getMinHeightForScrollView,
-} from "@classes/utils/common";
+import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
@@ -33,34 +30,27 @@ export const useCreateLectureScreen = () => {
     router.navigate("/classes");
   };
 
-  const fetchTeacherClasses: () => Promise<ClassItem[]> =
+  const fetchTeacherClasses: () => Promise<ClassItem[] | null> =
     useCallback(async () => {
-      let parsedClasses;
       try {
         const res = await lectureService.getTeacherClasses();
         let currentClasses: ClassItem[] = [];
         if (res.success) {
           currentClasses = [...res.data];
         }
-        // Load user-created classes from local storage
-        parsedClasses = getExistingClassesFromLocalStorage();
-        // Merge with existing classes, avoiding duplicates
-        const allClasses = [...currentClasses];
-        parsedClasses.forEach((saved: ClassItem) => {
-          if (!allClasses.find((c) => c.name === saved.name)) {
-            allClasses.push(saved);
-          }
-        });
-        return allClasses;
+        return currentClasses;
       } catch (error) {
         console.log("Error fetching classes", error);
-        return getExistingClassesFromLocalStorage() || [];
+        throw error;
       }
     }, []);
 
   const { data: existingClasses } = useQuery({
     queryFn: fetchTeacherClasses,
     queryKey: queryKeys.classes.teacher,
+    networkMode: "offlineFirst",
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const handleCreateLectureMutateFn = async () => {
@@ -158,43 +148,46 @@ export const useCreateLectureScreen = () => {
     setShowNewClassModal(true);
   };
 
-  const handleCreateNewClassMutateFN = useCallback(async () => {
-    if (!newClassName.trim()) {
-      alert("Error", "Please enter a class name");
-      return;
-    }
-    const res = await lectureService.addTeacherClass(newClassName.trim());
-    return res;
-  }, [alert, newClassName]);
+  const afterClassNameAdded = useCallback(() => {
+    setNewClassName("");
+    setShowNewClassModal(false);
+    setShowClassDropdown(true);
+  }, []);
 
-  const { mutateAsync: handleCreateNewClass } = useMutation({
-    mutationFn: handleCreateNewClassMutateFN,
+  const { mutateAsync: handleCreateNewClass } = useMutation<
+    { success: boolean },
+    Error,
+    string,
+    { previousClasses: ClassItem[] } | null
+  >({
     mutationKey: mutationKeys.classes.create,
-    networkMode: "offlineFirst",
-    gcTime: Infinity,
-    retry: 3,
-    retryDelay: (failureCount) => {
-      return Math.min(1000 * 2 * failureCount, 30000);
-    },
-    onMutate: async (_, context) => {
-      const previousClasses = await context.client.getQueryData<ClassItem[]>(
+    onMutate: (params, context) => {
+      if (!params.trim()) {
+        alert("Error", "Please enter a class name");
+        return null;
+      }
+      const newClassNameParam = params.trim();
+      const previousClasses = context.client.getQueryData<ClassItem[]>(
         queryKeys.classes.teacher,
       );
       context.client.setQueryData<ClassItem[]>(
         queryKeys.classes.teacher,
         (old) => {
+          const newClassNames: ClassItem[] = [];
           if (old) {
-            return [
-              ...old,
-              { id: "temp" + new Date(), name: newClassName.trim() },
-            ];
-          } else {
-            return [{ id: "temp" + new Date(), name: newClassName.trim() }];
+            newClassNames.push(
+              ...old.filter((classEle) => classEle.name !== newClassNameParam),
+            );
           }
+          newClassNames.push({
+            id: "temp" + new Date().getTime(),
+            name: newClassNameParam,
+          });
+          return newClassNames;
         },
       );
       return {
-        previousClasses,
+        previousClasses: previousClasses!,
       };
     },
     onSuccess: (res, _, onMutateResult, context) => {
@@ -202,21 +195,19 @@ export const useCreateLectureScreen = () => {
         queryClient.invalidateQueries({
           queryKey: queryKeys.classes.teacher,
         });
-      } else {
+      } else if (onMutateResult?.previousClasses) {
         context.client.setQueryData<ClassItem[]>(
           queryKeys.classes.teacher,
           onMutateResult.previousClasses,
         );
         alert("Class not Added sucessfully");
       }
+      afterClassNameAdded();
     },
     onError(error) {
       console.log("Error saving class", error);
-    },
-    onSettled() {
-      setNewClassName("");
-      setShowNewClassModal(false);
-      setShowClassDropdown(true);
+      alert(error.name);
+      afterClassNameAdded();
     },
   });
 
