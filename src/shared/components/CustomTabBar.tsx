@@ -29,7 +29,8 @@ const CustomTabBar = ({
   navigation,
 }: BottomTabBarProps) => {
   const { colors } = useTheme();
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
   let role = user?.role;
 
   // Filter routes based on user role

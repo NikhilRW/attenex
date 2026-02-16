@@ -1,14 +1,14 @@
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { LocationCoords } from "@attendance/types/studentDashboard.types";
 import * as Location from "expo-location";
-import { AlertFunc } from "../types";
+import { AlertFunction } from "../types";
 
 /**
  * Request location permissions from the user
  * @returns true if permission granted, false otherwise
  */
 export const requestLocationPermission = async (
-  alert: AlertFunc,
+  alert: AlertFunction,
 ): Promise<boolean> => {
   try {
     const { status } = await Location.requestForegroundPermissionsAsync();

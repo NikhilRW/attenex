@@ -24,10 +24,12 @@ import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import React, { useCallback } from "react";
 import { ScrollView } from "react-native";
+import { useAlerts } from "react-native-paper-alerts";
 
 const StudentDashboard = () => {
   const { colors } = useTheme();
-  const { user } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const { alert } = useAlerts();
 
   // Roll number management
   const {
@@ -67,7 +69,8 @@ const StudentDashboard = () => {
   // Socket manager
   const { lectureStatus, setLectureStatus } = useSocketManager(
     joinedLecture,
-    refreshLectures
+    refreshLectures,
+    alert,
   );
 
   // Class management
@@ -83,7 +86,7 @@ const StudentDashboard = () => {
   // Handle lecture details from URL params (notification join)
   const { fetchingLectureDetails } = useLectureDetailsParam(
     lectures,
-    handleJoin
+    handleJoin,
   );
 
   // Roll number submission handler
@@ -96,7 +99,7 @@ const StudentDashboard = () => {
         });
       }
     },
-    [pendingLecture, proceedWithJoin]
+    [pendingLecture, proceedWithJoin],
   );
 
   // Leave lecture handler
@@ -121,6 +124,10 @@ const StudentDashboard = () => {
   // Show loading screen while fetching lecture details
   if (fetchingLectureDetails) {
     return <LoadingScreen />;
+  }
+
+  if (user?.role !== "student") {
+    return null;
   }
 
   console.log("Student Dashboard Rendered.");

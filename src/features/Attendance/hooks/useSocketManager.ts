@@ -4,7 +4,7 @@ import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
 } from "@attendance/constants/studentDashboard.constants";
-import { Lecture } from "@attendance/types/common";
+import { AlertFunction, Lecture } from "@attendance/types/common";
 import {
   LectureStatus,
   UseSocketManagerReturn,
@@ -20,6 +20,7 @@ import { AppState } from "react-native";
 export const useSocketManager = (
   joinedLecture: Lecture | null,
   onAppForeground: () => void,
+  alert: AlertFunction,
 ): UseSocketManagerReturn => {
   const [lectureStatus, setLectureStatus] = useState<LectureStatus>("active");
   const { user } = useAuthStore();

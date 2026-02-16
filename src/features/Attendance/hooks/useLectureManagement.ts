@@ -49,12 +49,16 @@ export const useLectureManagement = (
     }
   }, [user]);
 
-  const shouldQueryBeEnabled = joinedLecture !== null ? false : true;
+  const shouldQueryBeEnabled =
+    joinedLecture !== null || user?.role === "teacher" ? false : true;
 
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
     queryKey: queryKeys.lectures.student,
-    refetchInterval: LECTURE_AUTO_REFRESH_INTERVAL,
+    refetchInterval: () => {
+      return user?.role === "teacher" ? false : LECTURE_AUTO_REFRESH_INTERVA
+      L;
+    },
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,
     enabled: shouldQueryBeEnabled,

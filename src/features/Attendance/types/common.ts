@@ -15,7 +15,7 @@ export type Lecture = {
   teacherLongitude: string;
 };
 
-export type AlertFunc = (
+export type AlertFunction = (
   title: string,
   message?: string,
   button?: AlertButton[],

@@ -1,9 +1,10 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { queryKeys } from "@/shared/constants/queryKeys";
 import { UserRole } from "@settings/types";
 import { handleResetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore, User } from "@shared/stores/authStore";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -12,38 +13,62 @@ import { useAlerts } from "react-native-paper-alerts";
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [displayName, setDisplayName] = useState(user?.name || "");
-  const [role, setRole] = useState<UserRole>(user?.role || "teacher");``
+  const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
 
   const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation<
     { success: boolean; message: string },
     any,
     UserRole,
-    { user: Partial<User> }
+    { user: Partial<User>; prevRole: UserRole }
   >({
     mutationKey: mutationKeys.user.updateRole,
-    onMutate: () => {
+    onMutate: async (newRole) => {
       const prevUser = { ...user };
-      updateUser({ role });
-      if (role === "teacher") {
-        router.replace("/(main)/classes");
+      const prevRole = user?.role || "teacher";
+      // Update local state
+      updateUser({ role: newRole });
+
+      // Cancel any outgoing queries for the OLD role
+      if (prevRole === "student") {
+        await queryClient.cancelQueries({
+          queryKey: queryKeys.lectures.student,
+        });
       } else {
-        router.replace("/(main)/attendance");
+        await queryClient.cancelQueries({
+          queryKey: queryKeys.lectures.teacher,
+        });
       }
-      return { user: prevUser };
+      return { user: prevUser, prevRole };
     },
-    onSuccess({ success }) {
+    async onSuccess({ success }, newRole, context) {
       if (success) {
-        alert("Role updated", `Your role is now set to ${role}.`);
+        if (context.prevRole === "student") {
+          queryClient.removeQueries({
+            queryKey: queryKeys.lectures.student,
+          });
+        } else {
+          queryClient.removeQueries({
+            queryKey: queryKeys.lectures.teacher,
+          });
+        }
+
+        // Navigate AFTER cleanup
+        if (newRole === "teacher") {
+          router.replace("/(main)/classes");
+        } else {
+          router.replace("/(main)/attendance");
+        }
+
+        alert("Role updated", `Your role is now set to ${newRole}.`);
       }
     },
     onError: (error, _, onMutateResult) => {
       alert("Error", error.message || "Failed to update role");
       updateUser({ role: onMutateResult?.user.role });
-      setRole(
-        onMutateResult?.user.role || role === "teacher" ? "student" : "teacher",
-      );
+      setRole(onMutateResult?.prevRole || "teacher");
     },
   });
 

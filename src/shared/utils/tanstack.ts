@@ -6,25 +6,18 @@ import {
 import * as Network from "expo-network";
 import { AppState, AppStateStatus, Platform } from "react-native";
 
-let isEmulator = false;
-
 export const setupTanstackForReactNative = (queryClient: QueryClient) => {
   // Set up online/offline detection for React Native
-
   onlineManager.setEventListener((setOnline) => {
-    if (__DEV__ && !isEmulator) {
-      const eventSubscription = Network.addNetworkStateListener(
-        async (state) => {
-          const isOnline = !!state.isConnected;
-          console.log("App Network Status 🛜 Changed : " + isOnline);
-          setOnline(isOnline);
-          if (isOnline) {
-            await queryClient.resumePausedMutations();
-          }
-        },
-      );
-      return eventSubscription.remove;
-    }
+    const eventSubscription = Network.addNetworkStateListener(async (state) => {
+      const isOnline = !!state.isConnected;
+      console.log("App Network Status 🛜 Changed : " + isOnline);
+      setOnline(isOnline);
+      if (isOnline) {
+        await queryClient.resumePausedMutations();
+      }
+    });
+    return eventSubscription.remove;
   });
 
   // Set up focus management for app state changes

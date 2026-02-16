@@ -27,7 +27,7 @@ export const useOfflineMutations = () => {
    */
   queryClient.setMutationDefaults(mutationKeys.user.updateRole, {
     mutationFn: roleUpdateMutateFn,
-    networkMode: "offlineFirst",
+    networkMode: "online",
     gcTime: Infinity,
     retry: 3,
     retryDelay: (failureCount) => {

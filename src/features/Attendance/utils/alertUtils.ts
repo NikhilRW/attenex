@@ -1,4 +1,4 @@
-import { AlertFunc } from "../types";
+import { AlertFunction } from "../types";
 
 /**
  * Show a success alert
@@ -6,7 +6,7 @@ import { AlertFunc } from "../types";
 export const showSuccessAlert = (
   title: string,
   message: string,
-  alert: AlertFunc,
+  alert: AlertFunction,
 ) => {
   alert(title, message);
 };
@@ -17,7 +17,7 @@ export const showSuccessAlert = (
 export const showErrorAlert = (
   title: string,
   message: string,
-  alert: AlertFunc,
+  alert: AlertFunction,
 ) => {
   alert(title, message);
 };
@@ -28,7 +28,7 @@ export const showErrorAlert = (
 export const showConfirmationAlert = (
   title: string,
   message: string,
-  alert: AlertFunc,
+  alert: AlertFunction,
   onConfirm: () => void,
   onCancel?: () => void,
 ) => {
@@ -51,7 +51,7 @@ export const showConfirmationAlert = (
 export const showDestructiveAlert = (
   title: string,
   message: string,
-  alert: AlertFunc,
+  alert: AlertFunction,
   confirmText: string,
   onConfirm: () => void,
 ) => {
