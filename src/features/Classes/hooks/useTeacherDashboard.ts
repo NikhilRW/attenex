@@ -46,15 +46,12 @@ export const useTeacherDashboard = () => {
   // const context = useSharedValue({ x: 0, y: 0 });
   // const animatedTranslateY = useSharedValue(0);
 
-  const printTheMutationCache = () => {
-    const cache = queryClient.getMutationCache();
-    const createClassCache = cache;
-    console.log("cache : " + JSON.stringify(createClassCache));
-  };
-
-  useEffect(() => {
-    printTheMutationCache();
-  }, []);
+  // For testing purposes
+  // const printTheMutationCache = () => {
+  //   const cache = queryClient.getMutationCache();
+  //   const createClassCache = cache;
+  //   console.log("cache : " + JSON.stringify(createClassCache));
+  // };
 
   const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
     useCallback(async () => {
@@ -97,13 +94,18 @@ export const useTeacherDashboard = () => {
   const { data: lectures, refetch: fetchActiveLectures } = useQuery({
     queryKey: queryKeys.lectures.teacher,
     queryFn: fetchActiveLecturesQueryFn,
+    networkMode: "offlineFirst",
+    gcTime: Infinity,
     refetchInterval: StaleTime.MINUTES_2,
     enabled: false,
   });
 
   useFocusEffect(
     useCallback(() => {
-      if (latestCreateLectureMutation !== "pending") {
+      if (
+        latestCreateLectureMutation !== "pending" &&
+        latestCreateLectureMutation !== "error"
+      ) {
         fetchActiveLectures();
       }
     }, [fetchActiveLectures, latestCreateLectureMutation]),
@@ -162,7 +164,10 @@ export const useTeacherDashboard = () => {
                 socketService.onStudentJoined(handleStudentJoined);
                 socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
               }
-              if (latestCreateLectureMutation !== "pending") {
+              if (
+                latestCreateLectureMutation !== "pending" &&
+                latestCreateLectureMutation !== "error"
+              ) {
                 fetchActiveLectures();
               }
             }

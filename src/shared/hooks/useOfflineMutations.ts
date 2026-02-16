@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { mutationKeys } from "../constants/mutationKeys";
 import {
+  createLectureMutateFn,
   createNewClassMutateFN,
   nameUpdateMutateFn,
   roleUpdateMutateFn,
@@ -39,6 +40,19 @@ export const useOfflineMutations = () => {
    */
   queryClient.setMutationDefaults(mutationKeys.classes.create, {
     mutationFn: createNewClassMutateFN,
+    networkMode: "offlineFirst",
+    gcTime: Infinity,
+    retry: 1,
+    retryDelay: (failureCount) => {
+      return Math.min(1000 * 2 * failureCount, 30000);
+    },
+  });
+
+  /**
+   * For being able to add new lecture in an offline first way.
+   */
+  queryClient.setMutationDefaults(mutationKeys.lectures.create, {
+    mutationFn: createLectureMutateFn,
     networkMode: "offlineFirst",
     gcTime: Infinity,
     retry: 1,

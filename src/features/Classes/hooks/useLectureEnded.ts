@@ -4,7 +4,7 @@ import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 import {
   useSharedValue,
@@ -12,7 +12,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-// TODO: Think about adding the change passcode feature.
+// TODO: Think about adding the refresh code feature.
 export const useLectureEnded = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -69,9 +69,9 @@ export const useLectureEnded = () => {
     };
   }, [lectureId]);
 
-  const handleDone = () => {
+  const handleDone = useCallback(() => {
     router.back();
-  };
+  }, [router]);
 
   return {
     lectureId,

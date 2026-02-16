@@ -10,7 +10,6 @@ import { router } from "expo-router";
  */
 const http = axios.create({
   baseURL: BASE_URI,
-  timeout: 10000,
 });
 
 // Request interceptor to add Authorization header

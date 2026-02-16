@@ -14,7 +14,8 @@
       "@classes/*": ["./src/features/Classes/*"],
       "@attendance/*": ["./src/features/Attendance/*"],
       "@settings/*": ["./src/features/Settings/*"],
-      "@role-selection/*": ["./src/features/RoleSelection/*"]
+      "@role-selection/*": ["./src/features/RoleSelection/*"],
+      "@test/*": ["./src/features/Test/*"],
     }
   },
   "include": [

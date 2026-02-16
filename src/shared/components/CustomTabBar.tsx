@@ -1,4 +1,9 @@
-import { Entypo, FontAwesome6, Ionicons } from "@expo/vector-icons";
+import {
+  Entypo,
+  FontAwesome6,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
 import { Pressable } from "react-native";
@@ -31,6 +36,10 @@ const CustomTabBar = ({
   const filteredRoutes = routeNames
     .filter((name) => {
       // Hide role-selection if user already has a role
+      if (!__DEV__ && name.includes("test")) {
+        return false;
+      }
+
       if (role && name.includes("role-selection")) {
         return false;
       }
@@ -191,7 +200,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
 export const getIconForRoute = (
   routeName: string,
   activated: boolean,
-  colors: any
+  colors: any,
 ) => {
   const color = activated ? colors.primary.main : colors.text.secondary;
   if (routeName.includes("attendance")) {
@@ -204,6 +213,8 @@ export const getIconForRoute = (
     return <Ionicons name="settings-outline" size={25} color={color} />;
   } else if (routeName.includes("create-class")) {
     return <Ionicons name="school" size={25} color={color} />;
+  } else if (routeName.includes("test")) {
+    return <MaterialCommunityIcons name="test-tube" size={25} color={color} />;
   }
 };
 

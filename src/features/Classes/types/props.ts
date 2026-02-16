@@ -7,6 +7,7 @@ import {
   FilterType,
   LectureWithCount,
 } from "./common";
+import { CreateLectureVariables } from "./params";
 
 /**
  * AttendanceFilter component props
@@ -94,7 +95,7 @@ export interface CreateLectureFormCardProps {
 
   // Submit
   loading: boolean;
-  onCreateLecture: () => void;
+  onCreateLecture: (variables: CreateLectureVariables) => void;
 }
 
 /**

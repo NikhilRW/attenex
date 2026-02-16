@@ -1,14 +1,18 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services";
-import { ClassItem, LectureWithCount } from "@classes/types";
+import {
+  ClassItem,
+  CreateLectureAPIResponse,
+  LectureWithCount,
+} from "@classes/types";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
 import { useAlerts } from "react-native-paper-alerts";
+import { CreateLectureVariables } from "../types/params";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
@@ -53,45 +57,17 @@ export const useCreateLectureScreen = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const handleCreateLectureMutateFn = async () => {
-    if (!lectureName || !selectedClass) {
-      alert("Missing Information", "Please fill in all fields.");
-      return;
-    }
-
-    const finalDuration = duration === -1 ? parseInt(customDuration) : duration;
-    if (isNaN(finalDuration) || finalDuration <= 0) {
-      alert("Invalid Duration", "Please enter a valid duration in minutes.");
-      return;
-    }
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission denied", "Location is required to start a lecture.");
-      return;
-    }
-
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Highest,
-    });
-
-    const res = await lectureService.createLecture(
-      lectureName,
-      selectedClass,
-      finalDuration,
-      location.coords.latitude,
-      location.coords.longitude,
-    );
-
-    return res;
-  };
-
-  const { mutateAsync: handleCreateLecture, isPending: loading } = useMutation({
-    mutationFn: handleCreateLectureMutateFn,
+  const { mutateAsync: handleCreateLecture, isPending: loading } = useMutation<
+    CreateLectureAPIResponse,
+    Error,
+    CreateLectureVariables,
+    { previousLetures: LectureWithCount[] | undefined }
+  >({
     onMutate: async (_, context) => {
       // Snapshot the previous value
-      const previousLetures = await context.client.getQueryData(
-        queryKeys.lectures.teacher,
-      );
+      const previousLetures = await context.client.getQueryData<
+        LectureWithCount[]
+      >(queryKeys.lectures.teacher);
 
       const newLecture = {
         id: "",
