@@ -29,7 +29,6 @@ const TeacherDashboard = () => {
     editModalVisible,
     editTitle,
     filteredLectures,
-    handleDeleteLecture,
     handleEditLecture,
     handleEndLecture,
     handleUpdateLecture,
@@ -147,7 +146,6 @@ const TeacherDashboard = () => {
                 handleViewAttendance={handleViewAttendance}
                 handleEditLecture={handleEditLecture}
                 handleEndLecture={handleEndLecture}
-                handleDeleteLecture={handleDeleteLecture}
               />
             ))
           )}

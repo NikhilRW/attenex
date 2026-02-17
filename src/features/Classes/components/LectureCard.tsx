@@ -8,6 +8,7 @@ import Animated, {
   FadeInDown,
   LinearTransition,
 } from "react-native-reanimated";
+import { useLectureCard } from "../hooks/useLectureCard";
 
 const LectureCard: React.FC<LectureCardProps> = ({
   lecture,
@@ -15,9 +16,9 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleViewAttendance,
   handleEditLecture,
   handleEndLecture,
-  handleDeleteLecture,
 }) => {
   const { colors, isDark } = useTheme();
+  const {deleteLecture} = useLectureCard(lecture.id);
   return (
     <Animated.View
       key={lecture.id}
@@ -170,7 +171,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                     backgroundColor: "rgba(239, 68, 68, 0.15)",
                   },
                 ]}
-                onPress={() => handleDeleteLecture(lecture)}
+                onPress={() => deleteLecture(lecture)}
               >
                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
               </TouchableOpacity>

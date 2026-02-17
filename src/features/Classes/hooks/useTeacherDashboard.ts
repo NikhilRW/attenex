@@ -214,38 +214,6 @@ export const useTeacherDashboard = () => {
     ]);
   };
 
-  const handleDeleteLecture = async (lecture: LectureWithCount) => {
-    if (lecture.status !== "ended") {
-      alert(
-        "Cannot Delete",
-        "Only ended lectures can be deleted. Please end the lecture first.",
-      );
-      return;
-    }
-
-    alert(
-      "Delete Lecture",
-      `Are you sure you want to delete "${lecture.title}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const res = await lectureService.deleteLecture(lecture.id);
-              if (res.success) {
-                fetchActiveLectures();
-              }
-            } catch (error: any) {
-              alert("Error", error.message || "Failed to delete lecture");
-            }
-          },
-        },
-      ],
-    );
-  };
-
   const handleEditLecture = (lecture: LectureWithCount) => {
     if (lecture.status !== "active") {
       alert("Cannot Edit", "Only active lectures can be edited.");
@@ -446,7 +414,6 @@ export const useTeacherDashboard = () => {
     handleViewAttendance,
     handleEditLecture,
     handleEndLecture,
-    handleDeleteLecture,
     editModalVisible,
     setEditModalVisible,
     editTitle,

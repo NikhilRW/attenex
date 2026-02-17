@@ -6,6 +6,7 @@ import {
   nameUpdateMutateFn,
   roleUpdateMutateFn,
 } from "../utils/offlineMutationFuncs";
+import { defaultFaliureCount } from "../utils/tanstack";
 
 export const useOfflineMutations = () => {
   const queryClient = useQueryClient();
@@ -14,12 +15,10 @@ export const useOfflineMutations = () => {
    */
   queryClient.setMutationDefaults(mutationKeys.user.updateName, {
     mutationFn: nameUpdateMutateFn,
-    networkMode: "offlineFirst",
+    networkMode: "online",
     gcTime: Infinity,
     retry: 3,
-    retryDelay: (failureCount) => {
-      return Math.min(1000 * 2 * failureCount, 30000);
-    },
+    retryDelay:defaultFaliureCount ,
   });
 
   /**
@@ -30,9 +29,7 @@ export const useOfflineMutations = () => {
     networkMode: "online",
     gcTime: Infinity,
     retry: 3,
-    retryDelay: (failureCount) => {
-      return Math.min(1000 * 2 * failureCount, 30000);
-    },
+    retryDelay:defaultFaliureCount ,
   });
 
   /**
@@ -40,12 +37,10 @@ export const useOfflineMutations = () => {
    */
   queryClient.setMutationDefaults(mutationKeys.classes.create, {
     mutationFn: createNewClassMutateFN,
-    networkMode: "offlineFirst",
+    networkMode: "online",
     gcTime: Infinity,
     retry: 1,
-    retryDelay: (failureCount) => {
-      return Math.min(1000 * 2 * failureCount, 30000);
-    },
+    retryDelay:defaultFaliureCount ,
   });
 
   /**
@@ -53,11 +48,21 @@ export const useOfflineMutations = () => {
    */
   queryClient.setMutationDefaults(mutationKeys.lectures.create, {
     mutationFn: createLectureMutateFn,
-    networkMode: "offlineFirst",
+    networkMode: "online",
     gcTime: Infinity,
     retry: 1,
-    retryDelay: (failureCount) => {
-      return Math.min(1000 * 2 * failureCount, 30000);
-    },
+    retryDelay:defaultFaliureCount ,
+  });
+
+
+  /**
+   * For being able to delete lecture in an offline first way.
+   */
+  queryClient.setMutationDefaults(mutationKeys.lectures.delete.default, {
+    mutationFn:deleteLectureMutateFN,
+    networkMode: "online",
+    gcTime: Infinity,
+    retry: 1,
+    retryDelay:defaultFaliureCount ,
   });
 };

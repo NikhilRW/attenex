@@ -18,7 +18,7 @@ export const mutationKeys = {
     create: ["lectures", "create"] as const,
     update: ["lectures", "update"] as const,
     end: ["lectures", "end"] as const,
-    delete: ["lectures", "delete"] as const,
+    delete: { default: ["lectures", "delete"], withId: (id: string) => ["lectures", "delete", id] },
     join: ["lectures", "join"] as const,
   },
 

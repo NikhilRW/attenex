@@ -33,3 +33,8 @@ export const setupTanstackForReactNative = (queryClient: QueryClient) => {
 
   return () => subscription.remove();
 };
+
+
+export const defaultFaliureCount = (failureCount:number ) => {
+      return Math.min(1000 * 2 * failureCount, 30000);
+    }
