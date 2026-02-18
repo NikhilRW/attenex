@@ -5,10 +5,8 @@ import { lectureClosure } from "../tasks/lectureClosure";
 
 export const scheduleLectureEnd = async (
   lectureId: string,
-  durationMinutes: number
+  durationMinutes: number,
 ) => {
-  console.log(durationMinutes);
-
   const currentDate = new Date();
 
   let minutes = currentDate.getMinutes();
@@ -16,14 +14,15 @@ export const scheduleLectureEnd = async (
 
   const extraHour = Math.floor((minutes + durationMinutes) / 60);
   const extraMinutes = Math.floor(
-    (minutes + durationMinutes) % (60 * (extraHour <= 1 ? 1 : extraHour))
+    (minutes + durationMinutes) % (60 * (extraHour <= 1 ? 1 : extraHour)),
   );
 
-  hours += extraHour;
+  hours = (hours + extraHour) % 23;
   minutes = extraMinutes;
 
-  const scheduleTimings = `${minutes} ${hours} * * *`;
+  console.log(`hours : ${hours} minutes : ${minutes}`);
 
+  const scheduleTimings = `${minutes} ${hours} * * *`;
 
   cron.schedule(scheduleTimings, async () => await lectureClosure(lectureId), {
     maxExecutions: 1,
