@@ -28,11 +28,13 @@ export const useTeacherDashboard = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
   const data = useMutationState({
     filters: { mutationKey: mutationKeys.lectures.create },
     select: (mutation) => mutation.state.status,
   });
   const latestCreateLectureMutation = data[data.length - 1];
+  const lectureIsBeingCreated = data.find((e) => e === "pending") && true;
   const subscriptionRef = useRef<NativeEventSubscription>(null);
   // Animation values
   const scrollY = useSharedValue(0);
@@ -400,6 +402,66 @@ export const useTeacherDashboard = () => {
     ],
   }));
 
+  const { mutateAsync: deleteLecture } = useMutation<
+    { success: boolean },
+    LectureWithCount,
+    {
+      lecture: LectureWithCount;
+    },
+    any
+  >({
+    onMutate: (variables, context) => {
+      const previousLectures = context.client.getQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+      );
+      context.client.setQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+        (old) => {
+          return (
+            old?.filter((oldLec) => oldLec.id !== variables?.lecture.id) || []
+          );
+        },
+      );
+      return { previousLectures };
+    },
+    onError(_, __, onMutateResult, context) {
+      context.client.setQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+        onMutateResult.previousLectures,
+      );
+    },
+    mutationKey: mutationKeys.lectures.delete,
+  });
+
+  const handleDeleteLecture = (lecture: LectureWithCount) => {
+    if (lecture.status !== "ended") {
+      alert(
+        "Cannot Delete",
+        "Only ended lectures can be deleted. Please end the lecture first.",
+      );
+      return;
+    }
+
+    alert(
+      "Delete Lecture",
+      `Are you sure you want to delete "${lecture.title}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteLecture({ lecture });
+            } catch (error: any) {
+              alert("Error", error.message || "Failed to delete lecture");
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return {
     pullIndicatorStyle,
     pullProgress,
@@ -421,5 +483,6 @@ export const useTeacherDashboard = () => {
     editDuration,
     setEditDuration,
     handleUpdateLecture,
+    handleDeleteLecture,
   };
 };

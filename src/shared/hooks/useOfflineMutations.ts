@@ -3,6 +3,7 @@ import { mutationKeys } from "../constants/mutationKeys";
 import {
   createLectureMutateFn,
   createNewClassMutateFN,
+  deleteLectureMutateFN,
   nameUpdateMutateFn,
   roleUpdateMutateFn,
 } from "../utils/offlineMutationFuncs";
@@ -18,7 +19,7 @@ export const useOfflineMutations = () => {
     networkMode: "online",
     gcTime: Infinity,
     retry: 3,
-    retryDelay:defaultFaliureCount ,
+    retryDelay: defaultFaliureCount,
   });
 
   /**
@@ -29,7 +30,7 @@ export const useOfflineMutations = () => {
     networkMode: "online",
     gcTime: Infinity,
     retry: 3,
-    retryDelay:defaultFaliureCount ,
+    retryDelay: defaultFaliureCount,
   });
 
   /**
@@ -40,7 +41,7 @@ export const useOfflineMutations = () => {
     networkMode: "online",
     gcTime: Infinity,
     retry: 1,
-    retryDelay:defaultFaliureCount ,
+    retryDelay: defaultFaliureCount,
   });
 
   /**
@@ -51,18 +52,17 @@ export const useOfflineMutations = () => {
     networkMode: "online",
     gcTime: Infinity,
     retry: 1,
-    retryDelay:defaultFaliureCount ,
+    retryDelay: defaultFaliureCount,
   });
-
 
   /**
    * For being able to delete lecture in an offline first way.
    */
-  queryClient.setMutationDefaults(mutationKeys.lectures.delete.default, {
-    mutationFn:deleteLectureMutateFN,
+  queryClient.setMutationDefaults(mutationKeys.lectures.delete, {
+    mutationFn: deleteLectureMutateFN,
     networkMode: "online",
     gcTime: Infinity,
     retry: 1,
-    retryDelay:defaultFaliureCount ,
+    retryDelay: defaultFaliureCount,
   });
 };

@@ -45,6 +45,7 @@ const TeacherDashboard = () => {
     setSearchQuery,
     totalActive,
     totalStudents,
+    handleDeleteLecture,
   } = useTeacherDashboard();
 
   // TODO: Research How Both Pull Indication And The List Is Handled.
@@ -146,6 +147,8 @@ const TeacherDashboard = () => {
                 handleViewAttendance={handleViewAttendance}
                 handleEditLecture={handleEditLecture}
                 handleEndLecture={handleEndLecture}
+                handleDeleteLecture={handleDeleteLecture}
+                isLectureCreating
               />
             ))
           )}

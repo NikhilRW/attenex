@@ -70,7 +70,7 @@ export const useCreateLectureScreen = () => {
       >(queryKeys.lectures.teacher);
 
       const newLecture = {
-        id: "",
+        id: "temp-" + new Date().getTime(),
         title: lectureName,
         courseName: selectedClass,
         createdAt: "",

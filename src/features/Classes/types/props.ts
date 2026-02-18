@@ -137,6 +137,8 @@ export interface LectureCardProps {
   handleViewAttendance: (lecture: LectureWithCount) => void;
   handleEditLecture: (lecture: LectureWithCount) => void;
   handleEndLecture: (lectureId: string, lectureTitle: string) => void;
+  handleDeleteLecture: (lecture: LectureWithCount) => void;
+  isLectureCreating: boolean;
 }
 
 /**

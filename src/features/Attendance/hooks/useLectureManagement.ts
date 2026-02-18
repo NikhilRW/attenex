@@ -56,8 +56,7 @@ export const useLectureManagement = (
     queryFn: fetchLectures,
     queryKey: queryKeys.lectures.student,
     refetchInterval: () => {
-      return user?.role === "teacher" ? false : LECTURE_AUTO_REFRESH_INTERVA
-      L;
+      return user?.role === "teacher" ? false : LECTURE_AUTO_REFRESH_INTERVAL;
     },
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,

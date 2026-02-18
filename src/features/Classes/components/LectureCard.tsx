@@ -1,14 +1,15 @@
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { LectureCardProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shared/hooks";
+import { useMutationState } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   FadeInDown,
   LinearTransition,
 } from "react-native-reanimated";
-import { useLectureCard } from "../hooks/useLectureCard";
 
 const LectureCard: React.FC<LectureCardProps> = ({
   lecture,
@@ -16,9 +17,12 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleViewAttendance,
   handleEditLecture,
   handleEndLecture,
+  handleDeleteLecture,
 }) => {
-  const { colors, isDark } = useTheme();
-  const {deleteLecture} = useLectureCard(lecture.id);
+  const { colors, isDark } = useTheme();  
+
+  const isPending = lecture.id.includes("temp");
+
   return (
     <Animated.View
       key={lecture.id}
@@ -116,6 +120,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
 
         <View style={styles.cardActions}>
           <TouchableOpacity
+            disabled={isPending}
             style={[
               styles.actionBtn,
               {
@@ -134,6 +139,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
             {lecture.status === "active" && (
               <>
                 <TouchableOpacity
+                  disabled={isPending}
                   style={[
                     styles.iconBtn,
                     {
@@ -151,6 +157,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
+                  disabled={isPending}
                   style={[
                     styles.iconBtn,
                     {
@@ -171,7 +178,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                     backgroundColor: "rgba(239, 68, 68, 0.15)",
                   },
                 ]}
-                onPress={() => deleteLecture(lecture)}
+                onPress={() => handleDeleteLecture(lecture)}
               >
                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
               </TouchableOpacity>

@@ -8,8 +8,10 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
 } from "expo-location";
-import { CreateLectureVariables, LectureWithCount } from "@/features/Classes/types";
-import { AlertFunction } from "@/features/Attendance";
+import {
+  CreateLectureVariables,
+  LectureWithCount,
+} from "@/features/Classes/types";
 
 export const nameUpdateMutateFn = async (username: string) => {
   impactAsync(ImpactFeedbackStyle.Medium);
@@ -70,10 +72,11 @@ export const createLectureMutateFn = async ({
   return res;
 };
 
-
-export const deleteLectureMutateFN = async (lecture: LectureWithCount,alert:AlertFunction) => {
-  
-                            const res = await lectureService.deleteLecture(lecture.id);
-                            return res;
-       
-    };
+export const deleteLectureMutateFN = async ({
+  lecture,
+}: {
+  lecture: LectureWithCount;
+}) => {
+  const res = await lectureService.deleteLecture(lecture.id);
+  return res;
+};
