@@ -73,7 +73,7 @@ export const useCreateLectureScreen = () => {
         id: "temp-" + new Date().getTime(),
         title: lectureName,
         courseName: selectedClass,
-        createdAt: "",
+        createdAt: new Date().toISOString(),
         studentCount: 0,
         absentCount: 0,
         totalClassStudents: 1,
@@ -86,7 +86,7 @@ export const useCreateLectureScreen = () => {
         queryKeys.lectures.teacher,
         (old) => {
           if (old) {
-            return [...old, newLecture];
+            return [newLecture, ...old];
           } else {
             return [newLecture];
           }
@@ -98,7 +98,7 @@ export const useCreateLectureScreen = () => {
     },
     onSuccess: async (data, _, onMutateResult, context) => {
       if (data && data.success) {
-        alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
+        // alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
           queryKey: queryKeys.lectures.teacher,
         });
@@ -107,6 +107,9 @@ export const useCreateLectureScreen = () => {
           queryKeys.lectures.teacher,
           onMutateResult.previousLetures,
         );
+        alert("Error", "Failed to create lecture kindly try again", [
+          { text: "OK" },
+        ]);
       }
     },
     onError(error, _, onMutateResult, context) {

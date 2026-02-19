@@ -147,6 +147,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
     borderColor: "rgba(150, 150, 150, 0.2)",
   },
   statusText: {

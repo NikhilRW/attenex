@@ -1,14 +1,18 @@
-import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { LectureCardProps } from "@classes/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shared/hooks";
-import { useMutationState } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
+  Easing,
   FadeInDown,
   LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
 } from "react-native-reanimated";
 
 const LectureCard: React.FC<LectureCardProps> = ({
@@ -19,27 +23,61 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleEndLecture,
   handleDeleteLecture,
 }) => {
-  const { colors, isDark } = useTheme();  
+  const { colors, isDark } = useTheme();
+  const isPending = lecture.id.includes("temp") || true;
+  const opacity = useSharedValue(1);
+  const shimmerTranslate = useSharedValue(-1);
 
-  const isPending = lecture.id.includes("temp");
+  useEffect(() => {
+    if (isPending) {
+      // Pulse animation
+      opacity.value = withRepeat(
+        withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+        -1,
+        true,
+      );
+
+      // Shimmer effect
+      shimmerTranslate.value = withRepeat(
+        withTiming(1, { duration: 1500, easing: Easing.linear }),
+        -1,
+        false,
+      );
+    } else {
+      opacity.value = withTiming(1, { duration: 300 });
+      shimmerTranslate.value = -1;
+    }
+  }, [isPending, opacity, shimmerTranslate]);
+
+  const animatedLoadingState = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
 
   return (
     <Animated.View
       key={lecture.id}
       entering={FadeInDown.delay(300 + index * 100).springify()}
       layout={LinearTransition.springify()}
+      style={animatedLoadingState}
     >
       <LinearGradient
         colors={
-          isDark
-            ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
-            : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
+          isPending
+            ? isDark
+              ? ["rgba(59, 130, 246, 0.12)", "rgba(0 0 0 / 0.05)"]
+              : ["rgba(60 134 252 / 0.15)", "rgba(76 144 254 / 0.05)"]
+            : isDark
+              ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
+              : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
         }
         style={[
           styles.lectureCard,
           {
-            borderColor:
-              lecture.status === "active"
+            borderColor: isPending
+              ? "rgba(137 183 255 / 0.4)"
+              : lecture.status === "active"
                 ? "rgba(34, 197, 94, 0.4)"
                 : colors.surface.glassBorder,
           },
@@ -56,7 +94,26 @@ const LectureCard: React.FC<LectureCardProps> = ({
               {lecture.courseName}
             </Text>
           </View>
-          {lecture.status === "active" ? (
+          {isPending ? (
+            <View
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: "rgba(59, 130, 246, 0.2)",
+                },
+              ]}
+            >
+              <Ionicons
+                name="hourglass-outline"
+                size={12}
+                color="#3B82F6"
+                style={{ marginRight: 4 }}
+              />
+              <Text style={[styles.statusText, { color: "#3B82F6" }]}>
+                Creating...
+              </Text>
+            </View>
+          ) : lecture.status === "active" ? (
             <View style={styles.activeBadge}>
               <View style={styles.pulsingDot} />
               <Text style={styles.activeText}>LIVE</Text>
