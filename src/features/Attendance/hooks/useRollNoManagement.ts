@@ -1,5 +1,6 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { logger } from "@/shared/utils";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
@@ -17,8 +18,8 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const [rollNo, setRollNo] = useState("");
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
-  
   const { alert } = useAlerts();
+  const { updateUser, user } = useAuthStore();
 
   const handleRollNoSubmitMutateFn = async (
     onSubmit: (rollNo: string) => Promise<void>,
@@ -35,17 +36,23 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
     mutationFn: handleRollNoSubmitMutateFn,
     gcTime: GarbageTime.SECONDS_30,
     mutationKey: mutationKeys.user.submitRollNo,
+    onMutate() {
+      const contextRollNo = user?.rollNo;
+      updateUser({ rollNo: rollNo });
+      return contextRollNo;
+    },
     onSuccess: () => {
       setPendingLecture(null);
       setRollNo("");
     },
-    onSettled: (data) => {
-      if (data === false) {
+    onSettled: (data, error, _, contextRollNo) => {
+      if (data === false || error) {
         showErrorAlert(
           ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.title,
           ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.message,
           alert,
         );
+        updateUser({ rollNo: contextRollNo });
       }
     },
     onError: (error) => {

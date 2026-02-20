@@ -71,16 +71,14 @@ export const useAttendanceJoin = (
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
     mutationFn: proceedWithJoinMutation,
     mutationKey: mutationKeys.lectures.join,
-    onMutate: ({ lecture }) => {
-      setJoinedLecture(lecture);
-      setStatus("joined");
-    },
     onSuccess: async (data) => {
       if (data === false) {
         return false;
       }
       const { res, lecture } = data;
       if (res.success) {
+        setJoinedLecture(lecture);
+        setStatus("joined");
         showSuccessAlert(
           ALERT_MESSAGES.JOINED.title,
           ALERT_MESSAGES.JOINED.message,

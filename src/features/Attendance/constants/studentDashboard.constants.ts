@@ -36,7 +36,7 @@ export const ALERT_MESSAGES = {
   },
   ATTENDANCE_SUCCESS: {
     title: "Success",
-    message: "Attendance Marked Present! ✅",
+    message: "Attendance Marked Present!",
   },
   SUBMISSION_FAILED: {
     title: "Submission Failed",

@@ -34,20 +34,12 @@ export const useTeacherDashboard = () => {
     select: (mutation) => mutation.state.status,
   });
   const latestCreateLectureMutation = data[data.length - 1];
-  const lectureIsBeingCreated = data.find((e) => e === "pending") && true;
   const subscriptionRef = useRef<NativeEventSubscription>(null);
-  // Animation values
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
+  
   // const context = useSharedValue({ x: 0, y: 0 });
   // const animatedTranslateY = useSharedValue(0);
-
-  // For testing purposes
-  // const printTheMutationCache = () => {
-  //   const cache = queryClient.getMutationCache();
-  //   const createClassCache = cache;
-  //   console.log("cache : " + JSON.stringify(createClassCache));
-  // };
 
   const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
     useCallback(async () => {

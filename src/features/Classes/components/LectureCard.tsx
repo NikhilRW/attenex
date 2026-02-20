@@ -24,7 +24,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleDeleteLecture,
 }) => {
   const { colors, isDark } = useTheme();
-  const isPending = lecture.id.includes("temp") || true;
+  const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
   const shimmerTranslate = useSharedValue(-1);
 

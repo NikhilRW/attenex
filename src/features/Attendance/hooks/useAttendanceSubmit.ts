@@ -64,9 +64,6 @@ export const useAttendanceSubmit = (
   const { mutateAsync: handleSubmit, isPending: loading } = useMutation({
     mutationFn: handleSubmitMutateFn,
     mutationKey: mutationKeys.attendance.submit,
-    onMutate({ onSuccess }) {
-      onSuccess();
-    },
     onSuccess: async (data) => {
       if (data === null) {
         return;
