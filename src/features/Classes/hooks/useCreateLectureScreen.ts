@@ -10,7 +10,6 @@ import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-
 import { useAlerts } from "react-native-paper-alerts";
 import { CreateLectureVariables } from "../types/params";
 
@@ -61,11 +60,10 @@ export const useCreateLectureScreen = () => {
     CreateLectureAPIResponse,
     Error,
     CreateLectureVariables,
-    { previousLetures: LectureWithCount[] | undefined }
+    { previousLectures: LectureWithCount[] | undefined }
   >({
     onMutate: async (_, context) => {
-      // Snapshot the previous value
-      const previousLetures = await context.client.getQueryData<
+      const previousLectures = context.client.getQueryData<
         LectureWithCount[]
       >(queryKeys.lectures.teacher);
 
@@ -94,18 +92,18 @@ export const useCreateLectureScreen = () => {
       );
 
       navigateToTeacherDashboard();
-      return { previousLetures };
+      return { previousLectures };
     },
     onSuccess: async (data, _, onMutateResult, context) => {
       if (data && data.success) {
-        // alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
+        alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
           queryKey: queryKeys.lectures.teacher,
         });
       } else {
         context.client.setQueryData(
           queryKeys.lectures.teacher,
-          onMutateResult.previousLetures,
+          onMutateResult.previousLectures,
         );
         alert("Error", "Failed to create lecture kindly try again", [
           { text: "OK" },
@@ -116,7 +114,7 @@ export const useCreateLectureScreen = () => {
       alert("Error", error.message || "Failed to create lecture");
       context.client.setQueryData(
         queryKeys.lectures.teacher,
-        onMutateResult!.previousLetures,
+        onMutateResult!.previousLectures,
       );
     },
     mutationKey: mutationKeys.lectures.create,
@@ -182,16 +180,14 @@ export const useCreateLectureScreen = () => {
         );
         alert("Class not Added sucessfully");
       }
-      afterClassNameAdded();
     },
     onError(error) {
       if ((error as any).response?.status === 409) {
-        alert("Info", "This class already exists");
+        alert("Info", "Class name added already exists");
       } else {
         alert("Error", error.message || "Failed to add class");
       }
       console.log("Error saving class", error);
-      afterClassNameAdded();
     },
   });
 
