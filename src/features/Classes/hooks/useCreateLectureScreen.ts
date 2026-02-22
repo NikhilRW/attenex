@@ -134,7 +134,7 @@ export const useCreateLectureScreen = () => {
   }, []);
 
   const { mutateAsync: handleCreateNewClass } = useMutation<
-    { success: boolean },
+    { success: boolean; message: string },
     Error,
     string,
     { previousClasses: ClassItem[] } | null
@@ -165,6 +165,7 @@ export const useCreateLectureScreen = () => {
           return newClassNames;
         },
       );
+      afterClassNameAdded();
       return {
         previousClasses: previousClasses!,
       };
@@ -184,8 +185,12 @@ export const useCreateLectureScreen = () => {
       afterClassNameAdded();
     },
     onError(error) {
+      if ((error as any).response?.status === 409) {
+        alert("Info", "This class already exists");
+      } else {
+        alert("Error", error.message || "Failed to add class");
+      }
       console.log("Error saving class", error);
-      alert(error.name);
       afterClassNameAdded();
     },
   });

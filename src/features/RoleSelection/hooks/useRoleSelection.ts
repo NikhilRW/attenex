@@ -1,10 +1,12 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
+import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { Role } from "@role-selection/types";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
+import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { showMessage } from "react-native-flash-message";
@@ -15,6 +17,7 @@ export const useRoleSelection = () => {
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [, setHoveredRole] = useState<Role>(null);
   const { user, updateUser } = useAuthStore();
+  const { isConnected } = useNetworkState();
 
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
@@ -39,35 +42,43 @@ export const useRoleSelection = () => {
     studentScale.value = withSpring(1.05, { duration: 1000 });
   }, [teacherScale, studentScale]);
 
-  const handleConfirmMutateFn = useCallback(async () => {
-    if (!selectedRole) return;
-    // Call backend API to update user role
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const res = await userService.updateUserRole(selectedRole);
+  const updateRoleMutateFn = useCallback(async () => {
+    const res = await userService.updateUserRole(selectedRole!);
     return res;
   }, [selectedRole]);
 
-  const { mutateAsync: handleConfirm, isPending: isUpdating } = useMutation({
-    mutationFn: handleConfirmMutateFn,
+  const { mutateAsync: updateRole, isPending: isUpdating } = useMutation({
+    mutationFn: updateRoleMutateFn,
     mutationKey: mutationKeys.user.updateRole,
     onMutate() {
       const prevUser = { ...user };
-      updateUser({ role: selectedRole });
-      if (selectedRole === "teacher") {
-        router.replace("/(main)/classes");
-      } else {
-        router.replace("/(main)/attendance");
-      }
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       return { user: prevUser };
     },
-    onSuccess() {
-      showMessage({
-        message: "Role Updated",
-        description: `You are now a ${selectedRole}!`,
-        type: "success",
-        duration: 2000,
-        position: "bottom",
-      });
+    onSuccess({ success }) {
+      if (success) {
+        updateUser({ role: selectedRole });
+        if (selectedRole === "teacher") {
+          router.replace("/(main)/classes");
+        } else {
+          router.replace("/(main)/attendance");
+        }
+        showMessage({
+          message: "Role Updated",
+          description: `You are now a ${selectedRole}!`,
+          type: "success",
+          duration: 2000,
+          position: "bottom",
+        });
+      } else {
+        showMessage({
+          message: "Role does not updated successfully",
+          description: `Kindly try again`,
+          type: "danger",
+          duration: 2000,
+          position: "bottom",
+        });
+      }
     },
     onError(error, _, onMutateResult) {
       logger.error(
@@ -87,6 +98,15 @@ export const useRoleSelection = () => {
     },
   });
 
+  const handleRoleUpdate = async () => {
+    if (!selectedRole) return;
+    if (!isConnected) {
+      showInternetNotConnected();
+      return;
+    }
+    return await updateRole();
+  };
+
   return {
     selectedRole,
     isUpdating,
@@ -95,6 +115,6 @@ export const useRoleSelection = () => {
     studentScale,
     handleTeacherPress,
     handleStudentPress,
-    handleConfirm,
+    handleRoleUpdate,
   };
 };

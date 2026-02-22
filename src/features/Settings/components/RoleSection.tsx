@@ -45,7 +45,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
               styles.updateButton,
               { backgroundColor: colors.primary.main },
             ]}
-            onPress={async() => await onRoleUpdate(role)}
+            onPress={async() => await onRoleUpdate()}
             disabled={savingRole}
           >
             <Text style={styles.updateButtonText}>

@@ -26,10 +26,13 @@ export interface RoleSectionProps {
   role: UserRole;
   userRole?: string | null;
   onRoleChange: Dispatch<SetStateAction<UserRole>>;
-  onRoleUpdate: (role: UserRole) => Promise<{
-    success: boolean;
-    message: string;
-  }>;
+  onRoleUpdate: () => Promise<
+    | {
+        success: boolean;
+        message: string;
+      }
+    | undefined
+  >;
   savingRole: boolean;
 }
 

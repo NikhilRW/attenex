@@ -1,11 +1,13 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
+import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
@@ -22,6 +24,7 @@ export const useAttendanceView = () => {
   const [showManualAttendance, setShowManualAttendance] = useState(false);
   const [manualRollNo, setManualRollNo] = useState("");
   const appStateSubsription = useRef<NativeEventSubscription>(null);
+  const { isConnected } = useNetworkState();
 
   const { alert } = useAlerts();
 
@@ -191,6 +194,10 @@ export const useAttendanceView = () => {
   const manualAttendance = async () => {
     if (!manualRollNo.trim()) {
       alert("Error", "Please enter student roll number");
+      return;
+    }
+    if (!isConnected) {
+      showInternetNotConnected();
       return;
     }
     const res = await lectureService.addManualAttendance(

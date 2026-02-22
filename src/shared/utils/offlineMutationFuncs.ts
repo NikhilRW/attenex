@@ -25,7 +25,7 @@ export const roleUpdateMutateFn = async (role: UserRole) => {
   return res;
 };
 
-export const createNewClassMutateFN = async (className: string) => {
+export const createNewClassMutateFn = async (className: string) => {
   if (!className.trim()) {
     return;
   }
@@ -72,11 +72,27 @@ export const createLectureMutateFn = async ({
   return res;
 };
 
-export const deleteLectureMutateFN = async ({
+export const deleteLectureMutateFn = async ({
   lecture,
 }: {
   lecture: LectureWithCount;
 }) => {
   const res = await lectureService.deleteLecture(lecture.id);
+  return res;
+};
+
+export const updateLectureMutateFn = async ({
+  lectureId,
+  title,
+  duration,
+}: {
+  lectureId: string;
+  title: string;
+  duration: number;
+}) => {
+  const res = await lectureService.updateLecture(lectureId, {
+    title,
+    duration,
+  });
   return res;
 };

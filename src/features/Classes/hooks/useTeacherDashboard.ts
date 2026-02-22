@@ -1,10 +1,12 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
+import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
+import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
@@ -25,6 +27,7 @@ export const useTeacherDashboard = () => {
   const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
     null,
   );
+  const { isConnected } = useNetworkState();
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,7 +40,7 @@ export const useTeacherDashboard = () => {
   const subscriptionRef = useRef<NativeEventSubscription>(null);
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
-  
+
   // const context = useSharedValue({ x: 0, y: 0 });
   // const animatedTranslateY = useSharedValue(0);
 
@@ -188,6 +191,10 @@ export const useTeacherDashboard = () => {
         style: "destructive",
         onPress: async () => {
           try {
+            if (!isConnected) {
+              showInternetNotConnected();
+              return;
+            }
             const res = await lectureService.endLecture(id);
             if (res.success) {
               fetchActiveLectures();
@@ -219,7 +226,7 @@ export const useTeacherDashboard = () => {
     setEditModalVisible(true);
   };
 
-  const handleUpdateLectureMutateFn = async () => {
+  const handleUpdateLecture = async () => {
     if (!editingLecture) return;
     if (!editTitle.trim()) {
       alert("Error", "Title cannot be empty");
@@ -230,32 +237,37 @@ export const useTeacherDashboard = () => {
       alert("Error", "Duration must be a positive number");
       return;
     }
-    const res = await lectureService.updateLecture(editingLecture.id, {
-      title: editTitle.trim(),
+    const res = await updateLecture({
+      lectureId: editingLecture.id,
       duration: durationNum,
+      title: editTitle.trim(),
     });
     return res;
   };
 
-  const { mutateAsync: handleUpdateLecture } = useMutation({
-    mutationFn: handleUpdateLectureMutateFn,
+  const { mutateAsync: updateLecture } = useMutation<
+    any,
+    any,
+    { lectureId: string; title: string; duration: number },
+    { previousLectures: LectureWithCount[] } | null
+  >({
     mutationKey: mutationKeys.lectures.update,
     onMutate: async (_, context) => {
       // Snapshot the previous value
-      const previousLetures = (await context.client.getQueryData(
+      const previousLectures = (await context.client.getQueryData(
         queryKeys.lectures.teacher,
       )) as LectureWithCount[];
 
-      if (!previousLetures) {
+      if (!previousLectures) {
         return null;
       }
 
-      const toBeEditedLecutre = previousLetures.find(
+      const toBeEditedLecutre = previousLectures.find(
         (lecture) => lecture.id === editingLecture?.id,
       );
 
       if (!toBeEditedLecutre) {
-        return { previousLetures };
+        return { previousLectures };
       }
 
       const optimisticUpdatedLecture: LectureWithCount = {
@@ -282,24 +294,24 @@ export const useTeacherDashboard = () => {
       );
 
       setEditModalVisible(false);
-      return { previousLetures };
+      return { previousLectures };
     },
     onSuccess: async (data, _, onMutateResult, context) => {
       if (data.success) {
         fetchActiveLectures();
-      } else if (onMutateResult) {
+      } else if (onMutateResult?.previousLectures) {
         context.client.setQueryData(
           queryKeys.lectures.teacher,
-          onMutateResult.previousLetures,
+          onMutateResult.previousLectures,
         );
         alert("Error", "Failed to update lecture");
       }
     },
     onError(error, _, onMutateResult, context) {
-      if (onMutateResult) {
+      if (onMutateResult?.previousLectures) {
         context.client.setQueryData(
           queryKeys.lectures.teacher,
-          onMutateResult.previousLetures,
+          onMutateResult.previousLectures,
         );
       }
       alert("Error", error.message || "Failed to update lecture");

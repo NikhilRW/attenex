@@ -24,7 +24,7 @@ const RoleSelection = () => {
     studentScale,
     handleTeacherPress,
     handleStudentPress,
-    handleConfirm,
+    handleRoleUpdate,
   } = useRoleSelection();
 
   return (
@@ -65,7 +65,7 @@ const RoleSelection = () => {
         isUpdating={isUpdating}
         userRole={user?.role}
         bottomInset={insets.bottom}
-        onConfirm={handleConfirm}
+        onConfirm={handleRoleUpdate}
       />
     </View>
   );

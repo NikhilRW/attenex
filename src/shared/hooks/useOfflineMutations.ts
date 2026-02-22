@@ -2,12 +2,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { mutationKeys } from "../constants/mutationKeys";
 import {
   createLectureMutateFn,
-  createNewClassMutateFN,
-  deleteLectureMutateFN,
+  createNewClassMutateFn,
+  deleteLectureMutateFn,
   nameUpdateMutateFn,
   roleUpdateMutateFn,
+  updateLectureMutateFn,
 } from "../utils/offlineMutationFuncs";
 import { defaultFaliureCount } from "../utils/tanstack";
+import { queryKeys } from "../constants/queryKeys";
 
 export const useOfflineMutations = () => {
   const queryClient = useQueryClient();
@@ -37,8 +39,7 @@ export const useOfflineMutations = () => {
    * For able to add new class in an offline first way.
    */
   queryClient.setMutationDefaults(mutationKeys.classes.create, {
-    mutationFn: createNewClassMutateFN,
-    networkMode: "online",
+    mutationFn: createNewClassMutateFn,
     gcTime: Infinity,
     retry: 1,
     retryDelay: defaultFaliureCount,
@@ -59,10 +60,24 @@ export const useOfflineMutations = () => {
    * For being able to delete lecture in an offline first way.
    */
   queryClient.setMutationDefaults(mutationKeys.lectures.delete, {
-    mutationFn: deleteLectureMutateFN,
+    mutationFn: deleteLectureMutateFn,
     networkMode: "online",
     gcTime: Infinity,
     retry: 1,
     retryDelay: defaultFaliureCount,
+  });
+
+  /**
+   * For able to edit lecture even when offline
+   */
+  queryClient.setMutationDefaults(mutationKeys.lectures.update, {
+    mutationFn: updateLectureMutateFn,
+    networkMode: "online",
+    gcTime: Infinity,
+    retry: 1,
+    retryDelay: defaultFaliureCount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.lectures.teacher });
+    },
   });
 };

@@ -1,11 +1,13 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
+import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { UserRole } from "@settings/types";
-import { handleResetPassword } from "@settings/utils/common";
+import { resetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore, User } from "@shared/stores/authStore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
+import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
@@ -17,34 +19,23 @@ export const useSettings = () => {
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
   const { alert } = useAlerts();
+  const { isConnected } = useNetworkState();
 
-  const { isPending: savingRole, mutateAsync: handleRoleUpdate } = useMutation<
+  const { isPending: savingRole, mutateAsync: updateRole } = useMutation<
     { success: boolean; message: string },
     any,
     UserRole,
     { user: Partial<User>; prevRole: UserRole }
   >({
     mutationKey: mutationKeys.user.updateRole,
-    onMutate: async (newRole) => {
+    onMutate: () => {
       const prevUser = { ...user };
       const prevRole = user?.role || "teacher";
-      // Update local state
-      updateUser({ role: newRole });
-
-      // Cancel any outgoing queries for the OLD role
-      if (prevRole === "student") {
-        await queryClient.cancelQueries({
-          queryKey: queryKeys.lectures.student,
-        });
-      } else {
-        await queryClient.cancelQueries({
-          queryKey: queryKeys.lectures.teacher,
-        });
-      }
       return { user: prevUser, prevRole };
     },
     async onSuccess({ success }, newRole, context) {
       if (success) {
+        updateUser({ role: newRole });
         if (context.prevRole === "student") {
           queryClient.removeQueries({
             queryKey: queryKeys.lectures.student,
@@ -54,23 +45,35 @@ export const useSettings = () => {
             queryKey: queryKeys.lectures.teacher,
           });
         }
-
-        // Navigate AFTER cleanup
         if (newRole === "teacher") {
           router.replace("/(main)/classes");
         } else {
           router.replace("/(main)/attendance");
         }
-
         alert("Role updated", `Your role is now set to ${newRole}.`);
+      } else {
+        setRole(context.prevRole);
+        updateUser({ role: context.prevRole });
+        alert("Role not updated successfully", `Please try again`);
       }
     },
     onError: (error, _, onMutateResult) => {
       alert("Error", error.message || "Failed to update role");
+      setRole(
+        onMutateResult?.prevRole || onMutateResult?.user.role || "student",
+      );
       updateUser({ role: onMutateResult?.user.role });
       setRole(onMutateResult?.prevRole || "teacher");
     },
   });
+
+  const handleRoleUpdate = useCallback(async () => {
+    if (!isConnected) {
+      showInternetNotConnected();
+      return;
+    }
+    return await updateRole(role);
+  }, [isConnected, role, updateRole]);
 
   const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation<
     { success: boolean; message: string },
@@ -107,6 +110,10 @@ export const useSettings = () => {
   const { mutateAsync: logoutUser } = useMutation({
     mutationKey: mutationKeys.auth.logout,
     mutationFn: async () => {
+      if (!isConnected) {
+        showInternetNotConnected();
+        return;
+      }
       if (user?.oauthProvider === "linkedin") {
         router.replace("/linkedin?logout=true");
         return;
@@ -149,6 +156,14 @@ export const useSettings = () => {
       },
     ]);
   }, [alert, deleteUserAccount]);
+
+  const handleResetPassword = async () => {
+    if (!isConnected) {
+      showInternetNotConnected();
+      return;
+    }
+    await resetPassword();
+  };
 
   return {
     displayName,

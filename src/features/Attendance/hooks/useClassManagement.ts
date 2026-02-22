@@ -37,6 +37,7 @@ export const useClassManagement = (
   const { mutateAsync: handleUpdateClass, isPending: classUpdateLoading } =
     useMutation({
       mutationFn: handleUpdateClassMutateFn,
+      networkMode: "online",
       mutationKey: mutationKeys.user.updateClass,
       onMutate: () => {
         setShowClassModal(false);
