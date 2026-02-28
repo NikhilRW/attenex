@@ -1,6 +1,6 @@
 import { styles } from "@attendance/styles";
 import { NoLectureFoundProps } from "@attendance/types/props";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";

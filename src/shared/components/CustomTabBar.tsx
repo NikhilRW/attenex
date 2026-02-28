@@ -1,9 +1,7 @@
-import {
-  Entypo,
-  FontAwesome6,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import Entypo from "@react-native-vector-icons/entypo";
+import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
 import { Pressable } from "react-native";

@@ -1,6 +1,6 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { AttendanceFloatingButtonProps } from "@classes/types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 

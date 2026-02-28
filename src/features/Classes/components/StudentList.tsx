@@ -1,6 +1,6 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { StudentListProps } from "@classes/types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";

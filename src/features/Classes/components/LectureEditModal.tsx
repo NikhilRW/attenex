@@ -1,6 +1,6 @@
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { LectureEditModalProps } from "@classes/types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";

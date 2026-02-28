@@ -5,7 +5,7 @@ import {
   PullIndicator,
 } from "@classes/components";
 import { teacherDashboardStyles as styles } from "@classes/styles";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useTheme } from "@shared/hooks";
 import { Skia } from "@shopify/react-native-skia";

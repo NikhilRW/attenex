@@ -1,5 +1,5 @@
 import { verifyEmailStyles as styles } from "@auth/styles";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { View } from "react-native";

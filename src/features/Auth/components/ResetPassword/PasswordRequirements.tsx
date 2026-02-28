@@ -1,6 +1,6 @@
 import { resetPasswordStyles as styles } from "@auth/styles";
 import { PasswordRequirementsProps } from "@auth/types/props";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

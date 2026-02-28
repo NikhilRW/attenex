@@ -1,5 +1,5 @@
 import { SocialLoginButtonsProps } from "@auth/types/props";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks/useTheme";
 import { useAuthStore } from "@shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";

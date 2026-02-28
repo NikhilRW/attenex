@@ -1,6 +1,6 @@
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { PullIndicatorProps } from "@classes/types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks";
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { View } from "react-native";

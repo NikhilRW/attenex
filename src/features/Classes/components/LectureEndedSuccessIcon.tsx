@@ -1,5 +1,5 @@
 import { lectureEndedStyles as styles } from "@classes/styles";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import Animated, { FadeInUp } from "react-native-reanimated";

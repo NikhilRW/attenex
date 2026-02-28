@@ -1,5 +1,5 @@
 import { classesStyles as styles } from "@classes/styles";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text } from "react-native";

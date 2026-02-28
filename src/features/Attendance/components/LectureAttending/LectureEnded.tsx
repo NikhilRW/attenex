@@ -1,6 +1,6 @@
 import { styles } from "@attendance/styles";
 import { LectureEndedProps } from "@attendance/types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
