@@ -105,7 +105,7 @@ const SignIn = () => {
             />
 
             <FuturisticButton
-              title="Sign In "
+              title="Sign In"
               onPress={handleSubmit}
               disabled={isSubmitting || isAuthenticated}
               loading={isSubmitting}

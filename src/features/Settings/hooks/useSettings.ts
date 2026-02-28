@@ -1,6 +1,7 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
+import { lectureService } from "@classes/services/lectureService";
 import { UserRole } from "@settings/types";
 import { resetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
@@ -36,6 +37,7 @@ export const useSettings = () => {
     async onSuccess({ success }, newRole, context) {
       if (success) {
         updateUser({ role: newRole });
+        // Remove old role's stale data
         if (context.prevRole === "student") {
           queryClient.removeQueries({
             queryKey: queryKeys.lectures.student,
@@ -45,7 +47,15 @@ export const useSettings = () => {
             queryKey: queryKeys.lectures.teacher,
           });
         }
+        // Prefetch new role's data before navigating so screen loads instantly
         if (newRole === "teacher") {
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.classes.teacher,
+            queryFn: async () => {
+              const res = await lectureService.getTeacherClasses();
+              return res.success ? [...res.data] : [];
+            },
+          });
           router.replace("/(main)/classes");
         } else {
           router.replace("/(main)/attendance");

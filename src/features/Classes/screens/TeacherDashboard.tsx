@@ -16,12 +16,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  LinearTransition,
+} from "react-native-reanimated";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
 import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
+import { LectureWithCount } from "../types";
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
@@ -124,53 +129,61 @@ const TeacherDashboard = () => {
               >
                 {searchQuery ? "Search Results" : "Recent Lectures"}
               </Text>
-
-              {filteredLectures.length === 0 ? (
-                <Animated.View
-                  entering={FadeInUp.springify()}
-                  style={styles.emptyState}
-                >
-                  <Ionicons
-                    name="search-outline"
-                    size={48}
-                    color={colors.text.muted}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text
-                    style={[styles.emptyText, { color: colors.text.muted }]}
+              <Animated.FlatList
+                data={filteredLectures}
+                itemLayoutAnimation={LinearTransition.springify()}
+                extraData={(e: LectureWithCount) => [
+                  e.id.includes("temp"),
+                  searchQuery,
+                ]}
+                ListEmptyComponent={
+                  <Animated.View
+                    entering={FadeInUp.springify()}
+                    style={styles.emptyState}
                   >
-                    {searchQuery ? "No lectures found" : "No lectures yet"}
-                  </Text>
-                  {!searchQuery && (
+                    <Ionicons
+                      name="search-outline"
+                      size={48}
+                      color={colors.text.muted}
+                      style={{ opacity: 0.5 }}
+                    />
                     <Text
-                      style={[
-                        styles.emptySubText,
-                        { color: colors.text.muted },
-                      ]}
+                      style={[styles.emptyText, { color: colors.text.muted }]}
                     >
-                      Pull down to create one
+                      {searchQuery ? "No lectures found" : "No lectures yet"}
                     </Text>
-                  )}
-                </Animated.View>
-              ) : (
-                filteredLectures.map((lecture, index) => (
-                  <LectureCard
-                    key={lecture.id}
-                    lecture={lecture}
-                    index={index}
-                    handleViewAttendance={handleViewAttendance}
-                    handleEditLecture={handleEditLecture}
-                    handleEndLecture={handleEndLecture}
-                    handleDeleteLecture={handleDeleteLecture}
-                    isLectureCreating
-                  />
-                ))
-              )}
+                    {!searchQuery && (
+                      <Text
+                        style={[
+                          styles.emptySubText,
+                          { color: colors.text.muted },
+                        ]}
+                      >
+                        Pull down to create one
+                      </Text>
+                    )}
+                  </Animated.View>
+                }
+                renderItem={({ item: lecture, index }) => {
+                  return (
+                    <LectureCard
+                      key={lecture.id}
+                      lecture={lecture}
+                      index={index}
+                      handleViewAttendance={handleViewAttendance}
+                      handleEditLecture={handleEditLecture}
+                      handleEndLecture={handleEndLecture}
+                      handleDeleteLecture={handleDeleteLecture}
+                      isLectureCreating
+                    />
+                  );
+                }}
+              />
             </View>
           </ScrollView>
         </Animated.View>
       </GestureHandlerRootView>
-      /{/* Edit Modal */}
+      {/* Edit Modal */}
       <LectureEditModal
         editModalVisible={editModalVisible}
         setEditModalVisible={setEditModalVisible}

@@ -1,12 +1,7 @@
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import Animated, {
   useAnimatedStyle,
@@ -64,7 +59,12 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text style={[{ fontFamily: "Inter_700Bold" }, styles.buttonText]}>
+            <Text
+              style={[
+                { fontFamily: "GoogleSansFlex_700Bold" },
+                styles.buttonText,
+              ]}
+            >
               {title}
             </Text>
           )}

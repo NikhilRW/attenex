@@ -6,7 +6,7 @@ import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { socketService } from "@shared/services/socketService";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -15,6 +15,7 @@ import { useAlerts } from "react-native-paper-alerts";
 
 export const useAttendanceView = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const params = useLocalSearchParams();
   const lectureId = params.lectureId as string;
   const lectureTitle = params.lectureTitle as string;
@@ -51,6 +52,7 @@ export const useAttendanceView = () => {
     queryKey: queryKeys.attendance.teacher(lectureId),
     staleTime: StaleTime.DAYS_5,
     gcTime: GarbageTime.SECONDS_30,
+    enabled: false,
   });
 
   useQuery({
@@ -119,38 +121,53 @@ export const useAttendanceView = () => {
     };
   }, [lectureId]);
 
-  // Ensure connection when screen regains focus
+  // Ensure connection when screen regains focus + initial data fetch with freshness check
   useFocusEffect(
     useCallback(() => {
-      refetchAttendance();
       if (!socketService.isConnected()) {
         socketService.connect();
         socketService.joinLecture(lectureId);
       }
+      // Only fetch if data is not already fresh (e.g. from prefetch on LectureCard press)
+      const queryState = queryClient.getQueryState(
+        queryKeys.attendance.teacher(lectureId),
+      );
+      const isDataFresh =
+        queryState?.dataUpdatedAt != null &&
+        Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+
+      if (!isDataFresh) {
+        refetchAttendance();
+      }
       return () => {};
-    }, [lectureId, refetchAttendance]),
+    }, [lectureId, queryClient, refetchAttendance]),
   );
 
   const filteredAttendance = useMemo(() => {
-    return (attendance || []).filter((record) => {
-      const matchesFilter =
-        filter === "all"
-          ? true
-          : filter === "present"
-            ? record.status === "present"
-            : filter === "incomplete"
-              ? record.status === "incomplete"
-              : record.status === "absent";
+    console.log(JSON.stringify(attendance));
+    return attendance
+      ? attendance.filter((record) => {
+          const matchesFilter =
+            filter === "all"
+              ? true
+              : filter === "present"
+                ? record.status === "present"
+                : filter === "incomplete"
+                  ? record.status === "incomplete"
+                  : record.status === "absent";
 
-      const matchesSearch =
-        record.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (record.studentRollNo &&
-          record.studentRollNo
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()));
+          const matchesSearch =
+            record.studentName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            (record.studentRollNo &&
+              record.studentRollNo
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()));
 
-      return matchesFilter && matchesSearch;
-    });
+          return matchesFilter && matchesSearch;
+        })
+      : [];
   }, [attendance, filter, searchQuery]);
 
   const presentCount = useMemo(() => {

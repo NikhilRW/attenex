@@ -26,6 +26,9 @@ import React, { useCallback } from "react";
 import { ScrollView } from "react-native";
 import { useAlerts } from "react-native-paper-alerts";
 
+
+// TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
+
 const StudentDashboard = () => {
   const { colors } = useTheme();
   const user = useAuthStore((state) => state.user);

@@ -1,7 +1,10 @@
+import { lectureService } from "@classes/services/lectureService";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { LectureCardProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
+import { queryKeys } from "@shared/constants/queryKeys";
 import { useTheme } from "@shared/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -24,6 +27,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleDeleteLecture,
 }) => {
   const { colors, isDark } = useTheme();
+  const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
   const shimmerTranslate = useSharedValue(-1);
@@ -54,6 +58,11 @@ const LectureCard: React.FC<LectureCardProps> = ({
       opacity: opacity.value,
     };
   });
+
+  const fetchLectureAttendance = async () => {
+    const result = await lectureService.fetchLectureAttendance(lecture.id);
+    return result.data.attendance;
+  };
 
   return (
     <Animated.View
@@ -186,6 +195,15 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   : "rgba(59, 130, 246, 0.1)",
               },
             ]}
+            onPressIn={() => {
+              if (!isPending) {
+                queryClient.prefetchQuery({
+                  queryKey: queryKeys.attendance.teacher(lecture.id),
+                  queryFn: fetchLectureAttendance,
+                  staleTime: 20000,
+                });
+              }
+            }}
             onPress={() => handleViewAttendance(lecture)}
           >
             <Text style={styles.actionBtnText}>View Attendance</Text>

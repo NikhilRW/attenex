@@ -52,6 +52,7 @@ export const useCreateLectureScreen = () => {
     queryFn: fetchTeacherClasses,
     queryKey: queryKeys.classes.teacher,
     networkMode: "offlineFirst",
+    enabled: false,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -63,9 +64,9 @@ export const useCreateLectureScreen = () => {
     { previousLectures: LectureWithCount[] | undefined }
   >({
     onMutate: async (_, context) => {
-      const previousLectures = context.client.getQueryData<
-        LectureWithCount[]
-      >(queryKeys.lectures.teacher);
+      const previousLectures = context.client.getQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+      );
 
       const newLecture = {
         id: "temp-" + new Date().getTime(),

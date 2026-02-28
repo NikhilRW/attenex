@@ -7,6 +7,12 @@ import React, { useEffect } from "react";
 import { Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { lectureService } from "@classes/services/lectureService";
+import { queryKeys } from "@shared/constants/queryKeys";
+import { StaleTime } from "@shared/constants/tanstackConfig";
+import { useTheme } from "@shared/hooks/useTheme";
+import { useAuthStore } from "@shared/stores/authStore";
+import { useQueryClient } from "@tanstack/react-query";
 import Animated, {
   Easing,
   FadeOut,
@@ -16,8 +22,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useTheme } from "@shared/hooks/useTheme";
-import { useAuthStore } from "@shared/stores/authStore";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 80;
@@ -29,7 +33,46 @@ const CustomTabBar = ({
   const { colors } = useTheme();
   const { isAuthenticated } = useAuthStore();
   const user = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient();
   let role = user?.role;
+
+  const handleTabPrefetch = (routeName: string) => {
+    if (routeName.includes("attendance") && role === "student") {
+      const className = (user as any)?.className;
+      if (className) {
+        const queryState = queryClient.getQueryState(queryKeys.lectures.student);
+        const isDataFresh =
+          queryState?.dataUpdatedAt != null &&
+          Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+        if (!isDataFresh) {
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.lectures.student,
+            queryFn: async () => {
+              const res = await lectureService.getStudentLectures(className);
+              return res.success ? res.data || [] : [];
+            },
+            staleTime: StaleTime.SECONDS_30,
+          });
+        }
+      }
+    }
+    if (routeName.includes("classes") && role === "teacher") {
+      const queryState = queryClient.getQueryState(queryKeys.classes.teacher);
+      const isDataFresh =
+        queryState?.dataUpdatedAt != null &&
+        Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+      if (!isDataFresh) {
+        queryClient.prefetchQuery({
+          queryKey: queryKeys.classes.teacher,
+          queryFn: async () => {
+            const res = await lectureService.getTeacherClasses();
+            return res.success ? [...res.data] : [];
+          },
+          staleTime: StaleTime.SECONDS_30,
+        });
+      }
+    }
+  };
 
   // Filter routes based on user role
   const filteredRoutes = routeNames
@@ -117,6 +160,7 @@ const CustomTabBar = ({
             name={name}
             isActivated={isActivated}
             onPress={() => navigation.navigate(name)}
+            onPrefetch={() => handleTabPrefetch(name)}
             colors={colors}
           />
         );
@@ -131,6 +175,7 @@ interface TabBarButtonProps {
   name: string;
   isActivated: boolean;
   onPress: () => void;
+  onPrefetch?: () => void;
   colors: any;
 }
 
@@ -138,6 +183,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   name,
   isActivated,
   onPress,
+  onPrefetch,
   colors,
 }) => {
   const scale = useSharedValue(1);
@@ -154,6 +200,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
 
   const handlePressIn = () => {
     scale.value = withSpring(0.9, {});
+    onPrefetch?.();
   };
 
   const handlePressOut = () => {

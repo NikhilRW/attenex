@@ -34,19 +34,32 @@ export const useLectureEnded = () => {
       const res = await lectureService.getPasscode(lectureId as string);
       if (res.success) {
         setPasscode(res.data.passcode);
+        return res;
       }
-      return res.success;
+      return null;
     } catch (error: any) {
       logger.error("Failed to fetch passcode:", error);
       alert("Error", error.message || "Failed to fetch passcode");
-      return false;
+      return null;
     }
   };
 
-  const { refetch: fetchPasscodeData, isFetching: loading } = useQuery({
+  const {
+    refetch: fetchPasscodeData,
+    isFetching: loading,
+    data: cachedPasscodeData,
+  } = useQuery({
     queryFn: fetchPasscodeDataQueryFn,
     queryKey: queryKeys.lectures.passcode(lectureId || ""),
   });
+
+  // Hydrate passcode from prefetched cache on first mount
+  useEffect(() => {
+    if (cachedPasscodeData?.data?.passcode && !passcode) {
+      setPasscode(cachedPasscodeData.data.passcode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cachedPasscodeData]);
 
   useEffect(() => {
     // Connect to socket and join lecture room

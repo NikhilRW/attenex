@@ -1,6 +1,6 @@
 import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
 import { handleEmailVerification } from "@auth/utils/common";
-import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import { GoogleSans_700Bold, useFonts } from "@expo-google-fonts/google-sans";
 import {
   FirebaseMessagingTypes,
   getInitialNotification,
@@ -71,7 +71,7 @@ export default function RootLayout() {
   } = useNotificationStore();
 
   const [loaded, error] = useFonts({
-    Inter_700Bold,
+    GoogleSans_700Bold,
   });
 
   useEffect(() => {

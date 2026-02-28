@@ -2,6 +2,9 @@ import { getStartingScreenPath } from "@/shared/utils";
 import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
 import { User } from "@backend/config/database_setup";
+import { lectureService } from "@classes/services/lectureService";
+import { queryKeys } from "@shared/constants/queryKeys";
+import { queryClient } from "@shared/constants/tanstackConfig";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
@@ -71,7 +74,7 @@ export const handleGoogleSignIn = async () => {
         photo_url: response.data.user.photo,
         oauth_id: response.data.user.id,
         oauth_provider: "google",
-      }
+      },
     );
 
     // Step 3: Update local authentication state
@@ -97,7 +100,7 @@ export const handleGoogleSignIn = async () => {
       // Step 5: Log successful authentication for monitoring
       logger.info(
         `Google sign-in successful for user: ${newUser.data.user?.email}`,
-        "common.ts :: handleGoogleSignIn()"
+        "common.ts :: handleGoogleSignIn()",
       );
 
       // Navigate to the main stack (replace to avoid back navigation to auth)
@@ -206,7 +209,7 @@ export const handleLinkedInSuccess = async ({
 }: LinkedInProfile) => {
   logger.info(
     JSON.stringify({ name, email, sub, picture }),
-    "LinkedInAuth :: LinkedInModal"
+    "LinkedInAuth :: LinkedInModal",
   );
   try {
     const response = await http.post("/api/users/signin?authType=linkedin", {
@@ -291,6 +294,27 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
       await subscribeToClassName(user.className!);
     }
 
+    // Prefetch initial data based on role so first screen loads instantly
+    if (user.role === "teacher") {
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.classes.teacher,
+        queryFn: async () => {
+          const res = await lectureService.getTeacherClasses();
+          return res.success ? [...res.data] : [];
+        },
+      });
+    } else if (user.role === "student" && (user as any).className) {
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.lectures.student,
+        queryFn: async () => {
+          const res = await lectureService.getStudentLectures(
+            (user as any).className,
+          );
+          return res.success ? res.data : [];
+        },
+      });
+    }
+
     showMessage({
       message: "Welcome Back!",
       description: `Hi ${user.name}, you're all set!`,
@@ -337,7 +361,7 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
     });
     logger.error(
       JSON.stringify(e.response?.data || e.message),
-      "common.ts :: handleEmailSignIn()"
+      "common.ts :: handleEmailSignIn()",
     );
   }
 };
@@ -407,7 +431,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     });
     logger.error(
       JSON.stringify(e.response?.data || e.message),
-      "common.ts :: emailSignUp()"
+      "common.ts :: emailSignUp()",
     );
   }
 };
@@ -419,7 +443,7 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
       {
         token: decodeURIComponent(token as string),
         email: decodeURIComponent(deepLink.queryParams!.email as string),
-      }
+      },
     );
     if (response.data.success) {
       router.replace("/(auth)/sign-in?verified=true");
@@ -449,7 +473,7 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
     });
     logger.error(
       JSON.stringify(e.response?.data || e.message),
-      "common.ts :: handleEmailVerification()"
+      "common.ts :: handleEmailVerification()",
     );
   }
 };

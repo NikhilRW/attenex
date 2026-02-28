@@ -5,11 +5,17 @@ import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
-import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useMutationState,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, NativeEventSubscription } from "react-native";
+import { Gesture } from "react-native-gesture-handler";
 import { useAlerts } from "react-native-paper-alerts";
 import {
   Extrapolation,
@@ -18,11 +24,11 @@ import {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { Gesture } from "react-native-gesture-handler";
 import { scheduleOnRN } from "react-native-worklets";
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { ended, lectureId } = useLocalSearchParams();
   const { alert } = useAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -100,9 +106,18 @@ export const useTeacherDashboard = () => {
         latestCreateLectureMutation !== "pending" &&
         latestCreateLectureMutation !== "error"
       ) {
-        fetchActiveLectures();
+        const queryState = queryClient.getQueryState(
+          queryKeys.lectures.teacher,
+        );
+        const isDataFresh =
+          queryState?.dataUpdatedAt != null &&
+          Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+
+        if (!isDataFresh) {
+          fetchActiveLectures();
+        }
       }
-    }, [fetchActiveLectures, latestCreateLectureMutation]),
+    }, [fetchActiveLectures, latestCreateLectureMutation, queryClient]),
   );
 
   useEffect(() => {
@@ -201,6 +216,15 @@ export const useTeacherDashboard = () => {
             const res = await lectureService.endLecture(id);
             if (res.success) {
               fetchActiveLectures();
+              // Prefetch passcode so lecture-ended screen loads instantly
+              queryClient.prefetchQuery({
+                queryKey: queryKeys.lectures.passcode(id),
+                queryFn: async () => {
+                  const res = await lectureService.getPasscode(id);
+                  // Return the full response so useLectureEnded can extract passcode
+                  return res.success ? res : null;
+                },
+              });
               // Navigate to lecture ended screen
               router.push({
                 pathname: "/(main)/classes/lecture-ended",
@@ -331,8 +355,19 @@ export const useTeacherDashboard = () => {
     });
   };
 
+  const handleFetchTeacherClasses = async () => {
+    const response = await lectureService.getTeacherClasses();
+    return response.data;
+  };
+
   const navigateToCreate = () => {
     if (!isNavigating) {
+      // Prefetch teacher classes so dropdown is instant on create-lecture screen
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.classes.teacher,
+        queryFn: handleFetchTeacherClasses,
+        staleTime: 60000,
+      });
       setIsNavigating(true);
       router.push("/(main)/classes/create-lecture");
       setTimeout(() => setIsNavigating(false), 1000);
