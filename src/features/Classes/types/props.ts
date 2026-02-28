@@ -1,6 +1,6 @@
 import { SkPath } from "@shopify/react-native-skia";
 import { StyleProp, ViewStyle } from "react-native";
-import { AnimatedStyle } from "react-native-reanimated";
+import { AnimatedStyle, SharedValue } from "react-native-reanimated";
 import {
   AttendanceRecord,
   ClassItem,
@@ -212,7 +212,7 @@ export interface PasscodeCardProps {
  */
 export interface PullIndicatorProps {
   pullIndicatorStyle: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
-  pullProgress: number;
+  pullProgress: SharedValue<number>;
   circlePath: SkPath;
 }
 

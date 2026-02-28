@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shared/hooks";
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useDerivedValue } from "react-native-reanimated";
 
 const PullIndicator: React.FC<PullIndicatorProps> = ({
   circlePath,
@@ -12,6 +12,10 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
   pullProgress,
 }) => {
   const { colors, isDark } = useTheme();
+  const actualPullProgress = useDerivedValue(
+    () => pullProgress.value,
+    [pullProgress],
+  );
   return (
     <Animated.View style={[styles.pullIndicator, pullIndicatorStyle]}>
       <View
@@ -35,7 +39,7 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
             style="stroke"
             strokeWidth={4}
             start={0}
-            end={pullProgress}
+            end={actualPullProgress}
             strokeCap="round"
           />
         </Canvas>

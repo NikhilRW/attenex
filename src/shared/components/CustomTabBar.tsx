@@ -37,6 +37,7 @@ const CustomTabBar = ({
   const filteredRoutes = routeNames
     .filter((name) => {
       // Hide role-selection if user already has a role
+      // TODO: to temporarily disable test screen.
       if (!__DEV__ && name.includes("test")) {
         return false;
       }

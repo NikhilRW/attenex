@@ -27,7 +27,7 @@ import {
 } from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import FlashMessage from "react-native-flash-message";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
@@ -345,6 +345,14 @@ export default function RootLayout() {
     }
   };
 
+  const tanstackOnSuccess = useCallback(() => {
+    if (isConnected) {
+      queryClient
+        .resumePausedMutations()
+        .then(() => queryClient.invalidateQueries());
+    }
+  }, [isConnected]);
+
   const ActualTheme = useMemo(
     () => (isDark ? MD3DarkTheme : MD3LightTheme),
     [isDark],
@@ -374,18 +382,12 @@ export default function RootLayout() {
               <AlertsProvider>
                 <PersistQueryClientProvider
                   client={queryClient}
-                  onSuccess={() => {
-                    if (isConnected) {
-                      queryClient
-                        .resumePausedMutations()
-                        .then(() => queryClient.invalidateQueries());
-                    }
-                  }}
+                  onSuccess={tanstackOnSuccess}
                   persistOptions={{
                     persister: clientPersister,
                     maxAge: Infinity, // Keep mutations indefinitely for offline-first
                     dehydrateOptions: {
-                      shouldDehydrateMutation: (mutation) => {
+                      shouldDehydrateMutation: (mutation: any) => {
                         // Persist pending/paused mutations (offline mutations)
                         return mutation.state.status === "pending";
                       },

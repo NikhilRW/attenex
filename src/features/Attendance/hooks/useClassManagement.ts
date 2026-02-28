@@ -8,6 +8,7 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage class updates
@@ -20,6 +21,7 @@ export const useClassManagement = (
     (user as any)?.className || storage.getString("userClassName") || "";
   const [className, setClassName] = useState(defaultClassName);
   const [showClassModal, setShowClassModal] = useState(false);
+  const { alert } = useAlerts();
 
   const handleUpdateClassMutateFn = async () => {
     if (!validateClassName(className)) {

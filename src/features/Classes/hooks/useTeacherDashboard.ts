@@ -16,7 +16,10 @@ import {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
+import { Gesture } from "react-native-gesture-handler";
+import { scheduleOnRN } from "react-native-worklets";
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
@@ -41,8 +44,8 @@ export const useTeacherDashboard = () => {
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
 
-  // const context = useSharedValue({ x: 0, y: 0 });
-  // const animatedTranslateY = useSharedValue(0);
+  const context = useSharedValue({ x: 0, y: 0 });
+  const animatedTranslateY = useSharedValue(0);
 
   const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
     useCallback(async () => {
@@ -359,37 +362,37 @@ export const useTeacherDashboard = () => {
   }, [lectures]);
 
   // Gesture Logic
-  // const swipeGesture = Gesture.Pan()
-  //   .onStart((event) => {
-  //     context.value = { x: event.x, y: event.y };
-  //   })
-  //   .onUpdate((event) => {
-  //     const dy = event.y - context.value.y;
-  //     if (dy > 0 && scrollY.value <= 0) {
-  //       const damping = 0.5;
-  //       const translateY = dy * damping;
-  //       if (translateY < 150) {
-  //         animatedTranslateY.value = translateY;
-  //         pullProgress.value = interpolate(
-  //           translateY,
-  //           [0, 100],
-  //           [0, 1],
-  //           Extrapolation.CLAMP
-  //         );
-  //       }
-  //     }
-  //   })
-  //   .onEnd(() => {
-  //     if (animatedTranslateY.value > 80) {
-  //       scheduleOnRN(navigateToCreate);
-  //     }
-  //     animatedTranslateY.value = withSpring(0);
-  //     pullProgress.value = withSpring(0);
-  //   });
+  const swipeGesture = Gesture.Pan()
+    .onStart((event) => {
+      context.value = { x: event.x, y: event.y };
+    })
+    .onUpdate((event) => {
+      const dy = event.y - context.value.y;
+      if (dy > 0) {
+        const damping = 0.5;
+        const translateY = dy * damping;
+        if (translateY < 150) {
+          animatedTranslateY.value = translateY;
+          pullProgress.value = interpolate(
+            translateY,
+            [0, 100],
+            [0, 1],
+            Extrapolation.CLAMP,
+          );
+        }
+      }
+    })
+    .onEnd(() => {
+      if (animatedTranslateY.value > 80) {
+        scheduleOnRN(navigateToCreate);
+      }
+      animatedTranslateY.value = withSpring(0);
+      pullProgress.value = withSpring(0);
+    });
 
-  // const animatedContainerStyle = useAnimatedStyle(() => ({
-  //   transform: [{ translateY: animatedTranslateY.value }],
-  // }));
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: animatedTranslateY.value }],
+  }));
 
   const pullIndicatorStyle = useAnimatedStyle(() => ({
     opacity: pullProgress.value,
@@ -488,5 +491,7 @@ export const useTeacherDashboard = () => {
     setEditDuration,
     handleUpdateLecture,
     handleDeleteLecture,
+    animatedContainerStyle,
+    swipeGesture,
   };
 };
