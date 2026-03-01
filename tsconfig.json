@@ -15,8 +15,9 @@
       "@attendance/*": ["./src/features/Attendance/*"],
       "@settings/*": ["./src/features/Settings/*"],
       "@role-selection/*": ["./src/features/RoleSelection/*"],
-      "@test/*": ["./src/features/Test/*"],
-    }
+      "@test/*": ["./src/features/Test/*"]
+    },
+    "types": ["@types/jest"]
   },
   "include": [
     "**/*.ts",
@@ -25,7 +26,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
-  "exclude": [
-    "backend/**"
-  ]
+  "exclude": ["backend/**"]
 }

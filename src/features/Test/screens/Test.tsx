@@ -12,9 +12,9 @@ const Test = () => {
   };
   return (
     <View style={styles.container}>
-      <Button contentStyle={styles.button} dark onPress={toggleOnlineMode}>
+      <Button contentStyle={styles.button} testID="toggleButton" dark onPress={toggleOnlineMode}>
         <Text style={styles.buttonText}>
-          Toggle {isOnline ? "off" : "on"} online mode{" "}
+          Toggle {isOnline ? "off" : "on"}  online mode{" "}
         </Text>
       </Button>
     </View>
