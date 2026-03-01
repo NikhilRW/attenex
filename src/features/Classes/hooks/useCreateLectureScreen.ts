@@ -52,7 +52,7 @@ export const useCreateLectureScreen = () => {
     queryFn: fetchTeacherClasses,
     queryKey: queryKeys.classes.teacher,
     networkMode: "offlineFirst",
-    enabled: false,
+    enabled: true,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -91,7 +91,9 @@ export const useCreateLectureScreen = () => {
           }
         },
       );
-
+      await context.client.cancelQueries({
+        queryKey: queryKeys.lectures.teacher,
+      });
       navigateToTeacherDashboard();
       return { previousLectures };
     },
@@ -99,6 +101,9 @@ export const useCreateLectureScreen = () => {
       if (data && data.success) {
         alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
+          queryKey: queryKeys.lectures.teacher,
+        });
+        await context.client.fetchQuery({
           queryKey: queryKeys.lectures.teacher,
         });
       } else {

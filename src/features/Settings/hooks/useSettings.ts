@@ -12,7 +12,7 @@ import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
-
+// TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
   const router = useRouter();
@@ -58,6 +58,7 @@ export const useSettings = () => {
           });
           router.replace("/(main)/classes");
         } else {
+          // TODO: why not student fetching done.
           router.replace("/(main)/attendance");
         }
         alert("Role updated", `Your role is now set to ${newRole}.`);

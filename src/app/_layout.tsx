@@ -13,6 +13,7 @@ import { useTheme } from "@shared/hooks/useTheme";
 import { useNotificationStore } from "@shared/stores/notificationStore";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import * as Linking from "expo-linking";
+import { useNetworkState } from "expo-network";
 import {
   addNotificationResponseReceivedListener,
   AndroidImportance,
@@ -44,7 +45,6 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
-import { useNetworkState } from "expo-network";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -387,10 +387,16 @@ export default function RootLayout() {
                     persister: clientPersister,
                     maxAge: Infinity, // Keep mutations indefinitely for offline-first
                     dehydrateOptions: {
+                      // Persist mutations that are queued/in-flight (paused = queued while offline)
                       shouldDehydrateMutation: (mutation: any) => {
-                        // Persist pending/paused mutations (offline mutations)
-                        return mutation.state.status === "pending";
+                        return (
+                          mutation.state.status === "pending" ||
+                          mutation.state.status === "paused"
+                        );
                       },
+                      // Persist successful query data so screens load instantly after app kill
+                      shouldDehydrateQuery: (query: any) =>
+                        query.state.status === "success",
                     },
                   }}
                 >
