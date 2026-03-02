@@ -398,6 +398,8 @@ export const useTeacherDashboard = () => {
 
   // Gesture Logic
   const swipeGesture = Gesture.Pan()
+    .activeOffsetY([0, 20]) // only activate for downward vertical movement
+    .failOffsetX([-10, 10]) // fail (yield) if horizontal movement detected first
     .onStart((event) => {
       context.value = { x: event.x, y: event.y };
     })

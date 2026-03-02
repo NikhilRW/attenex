@@ -12,7 +12,6 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-// TODO: Think about adding the refresh code feature.
 export const useLectureEnded = () => {
   const router = useRouter();
   const params = useLocalSearchParams();

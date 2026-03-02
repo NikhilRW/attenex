@@ -132,9 +132,6 @@ const StudentDashboard = () => {
   if (user?.role !== "student") {
     return null;
   }
-
-  console.log("Student Dashboard Rendered.");
-
   // If joined and lecture is still active - show ongoing status
   if (status === "joined" && lectureStatus === "active") {
     return (

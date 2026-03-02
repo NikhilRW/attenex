@@ -39,6 +39,9 @@ export const useSettings = () => {
         updateUser({ role: newRole });
         // Remove old role's stale data
         if (context.prevRole === "student") {
+          await queryClient.cancelQueries({
+            queryKey: queryKeys.lectures.student,
+          });
           queryClient.removeQueries({
             queryKey: queryKeys.lectures.student,
           });
@@ -47,6 +50,7 @@ export const useSettings = () => {
             queryKey: queryKeys.lectures.teacher,
           });
         }
+
         // Prefetch new role's data before navigating so screen loads instantly
         if (newRole === "teacher") {
           queryClient.prefetchQuery({
