@@ -4,6 +4,4 @@
 
 export const BASE_URI = __DEV__
   ? "http://localhost:5000"
-  : "https://attenex.up.railway.app";
-
-// export const BASE_URI = "https://attenex.up.railway.app";
+  : process.env.EXPO_PUBLIC_PRODUCTION_BACKEND_URL;
