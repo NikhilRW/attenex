@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create(() => ({
     padding: 8,
     marginRight: 16,
     borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: theme.surface.glass,
   },
   headerTitle: {
     fontSize: 24,
@@ -114,14 +114,14 @@ export const styles = StyleSheet.create(() => ({
     marginTop: 16,
   },
   primaryButtonText: {
-    color: "white",
+    color: theme.text.primary,
     fontWeight: "bold",
     fontSize: 18,
     letterSpacing: 0.5,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: theme.background.overlay,
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
@@ -159,7 +159,7 @@ export const styles = StyleSheet.create(() => ({
     fontSize: 16,
   },
   modalButtonTextPrimary: {
-    color: "white",
+    color: theme.text.primary,
     fontWeight: "bold",
     fontSize: 16,
   },

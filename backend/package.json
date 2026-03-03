@@ -8,7 +8,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/server.js",
+    "start": "pm2-runtime start ecosystem.config.js",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build": "tsc && tsc-alias",
     "serve": "node dist/server.js",
@@ -32,11 +32,14 @@
     "express-validator": "^7.3.1",
     "firebase-admin": "^13.6.0",
     "graphql": "^16.12.0",
+    "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
     "pg": "^8.16.3",
+    "pm2": "^6.0.14",
+    "pm2-runtime": "^5.4.1",
     "socket.io": "^4.8.1",
     "tsc-alias": "^1.8.16"
   },

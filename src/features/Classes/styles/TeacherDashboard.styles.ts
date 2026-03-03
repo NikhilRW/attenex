@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     paddingTop: 15,
@@ -135,10 +135,10 @@ export const styles = StyleSheet.create(() => ({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#22C55E",
+    backgroundColor: theme.accent.green,
   },
   activeText: {
-    color: "#22C55E",
+    color: theme.accent.green,
     fontSize: 12,
     fontWeight: "bold",
   },
@@ -200,7 +200,7 @@ export const styles = StyleSheet.create(() => ({
     gap: 8,
   },
   actionBtnText: {
-    color: "#3B82F6",
+    color: theme.accent.blue,
     fontWeight: "600",
     fontSize: 14,
   },
@@ -248,7 +248,7 @@ export const styles = StyleSheet.create(() => ({
     gap: 8,
   },
   pullText: {
-    color: "white",
+    color: theme.text.primary,
     fontWeight: "600",
   },
   // Modal
@@ -261,7 +261,7 @@ export const styles = StyleSheet.create(() => ({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: theme.background.overlay,
     justifyContent: "center",
     padding: 20,
   },

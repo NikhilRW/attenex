@@ -5,16 +5,16 @@ import {
 } from "@role-selection/components";
 import { STUDENT_IMG, TEACHER_IMG } from "@role-selection/constants";
 import { useRoleSelection } from "@role-selection/hooks";
-import { roleSelectionStyles as styles } from "@role-selection/styles";
+import { styles } from "@role-selection/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UnistylesRuntime } from "react-native-unistyles";
 
 const RoleSelection = () => {
-  const { colors, isDark } = useTheme();
+  const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const {
     selectedRole,
@@ -29,7 +29,7 @@ const RoleSelection = () => {
 
   return (
     <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
+      style={[styles.container, {  }]}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />

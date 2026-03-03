@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create(() => ({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: theme.surface.glass,
   },
   headerTitle: {
     fontSize: 18,
@@ -39,7 +39,7 @@ export const styles = StyleSheet.create(() => ({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#10B981",
+    shadowColor: theme.accent.green,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
@@ -180,7 +180,7 @@ export const styles = StyleSheet.create(() => ({
     marginTop: 2,
   },
   instructionNumberText: {
-    color: "white",
+    color: theme.text.primary,
     fontSize: 14,
     fontWeight: "bold",
   },
@@ -207,7 +207,7 @@ export const styles = StyleSheet.create(() => ({
     elevation: 8,
   },
   doneButtonText: {
-    color: "white",
+    color: theme.text.primary,
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 0.5,

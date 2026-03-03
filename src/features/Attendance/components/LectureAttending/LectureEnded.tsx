@@ -46,12 +46,8 @@ const LectureEnded = ({
           </LinearGradient>
         </View>
 
-        <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
-          Lecture Ended
-        </Text>
-        <Text
-          style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
-        >
+        <Text style={[styles.guardianTitle]}>Lecture Ended</Text>
+        <Text style={[styles.guardianSubtitle]}>
           {joinedLecture?.title ? (
             <>
               <Text style={{ fontWeight: "700", color: colors.primary.main }}>

@@ -7,10 +7,10 @@ import {
 import { useVerifyEmail } from "@auth/hooks";
 import { verifyEmailStyles as styles } from "@auth/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks/useTheme";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 /**
  * Verify Email Screen
@@ -19,13 +19,12 @@ import { View } from "react-native";
  * that a verification email has been sent to their inbox.
  */
 const VerifyEmail = () => {
-  const { colors, isDark } = useTheme();
+  const { rt } = useUnistyles();
+  const isDark = useMemo(() => rt.colorScheme === "dark", [rt.colorScheme]);
   const { handleBackToSignIn } = useVerifyEmail();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
+    <View style={[styles.container]}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 

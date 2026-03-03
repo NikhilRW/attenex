@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: theme.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -71,7 +71,7 @@ export const styles = StyleSheet.create(() => ({
     gap: 8,
   },
   createButtonText: {
-    color: "#FFFFFF",
+    color: theme.text.primary,
     fontSize: 18,
     fontWeight: "bold",
   },

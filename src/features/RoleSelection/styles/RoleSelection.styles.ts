@@ -1,8 +1,9 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const roleSelectionStyles = StyleSheet.create(() => ({
+export const roleSelectionStyles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.background.primary,
   },
   gradient: {
     position: "absolute",
@@ -24,7 +25,7 @@ export const roleSelectionStyles = StyleSheet.create(() => ({
   themeToggle: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: theme.surface.glass,
   },
   title: {
     fontSize: 32,
@@ -95,7 +96,7 @@ export const roleSelectionStyles = StyleSheet.create(() => ({
     elevation: 8,
   },
   checkmark: {
-    color: "#fff",
+    color: theme.text.primary,
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -120,7 +121,7 @@ export const roleSelectionStyles = StyleSheet.create(() => ({
   confirmButtonText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
+    color: theme.text.primary,
     textTransform: "capitalize",
   },
 }));

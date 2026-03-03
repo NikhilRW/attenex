@@ -20,8 +20,6 @@ import asyncHandler from "@utils/asyncHandler";
 import { userRouteLimiter } from "@utils/rateLimters";
 import { User } from "@middleware/auth";
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@as-integrations/express5";
-
 const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
   # This "Book" type defines the queryable fields for every book in our data source.
@@ -108,7 +106,7 @@ const io = new Server(httpServer, {
 app.set("io", io);
 
 // Server configuration
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT) || 5000;
 
 // HTTP reuqest logs
 app.use(morgan("dev"));
@@ -211,6 +209,14 @@ app.get(
   }),
 );
 
+// Health check endpoint for Azure App Service
+app.get("/", (_, res) => {
+  
+  res
+    .status(200)
+    .json({ status: "healthy", message: "Attenex backend is running" });
+});
+
 /**
  * Server Startup
  *
@@ -222,7 +228,7 @@ async function main() {
   // Added for testing purposes looking for future integrations.
   // await server.start();
   // app.use("/graphql", expressMiddleware(server));
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, "0.0.0.0", 0, () => {
     logger.info(`Server is running on port http://localhost:${PORT}`);
   });
 }

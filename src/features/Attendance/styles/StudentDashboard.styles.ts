@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -168,13 +168,13 @@ const styles = StyleSheet.create(() => ({
     elevation: 4,
   },
   joinButtonText: {
-    color: "white",
+    color: theme.text.primary,
     fontSize: 16,
     fontWeight: "700",
     marginRight: 8,
   },
   joinIconContainer: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: theme.surface.glass,
     borderRadius: 12,
     padding: 4,
     marginLeft: 8,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create(() => ({
   },
   guardianIconOuter: {
     marginBottom: 32,
-    shadowColor: "#4CAF50",
+    shadowColor: theme.accent.green,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create(() => ({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 4,
-    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderColor: theme.surface.glassBorder,
   },
   guardianTitle: {
     fontSize: 28,
@@ -221,6 +221,7 @@ const styles = StyleSheet.create(() => ({
     marginBottom: 12,
     textAlign: "center",
     letterSpacing: -0.5,
+    color: theme.text.primary,
   },
   guardianSubtitle: {
     fontSize: 16,
@@ -228,6 +229,7 @@ const styles = StyleSheet.create(() => ({
     marginBottom: 48,
     lineHeight: 24,
     opacity: 0.8,
+    color: theme.text.secondary,
   },
   passcodeCard: {
     width: "100%",
@@ -269,7 +271,7 @@ const styles = StyleSheet.create(() => ({
     elevation: 4,
   },
   submitButtonText: {
-    color: "white",
+    color: theme.text.primary,
     fontSize: 16,
     fontWeight: "700",
   },

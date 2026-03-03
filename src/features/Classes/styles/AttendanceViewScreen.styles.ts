@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -194,7 +194,7 @@ export const styles = StyleSheet.create(() => ({
     width: 3,
     height: 3,
     borderRadius: 1.5,
-    backgroundColor: "rgba(150,150,150,0.5)",
+    backgroundColor: theme.text.muted,
     marginHorizontal: 8,
   },
   statusContainer: {
@@ -225,7 +225,7 @@ export const styles = StyleSheet.create(() => ({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: theme.background.overlay,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
@@ -292,7 +292,7 @@ export const styles = StyleSheet.create(() => ({
     gap: 8,
   },
   copyButtonText: {
-    color: "white",
+    color: theme.text.primary,
     fontSize: 16,
     fontWeight: "700",
   },
