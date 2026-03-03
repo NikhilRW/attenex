@@ -1,14 +1,14 @@
+import { FuturisticButtonProps } from "@auth/types/props";
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { FuturisticButtonProps } from "@auth/types/props";
+import { StyleSheet } from "react-native-unistyles";
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,
@@ -77,7 +77,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   button: {
     height: 56,
     borderRadius: 16,
@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
     zIndex: -1,
     elevation: 10,
   },
-});
+}));
 
 export default FuturisticButton;

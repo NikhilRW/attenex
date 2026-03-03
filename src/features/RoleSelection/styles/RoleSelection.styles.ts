@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const roleSelectionStyles = StyleSheet.create({
+export const roleSelectionStyles = StyleSheet.create(() => ({
   container: {
     flex: 1,
   },
@@ -123,4 +123,4 @@ export const roleSelectionStyles = StyleSheet.create({
     color: "#fff",
     textTransform: "capitalize",
   },
-});
+}));

@@ -82,7 +82,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   socialSection: {
     flexDirection: "row",
     gap: 16,
@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     letterSpacing: 0.5,
   },
-});
+}));
 
 export default SocialLoginButtons;

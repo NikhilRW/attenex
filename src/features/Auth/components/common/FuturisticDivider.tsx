@@ -1,9 +1,9 @@
+import { FuturisticDividerProps } from "@auth/types/props";
 import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {  Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { FuturisticDividerProps } from "@auth/types/props";
 
 const FuturisticDivider: React.FC<FuturisticDividerProps> = ({ text }) => {
     const { colors } = useTheme();
@@ -27,7 +27,7 @@ const FuturisticDivider: React.FC<FuturisticDividerProps> = ({ text }) => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
     dividerContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         letterSpacing: 1,
     },
-});
+}));
 
 export default FuturisticDivider;

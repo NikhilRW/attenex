@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
     backgroundColor: "black",
@@ -87,4 +87,4 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-});
+}));

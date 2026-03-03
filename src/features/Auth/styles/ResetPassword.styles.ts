@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -54,12 +54,14 @@ export const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: "700",
     textAlign: "center",
+    color: theme.text.primary,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
     marginBottom: 8,
+    color: theme.text.secondary,
   },
   requirementsContainer: {
     borderRadius: 12,
@@ -79,4 +81,4 @@ export const styles = StyleSheet.create({
   requirementText: {
     fontSize: 14,
   },
-});
+}));

@@ -21,7 +21,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ title, logoSource }) => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
     headerContainer: {
         alignItems: "center",
         marginBottom: 20,
@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         marginBottom: 8,
     },
-});
+}));
 
 export default AuthHeader;

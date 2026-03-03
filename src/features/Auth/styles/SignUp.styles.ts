@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
   },
@@ -16,4 +16,4 @@ export const styles = StyleSheet.create({
   formContainer: {
     gap: 24,
   },
-});
+}));

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
     backgroundColor: "transparent",
@@ -206,4 +206,4 @@ export const styles = StyleSheet.create({
     height: 1,
     marginLeft: 64,
   },
-});
+}));

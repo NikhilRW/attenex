@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   optionsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -26,4 +26,4 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-});
+}));

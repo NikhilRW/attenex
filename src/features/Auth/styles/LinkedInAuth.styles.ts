@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
   },
@@ -17,4 +17,4 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1000, // Ensure it appears above WebView
   },
-});
+}));

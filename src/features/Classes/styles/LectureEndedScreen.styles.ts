@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create({
+export const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
   },
@@ -212,4 +212,4 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
   },
-});
+}));

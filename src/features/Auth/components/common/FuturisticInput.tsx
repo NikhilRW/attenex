@@ -71,7 +71,7 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   inputGroup: {
     gap: 8,
   },
@@ -109,6 +109,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 4,
   },
-});
+}));
 
 export default FuturisticInput;

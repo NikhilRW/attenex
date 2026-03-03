@@ -118,7 +118,7 @@ export const lightTheme = {
     warning: "#D97706",
     info: "#2563EB",
   },
-};
+} as const;
 
 // Default export for backward compatibility if needed, though we should migrate to useTheme
 export const colors = darkTheme;

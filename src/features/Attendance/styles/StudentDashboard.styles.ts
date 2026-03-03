@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   container: {
     flex: 1,
   },
@@ -399,5 +399,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "italic",
   },
-});
+}));
 export default styles;

@@ -265,7 +265,7 @@ export const getIconForRoute = (
   }
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   container: {
     height: 70,
     position: "absolute",
@@ -311,4 +311,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 2,
   },
-});
+}));

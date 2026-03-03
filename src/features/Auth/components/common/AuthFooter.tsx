@@ -1,7 +1,7 @@
+import { AuthFooterProps } from "@auth/types/props";
 import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { AuthFooterProps } from "@auth/types/props";
 import { StyleSheet } from "react-native-unistyles";
 
 const AuthFooter: React.FC<AuthFooterProps> = ({
@@ -25,7 +25,7 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create(() => ({
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
-});
+}));
 
 export default AuthFooter;
