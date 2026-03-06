@@ -1,14 +1,21 @@
 import { createLectureStyles as styles } from "@classes/styles";
 import { CreateLectureFormCardProps } from "@classes/types";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
+import { useAlerts } from "react-native-paper-alerts";
+import { withUnistyles } from "react-native-unistyles";
 import { ClassSelector } from "./ClassSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
 import { TopicInput } from "./TopicInput";
-import { useAlerts } from "react-native-paper-alerts";
+
+const CreateLectureCardGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
+      : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
+}));
 
 export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   selectedClass,
@@ -29,28 +36,11 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   loading,
   onCreateLecture,
 }: CreateLectureFormCardProps) => {
-  const { colors, isDark } = useTheme();
   const { alert } = useAlerts();
 
   return (
-    <LinearGradient
-      colors={
-        isDark
-          ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
-          : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
-      }
-      style={[styles.card, { borderColor: colors.surface.glassBorder }]}
-    >
-      <Text
-        style={{
-          color: colors.text.secondary,
-          fontSize: 12,
-          fontWeight: "700",
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          marginBottom: 16,
-        }}
-      >
+    <CreateLectureCardGradient style={styles.card}>
+      <Text style={styles.cardEyebrow}>
         Class Details
       </Text>
 
@@ -65,24 +55,9 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
 
       <TopicInput value={lectureName} onChangeText={onLectureNameChange} />
 
-      <View
-        style={{
-          height: 1,
-          backgroundColor: colors.surface.glassBorder,
-          marginVertical: 14,
-        }}
-      />
+      <View style={styles.sectionDivider} />
 
-      <Text
-        style={{
-          color: colors.text.secondary,
-          fontSize: 12,
-          fontWeight: "700",
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          marginBottom: 16,
-        }}
-      >
+      <Text style={styles.cardEyebrow}>
         Time & Duration
       </Text>
 
@@ -110,6 +85,6 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
           }
         />
       </View>
-    </LinearGradient>
+    </CreateLectureCardGradient>
   );
 };

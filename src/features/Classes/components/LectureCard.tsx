@@ -3,7 +3,6 @@ import { teacherDashboardStyles as styles } from "@classes/styles";
 import { LectureCardProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
-import { useTheme } from "@shared/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
@@ -17,6 +16,29 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const PendingGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(59, 130, 246, 0.12)", "rgba(0 0 0 / 0.05)"] as const
+      : ["rgba(60 134 252 / 0.15)", "rgba(76 144 254 / 0.05)"] as const,
+}));
+
+const DefaultGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const
+      : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const,
+}));
+
+const TimeIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const EditIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.primary,
+}));
 
 const LectureCard: React.FC<LectureCardProps> = ({
   lecture,
@@ -26,11 +48,11 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleEndLecture,
   handleDeleteLecture,
 }) => {
-  const { colors, isDark } = useTheme();
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
   const shimmerTranslate = useSharedValue(-1);
+  const CardGradient = isPending ? PendingGradient : DefaultGradient;
 
   useEffect(() => {
     if (isPending) {
@@ -71,54 +93,30 @@ const LectureCard: React.FC<LectureCardProps> = ({
       layout={LinearTransition.springify()}
       style={animatedLoadingState}
     >
-      <LinearGradient
-        colors={
-          isPending
-            ? isDark
-              ? ["rgba(59, 130, 246, 0.12)", "rgba(0 0 0 / 0.05)"]
-              : ["rgba(60 134 252 / 0.15)", "rgba(76 144 254 / 0.05)"]
-            : isDark
-              ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
-              : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
-        }
+      <CardGradient
         style={[
           styles.lectureCard,
-          {
-            borderColor: isPending
-              ? "rgba(137 183 255 / 0.4)"
-              : lecture.status === "active"
-                ? "rgba(34, 197, 94, 0.4)"
-                : colors.surface.glassBorder,
-          },
+          isPending
+            ? styles.lectureCardBorderPending
+            : lecture.status === "active"
+              ? styles.lectureCardBorderActive
+              : styles.lectureCardBorderDefault,
         ]}
       >
         <View style={styles.cardHeader}>
           <View style={styles.cardTitleContainer}>
-            <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-              {lecture.title}
-            </Text>
-            <Text
-              style={[styles.cardSubtitle, { color: colors.text.secondary }]}
-            >
-              {lecture.courseName}
-            </Text>
+            <Text style={styles.cardTitle}>{lecture.title}</Text>
+            <Text style={styles.cardSubtitle}>{lecture.courseName}</Text>
           </View>
           {isPending ? (
-            <View
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: "rgba(59, 130, 246, 0.2)",
-                },
-              ]}
-            >
+            <View style={[styles.statusBadge, styles.statusBadgePending]}>
               <Ionicons
                 name="hourglass-outline"
                 size={12}
                 color="#3B82F6"
-                style={{ marginRight: 4 }}
+                style={styles.metaIconSpacing}
               />
-              <Text style={[styles.statusText, { color: "#3B82F6" }]}>
+              <Text style={[styles.statusText, styles.statusTextPending]}>
                 Creating...
               </Text>
             </View>
@@ -128,17 +126,8 @@ const LectureCard: React.FC<LectureCardProps> = ({
               <Text style={styles.activeText}>LIVE</Text>
             </View>
           ) : (
-            <View
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
-                },
-              ]}
-            >
-              <Text style={[styles.statusText, { color: colors.text.muted }]}>
+            <View style={[styles.statusBadge, styles.statusBadgeEnded]}>
+              <Text style={[styles.statusText, styles.statusTextEnded]}>
                 Ended
               </Text>
             </View>
@@ -152,23 +141,19 @@ const LectureCard: React.FC<LectureCardProps> = ({
               size={16}
               color="#22C55E"
             />
-            <Text style={[styles.statText, { color: colors.text.secondary }]}>
+            <Text style={styles.statText}>
               {lecture.studentCount} Present
             </Text>
           </View>
           <View style={styles.statItem}>
             <Ionicons name="close-circle-outline" size={16} color="#EF4444" />
-            <Text style={[styles.statText, { color: colors.text.secondary }]}>
+            <Text style={styles.statText}>
               {lecture.absentCount || 0} Absent
             </Text>
           </View>
           <View style={styles.statItem}>
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color={colors.text.secondary}
-            />
-            <Text style={[styles.statText, { color: colors.text.secondary }]}>
+            <TimeIcon name="time-outline" size={16} />
+            <Text style={styles.statText}>
               {new Date(lecture.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -177,24 +162,12 @@ const LectureCard: React.FC<LectureCardProps> = ({
           </View>
         </View>
 
-        <View
-          style={[
-            styles.divider,
-            { backgroundColor: colors.surface.glassBorder },
-          ]}
-        />
+        <View style={styles.divider} />
 
         <View style={styles.cardActions}>
           <TouchableOpacity
             disabled={isPending}
-            style={[
-              styles.actionBtn,
-              {
-                backgroundColor: isDark
-                  ? "rgba(59, 130, 246, 0.15)"
-                  : "rgba(59, 130, 246, 0.1)",
-              },
-            ]}
+            style={[styles.actionBtn, styles.actionBtnPrimary]}
             onPressIn={() => {
               if (!isPending) {
                 queryClient.prefetchQuery({
@@ -215,30 +188,14 @@ const LectureCard: React.FC<LectureCardProps> = ({
               <>
                 <TouchableOpacity
                   disabled={isPending}
-                  style={[
-                    styles.iconBtn,
-                    {
-                      backgroundColor: isDark
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.05)",
-                    },
-                  ]}
+                  style={[styles.iconBtn, styles.iconBtnNeutral]}
                   onPress={() => handleEditLecture(lecture)}
                 >
-                  <Ionicons
-                    name="create-outline"
-                    size={20}
-                    color={colors.text.primary}
-                  />
+                  <EditIcon name="create-outline" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   disabled={isPending}
-                  style={[
-                    styles.iconBtn,
-                    {
-                      backgroundColor: "rgba(239, 68, 68, 0.15)",
-                    },
-                  ]}
+                  style={[styles.iconBtn, styles.iconBtnDanger]}
                   onPress={() => handleEndLecture(lecture.id, lecture.title)}
                 >
                   <Ionicons name="stop" size={20} color="#EF4444" />
@@ -247,12 +204,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
             )}
             {lecture.status === "ended" && (
               <TouchableOpacity
-                style={[
-                  styles.iconBtn,
-                  {
-                    backgroundColor: "rgba(239, 68, 68, 0.15)",
-                  },
-                ]}
+                style={[styles.iconBtn, styles.iconBtnDanger]}
                 onPress={() => handleDeleteLecture(lecture)}
               >
                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
@@ -260,7 +212,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
             )}
           </View>
         </View>
-      </LinearGradient>
+      </CardGradient>
     </Animated.View>
   );
 };

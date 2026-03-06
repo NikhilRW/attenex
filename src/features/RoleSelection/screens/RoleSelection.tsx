@@ -28,9 +28,7 @@ const RoleSelection = () => {
   } = useRoleSelection();
 
   return (
-    <View
-      style={[styles.container, {  }]}
-    >
+    <View style={styles.container}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <FuturisticBackground />
 

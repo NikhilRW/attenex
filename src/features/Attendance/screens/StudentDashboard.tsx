@@ -19,7 +19,6 @@ import {
   useSocketManager,
 } from "@attendance/hooks";
 import { styles } from "@attendance/styles";
-import { useTheme } from "@shared/hooks/useTheme";
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import React, { useCallback } from "react";
@@ -30,7 +29,6 @@ import { useAlerts } from "react-native-paper-alerts";
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 
 const StudentDashboard = () => {
-  const { colors } = useTheme();
   const user = useAuthStore((state) => state.user);
   const { alert } = useAlerts();
 
@@ -162,13 +160,7 @@ const StudentDashboard = () => {
   }
 
   return (
-    <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: colors.background.secondary },
-      ]}
-      contentContainerStyle={styles.scrollContent}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <StudentDashboardHeader
         user={user}
         setShowClassModal={setShowClassModal}

@@ -1,32 +1,24 @@
 import { styles } from "@attendance/styles";
 import { NoClassSelectedProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const MutedIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
 
 const NoClassSelected = ({ setShowClassModal }: NoClassSelectedProps) => {
-  const { colors } = useTheme();
   return (
     <View style={styles.emptyContainer}>
-      <Ionicons name="school-outline" size={64} color={colors.text.muted} />
-      <Text style={[styles.emptyText, { color: colors.text.muted }]}>
-        No class selected.
-      </Text>
+      <MutedIcon name="school-outline" size={64} />
+      <Text style={styles.emptyText}>No class selected.</Text>
       <TouchableOpacity
         onPress={() => setShowClassModal(true)}
-        style={[
-          styles.refreshButton,
-          {
-            backgroundColor: colors.primary.main,
-            borderRadius: 12,
-            marginTop: 20,
-          },
-        ]}
+        style={[styles.refreshButton, styles.refreshButtonFilled]}
       >
-        <Text style={[styles.refreshText, { color: "white" }]}>
-          Select Class
-        </Text>
+        <Text style={[styles.refreshText, styles.refreshTextOnPrimary]}>Select Class</Text>
       </TouchableOpacity>
     </View>
   );

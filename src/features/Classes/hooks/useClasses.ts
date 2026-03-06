@@ -1,11 +1,9 @@
-import { useTheme } from "@shared/hooks";
 import { lectureService } from "@shared/services/lectureService";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { showMessage } from "react-native-flash-message";
 
 export const useClasses = () => {
-  const { colors } = useTheme();
   const router = useRouter();
   const [lectureName, setLectureName] = useState("");
   const [className, setClassName] = useState("");
@@ -61,7 +59,6 @@ export const useClasses = () => {
   };
 
   return {
-    colors,
     router,
     lectureName,
     setLectureName,

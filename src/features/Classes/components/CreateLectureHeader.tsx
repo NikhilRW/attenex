@@ -1,23 +1,23 @@
 import { createLectureStyles as styles } from "@classes/styles";
 import { CreateLectureHeaderProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.primary,
+}));
 
 export const CreateLectureHeader: React.FC<CreateLectureHeaderProps> = ({
   onBack,
 }) => {
-  const { colors } = useTheme();
-
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+        <PrimaryTextIcon name="arrow-back" size={24} />
       </TouchableOpacity>
-      <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-        New Lecture
-      </Text>
+      <Text style={styles.headerTitle}>New Lecture</Text>
     </View>
   );
 };

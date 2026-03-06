@@ -22,7 +22,6 @@ export interface AttendanceFilterProps {
  */
 export interface AttendanceFloatingButtonProps {
   onPress: () => void;
-  color: string;
 }
 
 /**

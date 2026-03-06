@@ -1,11 +1,30 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { RollSummaryModalProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const
+      : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const,
+}));
+
+const CopyGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, "#3B82F6"] as const,
+}));
+
+const HeaderIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const CloseIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
 
 export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   visible,
@@ -16,9 +35,6 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   absentCount,
   onCopy,
 }) => {
-  const { colors, isDark } = useTheme();
-
-
   return (
     <Modal
       visible={visible}
@@ -30,101 +46,28 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
         <Animated.View
           entering={FadeInUp.duration(400)}
           exiting={FadeOutDown.duration(400)}
-          style={{ width: "100%", maxWidth: 500 }}
+          style={styles.modalAnimatedWrapperWide}
         >
-          <LinearGradient
-            colors={
-              isDark
-                ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-            }
+          <ModalSurface
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              {
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(255,255,255,0.8)",
-                borderWidth: 1,
-              },
-            ]}
+            style={[styles.modalContent, styles.modalSurface]}
           >
             <View style={styles.modalHeader}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 12,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons
-                    name="people"
-                    size={20}
-                    color={colors.primary.main}
-                  />
+              <View style={styles.modalHeaderLeft}>
+                <View style={styles.modalHeaderIcon}>
+                  <HeaderIcon name="people" size={20} />
                 </View>
-                <Text
-                  style={[
-                    styles.modalTitle,
-                    { color: colors.text.primary, fontSize: 22 },
-                  ]}
-                >
-                  Present Students
-                </Text>
+                <Text style={styles.modalTitle}>Present Students</Text>
               </View>
-              <TouchableOpacity
-                onPress={onClose}
-                style={[
-                  styles.closeButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="close"
-                  size={20}
-                  color={colors.text.secondary}
-                />
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <CloseIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
 
-            <View style={[styles.modalBody, { paddingTop: 10 }]}>
-              <View
-                style={[
-                  styles.rollNumberBox,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(0, 0, 0, 0.3)"
-                      : "rgba(255, 255, 255, 0.8)",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.rollNumberText,
-                    { color: colors.text.primary },
-                  ]}
-                  selectable
-                >
+            <View style={[styles.modalBody, styles.modalBodyTop]}>
+              <View style={styles.rollNumberBox}>
+                <Text style={styles.rollNumberText} selectable>
                   {presentRollNumbers || "No present students"}
                 </Text>
               </View>
@@ -134,63 +77,36 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
                   <Text style={[styles.statValue, { color: "#4ADE80" }]}>
                     {presentCount}
                   </Text>
-                  <Text
-                    style={[
-                      styles.statLabelSmall,
-                      { color: colors.text.secondary },
-                    ]}
-                  >
-                    Present
-                  </Text>
+                  <Text style={styles.statLabelSmall}>Present</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: "#FBBF24" }]}>
                     {incompleteCount}
                   </Text>
-                  <Text
-                    style={[
-                      styles.statLabelSmall,
-                      { color: colors.text.secondary },
-                    ]}
-                  >
-                    Incomplete
-                  </Text>
+                  <Text style={styles.statLabelSmall}>Incomplete</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[styles.statValue, { color: "#F87171" }]}>
                     {absentCount}
                   </Text>
-                  <Text
-                    style={[
-                      styles.statLabelSmall,
-                      { color: colors.text.secondary },
-                    ]}
-                  >
-                    Absent
-                  </Text>
+                  <Text style={styles.statLabelSmall}>Absent</Text>
                 </View>
               </View>
             </View>
 
-            <View
-              style={[
-                styles.modalFooter,
-                { borderTopWidth: 0, paddingTop: 10 },
-              ]}
-            >
+            <View style={[styles.modalFooter, styles.modalFooterCompact]}>
               <TouchableOpacity style={{ flex: 1 }} onPress={onCopy}>
-                <LinearGradient
-                  colors={[colors.primary.main, "#3B82F6"]}
+                <CopyGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={[styles.copyButton, { borderWidth: 0 }]}
+                  style={styles.copyButton}
                 >
                   <Ionicons name="copy-outline" size={20} color="white" />
                   <Text style={styles.copyButtonText}>Copy Roll Numbers</Text>
-                </LinearGradient>
+                </CopyGradient>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </ModalSurface>
         </Animated.View>
       </View>
     </Modal>

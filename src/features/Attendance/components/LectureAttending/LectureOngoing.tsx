@@ -1,11 +1,23 @@
 import { styles } from "@attendance/styles";
 import { LectureOngoingProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { withUnistyles } from "react-native-unistyles";
+
+const SuccessGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.accent.green, "#4CAF50"] as const,
+}));
+
+const DangerGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.accent.red, theme.status.error] as const,
+}));
+
+const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.primary,
+}));
 
 const LectureOngoing = ({
   handleLeaveLecture,
@@ -13,41 +25,26 @@ const LectureOngoing = ({
   loading,
 }: LectureOngoingProps) => {
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
+    <View style={styles.screenContainer}>
       <View
         style={[
           styles.joinedContainer,
-          {
-            backgroundColor: colors.surface.cardBg,
-            borderColor: colors.surface.glassBorder,
-            borderWidth: 1,
-            marginBottom: 70 + insets.bottom,
-          },
+          styles.joinedContainerWithInset(insets.bottom),
         ]}
       >
         <View style={styles.guardianIconOuter}>
-          <LinearGradient
-            colors={[colors.accent.green, "#4CAF50"]}
-            style={styles.guardianIconInner}
-          >
-            <Ionicons name="school" size={48} color="white" />
-          </LinearGradient>
+          <SuccessGradient style={styles.guardianIconInner}>
+            <PrimaryTextIcon name="school" size={48} />
+          </SuccessGradient>
         </View>
 
-        <Text style={[styles.guardianTitle, { color: colors.text.primary }]}>
-          Lecture Ongoing
-        </Text>
-        <Text
-          style={[styles.guardianSubtitle, { color: colors.text.secondary }]}
-        >
+        <Text style={styles.guardianTitle}>Lecture Ongoing</Text>
+        <Text style={styles.guardianSubtitle}>
           {joinedLecture?.title ? (
             <>
               Attending:{" "}
-              <Text style={{ fontWeight: "700", color: colors.primary.main }}>
+              <Text style={styles.leaveLectureTitleHighlight}>
                 {joinedLecture.title}
               </Text>
               {"\n"}
@@ -58,22 +55,11 @@ const LectureOngoing = ({
 
         <View style={styles.ongoingInfo}>
           <View style={styles.trackingBadge}>
-            <View
-              style={[
-                styles.pulseDot,
-                { backgroundColor: colors.accent.green },
-              ]}
-            />
-            <Text
-              style={[styles.trackingBadgeText, { color: colors.text.primary }]}
-            >
-              Tracking Active
-            </Text>
+            <View style={styles.pulseDot} />
+            <Text style={styles.trackingBadgeText}>Tracking Active</Text>
           </View>
 
-          <Text style={[styles.waitText, { color: colors.text.secondary }]}>
-            Wait for your teacher to end the class
-          </Text>
+          <Text style={styles.waitText}>Wait for your teacher to end the class</Text>
         </View>
 
         <TouchableOpacity
@@ -81,13 +67,10 @@ const LectureOngoing = ({
           style={styles.leaveButtonWrapper}
           disabled={loading}
         >
-          <LinearGradient
-            colors={["#EF4444", "#DC2626"]}
-            style={styles.leaveButton}
-          >
-            <Ionicons name="exit-outline" size={20} color="white" />
+          <DangerGradient style={styles.leaveButton}>
+            <PrimaryTextIcon name="exit-outline" size={20} />
             <Text style={styles.leaveButtonText}>Leave Lecture</Text>
-          </LinearGradient>
+          </DangerGradient>
         </TouchableOpacity>
       </View>
     </View>

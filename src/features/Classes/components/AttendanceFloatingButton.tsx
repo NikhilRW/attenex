@@ -6,10 +6,10 @@ import { TouchableOpacity } from "react-native";
 
 export const AttendanceFloatingButton: React.FC<
     AttendanceFloatingButtonProps
-> = ({ onPress, color }) => {
+> = ({ onPress }) => {
     return (
         <TouchableOpacity
-            style={[styles.fab, { backgroundColor: color }]}
+            style={styles.fab}
             onPress={onPress}
         >
             <Ionicons name="person-add" size={24} color="white" />

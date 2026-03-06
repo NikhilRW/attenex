@@ -1,10 +1,29 @@
 import { styles } from "@attendance/styles";
 import { RollnoModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const RollnoModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(30, 30, 30, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(240, 240, 240, 0.98)"] as const),
+}));
+
+const UniTextInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+
+const PrimaryGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, theme.accent.blue] as const,
+}));
+
+const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.primary,
+}));
 
 const RollnoModal = ({
   showRollNoModal,
@@ -14,7 +33,6 @@ const RollnoModal = ({
   handleRollNoSubmit,
   setPendingLecture,
 }: RollnoModalProps) => {
-  const { isDark, colors } = useTheme();
   return (
     <Modal
       visible={showRollNoModal}
@@ -23,21 +41,13 @@ const RollnoModal = ({
       onRequestClose={() => setShowRollNoModal(false)}
     >
       <View style={styles.modalOverlay}>
-        <LinearGradient
-          colors={
-            isDark
-              ? ["rgba(30, 30, 30, 0.95)", "rgba(20, 20, 20, 0.98)"]
-              : ["rgba(255, 255, 255, 0.95)", "rgba(240, 240, 240, 0.98)"]
-          }
-          style={[
-            styles.modalContent,
-            { borderColor: colors.surface.glassBorder },
-          ]}
+        <RollnoModalGradient
+          style={styles.modalContent}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
+            <Text style={[styles.modalTitle, styles.modalTitlePrimary]}>
               Enter Roll Number
             </Text>
             <TouchableOpacity
@@ -48,29 +58,22 @@ const RollnoModal = ({
               }}
               style={styles.closeButton}
             >
-              <Ionicons name="close" size={24} color={colors.text.primary} />
+              <PrimaryTextIcon name="close" size={24} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.modalBody}>
-            <Text style={[styles.modalLabel, { color: colors.text.secondary }]}>
+            <Text style={[styles.modalLabel, styles.modalLabelSecondary]}>
               Please enter your roll number to continue
             </Text>
-            <TextInput
+            <UniTextInput
               style={[
                 styles.modalInput,
-                {
-                  color: colors.text.primary,
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.05)"
-                    : "rgba(0, 0, 0, 0.03)",
-                  borderColor: colors.surface.glassBorder,
-                },
+                styles.modalInputField,
               ]}
               value={rollNo}
               onChangeText={setRollNo}
               placeholder="e.g., 2021001"
-              placeholderTextColor={colors.text.muted}
               keyboardType="default"
               autoCapitalize="characters"
             />
@@ -78,14 +81,7 @@ const RollnoModal = ({
 
           <View style={styles.modalFooter}>
             <TouchableOpacity
-              style={[
-                styles.modalButton,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.05)",
-                },
-              ]}
+              style={[styles.modalButton, styles.modalButtonSoft]}
               onPress={() => {
                 setShowRollNoModal(false);
                 setPendingLecture(null);
@@ -93,25 +89,19 @@ const RollnoModal = ({
               }}
             >
               <Text
-                style={[styles.modalButtonText, { color: colors.text.primary }]}
+                style={[styles.modalButtonText, styles.modalButtonTextPrimary]}
               >
                 Cancel
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.modalButton,
-                { backgroundColor: colors.primary.main },
-              ]}
-              onPress={handleRollNoSubmit}
-            >
-              <Text style={[styles.modalButtonText, { color: "white" }]}>
-                Submit
-              </Text>
+            <TouchableOpacity style={styles.modalButtonWrapper} onPress={handleRollNoSubmit}>
+              <PrimaryGradient style={[styles.modalButton, styles.modalButtonPrimary]}>
+                <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Submit</Text>
+              </PrimaryGradient>
             </TouchableOpacity>
           </View>
-        </LinearGradient>
+        </RollnoModalGradient>
       </View>
     </Modal>
   );

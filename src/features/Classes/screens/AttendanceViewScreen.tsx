@@ -8,12 +8,10 @@ import {
 } from "@classes/components";
 import { useAttendanceView } from "@classes/hooks";
 import { attendanceViewStyles as styles } from "@classes/styles";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import { ScrollView, View } from "react-native";
 
 const AttendanceViewScreen = () => {
-  const { colors } = useTheme();
   const {
     lectureTitle,
     loading,
@@ -39,9 +37,7 @@ const AttendanceViewScreen = () => {
   } = useAttendanceView();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
+    <View style={styles.container}>
       <AttendanceHeader
         lectureTitle={lectureTitle}
         searchQuery={searchQuery}
@@ -61,7 +57,7 @@ const AttendanceViewScreen = () => {
           loading={loading}
           filteredAttendance={filteredAttendance}
         />
-        <View style={{ height: 40 }} />
+        <View style={styles.spacerBottom} />
       </ScrollView>
 
       <RollSummaryModal
@@ -85,7 +81,6 @@ const AttendanceViewScreen = () => {
 
       <AttendanceFloatingButton
         onPress={() => setShowManualAttendance(true)}
-        color={colors.primary.main}
       />
     </View>
   );

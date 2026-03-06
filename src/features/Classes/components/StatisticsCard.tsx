@@ -1,13 +1,37 @@
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { StatisticsCardProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
 
-const StatisticsCard: React.FC<StatisticsCardProps> = ({ lectures, totalActive, totalStudents }) => {
-  const { colors, isDark } = useTheme();
+const BlueGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"] as const
+      : ["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"] as const,
+}));
+
+const GreenGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"] as const
+      : ["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"] as const,
+}));
+
+const AmberGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"] as const
+      : ["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"] as const,
+}));
+
+const StatisticsCard: React.FC<StatisticsCardProps> = ({
+  lectures,
+  totalActive,
+  totalStudents,
+}) => {
   return (
     <ScrollView
       horizontal={true}
@@ -15,83 +39,35 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({ lectures, totalActive, 
       style={styles.statsScroll}
       contentContainerStyle={styles.statsContent}
     >
-      <LinearGradient
-        colors={
-          isDark
-            ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"]
-            : ["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"]
-        }
-        style={[styles.statsCard, { borderColor: "rgba(59, 130, 246, 0.3)" }]}
-      >
-        <View
-          style={[
-            styles.statsIcon,
-            { backgroundColor: "rgba(59, 130, 246, 0.2)" },
-          ]}
-        >
+      <BlueGradient style={[styles.statsCard, styles.statsCardBlue]}>
+        <View style={[styles.statsIcon, styles.statsIconBlue]}>
           <Ionicons name="radio" size={20} color="#60A5FA" />
         </View>
         <View>
-          <Text style={[styles.statsValue, { color: colors.text.primary }]}>
-            {totalActive}
-          </Text>
-          <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>
-            Active Now
-          </Text>
+          <Text style={styles.statsValue}>{totalActive}</Text>
+          <Text style={styles.statsLabel}>Active Now</Text>
         </View>
-      </LinearGradient>
+      </BlueGradient>
 
-      <LinearGradient
-        colors={
-          isDark
-            ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"]
-            : ["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"]
-        }
-        style={[styles.statsCard, { borderColor: "rgba(16, 185, 129, 0.3)" }]}
-      >
-        <View
-          style={[
-            styles.statsIcon,
-            { backgroundColor: "rgba(16, 185, 129, 0.2)" },
-          ]}
-        >
+      <GreenGradient style={[styles.statsCard, styles.statsCardGreen]}>
+        <View style={[styles.statsIcon, styles.statsIconGreen]}>
           <Ionicons name="people" size={20} color="#34D399" />
         </View>
         <View>
-          <Text style={[styles.statsValue, { color: colors.text.primary }]}>
-            {totalStudents}
-          </Text>
-          <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>
-            Total Students
-          </Text>
+          <Text style={styles.statsValue}>{totalStudents}</Text>
+          <Text style={styles.statsLabel}>Total Students</Text>
         </View>
-      </LinearGradient>
+      </GreenGradient>
 
-      <LinearGradient
-        colors={
-          isDark
-            ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"]
-            : ["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"]
-        }
-        style={[styles.statsCard, { borderColor: "rgba(245, 158, 11, 0.3)" }]}
-      >
-        <View
-          style={[
-            styles.statsIcon,
-            { backgroundColor: "rgba(245, 158, 11, 0.2)" },
-          ]}
-        >
+      <AmberGradient style={[styles.statsCard, styles.statsCardAmber]}>
+        <View style={[styles.statsIcon, styles.statsIconAmber]}>
           <Ionicons name="library" size={20} color="#FBBF24" />
         </View>
         <View>
-          <Text style={[styles.statsValue, { color: colors.text.primary }]}>
-            {lectures.length}
-          </Text>
-          <Text style={[styles.statsLabel, { color: colors.text.secondary }]}>
-            Total Lectures
-          </Text>
+          <Text style={styles.statsValue}>{lectures.length}</Text>
+          <Text style={styles.statsLabel}>Total Lectures</Text>
         </View>
-      </LinearGradient>
+      </AmberGradient>
     </ScrollView>
   );
 };

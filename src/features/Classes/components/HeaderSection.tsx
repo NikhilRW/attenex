@@ -2,9 +2,13 @@ import StatisticsCard from "@classes/components/StatisticsCard";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import { HeaderSectionProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const AddIcon = withUnistyles(Ionicons, () => ({
+  color: "white",
+}));
 
 export const HeaderSection: React.FC<HeaderSectionProps> = ({
   lectures,
@@ -12,25 +16,15 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({
   totalStudents,
   navigateToCreate,
 }) => {
-  const { colors } = useTheme();
   return (
     <Animated.View entering={FadeInDown.delay(100).springify()}>
       <View style={styles.header}>
         <View>
-          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-            Teacher Dashboard
-          </Text>
-          <Text
-            style={[styles.headerSubtitle, { color: colors.text.secondary }]}
-          >
-            Overview & Management
-          </Text>
+          <Text style={styles.headerTitle}>Teacher Dashboard</Text>
+          <Text style={styles.headerSubtitle}>Overview & Management</Text>
         </View>
-        <TouchableOpacity
-          onPress={navigateToCreate}
-          style={[styles.addButton, { backgroundColor: colors.primary.main }]}
-        >
-          <Ionicons name="add" size={24} color="white" />
+        <TouchableOpacity onPress={navigateToCreate} style={styles.addButton}>
+          <AddIcon name="add" size={24} />
         </TouchableOpacity>
       </View>
 

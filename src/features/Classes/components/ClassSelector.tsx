@@ -1,11 +1,34 @@
 import { createLectureStyles as styles } from "@classes/styles";
 import { ClassSelectorProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const AddCircleIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const PrimaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const SecondaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const MutedIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
+
+const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
+}));
 
 export const ClassSelector: React.FC<ClassSelectorProps> = ({
   selectedClass,
@@ -15,41 +38,19 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
   onSelectClass,
   onAddNewClass,
 }) => {
-  const { colors, isDark } = useTheme();
-
-
   return (
-    <View style={[styles.inputGroup, { zIndex: 20 }]}>
-      <Text style={[styles.label, { color: colors.text.secondary }]}>
-        Class Name
-      </Text>
-      <TouchableOpacity
-        onPress={onToggleDropdown}
-        style={[
-          styles.dropdown,
-          {
-            backgroundColor: isDark
-              ? "rgba(0, 0, 0, 0.2)"
-              : "rgba(255, 255, 255, 0.5)",
-            borderColor: colors.surface.glassBorder,
-          },
-        ]}
-      >
+    <View style={[styles.inputGroup, styles.inputGroupClassSelector]}>
+      <Text style={styles.label}>Class Name</Text>
+      <TouchableOpacity onPress={onToggleDropdown} style={styles.dropdown}>
         <Text
           style={[
             styles.dropdownText,
-            {
-              color: selectedClass ? colors.text.primary : colors.text.muted,
-            },
+            !selectedClass && styles.dropdownTextMuted,
           ]}
         >
           {selectedClass || "Select a class"}
         </Text>
-        <Ionicons
-          name={"add-circle-sharp"}
-          size={20}
-          color={colors.text.secondary}
-        />
+        <AddCircleIcon name={"add-circle-sharp"} size={20} />
       </TouchableOpacity>
 
       <Modal
@@ -60,84 +61,47 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
       >
         <View style={styles.modalOverlay}>
           <TouchableOpacity
-            style={{ width: "100%", height: "100%", position: "absolute" }}
+            style={styles.modalBackdrop}
             onPress={onToggleDropdown}
           />
           <Animated.View
             entering={FadeInUp.springify()}
-            style={{ width: "100%", maxWidth: 400 }}
+            style={styles.modalAnimatedWrapper}
           >
-            <LinearGradient
-              colors={
-                isDark
-                  ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                  : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-              }
+            <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={[
                 styles.modalContent,
-                {
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(255,255,255,0.8)",
-                  borderWidth: 1,
-                  padding: 0,
-                  overflow: "hidden",
-                },
+                styles.modalSurface,
+                styles.modalSurfaceFlat,
               ]}
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: 20,
-                  borderBottomWidth: 1,
-                  borderBottomColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.05)",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "700",
-                    color: colors.text.primary,
-                  }}
-                >
+              <View style={styles.modalHeaderRow}>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
                   Select Class
                 </Text>
                 <TouchableOpacity
                   onPress={onToggleDropdown}
-                  style={{
-                    padding: 8,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                    borderRadius: 20,
-                  }}
+                  style={styles.modalCloseButton}
                 >
-                  <Ionicons
-                    name="close"
-                    size={20}
-                    color={colors.text.secondary}
-                  />
+                  <SecondaryIcon name="close" size={20} />
                 </TouchableOpacity>
               </View>
 
               <ScrollView
-                style={{
-                  maxHeight: 280,
-                  ...(existingClasses.length === 0 && { minHeight: 120 }),
-                }}
+                style={styles.dropdownScroll}
                 nestedScrollEnabled
                 showsVerticalScrollIndicator={true}
               >
                 {existingClasses.length === 0 ? (
-                  <View style={{ padding: 40, alignItems: "center", justifyContent: "center", flex: 1 }}>
-                    <Ionicons name="school-outline" size={48} color={colors.text.muted} style={{ opacity: 0.3, marginBottom: 12 }} />
-                    <Text style={{ color: colors.text.muted, fontSize: 16, textAlign: "center" }}>
+                  <View style={styles.selectionEmptyState}>
+                    <MutedIcon
+                      name="school-outline"
+                      size={48}
+                      style={styles.selectionEmptyIcon}
+                    />
+                    <Text style={styles.selectionEmptyText}>
                       No classes found.{"\n"}Add one below!
                     </Text>
                   </View>
@@ -146,81 +110,39 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                     <TouchableOpacity
                       key={cls.id}
                       onPress={() => onSelectClass(cls.name)}
-                      style={{
-                        padding: 16,
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderBottomWidth: 1,
-                        borderBottomColor: isDark
-                          ? "rgba(255,255,255,0.02)"
-                          : "rgba(0,0,0,0.02)",
-                        backgroundColor:
-                          selectedClass === cls.name
-                            ? isDark
-                              ? "rgba(8, 145, 178, 0.1)"
-                              : "rgba(8, 145, 178, 0.05)"
-                            : "transparent",
-                      }}
+                      style={[
+                        styles.optionItem,
+                        selectedClass === cls.name && styles.optionItemSelected,
+                      ]}
                     >
                       <Text
-                        style={{
-                          fontSize: 16,
-                          color:
-                            selectedClass === cls.name
-                              ? colors.primary.main
-                              : colors.text.primary,
-                          fontWeight: selectedClass === cls.name ? "600" : "500",
-                        }}
+                        style={[
+                          styles.optionItemText,
+                          selectedClass === cls.name
+                            ? styles.optionItemTextSelected
+                            : null,
+                        ]}
                       >
                         {cls.name}
                       </Text>
                       {selectedClass === cls.name && (
-                        <Ionicons
-                          name="checkmark-circle"
-                          size={20}
-                          color={colors.primary.main}
-                        />
+                        <PrimaryIcon name="checkmark-circle" size={20} />
                       )}
                     </TouchableOpacity>
                   ))
                 )}
               </ScrollView>
 
-              <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: colors.surface.glassBorder }}>
+              <View style={styles.selectionFooter}>
                 <TouchableOpacity
                   onPress={onAddNewClass}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 16,
-                    backgroundColor: isDark
-                      ? "rgba(59, 130, 246, 0.1)"
-                      : "rgba(59, 130, 246, 0.05)",
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: colors.primary.glow,
-                    gap: 8,
-                  }}
+                  style={styles.addClassCta}
                 >
-                  <Ionicons
-                    name="add-circle"
-                    size={20}
-                    color={colors.primary.main}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: "600",
-                      color: colors.primary.main,
-                    }}
-                  >
-                    Add New Class
-                  </Text>
+                  <PrimaryIcon name="add-circle" size={20} />
+                  <Text style={styles.addClassCtaText}>Add New Class</Text>
                 </TouchableOpacity>
               </View>
-            </LinearGradient>
+            </SelectionModalGradient>
           </Animated.View>
         </View>
       </Modal>

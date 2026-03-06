@@ -1,127 +1,86 @@
 import { lectureEndedStyles as styles } from "@classes/styles";
 import { PasscodeCardProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const PasscodeSurface = withUnistyles(LinearGradient, (_, rt) => ({
+    colors:
+        rt.colorScheme === "dark"
+            ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const
+            : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const,
+}));
+
+const LockIcon = withUnistyles(Ionicons, (theme) => ({
+    color: theme.primary.main,
+}));
+
+const RefreshIcon = withUnistyles(Ionicons, (theme) => ({
+    color: theme.primary.main,
+}));
+
+const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+    color: theme.primary.main,
+}));
 
 export const PasscodeCard: React.FC<PasscodeCardProps> = ({ passcode, loading, onRefresh }) => {
-    const { colors, isDark } = useTheme();
-
     return (
         <Animated.View
             entering={FadeInUp.delay(400).springify()}
             style={styles.passcodeSection}
         >
-            <LinearGradient
-                colors={
-                    isDark
-                        ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
-                        : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
-                }
-                style={[
-                    styles.passcodeCard,
-                    {
-                        borderColor: colors.surface.glassBorder,
-                        borderWidth: 1,
-                    },
-                ]}
-            >
-                <View
-                    style={[
-                        styles.passcodeHeader,
-                        { backgroundColor: colors.surface.glass },
-                    ]}
-                >
-                    <Ionicons
-                        name="lock-closed"
-                        size={20}
-                        color={colors.primary.main}
-                    />
-                    <Text
-                        style={[styles.passcodeLabel, { color: colors.primary.main }]}
-                    >
+            <PasscodeSurface style={styles.passcodeCard}>
+                <View style={styles.passcodeHeader}>
+                    <LockIcon name="lock-closed" size={20} />
+                    <Text style={styles.passcodeLabel}>
                         Share This Passcode
                     </Text>
                 </View>
 
                 {loading ? (
-                    <ActivityIndicator size="large" color={colors.primary.main} />
+                    <LoadingIndicator size="large" />
                 ) : passcode ? (
                     <>
                         <View style={styles.passcodeDigits}>
                             {passcode.split("").map((digit, idx) => (
-                                <View
-                                    key={idx}
-                                    style={[
-                                        styles.passcodeDigit,
-                                        {
-                                            backgroundColor: isDark
-                                                ? "rgba(28, 84, 114, 0.2)"
-                                                : "rgba(255,255,255,0.5)",
-                                            borderColor: colors.surface.glassBorder,
-                                        },
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.passcodeDigitText,
-                                            { color: colors.text.primary },
-                                        ]}
-                                    >
+                                <View key={idx} style={styles.passcodeDigit}>
+                                    <Text style={styles.passcodeDigitText}>
                                         {digit}
                                     </Text>
                                 </View>
                             ))}
                         </View>
 
-                        <Text
-                            style={[
-                                styles.passcodeHint,
-                                { color: colors.text.secondary },
-                            ]}
-                        >
+                        <Text style={styles.passcodeHint}>
                             Students need this code to verify attendance
                         </Text>
                     </>
                 ) : (
-                    <Text
-                        style={[styles.errorText, { color: colors.status.error }]}
-                    >
+                    <Text style={styles.errorText}>
                         Failed to load passcode
                     </Text>
                 )}
 
                 <View style={styles.buttonGroup}>
                     <TouchableOpacity
-                        style={[
-                            styles.refreshButton,
-                            {
-                                backgroundColor: colors.primary.glow,
-                            },
-                        ]}
+                        style={styles.refreshButton}
                         onPress={onRefresh}
                         disabled={loading}
                     >
-                        <Ionicons
+                        <RefreshIcon
                             name="refresh"
                             size={20}
-                            color={colors.primary.main}
-                            style={{ marginRight: 8 }}
+                            style={styles.refreshIcon}
                         />
-                        <Text
-                            style={[
-                                styles.refreshButtonText,
-                                { color: colors.primary.main },
-                            ]}
-                        >
+                        <Text style={styles.refreshButtonText}>
                             Refresh
                         </Text>
                     </TouchableOpacity>
                 </View>
-            </LinearGradient>
+            </PasscodeSurface>
         </Animated.View>
     );
 };

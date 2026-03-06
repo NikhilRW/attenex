@@ -1,27 +1,35 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { StudentCardProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
 import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const PresentAvatar = withUnistyles(LinearGradient, () => ({
+  colors: ["rgba(74, 222, 128, 0.2)", "rgba(74, 222, 128, 0.1)"] as const,
+}));
+
+const IncompleteAvatar = withUnistyles(LinearGradient, () => ({
+  colors: ["rgba(251, 191, 36, 0.2)", "rgba(251, 191, 36, 0.1)"] as const,
+}));
+
+const AbsentAvatar = withUnistyles(LinearGradient, () => ({
+  colors: ["rgba(248, 113, 113, 0.2)", "rgba(248, 113, 113, 0.1)"] as const,
+}));
+
+const MetaIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
 
 export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
-  const { colors, isDark } = useTheme();
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "present":
-        return "#4ADE80"; // Brighter green
-      case "absent":
-        return "#F87171"; // Brighter red
-      case "incomplete":
-        return "#FBBF24"; // Brighter amber
-      default:
-        return colors.text.muted;
-    }
-  };
+  const AvatarGradient =
+    record.status === "present"
+      ? PresentAvatar
+      : record.status === "incomplete"
+        ? IncompleteAvatar
+        : AbsentAvatar;
 
   const getInitials = (name: string) => {
     return name
@@ -38,63 +46,48 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
       layout={Layout.springify()}
       style={[
         styles.studentCard,
-        {
-          backgroundColor: isDark
-            ? colors.surface.cardBg
-            : "rgba(255, 255, 255, 0.7)",
-          borderColor: colors.surface.glassBorder,
-          borderLeftColor: getStatusColor(record.status),
-        },
+        record.status === "present"
+          ? styles.studentCardPresent
+          : record.status === "incomplete"
+            ? styles.studentCardIncomplete
+            : styles.studentCardAbsent,
       ]}
     >
       <View style={styles.cardContent}>
         {/* Avatar */}
-        <LinearGradient
-          colors={
-            record.status === "present"
-              ? ["rgba(74, 222, 128, 0.2)", "rgba(74, 222, 128, 0.1)"]
-              : ["rgba(248, 113, 113, 0.2)", "rgba(248, 113, 113, 0.1)"]
-          }
-          style={styles.avatar}
-        >
+        <AvatarGradient style={styles.avatar}>
           <Text
             style={[
               styles.avatarText,
-              { color: getStatusColor(record.status) },
+              record.status === "present"
+                ? styles.avatarTextPresent
+                : record.status === "incomplete"
+                  ? styles.avatarTextIncomplete
+                  : styles.avatarTextAbsent,
             ]}
           >
             {getInitials(record.studentName)}
           </Text>
-        </LinearGradient>
+        </AvatarGradient>
 
         {/* Info */}
         <View style={styles.infoContainer}>
           <View style={styles.nameRow}>
-            <Text
-              style={[styles.studentName, { color: colors.text.primary }]}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
+            <Text style={styles.studentName} ellipsizeMode="tail" numberOfLines={1}>
               {record.studentName.length > 20
                 ? record.studentName.substr(0, 20) + "..."
                 : record.studentName}
             </Text>
           </View>
 
-          <Text style={[styles.rollNo, { color: colors.text.secondary }]}>
-            {record.studentRollNo || "No Roll No"}
-          </Text>
+          <Text style={styles.rollNo}>{record.studentRollNo || "No Roll No"}</Text>
 
           <View style={styles.metaRow}>
             {record.joinTime ? (
               <>
                 <View style={styles.metaItem}>
-                  <Ionicons
-                    name="time-outline"
-                    size={12}
-                    color={colors.text.muted}
-                  />
-                  <Text style={[styles.metaText, { color: colors.text.muted }]}>
+                  <MetaIcon name="time-outline" size={12} />
+                  <Text style={styles.metaText}>
                     {new Date(record.joinTime).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -103,28 +96,21 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
                 </View>
                 <View style={styles.metaDot} />
                 <View style={styles.metaItem}>
-                  <Ionicons
+                  <MetaIcon
                     name={
                       record.method === "manual"
                         ? "hand-left-outline"
                         : "location-outline"
                     }
                     size={12}
-                    color={colors.text.muted}
                   />
-                  <Text style={[styles.metaText, { color: colors.text.muted }]}>
-                    {record.method}
-                  </Text>
+                  <Text style={styles.metaText}>{record.method}</Text>
                 </View>
               </>
             ) : (
               <View style={styles.metaItem}>
-                <Ionicons
-                  name="close-circle-outline"
-                  size={12}
-                  color={colors.text.muted}
-                />
-                <Text style={[styles.metaText, { color: colors.text.muted }]}>
+                <MetaIcon name="close-circle-outline" size={12} />
+                <Text style={styles.metaText}>
                   Did not attend
                 </Text>
               </View>
@@ -136,32 +122,15 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         <View style={styles.statusContainer}>
           {record.status === "present" ? (
             <View style={styles.rollBadge}>
-              <Text
-                style={[
-                  styles.rollText,
-                  { color: getStatusColor(record.status) },
-                ]}
-              >
-                {record.studentRollNo || "N/A"}
-              </Text>
+              <Text style={styles.rollText}>{record.studentRollNo || "N/A"}</Text>
             </View>
           ) : record.status === "incomplete" ? (
-            <View
-              style={[
-                styles.absentBadge,
-                { backgroundColor: "rgba(251, 191, 36, 0.1)" },
-              ]}
-            >
-              <Text style={[styles.absentText, { color: "#FBBF24" }]}>INC</Text>
+            <View style={[styles.absentBadge, styles.absentBadgeIncomplete]}>
+              <Text style={[styles.absentText, styles.absentTextIncomplete]}>INC</Text>
             </View>
           ) : (
-            <View
-              style={[
-                styles.absentBadge,
-                { backgroundColor: "rgba(248, 113, 113, 0.1)" },
-              ]}
-            >
-              <Text style={[styles.absentText, { color: "#F87171" }]}>ABS</Text>
+            <View style={[styles.absentBadge, styles.absentBadgeAbsent]}>
+              <Text style={[styles.absentText, styles.absentTextAbsent]}>ABS</Text>
             </View>
           )}
         </View>

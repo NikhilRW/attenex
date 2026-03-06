@@ -1,23 +1,28 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { StudentListProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
 import { StudentCard } from "./StudentCard";
+
+const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const EmptyStateIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
 
 export const StudentList: React.FC<StudentListProps> = ({
   loading,
   filteredAttendance,
 }) => {
-  const { colors, isDark } = useTheme();
-
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary.main} />
+        <LoadingIndicator size="large" />
       </View>
     );
   }
@@ -27,23 +32,14 @@ export const StudentList: React.FC<StudentListProps> = ({
       {filteredAttendance.length === 0 ? (
         <Animated.View
           entering={FadeInUp.delay(300).springify()}
-          style={[
-            styles.emptyState,
-            {
-              backgroundColor: isDark
-                ? colors.surface.glass
-                : "rgba(0,0,0,0.02)",
-              borderColor: colors.surface.glassBorder,
-            },
-          ]}
+          style={styles.emptyState}
         >
-          <Ionicons
+          <EmptyStateIcon
             name="search-outline"
             size={48}
-            color={colors.text.muted}
-            style={{ marginBottom: 16, opacity: 0.5 }}
+            style={styles.emptyStateIcon}
           />
-          <Text style={[styles.emptyStateText, { color: colors.text.muted }]}>
+          <Text style={styles.emptyStateText}>
             No students found
           </Text>
         </Animated.View>

@@ -7,14 +7,8 @@ import {
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks";
 import { Skia } from "@shopify/react-native-skia";
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   GestureDetector,
   GestureHandlerRootView,
@@ -24,14 +18,30 @@ import Animated, {
   FadeInUp,
   LinearTransition,
 } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
 import { LectureWithCount } from "../types";
+
+const SearchIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
+
+const ClearIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
+
+const EmptyStateIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
+
+const SearchInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
 
 const TeacherDashboard = () => {
-  const { colors, isDark } = useTheme();
   const {
     editDuration,
     editModalVisible,
@@ -60,9 +70,9 @@ const TeacherDashboard = () => {
 
   return (
     <View style={styles.container}>
-      {isDark && <FuturisticBackground />}
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Animated.View style={[{ flex: 1 }, animatedContainerStyle]}>
+      <FuturisticBackground />
+      <GestureHandlerRootView style={styles.screenFill}>
+        <Animated.View style={[styles.screenFill, animatedContainerStyle]}>
           <PullIndicator
             pullIndicatorStyle={pullIndicatorStyle}
             pullProgress={pullProgress}
@@ -97,40 +107,25 @@ const TeacherDashboard = () => {
                   {/* Search Bar */}
                   <Animated.View
                     entering={FadeInDown.delay(200).springify()}
-                    style={[
-                      styles.searchContainer,
-                      {
-                        backgroundColor: isDark
-                          ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.03)",
-                        borderColor: colors.surface.glassBorder,
-                      },
-                    ]}
+                    style={styles.searchContainer}
                   >
-                    <Ionicons name="search" size={20} color={colors.text.muted} />
-                    <TextInput
-                      style={[styles.searchInput, { color: colors.text.primary }]}
+                    <SearchIcon name="search" size={20} />
+                    <SearchInput
+                      style={styles.searchInput}
                       placeholder="Search lectures..."
-                      placeholderTextColor={colors.text.muted}
                       value={searchQuery}
                       onChangeText={setSearchQuery}
                     />
                     {searchQuery.length > 0 && (
                       <TouchableOpacity onPress={() => setSearchQuery("")}>
-                        <Ionicons
-                          name="close-circle"
-                          size={20}
-                          color={colors.text.muted}
-                        />
+                        <ClearIcon name="close-circle" size={20} />
                       </TouchableOpacity>
                     )}
                   </Animated.View>
 
                   {/* Section Title */}
                   <View style={styles.listContainer}>
-                    <Text
-                      style={[styles.sectionTitle, { color: colors.text.primary }]}
-                    >
+                    <Text style={styles.sectionTitle}>
                       {searchQuery ? "Search Results" : "Recent Lectures"}
                     </Text>
                   </View>
@@ -141,24 +136,16 @@ const TeacherDashboard = () => {
                   entering={FadeInUp.springify()}
                   style={styles.emptyState}
                 >
-                  <Ionicons
+                  <EmptyStateIcon
                     name="search-outline"
                     size={48}
-                    color={colors.text.muted}
-                    style={{ opacity: 0.5 }}
+                    style={styles.emptyIcon}
                   />
-                  <Text
-                    style={[styles.emptyText, { color: colors.text.muted }]}
-                  >
+                  <Text style={styles.emptyText}>
                     {searchQuery ? "No lectures found" : "No lectures yet"}
                   </Text>
                   {!searchQuery && (
-                    <Text
-                      style={[
-                        styles.emptySubText,
-                        { color: colors.text.muted },
-                      ]}
-                    >
+                    <Text style={styles.emptySubText}>
                       Pull down to create one
                     </Text>
                   )}

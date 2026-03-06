@@ -1,11 +1,34 @@
 import { createLectureStyles as styles } from "@classes/styles";
 import { DurationSelectorProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const DurationTextInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+
+const AddCircleIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const PrimaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const SecondaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
+}));
 
 export const DurationSelector: React.FC<DurationSelectorProps> = ({
   duration,
@@ -16,7 +39,6 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   onChangeCustomDuration,
   options,
 }) => {
-  const { colors, isDark } = useTheme();
 
   const selectedDurationLabel =
     duration === -1
@@ -25,52 +47,30 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
 
   return (
     <>
-      <View style={[styles.inputGroupLarge, { zIndex: 15 }]}>
-        <Text style={[styles.label, { color: colors.text.secondary }]}>
+      <View style={[styles.inputGroupLarge, styles.inputGroupDuration]}>
+        <Text style={styles.label}>
           Duration
         </Text>
         <TouchableOpacity
           onPress={onToggleDropdown}
-          style={[
-            styles.dropdown,
-            {
-              backgroundColor: isDark
-                ? "rgba(0, 0, 0, 0.2)"
-                : "rgba(255, 255, 255, 0.5)",
-              borderColor: colors.surface.glassBorder,
-            },
-          ]}
+          style={styles.dropdown}
         >
-          <Text style={[styles.dropdownText, { color: colors.text.primary }]}>
+          <Text style={styles.dropdownText}>
             {selectedDurationLabel}
           </Text>
-          <Ionicons
-            name={"add-circle-sharp"}
-            size={20}
-            color={colors.text.secondary}
-          />
+          <AddCircleIcon name={"add-circle-sharp"} size={20} />
         </TouchableOpacity>
       </View>
 
       {/* Custom Duration Input */}
       {duration === -1 && (
-        <View style={[styles.inputGroup, { marginTop: 10 }]}>
-          <Text style={[styles.label, { color: colors.text.secondary }]}>
+        <View style={[styles.inputGroup, styles.customDurationGroup]}>
+          <Text style={styles.label}>
             Custom Duration (minutes)
           </Text>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: isDark
-                  ? "rgba(0, 0, 0, 0.2)"
-                  : "rgba(255, 255, 255, 0.5)",
-                borderColor: colors.surface.glassBorder,
-                color: colors.text.primary,
-              },
-            ]}
+          <DurationTextInput
+            style={styles.textInput}
             placeholder="Enter minutes"
-            placeholderTextColor={colors.text.muted}
             value={customDuration}
             onChangeText={onChangeCustomDuration}
             keyboardType="numeric"
@@ -86,116 +86,56 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
       >
         <View style={styles.modalOverlay}>
           <TouchableOpacity
-            style={{ width: "100%", height: "100%", position: "absolute" }}
+            style={styles.modalBackdrop}
             onPress={onToggleDropdown}
             activeOpacity={1}
           />
           <Animated.View
             entering={FadeInUp.springify()}
-            style={{ width: "100%", maxWidth: 400 }}
+            style={styles.modalAnimatedWrapper}
           >
-            <LinearGradient
-              colors={
-                isDark
-                  ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                  : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-              }
+            <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[
-                styles.modalContent,
-                {
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(255,255,255,0.8)",
-                  borderWidth: 1,
-                  padding: 0,
-                  overflow: "hidden",
-                },
-              ]}
+              style={[styles.modalContent, styles.modalSurface, styles.modalSurfaceFlat]}
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: 20,
-                  borderBottomWidth: 1,
-                  borderBottomColor: isDark
-                    ? "rgba(255,255,255,0.15)"
-                    : "rgba(0,0,0,0.15)",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "700",
-                    color: colors.text.primary,
-                  }}
-                >
+              <View style={styles.modalHeaderRow}>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
                   Select Duration
                 </Text>
                 <TouchableOpacity
                   onPress={onToggleDropdown}
-                  style={{
-                    padding: 8,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                    borderRadius: 20,
-                  }}
+                  style={styles.modalCloseButton}
                 >
-                  <Ionicons
-                    name="close"
-                    size={20}
-                    color={colors.text.secondary}
-                  />
+                  <SecondaryIcon name="close" size={20} />
                 </TouchableOpacity>
               </View>
 
-              <View style={{ padding: 16 }}>
+              <View style={styles.optionsWrapper}>
                 {options.map((option) => (
                   <TouchableOpacity
                     key={option.label}
                     onPress={() => onSelectDuration(option.value)}
-                    style={{
-                      padding: 16,
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderRadius: 12,
-                      marginBottom: 8,
-                      backgroundColor:
-                        duration === option.value
-                          ? isDark
-                            ? "rgba(8, 145, 178, 0.15)"
-                            : "rgba(8, 145, 178, 0.1)"
-                          : "transparent",
-                    }}
+                    style={[
+                      styles.optionItem,
+                      duration === option.value && styles.optionItemSelected,
+                    ]}
                   >
                     <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          duration === option.value
-                            ? colors.primary.main
-                            : colors.text.primary,
-                        fontWeight: duration === option.value ? "600" : "500",
-                      }}
+                      style={[
+                        styles.optionItemText,
+                        duration === option.value ? styles.optionItemTextSelected : null,
+                      ]}
                     >
                       {option.label}
                     </Text>
                     {duration === option.value && (
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={20}
-                        color={colors.primary.main}
-                      />
+                      <PrimaryIcon name="checkmark-circle" size={20} />
                     )}
                   </TouchableOpacity>
                 ))}
               </View>
-            </LinearGradient>
+            </SelectionModalGradient>
           </Animated.View>
         </View>
       </Modal>

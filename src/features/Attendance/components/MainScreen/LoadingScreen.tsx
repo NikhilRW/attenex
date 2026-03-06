@@ -1,28 +1,17 @@
 import { styles } from "@attendance/styles";
-import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.primary.main,
+}));
 
 const LoadingScreen = () => {
-  const { colors } = useTheme();
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background.primary,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-      ]}
-    >
-      <ActivityIndicator size="large" color={colors.primary.main} />
-      <Text
-        style={[
-          styles.loadingText,
-          { color: colors.text.secondary, marginTop: 16 },
-        ]}
-      >
+    <View style={[styles.screenContainer, styles.centeredContainer]}>
+      <PrimarySpinner size="large" />
+      <Text style={styles.loadingText}>
         Loading lecture details...
       </Text>
     </View>

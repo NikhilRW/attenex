@@ -1,7 +1,6 @@
 import { classesStyles as styles } from "@classes/styles";
 import { CreateLectureFormProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import {
     ActivityIndicator,
@@ -11,6 +10,23 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const SecondaryIcon = withUnistyles(Ionicons, (theme) => ({
+    color: theme.text.secondary,
+}));
+
+const PrimaryTextInput = withUnistyles(TextInput, (theme) => ({
+    placeholderTextColor: theme.text.secondary,
+}));
+
+const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
+    color: theme.text.primary,
+}));
+
+const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
+    color: theme.text.primary,
+}));
 
 export const CreateLectureForm: React.FC<CreateLectureFormProps> = ({
     lectureName,
@@ -20,37 +36,25 @@ export const CreateLectureForm: React.FC<CreateLectureFormProps> = ({
     isCreating,
     onCreateLecture,
 }: CreateLectureFormProps) => {
-    const { colors } = useTheme();
-
     return (
         <Animated.View
             entering={FadeInUp.duration(600).delay(200).springify()}
-            style={[styles.card, { backgroundColor: colors.surface.cardBg }]}
+            style={styles.card}
         >
             {/* Lecture Name Input */}
             <View style={styles.inputContainer}>
-                <Text style={[styles.label, { color: colors.text.primary }]}>
+                <Text style={styles.label}>
                     Lecture Name
                 </Text>
-                <View
-                    style={[
-                        styles.inputWrapper,
-                        {
-                            backgroundColor: colors.background.tertiary,
-                            borderColor: colors.surface.glassBorder,
-                        },
-                    ]}
-                >
-                    <Ionicons
+                <View style={styles.inputWrapper}>
+                    <SecondaryIcon
                         name="bookmark-outline"
                         size={20}
-                        color={colors.text.secondary}
                         style={styles.inputIcon}
                     />
-                    <TextInput
-                        style={[styles.input, { color: colors.text.primary }]}
+                    <PrimaryTextInput
+                        style={styles.input}
                         placeholder="e.g., Introduction to React Native"
-                        placeholderTextColor={colors.text.secondary}
                         value={lectureName}
                         onChangeText={setLectureName}
                         editable={!isCreating}
@@ -60,28 +64,18 @@ export const CreateLectureForm: React.FC<CreateLectureFormProps> = ({
 
             {/* Class Name Input */}
             <View style={styles.inputContainer}>
-                <Text style={[styles.label, { color: colors.text.primary }]}>
+                <Text style={styles.label}>
                     Class Name
                 </Text>
-                <View
-                    style={[
-                        styles.inputWrapper,
-                        {
-                            backgroundColor: colors.background.tertiary,
-                            borderColor: colors.surface.glassBorder,
-                        },
-                    ]}
-                >
-                    <Ionicons
+                <View style={styles.inputWrapper}>
+                    <SecondaryIcon
                         name="people-outline"
                         size={20}
-                        color={colors.text.secondary}
                         style={styles.inputIcon}
                     />
-                    <TextInput
-                        style={[styles.input, { color: colors.text.primary }]}
+                    <PrimaryTextInput
+                        style={styles.input}
                         placeholder="e.g., Computer Science 101"
-                        placeholderTextColor={colors.text.secondary}
                         value={className}
                         onChangeText={setClassName}
                         editable={!isCreating}
@@ -93,20 +87,17 @@ export const CreateLectureForm: React.FC<CreateLectureFormProps> = ({
             <TouchableOpacity
                 style={[
                     styles.createButton,
-                    {
-                        backgroundColor: colors.primary.main,
-                        opacity: isCreating ? 0.7 : 1,
-                    },
+                    isCreating && styles.createButtonDisabled,
                 ]}
                 onPress={onCreateLecture}
                 disabled={isCreating}
                 activeOpacity={0.8}
             >
                 {isCreating ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <PrimarySpinner />
                 ) : (
                     <>
-                        <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+                        <PrimaryTextIcon name="add-circle-outline" size={24} />
                         <Text style={styles.createButtonText}>Create Lecture</Text>
                     </>
                 )}

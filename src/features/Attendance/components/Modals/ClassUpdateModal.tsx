@@ -1,7 +1,6 @@
 import { styles } from "@attendance/styles";
 import { ClassUpdateModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -13,6 +12,34 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const ClassModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
+}));
+
+const PrimaryGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, theme.accent.blue] as const,
+}));
+
+const UniTextInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+
+const PrimaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const SecondaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const PrimaryTextSpinner = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.text.primary,
+}));
 
 const ClassUpdateModal = ({
   showClassModal,
@@ -22,7 +49,6 @@ const ClassUpdateModal = ({
   handleUpdateClass,
   classUpdateLoading,
 }: ClassUpdateModalProps) => {
-  const { isDark, colors } = useTheme();
   return (
     <Modal
       visible={showClassModal}
@@ -34,60 +60,23 @@ const ClassUpdateModal = ({
         <Animated.View
           entering={FadeInUp.duration(400)}
           exiting={FadeOutDown.duration(400)}
-          style={{ width: "100%", maxWidth: 400 }}
+          style={styles.modalAnimatedWrapper}
         >
-          <LinearGradient
-            colors={
-              isDark
-                ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-            }
+          <ClassModalGradient
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              {
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(255,255,255,0.8)",
-                borderWidth: 1,
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.2,
-                shadowRadius: 20,
-                // elevation: 10,
-              },
-            ]}
+            style={[styles.modalContent, styles.modalSurfaceElevated]}
           >
             <View style={styles.modalHeader}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 12,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons
-                    name="school"
-                    size={20}
-                    color={colors.primary.main}
-                  />
+              <View style={styles.modalHeaderContent}>
+                <View style={styles.modalHeaderIconContainer}>
+                  <PrimaryIcon name="school" size={20} />
                 </View>
                 <Text
                   style={[
                     styles.modalTitle,
-                    { color: colors.text.primary, fontSize: 22 },
+                    styles.modalTitlePrimary,
+                    styles.modalTitleLarge,
                   ]}
                 >
                   Update Class
@@ -95,88 +84,43 @@ const ClassUpdateModal = ({
               </View>
               <TouchableOpacity
                 onPress={() => setShowClassModal(false)}
-                style={[
-                  styles.closeButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                  },
-                ]}
+                style={[styles.closeButton, styles.closeButtonSubtle]}
               >
-                <Ionicons
-                  name="close"
-                  size={20}
-                  color={colors.text.secondary}
-                />
+                <SecondaryIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
 
-            <View style={[styles.modalBody, { paddingTop: 10 }]}>
+            <View style={[styles.modalBody, styles.modalBodyCompact]}>
               <Text
                 style={[
                   styles.modalLabel,
-                  { color: colors.text.secondary, marginBottom: 12 },
+                  styles.modalLabelSecondary,
+                  styles.modalLabelSpaced,
                 ]}
               >
                 Enter your class name to join lectures
               </Text>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.3)"
-                    : "rgba(255, 255, 255, 0.8)",
-                  borderRadius: 16,
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
-                  paddingHorizontal: 16,
-                  height: 56,
-                }}
-              >
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: colors.text.primary,
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}
+              <View style={styles.modalInputRow}>
+                <UniTextInput
+                  style={[styles.modalInputText, styles.modalButtonWrapper]}
                   value={className}
                   onChangeText={setClassName}
                   placeholder="e.g., Computer Science 101"
-                  placeholderTextColor={colors.text.muted}
                   autoFocus={true}
                 />
               </View>
             </View>
 
-            <View
-              style={[
-                styles.modalFooter,
-                { borderTopWidth: 0, paddingTop: 10 },
-              ]}
-            >
+            <View style={[styles.modalFooter, styles.modalFooterCompact]}>
               <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: "transparent",
-                    borderWidth: 1,
-                    borderColor: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
-                  },
-                ]}
+                style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={() => setShowClassModal(false)}
               >
                 <Text
                   style={[
                     styles.modalButtonText,
-                    { color: colors.text.secondary },
+                    styles.modalButtonTextSecondary,
                   ]}
                 >
                   Cancel
@@ -184,32 +128,32 @@ const ClassUpdateModal = ({
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={{ flex: 1 }}
+                style={styles.modalButtonWrapper}
                 onPress={handleUpdateClass}
                 disabled={classUpdateLoading}
               >
-                <LinearGradient
-                  colors={[colors.primary.main, "#3B82F6"]}
+                <PrimaryGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={[styles.modalButton, { borderWidth: 0 }]}
+                  style={[styles.modalButton, styles.modalButtonPrimary]}
                 >
                   {classUpdateLoading ? (
-                    <ActivityIndicator color="white" />
+                    <PrimaryTextSpinner />
                   ) : (
                     <Text
                       style={[
                         styles.modalButtonText,
-                        { color: "white", fontWeight: "700" },
+                        styles.modalButtonTextPrimary,
+                        styles.modalButtonTextBold,
                       ]}
                     >
                       Update Class
                     </Text>
                   )}
-                </LinearGradient>
+                </PrimaryGradient>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </ClassModalGradient>
         </Animated.View>
       </View>
     </Modal>

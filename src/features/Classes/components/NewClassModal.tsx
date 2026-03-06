@@ -1,11 +1,30 @@
 import { createLectureStyles as styles } from "@classes/styles";
 import { NewClassModalProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const NewClassGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
+}));
+
+const PrimaryGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, theme.accent.blue] as const,
+}));
+
+const SecondaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const NewClassInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
 
 export const NewClassModal: React.FC<NewClassModalProps> = ({
   visible,
@@ -14,8 +33,6 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
   setNewClassName,
   onCreateClass,
 }) => {
-  const { colors, isDark } = useTheme();
-
   const handleCreateClass = async () => {
     await onCreateClass(newClassName);
   };
@@ -31,120 +48,36 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
         <Animated.View
           entering={FadeInUp.duration(400)}
           exiting={FadeOutDown.duration(400)}
-          style={{ width: "100%", maxWidth: 400 }}
+          style={styles.modalAnimatedWrapper}
         >
-          <LinearGradient
-            colors={
-              isDark
-                ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-            }
+          <NewClassGradient
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              {
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(255,255,255,0.8)",
-                borderWidth: 1,
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.2,
-                shadowRadius: 20,
-                padding: 0, // Reset padding to handle internal layout
-                overflow: "hidden",
-              },
-            ]}
+            style={[styles.modalContent, styles.modalSurfaceElevated, styles.modalSurfaceFlat]}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: 20,
-                borderBottomWidth: 1,
-                borderBottomColor: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.05)",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "700",
-                    color: colors.text.primary,
-                  }}
-                >
+            <View style={styles.modalHeaderRow}>
+              <View>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
                   Add New Class
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={onClose}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={styles.modalCloseButton}
               >
-                <Ionicons
-                  name="close"
-                  size={20}
-                  color={colors.text.secondary}
-                />
+                <SecondaryIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
 
-            <View style={{ padding: 24 }}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: colors.text.secondary,
-                  marginBottom: 12,
-                  marginLeft: 4,
-                }}
-              >
+            <View style={styles.modalBody}>
+              <Text style={styles.modalLabel}>
                 Class Name
               </Text>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.3)"
-                    : "rgba(255, 255, 255, 0.8)",
-                  borderRadius: 16,
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
-                  paddingHorizontal: 16,
-                  height: 56,
-                  marginBottom: 8,
-                }}
-              >
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: colors.text.primary,
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}
+              <View style={styles.modalInputRow}>
+                <NewClassInput
+                  style={styles.modalInputText}
                   placeholder="e.g., Computer Science 101"
-                  placeholderTextColor={colors.text.muted}
                   value={newClassName}
                   onChangeText={setNewClassName}
                   autoFocus
@@ -152,64 +85,25 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
               </View>
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                padding: 20,
-                paddingTop: 0,
-                gap: 12,
-              }}
-            >
+            <View style={styles.modalFooter}>
               <TouchableOpacity
-                style={{
-                  flex: 1,
-                  padding: 16,
-                  borderRadius: 16,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
-                }}
+                style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={onClose}
               >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "600",
-                    color: colors.text.secondary,
-                  }}
-                >
-                  Cancel
-                </Text>
+                <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={{ flex: 1 }} onPress={handleCreateClass}>
-                <LinearGradient
-                  colors={[colors.primary.main, "#3B82F6"]}
+              <TouchableOpacity style={styles.modalButtonWrapper} onPress={handleCreateClass}>
+                <PrimaryGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={{
-                    padding: 16,
-                    borderRadius: 16,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  style={styles.modalButton}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: 16,
-                    }}
-                  >
-                    Create Class
-                  </Text>
-                </LinearGradient>
+                  <Text style={styles.modalButtonTextPrimary}>Create Class</Text>
+                </PrimaryGradient>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </NewClassGradient>
         </Animated.View>
       </View>
     </Modal>

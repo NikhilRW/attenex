@@ -1,11 +1,42 @@
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { ManualAttendanceModalProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const
+      : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const,
+}));
+
+const SubmitButtonGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, "#3B82F6"] as const,
+}));
+
+const HeaderIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const CloseIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+
+const InputIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
+
+const ModalInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+
+const SubmitIndicator = withUnistyles(ActivityIndicator, () => ({
+  color: "white",
+}));
 
 export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   visible,
@@ -15,9 +46,6 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   onSubmit,
   isSubmitting,
 }) => {
-  const { colors, isDark } = useTheme();
-
-
   return (
     <Modal
       visible={visible}
@@ -29,121 +57,35 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
         <Animated.View
           entering={FadeInUp.duration(400)}
           exiting={FadeOutDown.duration(400)}
-          style={{ width: "100%", maxWidth: 400 }}
+          style={styles.modalAnimatedWrapper}
         >
-          <LinearGradient
-            colors={
-              isDark
-                ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"]
-                : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"]
-            }
+          <ModalSurface
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              {
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(255,255,255,0.8)",
-                borderWidth: 1,
-              },
-            ]}
+            style={[styles.modalContent, styles.modalSurface]}
           >
             <View style={styles.modalHeader}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 12,
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons
-                    name="person-add"
-                    size={20}
-                    color={colors.primary.main}
-                  />
+              <View style={styles.modalHeaderLeft}>
+                <View style={styles.modalHeaderIcon}>
+                  <HeaderIcon name="person-add" size={20} />
                 </View>
-                <Text
-                  style={[
-                    styles.modalTitle,
-                    { color: colors.text.primary, fontSize: 22 },
-                  ]}
-                >
-                  Add Manual Attendance
-                </Text>
+                <Text style={styles.modalTitle}>Add Manual Attendance</Text>
               </View>
-              <TouchableOpacity
-                onPress={onClose}
-                style={[
-                  styles.closeButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="close"
-                  size={20}
-                  color={colors.text.secondary}
-                />
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <CloseIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
 
-            <View style={[styles.modalBody, { paddingTop: 10 }]}>
-              <Text
-                style={[
-                  styles.modalLabel,
-                  { color: colors.text.secondary, marginBottom: 12 },
-                ]}
-              >
+            <View style={[styles.modalBody, styles.modalBodyTop]}>
+              <Text style={[styles.modalLabel, styles.modalLabelDescription]}>
                 Enter the student&apos;s roll number to manually mark them present.
               </Text>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: isDark
-                    ? "rgba(0, 0, 0, 0.3)"
-                    : "rgba(255, 255, 255, 0.8)",
-                  borderRadius: 16,
-                  borderWidth: 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
-                  paddingHorizontal: 16,
-                  height: 56,
-                }}
-              >
-                <Ionicons
-                  name="id-card-outline"
-                  size={20}
-                  color={colors.text.muted}
-                  style={{ marginRight: 12 }}
-                />
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: colors.text.primary,
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}
+              <View style={styles.inputContainer}>
+                <InputIcon name="id-card-outline" size={20} style={styles.inputIcon} />
+                <ModalInput
+                  style={styles.input}
                   placeholder="e.g 66"
-                  placeholderTextColor={colors.text.muted}
                   value={manualRollNo}
                   onChangeText={setManualRollNo}
                   autoCapitalize="characters"
@@ -153,77 +95,41 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
               </View>
             </View>
 
-            <View
-              style={[
-                styles.modalFooter,
-                { borderTopWidth: 0, paddingTop: 10 },
-              ]}
-            >
+            <View style={[styles.modalFooter, styles.modalFooterCompact]}>
               <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  {
-                    width: "30%",
-                    backgroundColor: "transparent",
-                    borderWidth: 1,
-                    borderColor: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
-                  },
-                ]}
+                style={[styles.actionButton, styles.cancelButtonNarrow]}
                 onPress={onClose}
               >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    { color: colors.text.secondary },
-                  ]}
-                >
-                  Cancel
-                </Text>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={onSubmit}
                 disabled={isSubmitting}
-                style={{
-                  width: "60%",
-                  height: 48,
-                  borderRadius: 12,
-                  flexDirection: "row",
-                  paddingHorizontal: 5,
-                }}
+                style={styles.submitButtonWide}
               >
-                <LinearGradient
-                  colors={[colors.primary.main, "#3B82F6"]}
+                <SubmitButtonGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={[styles.modalButton, { borderWidth: 0 }]}
+                  style={[styles.actionButton, { borderWidth: 0 }]}
                 >
                   {isSubmitting ? (
-                    <ActivityIndicator color="white" />
+                    <SubmitIndicator />
                   ) : (
                     <>
-                      <Text
-                        style={[
-                          styles.modalButtonText,
-                          { color: "white", fontWeight: "700" },
-                        ]}
-                      >
-                        Mark Present
-                      </Text>
+                      <Text style={styles.submitButtonText}>Mark Present</Text>
                       <Ionicons
                         name="checkmark-circle"
                         size={18}
                         color="white"
-                        style={{ marginLeft: 8 }}
+                        style={styles.submitButtonIcon}
                       />
                     </>
                   )}
-                </LinearGradient>
+                </SubmitButtonGradient>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </ModalSurface>
         </Animated.View>
       </View>
     </Modal>

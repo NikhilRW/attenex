@@ -23,7 +23,7 @@ const LectureEndedScreen = () => {
   return (
     <View style={styles.container}>
       <FuturisticBackground />
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         <View style={styles.contentContainer}>
           <LectureEndedHeader onDone={handleDone} />
 

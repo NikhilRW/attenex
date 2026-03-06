@@ -1,24 +1,22 @@
 import { classesStyles as styles } from "@classes/styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const PrimaryIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
 
 export const CreateLectureInfo: React.FC = () => {
-  const { colors } = useTheme();
-
   return (
     <Animated.View
       entering={FadeInUp.duration(600).delay(400).springify()}
-      style={[styles.infoCard, { backgroundColor: colors.surface.cardBg }]}
+      style={styles.infoCard}
     >
-      <Ionicons
-        name="information-circle-outline"
-        size={24}
-        color={colors.primary.main}
-      />
-      <Text style={[styles.infoText, { color: colors.text.secondary }]}>
+      <PrimaryIcon name="information-circle-outline" size={24} />
+      <Text style={styles.infoText}>
         Students will be able to join this lecture using a unique code that will
         be generated automatically.
       </Text>
