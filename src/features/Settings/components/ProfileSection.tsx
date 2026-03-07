@@ -1,7 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { settingsStyles as styles } from "@settings/styles";
 import { ProfileSectionProps } from "@settings/types";
-import { useTheme } from "@shared/hooks";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -13,6 +12,34 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const ProfileHeaderGradient = withUnistyles(LinearGradient, (_, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? (["rgba(255,255,255,0.05)", "transparent"] as const)
+      : (["rgba(0,0,0,0.02)", "transparent"] as const),
+}));
+
+const AvatarGradient = withUnistyles(LinearGradient, (theme) => ({
+  colors: [theme.primary.main, theme.accent.purple] as const,
+}));
+
+const NameInput = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+
+const SavingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const SaveIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const MailIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({
   displayName,
@@ -23,8 +50,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   userEmail,
   userName,
 }) => {
-  const { colors, isDark } = useTheme();
-
   const getInitials = (name: string) => {
     return (name || "User").slice(0, 2).toUpperCase();
   };
@@ -34,25 +59,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       entering={FadeInDown.delay(100).springify()}
       style={styles.section}
     >
-      <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
-        PROFILE
-      </Text>
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor: colors.surface.cardBg,
-            borderColor: colors.surface.glassBorder,
-          },
-        ]}
-      >
-        <LinearGradient
-          colors={[
-            isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-            "transparent",
-          ]}
-          style={styles.profileHeader}
-        >
+      <Text style={styles.sectionTitle}>PROFILE</Text>
+      <View style={[styles.card, styles.cardSurface]}>
+        <ProfileHeaderGradient style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             {userPhotoUrl ? (
               <Image
@@ -60,42 +69,23 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 style={styles.avatarImage}
               />
             ) : (
-              <LinearGradient
-                colors={[colors.primary.main, colors.accent.purple]}
-                style={styles.avatar}
-              >
+              <AvatarGradient style={styles.avatar}>
                 <Text style={styles.avatarText}>
                   {getInitials(displayName)}
                 </Text>
-              </LinearGradient>
+              </AvatarGradient>
             )}
-            <View
-              style={[
-                styles.onlineBadge,
-                { borderColor: colors.surface.cardBg },
-              ]}
-            />
+            <View style={styles.onlineBadge} />
           </View>
 
           <View style={styles.profileInfo}>
-            <Text style={[styles.label, { color: colors.text.secondary }]}>
-              Full Name
-            </Text>
-            <View
-              style={[
-                styles.inputContainer,
-                {
-                  backgroundColor: colors.surface.glass,
-                  borderColor: colors.surface.glassBorder,
-                },
-              ]}
-            >
-              <TextInput
+            <Text style={[styles.label, styles.labelSecondary]}>Full Name</Text>
+            <View style={styles.inputContainer}>
+              <NameInput
                 value={displayName}
                 onChangeText={onDisplayNameChange}
-                style={[styles.input, { color: colors.text.primary }]}
+                style={styles.input}
                 placeholder="Enter name"
-                placeholderTextColor={colors.text.muted}
               />
               {displayName !== userName && (
                 <TouchableOpacity
@@ -103,38 +93,19 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                   disabled={savingName}
                 >
                   {savingName ? (
-                    <ActivityIndicator size="small" color={"#000"} />
+                    <SavingIndicator size="small" />
                   ) : (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={24}
-                      color={colors.primary.main}
-                    />
+                    <SaveIcon name="checkmark-circle" size={24} />
                   )}
                 </TouchableOpacity>
               )}
             </View>
           </View>
-        </LinearGradient>
+        </ProfileHeaderGradient>
 
-        <View
-          style={[
-            styles.statsRow,
-            {
-              borderTopColor: colors.surface.glassBorder,
-              justifyContent: "center",
-              gap: 8,
-            },
-          ]}
-        >
-          <Ionicons name="mail-outline" size={16} color={colors.text.muted} />
-          <Text
-            style={{
-              color: colors.text.secondary,
-              fontSize: 14,
-              fontWeight: "500",
-            }}
-          >
+        <View style={[styles.statsRow, styles.statsRowCentered]}>
+          <MailIcon name="mail-outline" size={16} />
+          <Text style={styles.emailText}>
             {userEmail || "No email connected"}
           </Text>
         </View>

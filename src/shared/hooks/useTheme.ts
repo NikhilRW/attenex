@@ -1,10 +1,11 @@
+import { darkTheme, lightTheme } from "@shared/constants/colors";
+import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { useMemo } from "react";
 import { useColorScheme } from "react-native";
+import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
-import { darkTheme, lightTheme } from "@shared/constants/colors";
-import { mmkvStorage } from "@shared/utils/mmkvStorage";
 
 export type ThemeMode = "dark" | "light" | "system";
 
@@ -17,7 +18,15 @@ export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
       mode: "system",
-      setTheme: (mode) => set({ mode }),
+      setTheme: (mode) => {
+        set({ mode });
+        if (mode === "system") {
+          UnistylesRuntime.setAdaptiveThemes(true);
+        } else {
+          UnistylesRuntime.setAdaptiveThemes(false);
+          UnistylesRuntime.setTheme(mode);
+        }
+      },
     }),
     {
       name: "theme-storage",
@@ -30,8 +39,8 @@ export const useThemeStore = create<ThemeStore>()(
           state.setTheme(state.mode);
         }
       },
-    }
-  )
+    },
+  ),
 );
 
 // Hook for easy access
@@ -40,7 +49,7 @@ export const useTheme = () => {
     useShallow((state) => ({
       mode: state.mode,
       setTheme: state.setTheme,
-    }))
+    })),
   );
   const systemScheme = useColorScheme();
 

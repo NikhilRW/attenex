@@ -7,13 +7,29 @@ import {
 import { useSettings } from "@settings/hooks";
 import { settingsStyles as styles } from "@settings/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks";
+import { useThemeStore } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+import { useShallow } from "zustand/shallow";
+
+const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
+  colors:
+    rt.colorScheme === "dark"
+      ? ([theme.background.secondary, "transparent"] as const)
+      : (["rgba(255,255,255,0.95)", "rgba(255,255,255,0.0)"] as const),
+}));
 
 const SettingsScreen = () => {
-  const { colors, isDark, mode, setTheme } = useTheme();
+  const { mode, setTheme } = useThemeStore(
+    useShallow((state) => ({
+      mode: state.mode,
+      setTheme: state.setTheme,
+    })),
+  );
+  console.log("mode:"+mode);
+  
   const {
     displayName,
     setDisplayName,
@@ -31,25 +47,14 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {isDark && <FuturisticBackground />}
+      <FuturisticBackground />
 
-      <LinearGradient
-        colors={
-          isDark
-            ? [colors.background.secondary, "transparent"]
-            : ["rgba(255,255,255,0.95)", "rgba(255,255,255,0.0)"]
-        }
-        style={styles.header}
-      >
+      <HeaderGradient style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text.primary }]}>
-            Settings
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-            Preferences & Account
-          </Text>
+          <Text style={styles.title}>Settings</Text>
+          <Text style={styles.subtitle}>Preferences & Account</Text>
         </View>
-      </LinearGradient>
+      </HeaderGradient>
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -82,7 +87,7 @@ const SettingsScreen = () => {
           onDeleteAccount={handleDeleteAccount}
         />
 
-        <View style={{ height: 50 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );

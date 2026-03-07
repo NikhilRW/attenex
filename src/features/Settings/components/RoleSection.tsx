@@ -1,7 +1,6 @@
 import { ThemeOption } from "@settings/components/ThemeOption";
 import { settingsStyles as styles } from "@settings/styles";
 import { RoleSectionProps } from "@settings/types";
-import { useTheme } from "@shared/hooks";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -13,16 +12,12 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
   onRoleUpdate,
   savingRole,
 }) => {
-  const { colors } = useTheme();
-
   return (
     <Animated.View
       entering={FadeInDown.delay(200).springify()}
       style={styles.section}
     >
-      <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
-        ROLE
-      </Text>
+      <Text style={styles.sectionTitle}>ROLE</Text>
       <View style={styles.roleContainer}>
         {(["teacher", "student"] as const).map((r) => {
           const isActive = role === r;
@@ -41,11 +36,8 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
       {role !== userRole && (
         <Animated.View entering={FadeInDown.springify()}>
           <TouchableOpacity
-            style={[
-              styles.updateButton,
-              { backgroundColor: colors.primary.main },
-            ]}
-            onPress={async() => await onRoleUpdate()}
+            style={[styles.updateButton, styles.updateButtonPrimary]}
+            onPress={async () => await onRoleUpdate()}
             disabled={savingRole}
           >
             <Text style={styles.updateButtonText}>
