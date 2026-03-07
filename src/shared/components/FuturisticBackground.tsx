@@ -11,10 +11,7 @@ import {
 } from "@shopify/react-native-skia";
 import React, { useEffect } from "react";
 import { Dimensions, View } from "react-native";
-import {
-  StyleSheet,
-  useUnistyles,
-} from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import {
   Easing,
   useDerivedValue,
@@ -22,14 +19,13 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { styles } from "../styles/FuturisticBackground.styles";
 
 const { width, height } = Dimensions.get("screen");
 
 export const FuturisticBackground = () => {
   const { theme: colors, rt } = useUnistyles();
   const isDark = rt.themeName === "dark";
-  
+
   const time1 = useSharedValue(0);
   const time2 = useSharedValue(0);
   const time3 = useSharedValue(0);
@@ -95,7 +91,7 @@ export const FuturisticBackground = () => {
   }
 
   return (
-    <View style={[StyleSheet.absoluteFillObject, styles.canvasView]}>
+    <View style={[StyleSheet.absoluteFillObject]}>
       <Canvas style={[StyleSheet.absoluteFillObject]}>
         {/* Deep Space Background */}
         <Rect

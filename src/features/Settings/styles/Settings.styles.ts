@@ -1,15 +1,9 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
-
+export const styles = StyleSheet.create((theme) => {
   return {
     container: {
       flex: 1,
-      backgroundColor: "transparent",
-    },
-    backgroundContainer: {
-      display: isDark ? "flex" : "none",
     },
     header: {
       paddingTop: 30,

@@ -1,7 +1,6 @@
 import { darkTheme, lightTheme } from "@shared/constants/colors";
 import { StyleSheet } from "react-native-unistyles";
 import { useThemeStore } from "./shared/hooks";
-import { Appearance } from "react-native";
 
 const appThemes = {
   dark: darkTheme,
@@ -20,7 +19,7 @@ const selectedThemeMode = useThemeStore.getState().mode;
 const settings =
   selectedThemeMode === "system"
     ? {
-        initialTheme: Appearance.getColorScheme() as "dark" | "light",
+        adaptiveThemes: true,
       }
     : {
         initialTheme: selectedThemeMode,
@@ -28,5 +27,5 @@ const settings =
 
 StyleSheet.configure({
   themes: appThemes,
-  settings,
+  settings: settings,
 });

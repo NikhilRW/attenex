@@ -1,9 +1,9 @@
 import { User as UserSchema } from "@backend/config/database_setup";
+import { useThemeStore } from "@shared/hooks/useTheme";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useThemeStore } from "@shared/hooks/useTheme";
 
 export interface User extends UserSchema {
   className: string;
@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
         secureStore.removeItem("jwt").catch((err) => {
           console.error("Failed to remove token from secure storage", err);
         });
-        useThemeStore.setState({ mode: "system" });
+        useThemeStore.getState().setTheme("system");
         set({
           user: null,
           token: null,

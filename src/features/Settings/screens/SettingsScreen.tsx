@@ -23,7 +23,6 @@ const SettingsScreen = () => {
       setTheme: state.setTheme,
     })),
   );
-  console.log("mode:" + mode);
 
   const {
     displayName,
@@ -43,7 +42,6 @@ const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       <FuturisticBackground />
-
       <HeaderGradient
         style={styles.header}
         uniProps={(theme, rt) => ({

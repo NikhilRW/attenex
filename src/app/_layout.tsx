@@ -30,7 +30,7 @@ import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect } from "react";
-import { useColorScheme, Appearance } from "react-native";
+import { Appearance, useColorScheme } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
@@ -409,11 +409,14 @@ export default function RootLayout() {
   }, [isConnected]);
 
   useEffect(() => {
-    Appearance.addChangeListener((state) => {
+    const subscription = Appearance.addChangeListener((state) => {
       if (mode === "system") {
         UnistylesRuntime.setTheme(state.colorScheme as "dark" | "light");
       }
     });
+    return () => {
+      subscription.remove();
+    };
   }, [mode]);
 
   if (!loaded && !error) {
