@@ -1,5 +1,4 @@
 import { FuturisticButtonProps } from "@auth/types/props";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
@@ -8,7 +7,9 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
+
+const ButtonGradient = withUnistyles(LinearGradient);
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,
@@ -17,11 +18,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   disabled = false,
   loading = false,
 }) => {
-  const { colors } = useTheme();
   const buttonScale = useSharedValue(1);
-
-  const defaultGradient = [colors.primary.main, colors.accent.blue];
-  const activeGradient = gradient || defaultGradient;
 
   const handlePressIn = () => {
     if (loading) return;
@@ -50,8 +47,14 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
         activeOpacity={0.9}
         style={{ elevation: 4 }}
       >
-        <LinearGradient
-          colors={activeGradient as [string, string, ...string[]]}
+        <ButtonGradient
+          uniProps={(theme) => ({
+            colors: (gradient ?? [theme.primary.main, theme.accent.blue]) as [
+              string,
+              string,
+              ...string[],
+            ],
+          })}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.button}
@@ -68,16 +71,14 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
               {title}
             </Text>
           )}
-        </LinearGradient>
-        <View
-          style={[styles.buttonGlow, { shadowColor: colors.primary.main }]}
-        />
+        </ButtonGradient>
+        <View style={styles.buttonGlow} />
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   button: {
     height: 56,
     borderRadius: 16,
@@ -103,6 +104,7 @@ const styles = StyleSheet.create(() => ({
     shadowRadius: 20,
     zIndex: -1,
     elevation: 10,
+    shadowColor: theme.primary.main,
   },
 }));
 

@@ -9,7 +9,7 @@ import {
   onNotificationOpenedApp,
   setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
-import { useTheme } from "@shared/hooks/useTheme";
+import { useThemeStore } from "@shared/hooks/useTheme";
 import { useNotificationStore } from "@shared/stores/notificationStore";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import * as Linking from "expo-linking";
@@ -28,7 +28,9 @@ import {
 } from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useEffect, useMemo } from "react";
+import { StatusBar } from "expo-status-bar";
+import { useCallback, useEffect } from "react";
+import { useColorScheme, Appearance } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
@@ -41,6 +43,12 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  withUnistyles,
+} from "react-native-unistyles";
+import { useShallow } from "zustand/shallow";
 import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
@@ -49,7 +57,7 @@ import { setupTanstackForReactNative } from "../shared/utils/tanstack";
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
 const ATTENEX_ANDROID_CHANNEL_ID = "attenex";
-
+Appearance.setColorScheme(null);
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -58,11 +66,48 @@ configureReanimatedLogger({
 
 SplashScreen.preventAutoHideAsync();
 
+const ThemedSafeAreaView = withUnistyles(SafeAreaView);
+
+const ThemedPaperProvider = withUnistyles(PaperProvider, (theme, rt) => {
+  const paperTheme = rt.themeName === "dark" ? MD3DarkTheme : MD3LightTheme;
+
+  return {
+    theme: {
+      ...paperTheme,
+      colors: {
+        ...paperTheme.colors,
+        primary: theme.primary.main,
+        backdrop: "#00000053",
+      },
+    },
+  };
+});
+
+const styles = StyleSheet.create((_, rt) => ({
+  safeArea: {
+    flex: 1,
+    backgroundColor: rt.themeName === "dark" ? "black" : "rgb(232 232 232)",
+  },
+}));
+
 export default function RootLayout() {
   const router = useRouter();
-  const { isDark, colors } = useTheme();
   const { isConnected } = useNetworkState();
   const { bottom } = useSafeAreaInsets();
+  const systemColorScheme = useColorScheme();
+  const { mode } = useThemeStore(
+    useShallow((state) => ({
+      mode: state.mode,
+    })),
+  );
+
+  const effectiveThemeName =
+    mode === "system"
+      ? systemColorScheme === "dark"
+        ? "dark"
+        : "light"
+      : mode;
+  const statusBarStyle = effectiveThemeName === "dark" ? "light" : "dark";
 
   // Track if we've already handled the killed-state notification to prevent infinite loop
   const {
@@ -109,6 +154,16 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
+    const getCurrentTheme = () => UnistylesRuntime.getTheme();
+
+    const getNotificationAccentColor = () => {
+      const currentTheme = getCurrentTheme();
+
+      return UnistylesRuntime.themeName === "dark"
+        ? currentTheme.primary.light
+        : currentTheme.primary.main;
+    };
+
     const buildAttenexNotificationContent = (
       remoteMessage: FirebaseMessagingTypes.RemoteMessage,
     ): NotificationContentInput => {
@@ -120,7 +175,7 @@ export default function RootLayout() {
         body,
         data: remoteMessage.data,
         sound: "default" as const,
-        color: isDark ? colors.primary.light : colors.primary.main,
+        color: getNotificationAccentColor(),
         attachments: [
           {
             url: ATTENEX_NOTIFICATION_IMAGE_URL,
@@ -158,7 +213,7 @@ export default function RootLayout() {
       lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
       enableVibrate: true,
       vibrationPattern: [0, 250, 200, 250],
-      lightColor: colors.primary.main,
+      lightColor: getCurrentTheme().primary.main,
       sound: "default",
     }).catch(() => {
       // Ignore channel creation failures to avoid blocking app startup.
@@ -353,10 +408,13 @@ export default function RootLayout() {
     }
   }, [isConnected]);
 
-  const ActualTheme = useMemo(
-    () => (isDark ? MD3DarkTheme : MD3LightTheme),
-    [isDark],
-  );
+  useEffect(() => {
+    Appearance.addChangeListener((state) => {
+      if (mode === "system") {
+        UnistylesRuntime.setTheme(state.colorScheme as "dark" | "light");
+      }
+    });
+  }, [mode]);
 
   if (!loaded && !error) {
     return null;
@@ -364,21 +422,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: isDark ? "black" : "white" }}
-      >
+      <StatusBar
+        style={statusBarStyle}
+        hideTransitionAnimation="fade"
+        translucent
+      />
+      <ThemedSafeAreaView style={styles.safeArea}>
         <ApolloGraphQLProvider>
           <>
-            <PaperProvider
-              theme={{
-                ...ActualTheme,
-                colors: {
-                  ...ActualTheme.colors,
-                  primary: colors.primary.main, // Button Text
-                  backdrop: "#00000053",
-                },
-              }}
-            >
+            <ThemedPaperProvider>
               <AlertsProvider>
                 <PersistQueryClientProvider
                   client={queryClient}
@@ -406,11 +458,11 @@ export default function RootLayout() {
                   </Stack>
                 </PersistQueryClientProvider>
               </AlertsProvider>
-            </PaperProvider>
+            </ThemedPaperProvider>
             <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
           </>
         </ApolloGraphQLProvider>
-      </SafeAreaView>
+      </ThemedSafeAreaView>
     </SafeAreaProvider>
   );
 }

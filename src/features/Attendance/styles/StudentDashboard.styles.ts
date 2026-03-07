@@ -552,7 +552,7 @@ const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "600",
     },
     modalButtonTextPrimary: {
-      color: theme.text.primary,
+      color: "white",
     },
     modalButtonTextSecondary: {
       color: theme.text.secondary,

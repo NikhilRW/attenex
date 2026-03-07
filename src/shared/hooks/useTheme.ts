@@ -1,7 +1,7 @@
 import { darkTheme, lightTheme } from "@shared/constants/colors";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { useMemo } from "react";
-import { useColorScheme } from "react-native";
+import { Appearance, useColorScheme } from "react-native";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -21,9 +21,10 @@ export const useThemeStore = create<ThemeStore>()(
       setTheme: (mode) => {
         set({ mode });
         if (mode === "system") {
-          UnistylesRuntime.setAdaptiveThemes(true);
+          UnistylesRuntime.setTheme(
+            Appearance.getColorScheme() as "dark" | "light",
+          );
         } else {
-          UnistylesRuntime.setAdaptiveThemes(false);
           UnistylesRuntime.setTheme(mode);
         }
       },

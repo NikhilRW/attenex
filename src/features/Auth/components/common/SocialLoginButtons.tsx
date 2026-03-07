@@ -1,19 +1,24 @@
 import { SocialLoginButtonsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { useAuthStore } from "@shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
+
+const SocialIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.primary,
+}));
+const SocialLoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.text.primary,
+}));
 
 const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   onGooglePress,
   onLinkedInPress,
   isGoogleLoading = false,
 }) => {
-  const { colors } = useTheme();
   const { user } = useAuthStore(useShallow((state) => ({ user: state.user })));
 
   return (
@@ -35,24 +40,13 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
           ]}
         >
           {isGoogleLoading ? (
-            <ActivityIndicator size="small" color={colors.text.primary} />
+            <SocialLoadingIndicator size="small" />
           ) : (
             <>
               <View style={styles.socialIconWrapper}>
-                <Ionicons
-                  name="logo-google"
-                  size={24}
-                  color={colors.text.primary}
-                />
+                <SocialIcon name="logo-google" size={24} />
               </View>
-              <Text
-                style={[
-                  styles.socialButtonText,
-                  { color: colors.text.primary },
-                ]}
-              >
-                Google
-              </Text>
+              <Text style={styles.socialButtonText}>Google</Text>
             </>
           )}
         </LinearGradient>
@@ -68,21 +62,15 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         onPress={onLinkedInPress}
       >
         <View style={styles.socialIconWrapper}>
-          <Ionicons
-            name="logo-linkedin"
-            size={24}
-            color={colors.text.primary}
-          />
+          <SocialIcon name="logo-linkedin" size={24} />
         </View>
-        <Text style={[styles.socialButtonText, { color: colors.text.primary }]}>
-          LinkedIn
-        </Text>
+        <Text style={styles.socialButtonText}>LinkedIn</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   socialSection: {
     flexDirection: "row",
     gap: 16,
@@ -112,6 +100,7 @@ const styles = StyleSheet.create(() => ({
     fontSize: 16,
     fontWeight: "600",
     letterSpacing: 0.5,
+    color: theme.text.primary,
   },
 }));
 

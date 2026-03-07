@@ -1,9 +1,11 @@
-import { roleSelectionStyles as styles } from "@role-selection/styles";
+import { styles } from "@role-selection/styles";
 import { ConfirmButtonProps } from "@role-selection/types";
-import { useTheme } from "@shared/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const ConfirmGradient = withUnistyles(LinearGradient);
 
 export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
     selectedRole,
@@ -12,8 +14,6 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
     bottomInset,
     onConfirm,
 }) => {
-    const { colors } = useTheme();
-
     const getButtonText = () => {
         if (userRole) {
             return `You are ${userRole}`;
@@ -27,23 +27,20 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
     return (
         <TouchableOpacity
             style={[
-                styles.confirmButton,
-                {
-                    marginBottom: 70 + bottomInset * 2,
-                },
+                styles.confirmButton(bottomInset),
                 (!selectedRole || isUpdating) && styles.confirmButtonDisabled,
-                { shadowColor: colors.primary.main },
             ]}
             onPress={onConfirm}
             disabled={!selectedRole || isUpdating}
             activeOpacity={0.8}
         >
-            <LinearGradient
-                colors={
-                    selectedRole && !isUpdating
-                        ? [colors.primary.main, colors.accent.blue]
-                        : [colors.surface.glassBorder, colors.surface.glass]
-                }
+            <ConfirmGradient
+                uniProps={(theme) => ({
+                    colors:
+                        selectedRole && !isUpdating
+                            ? ([theme.primary.main, theme.accent.blue] as const)
+                            : ([theme.surface.glassBorder, theme.surface.glass] as const),
+                })}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.confirmGradient}
@@ -60,7 +57,7 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
                         {getButtonText()}
                     </Text>
                 )}
-            </LinearGradient>
+            </ConfirmGradient>
         </TouchableOpacity>
     );
 };

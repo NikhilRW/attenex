@@ -1,8 +1,9 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.background.primary,
   },
   webView: {
     flex: 1, // Takes full screen space
@@ -16,5 +17,6 @@ export const styles = StyleSheet.create(() => ({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1000, // Ensure it appears above WebView
+    backgroundColor: theme.background.overlay,
   },
 }));

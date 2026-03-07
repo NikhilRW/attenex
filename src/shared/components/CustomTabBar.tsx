@@ -5,12 +5,11 @@ import MaterialCommunityIcons from "@react-native-vector-icons/material-design-i
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
 import { Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
 
 import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { StaleTime } from "@shared/constants/tanstackConfig";
-import { useTheme } from "@shared/hooks/useTheme";
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
 import Animated, {
@@ -25,12 +24,15 @@ import Animated, {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 80;
+const TabEntypo = withUnistyles(Entypo);
+const TabFontAwesome6 = withUnistyles(FontAwesome6);
+const TabIonicons = withUnistyles(Ionicons);
+const TabMaterialCommunityIcons = withUnistyles(MaterialCommunityIcons);
 
 const CustomTabBar = ({
   state: { index, routeNames },
   navigation,
 }: BottomTabBarProps) => {
-  const { colors } = useTheme();
   const { isAuthenticated } = useAuthStore();
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
@@ -133,22 +135,13 @@ const CustomTabBar = ({
     <Animated.View
       style={[
         styles.container,
-        {
-          display: isEmptyTabBar ? "none" : isAuthenticated ? "flex" : "none",
-          backgroundColor: colors.surface.cardBg,
-          bottom: 0,
-          borderColor: colors.surface.glassBorder,
-        },
+        (isEmptyTabBar || !isAuthenticated) && styles.hidden,
       ]}
     >
       <Animated.View
         key={"activated-background"}
         layout={LinearTransition}
-        style={[
-          styles.activeBackground,
-          { backgroundColor: colors.primary.glow },
-          activatedBackgroundStyle,
-        ]}
+        style={[styles.activeBackground, activatedBackgroundStyle]}
       />
 
       {filteredRoutes.map((name, idx) => {
@@ -161,7 +154,6 @@ const CustomTabBar = ({
             isActivated={isActivated}
             onPress={() => navigation.navigate(name)}
             onPrefetch={() => handleTabPrefetch(name)}
-            colors={colors}
           />
         );
       })}
@@ -176,7 +168,6 @@ interface TabBarButtonProps {
   isActivated: boolean;
   onPress: () => void;
   onPrefetch?: () => void;
-  colors: any;
 }
 
 const TabBarButton: React.FC<TabBarButtonProps> = ({
@@ -184,7 +175,6 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   isActivated,
   onPress,
   onPrefetch,
-  colors,
 }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(isActivated ? 1 : 0.6);
@@ -224,18 +214,13 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
       onPressOut={handlePressOut}
     >
       <Animated.View layout={LinearTransition} style={animatedIconStyle}>
-        {getIconForRoute(name, isActivated, colors)}
+        {getIconForRoute(name, isActivated)}
       </Animated.View>
       {!isActivated && (
         <Animated.Text
           key={"key-" + name}
           exiting={FadeOut.duration(300).easing(Easing.inOut(Easing.quad))}
-          style={[
-            styles.tabLabel,
-            {
-              color: isActivated ? colors.primary.main : colors.text.secondary,
-            },
-          ]}
+          style={styles.tabLabel(isActivated)}
         >
           {name.split("/index")[0]}
         </Animated.Text>
@@ -247,25 +232,71 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
 export const getIconForRoute = (
   routeName: string,
   activated: boolean,
-  colors: any,
 ) => {
-  const color = activated ? colors.primary.main : colors.text.secondary;
   if (routeName.includes("attendance")) {
-    return <FontAwesome6 name="calendar" size={25} color={color} />;
+    return (
+      <TabFontAwesome6
+        name="calendar"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   } else if (routeName.includes("classes")) {
-    return <Entypo name="blackboard" size={25} color={color} />;
+    return (
+      <TabEntypo
+        name="blackboard"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   } else if (routeName.includes("role-selection")) {
-    return <Ionicons name="people" size={25} color={color} />;
+    return (
+      <TabIonicons
+        name="people"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   } else if (routeName.includes("settings")) {
-    return <Ionicons name="settings-outline" size={25} color={color} />;
+    return (
+      <TabIonicons
+        name="settings-outline"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   } else if (routeName.includes("create-class")) {
-    return <Ionicons name="school" size={25} color={color} />;
+    return (
+      <TabIonicons
+        name="school"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   } else if (routeName.includes("test")) {
-    return <MaterialCommunityIcons name="test-tube" size={25} color={color} />;
+    return (
+      <TabMaterialCommunityIcons
+        name="test-tube"
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   }
 };
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     height: 70,
     position: "absolute",
@@ -288,6 +319,12 @@ const styles = StyleSheet.create(() => ({
     // shadowRadius: 8,
     zIndex: 2,
     borderWidth: 1,
+    backgroundColor: theme.surface.cardBg,
+    borderColor: theme.surface.glassBorder,
+    bottom: 0,
+  },
+  hidden: {
+    display: "none",
   },
   navigationButton: {
     flexDirection: "column",
@@ -304,11 +341,13 @@ const styles = StyleSheet.create(() => ({
     position: "absolute",
     top: 5,
     borderRadius: 30,
+    backgroundColor: theme.primary.glow,
   },
-  tabLabel: {
+  tabLabel: (isActivated: boolean) => ({
     textAlign: "center",
     fontSize: 11,
     fontWeight: "600",
     marginTop: 2,
-  },
+    color: isActivated ? theme.primary.main : theme.text.secondary,
+  }),
 }));

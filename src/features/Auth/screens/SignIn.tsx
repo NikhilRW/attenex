@@ -7,19 +7,16 @@ import {
   FuturisticInput,
   SocialLoginButtons,
 } from "@auth/components";
+import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants";
 import { useSignIn } from "@auth/hooks";
 import { signInStyles as styles } from "@auth/styles";
 import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks/useTheme";
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants";
 
 const SignIn = () => {
-  const { colors, isDark } = useTheme();
   const {
     control,
     handleSubmit,
@@ -35,10 +32,7 @@ const SignIn = () => {
   } = useSignIn();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
-      <StatusBar style={isDark ? "light" : "dark"} />
+    <View style={styles.container}>
       <FuturisticBackground />
 
       <KeyboardAvoidingView

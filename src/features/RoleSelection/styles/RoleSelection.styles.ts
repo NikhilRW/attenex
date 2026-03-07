@@ -31,9 +31,11 @@ export const roleSelectionStyles = StyleSheet.create((theme) => ({
     fontSize: 32,
     fontWeight: "bold",
     marginBottom: 8,
+    color: theme.text.primary,
   },
   subtitle: {
     fontSize: 16,
+    color: theme.text.secondary,
   },
   modelsContainer: {
     flex: 1,
@@ -49,6 +51,12 @@ export const roleSelectionStyles = StyleSheet.create((theme) => ({
     borderWidth: 2,
     overflow: "hidden",
     position: "relative",
+    backgroundColor: theme.surface.glass,
+    borderColor: theme.surface.glassBorder,
+  },
+  modelWrapperSelected: {
+    borderColor: theme.primary.main,
+    backgroundColor: theme.primary.glow,
   },
   canvasContainer: {
     flex: 1,
@@ -70,16 +78,19 @@ export const roleSelectionStyles = StyleSheet.create((theme) => ({
     backdropFilter: "blur(10px)",
     zIndex: 2,
     height: 110,
+    backgroundColor: theme.surface.cardBg,
   },
   roleLabel: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 4,
+    color: theme.text.primary,
   },
   roleDescription: {
     fontSize: 14,
     textAlign: "center",
+    color: theme.text.secondary,
   },
   selectedIndicator: {
     position: "absolute",
@@ -94,21 +105,25 @@ export const roleSelectionStyles = StyleSheet.create((theme) => ({
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 8,
+    backgroundColor: theme.primary.main,
+    shadowColor: theme.primary.main,
   },
   checkmark: {
     color: theme.text.primary,
     fontSize: 24,
     fontWeight: "bold",
   },
-  confirmButton: {
+  confirmButton: (bottomInset: number) => ({
     marginHorizontal: 24,
+    marginBottom: 70 + bottomInset * 2,
     borderRadius: 16,
     overflow: "hidden",
+    shadowColor: theme.primary.main,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-  },
+  }),
   confirmButtonDisabled: {
     shadowOpacity: 0,
     elevation: 0,
@@ -121,7 +136,7 @@ export const roleSelectionStyles = StyleSheet.create((theme) => ({
   confirmButtonText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: theme.text.primary,
+    color: "white",
     textTransform: "capitalize",
   },
 }));

@@ -1,17 +1,18 @@
 import { resetPasswordStyles as styles } from "@auth/styles";
 import { PasswordRequirementsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const RequirementsSurface = withUnistyles(LinearGradient);
+const RequirementIcon = withUnistyles(Ionicons);
 
 const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
   password,
   confirmPassword,
 }) => {
-  const { colors, isDark } = useTheme();
-
   const requirements = [
     { label: "At least 8 characters", valid: password.length >= 8 },
     { label: "One uppercase letter", valid: /(?=.*[A-Z])/.test(password) },
@@ -24,36 +25,31 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
   ];
 
   return (
-    <LinearGradient
-      colors={
-        isDark
-          ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]
-          : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]
-      }
+    <RequirementsSurface
+      uniProps={(_theme, rt) => ({
+        colors:
+          rt.themeName === "dark"
+            ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
+            : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
+      })}
       style={{ borderRadius: 12 }}
     >
       <View style={styles.requirementsContainer}>
-        <Text
-          style={[styles.requirementsTitle, { color: colors.primary.main }]}
-        >
-          Password Requirements:
-        </Text>
+        <Text style={styles.requirementsTitle}>Password Requirements:</Text>
         {requirements.map((req, index) => (
           <View key={index} style={styles.requirementItem}>
-            <Ionicons
+            <RequirementIcon
               name={req.valid ? "checkmark-circle" : "ellipse-outline"}
               size={16}
-              color={req.valid ? colors.status.success : colors.text.muted}
+              uniProps={(theme) => ({
+                color: req.valid ? theme.status.success : theme.text.muted,
+              })}
             />
-            <Text
-              style={[styles.requirementText, { color: colors.text.secondary }]}
-            >
-              {req.label}
-            </Text>
+            <Text style={styles.requirementText}>{req.label}</Text>
           </View>
         ))}
       </View>
-    </LinearGradient>
+    </RequirementsSurface>
   );
 };
 

@@ -1,5 +1,4 @@
 import { AuthFooterProps } from "@auth/types/props";
-import { useTheme } from "@shared/hooks/useTheme";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -9,23 +8,17 @@ const AuthFooter: React.FC<AuthFooterProps> = ({
   linkText,
   onLinkPress,
 }) => {
-  const { colors } = useTheme();
-
   return (
     <View style={styles.footer}>
-      <Text style={[styles.footerText, { color: colors.text.secondary }]}>
-        {text}
-      </Text>
+      <Text style={styles.footerText}>{text}</Text>
       <TouchableOpacity onPress={onLinkPress}>
-        <Text style={[styles.signUpLink, { color: colors.primary.main }]}>
-          {linkText}
-        </Text>
+        <Text style={styles.signUpLink}>{linkText}</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -33,10 +26,12 @@ const styles = StyleSheet.create(() => ({
   },
   footerText: {
     fontSize: 14,
+    color: theme.text.secondary,
   },
   signUpLink: {
     fontSize: 14,
     fontWeight: "700",
+    color: theme.primary.main,
   },
 }));
 

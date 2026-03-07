@@ -1,5 +1,7 @@
 import { darkTheme, lightTheme } from "@shared/constants/colors";
 import { StyleSheet } from "react-native-unistyles";
+import { useThemeStore } from "./shared/hooks";
+import { Appearance } from "react-native";
 
 const appThemes = {
   dark: darkTheme,
@@ -13,13 +15,18 @@ declare module "react-native-unistyles" {
   export interface UnistylesThemes extends AppThemes {}
 }
 
+const selectedThemeMode = useThemeStore.getState().mode;
+
+const settings =
+  selectedThemeMode === "system"
+    ? {
+        initialTheme: Appearance.getColorScheme() as "dark" | "light",
+      }
+    : {
+        initialTheme: selectedThemeMode,
+      };
+
 StyleSheet.configure({
   themes: appThemes,
-  settings: {
-    // Follows the device color scheme automatically.
-    // In Phase 4 this will be replaced with initialTheme reading
-    // the user's saved preference from MMKV once the Zustand theme
-    // store is removed.
-    adaptiveThemes: true,
-  },
+  settings,
 });

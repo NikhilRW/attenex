@@ -9,8 +9,6 @@ import {
 import { useResetPassword } from "@auth/hooks";
 import { resetPasswordStyles as styles } from "@auth/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks/useTheme";
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -22,7 +20,6 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
  * Validates the reset token before allowing password change.
  */
 const ResetPassword = () => {
-  const { colors, isDark } = useTheme();
   const {
     control,
     handleSubmit,
@@ -48,10 +45,7 @@ const ResetPassword = () => {
   }
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
-      <StatusBar style={isDark ? "light" : "dark"} />
+    <View style={styles.container}>
       <FuturisticBackground />
 
       <KeyboardAvoidingView

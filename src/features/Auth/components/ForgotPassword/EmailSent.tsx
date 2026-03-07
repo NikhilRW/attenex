@@ -2,10 +2,14 @@ import { FuturisticButton } from "@auth/components/common";
 import { forgotPasswordStyles as styles } from "@auth/styles";
 import { EmailSentProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const MailIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.primary.main,
+}));
 
 const EmailSent: React.FC<EmailSentProps> = ({
   email,
@@ -13,36 +17,25 @@ const EmailSent: React.FC<EmailSentProps> = ({
   emailParam,
   handleRequestReset,
 }) => {
-  const { colors } = useTheme();
   const router = useRouter();
 
   return (
     <View style={styles.successContainer}>
-      <View
-        style={[styles.iconContainer, { backgroundColor: colors.primary.glow }]}
-      >
-        <Ionicons name="mail-outline" size={64} color={colors.primary.main} />
+      <View style={styles.iconContainer}>
+        <MailIcon name="mail-outline" size={64} />
       </View>
-      <Text style={[styles.successTitle, { color: colors.text.primary }]}>
-        Check Your Email
-      </Text>
-      <Text
-        style={[styles.successDescription, { color: colors.text.secondary }]}
-      >
+      <Text style={styles.successTitle}>Check Your Email</Text>
+      <Text style={styles.successDescription}>
         We&apos;ve sent a password reset link to{" "}
-        <Text style={[styles.emailText, { color: colors.primary.main }]}>
-          {email}
-        </Text>
+        <Text style={styles.emailText}>{email}</Text>
       </Text>
-      <Text style={[styles.instructionText, { color: colors.text.muted }]}>
+      <Text style={styles.instructionText}>
         Click the link in the email to reset your password. The link will expire
         in 1 hour.
       </Text>
 
       <View style={styles.helpContainer}>
-        <Text style={[styles.helpText, { color: colors.text.secondary }]}>
-          Didn&apos;t receive the email?
-        </Text>
+        <Text style={styles.helpText}>Didn&apos;t receive the email?</Text>
         <TouchableOpacity
           onPress={() => {
             setEmailSent(false);
@@ -50,9 +43,7 @@ const EmailSent: React.FC<EmailSentProps> = ({
           }}
           style={styles.resendButton}
         >
-          <Text style={[styles.resendText, { color: colors.primary.main }]}>
-            Resend Email
-          </Text>
+          <Text style={styles.resendText}>Resend Email</Text>
         </TouchableOpacity>
       </View>
 

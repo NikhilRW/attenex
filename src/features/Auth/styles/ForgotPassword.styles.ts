@@ -1,8 +1,9 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -19,6 +20,7 @@ export const styles = StyleSheet.create(() => ({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    backgroundColor: theme.surface.glass,
   },
   formContainer: {
     gap: 24,
@@ -28,6 +30,7 @@ export const styles = StyleSheet.create(() => ({
     lineHeight: 24,
     textAlign: "center",
     marginBottom: 8,
+    color: theme.text.secondary,
   },
   backToSignIn: {
     alignItems: "center",
@@ -35,9 +38,11 @@ export const styles = StyleSheet.create(() => ({
   },
   backToSignInText: {
     fontSize: 14,
+    color: theme.text.secondary,
   },
   signInLink: {
     fontWeight: "700",
+    color: theme.primary.main,
   },
   successContainer: {
     gap: 24,
@@ -50,25 +55,30 @@ export const styles = StyleSheet.create(() => ({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 20,
+    backgroundColor: theme.primary.glow,
   },
   successTitle: {
     fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
+    color: theme.text.primary,
   },
   successDescription: {
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
+    color: theme.text.secondary,
   },
   emailText: {
     fontWeight: "700",
+    color: theme.primary.main,
   },
   instructionText: {
     fontSize: 14,
     lineHeight: 22,
     textAlign: "center",
     marginTop: -8,
+    color: theme.text.muted,
   },
   helpContainer: {
     alignItems: "center",
@@ -77,6 +87,7 @@ export const styles = StyleSheet.create(() => ({
   },
   helpText: {
     fontSize: 14,
+    color: theme.text.secondary,
   },
   resendButton: {
     padding: 8,
@@ -84,5 +95,6 @@ export const styles = StyleSheet.create(() => ({
   resendText: {
     fontSize: 14,
     fontWeight: "700",
+    color: theme.primary.main,
   },
 }));

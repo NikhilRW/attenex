@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.background.primary,
   },
   keyboardView: {
     flex: 1,
@@ -21,6 +22,7 @@ export const styles = StyleSheet.create((theme) => ({
   },
   loadingText: {
     fontSize: 16,
+    color: theme.text.secondary,
   },
   errorContainer: {
     flex: 1,
@@ -37,15 +39,20 @@ export const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     marginVertical: 20,
   },
+  errorIconContainer: {
+    backgroundColor: `${theme.status.error}20`,
+  },
   errorTitle: {
     fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
+    color: theme.text.primary,
   },
   errorDescription: {
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
+    color: theme.text.secondary,
   },
   formContainer: {
     gap: 24,
@@ -72,6 +79,7 @@ export const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
     fontWeight: "700",
     marginBottom: 4,
+    color: theme.primary.main,
   },
   requirementItem: {
     flexDirection: "row",
@@ -80,5 +88,6 @@ export const styles = StyleSheet.create((theme) => ({
   },
   requirementText: {
     fontSize: 14,
+    color: theme.text.secondary,
   },
 }));

@@ -7,8 +7,6 @@ import {
 import { useForgotPassword } from "@auth/hooks";
 import { forgotPasswordStyles as styles } from "@auth/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks/useTheme";
-import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -19,7 +17,6 @@ import Animated from "react-native-reanimated";
  * The link will open the app with the reset password screen.
  */
 const ForgotPassword = () => {
-  const { colors, isDark } = useTheme();
   const {
     handleRequestReset,
     email,
@@ -32,10 +29,7 @@ const ForgotPassword = () => {
   } = useForgotPassword();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
-      <StatusBar style={isDark ? "light" : "dark"} />
+    <View style={styles.container}>
       <FuturisticBackground />
 
       <Animated.ScrollView

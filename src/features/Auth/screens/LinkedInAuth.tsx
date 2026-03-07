@@ -1,12 +1,16 @@
 import { ActivityIndicator, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
 import WebView from "react-native-webview";
+import { LINKEDIN_LOGOUT_REDIRECT_URI } from "../constants";
 import { useLinkedInAuth } from "../hooks";
 import { styles } from "../styles/LinkedInAuth.styles";
-import { LINKEDIN_LOGOUT_REDIRECT_URI } from "../constants";
+
+const LinkedInLoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.primary.main,
+}));
 
 const LinkedInAuth = () => {
   const {
-    colors,
     handleLinkedInLogout,
     handleNavigationStateChange,
     isDeleteAccount,
@@ -18,18 +22,11 @@ const LinkedInAuth = () => {
   } = useLinkedInAuth();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
+    <View style={styles.container}>
       {/* Loading overlay shown during WebView loading and auth processing */}
       {isLoading && (
-        <View
-          style={[
-            styles.loadingOverlay,
-            { backgroundColor: colors.background.overlay },
-          ]}
-        >
-          <ActivityIndicator size="large" color={colors.primary.main} />
+        <View style={styles.loadingOverlay}>
+          <LinkedInLoadingIndicator size="large" />
         </View>
       )}
 

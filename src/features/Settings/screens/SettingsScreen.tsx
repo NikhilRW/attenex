@@ -14,12 +14,7 @@ import { ScrollView, Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 
-const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
-  colors:
-    rt.colorScheme === "dark"
-      ? ([theme.background.secondary, "transparent"] as const)
-      : (["rgba(255,255,255,0.95)", "rgba(255,255,255,0.0)"] as const),
-}));
+const HeaderGradient = withUnistyles(LinearGradient);
 
 const SettingsScreen = () => {
   const { mode, setTheme } = useThemeStore(
@@ -28,8 +23,8 @@ const SettingsScreen = () => {
       setTheme: state.setTheme,
     })),
   );
-  console.log("mode:"+mode);
-  
+  console.log("mode:" + mode);
+
   const {
     displayName,
     setDisplayName,
@@ -49,7 +44,15 @@ const SettingsScreen = () => {
     <View style={styles.container}>
       <FuturisticBackground />
 
-      <HeaderGradient style={styles.header}>
+      <HeaderGradient
+        style={styles.header}
+        uniProps={(theme, rt) => ({
+          colors:
+            rt.themeName === "dark"
+              ? ([theme.background.secondary, "transparent"] as const)
+              : (["rgba(255,255,255,0.95)", "rgba(255,255,255,0.0)"] as const),
+        })}
+      >
         <View style={styles.headerContent}>
           <Text style={styles.title}>Settings</Text>
           <Text style={styles.subtitle}>Preferences & Account</Text>

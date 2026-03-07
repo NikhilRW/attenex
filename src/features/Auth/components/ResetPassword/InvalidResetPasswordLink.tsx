@@ -2,40 +2,26 @@ import FuturisticButton from "@auth/components/common/FuturisticButton";
 import { resetPasswordStyles as styles } from "@auth/styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import { useTheme } from "@shared/hooks/useTheme";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Text, View } from "react-native";
+import { withUnistyles } from "react-native-unistyles";
+
+const ErrorIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.status.error,
+}));
 
 const InvalidResetPasswordLink = () => {
-  const { colors, isDark } = useTheme();
   const router = useRouter();
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-    >
-      <StatusBar style={isDark ? "dark" : "dark"} />
+    <View style={styles.container}>
       <FuturisticBackground />
       <View style={styles.errorContainer}>
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: colors.status.error + "20" },
-          ]}
-        >
-          <Ionicons
-            name="close-circle-outline"
-            size={64}
-            color={colors.status.error}
-          />
+        <View style={[styles.iconContainer, styles.errorIconContainer]}>
+          <ErrorIcon name="close-circle-outline" size={64} />
         </View>
-        <Text style={[styles.errorTitle, { color: colors.text.primary }]}>
-          Invalid Reset Link
-        </Text>
-        <Text
-          style={[styles.errorDescription, { color: colors.text.secondary }]}
-        >
+        <Text style={styles.errorTitle}>Invalid Reset Link</Text>
+        <Text style={styles.errorDescription}>
           This password reset link is invalid or has expired. Reset links are
           only valid for 1 hour.
         </Text>

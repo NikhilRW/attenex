@@ -1,6 +1,5 @@
 import { FuturisticInputProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -9,7 +8,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
+
+const ThemedInputField = withUnistyles(TextInput, (theme) => ({
+  placeholderTextColor: theme.text.muted,
+}));
+const EyeIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.secondary,
+}));
+const InputBorder = withUnistyles(LinearGradient);
 
 const FuturisticInput: React.FC<FuturisticInputProps> = ({
   label,
@@ -19,59 +26,41 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
   error,
   ...textInputProps
 }) => {
-  const { colors } = useTheme();
-
   return (
     <View style={styles.inputGroup}>
-      <Text style={[styles.inputLabel, { color: colors.primary.main }]}>
-        {label}
-      </Text>
+      <Text style={styles.inputLabel}>{label}</Text>
       <View
         style={[
           styles.inputWrapper,
-          {
-            backgroundColor: colors.surface.cardBg,
-            borderColor: error
-              ? colors.status.error
-              : colors.surface.glassBorder,
-          },
+          error && styles.inputWrapperError,
         ]}
       >
-        <TextInput
-          style={[styles.input, { color: colors.text.primary }]}
-          placeholderTextColor={colors.text.muted}
-          {...textInputProps}
-        />
-        <LinearGradient
-          colors={
-            error
-              ? ["transparent", colors.accent.red, "transparent"]
-              : ["transparent", colors.primary.main, "transparent"]
-          }
+        <ThemedInputField style={styles.input} {...textInputProps} />
+        <InputBorder
+          uniProps={(theme) => ({
+            colors: error
+              ? (["transparent", theme.accent.red, "transparent"] as const)
+              : (["transparent", theme.primary.main, "transparent"] as const),
+          })}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.inputBorder}
         />
         {isPassword && (
           <TouchableOpacity onPress={onTogglePassword} style={styles.eyeIcon}>
-            <Ionicons
+            <EyeIcon
               name={showPassword ? "eye-outline" : "eye-off-outline"}
               size={20}
-              color={colors.text.secondary}
             />
           </TouchableOpacity>
         )}
       </View>
-      {error && (
-        <Text style={[styles.errorText, { color: colors.accent.red }]}>
-          {error}
-        </Text>
-      )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   inputGroup: {
     gap: 8,
   },
@@ -80,6 +69,7 @@ const styles = StyleSheet.create(() => ({
     fontWeight: "700",
     letterSpacing: 1,
     marginLeft: 4,
+    color: theme.primary.main,
   },
   inputWrapper: {
     height: 56,
@@ -88,10 +78,16 @@ const styles = StyleSheet.create(() => ({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
+    backgroundColor: theme.surface.cardBg,
+    borderColor: theme.surface.glassBorder,
+  },
+  inputWrapperError: {
+    borderColor: theme.status.error,
   },
   input: {
     flex: 1,
     fontSize: 16,
+    color: theme.text.primary,
   },
   inputBorder: {
     position: "absolute",
@@ -108,6 +104,7 @@ const styles = StyleSheet.create(() => ({
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
+    color: theme.accent.red,
   },
 }));
 

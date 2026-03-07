@@ -1,6 +1,5 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { linkedinAuthService } from "@auth/services/linkedinAuthService";
-import { useTheme } from "@shared/hooks/useTheme";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
@@ -24,7 +23,6 @@ export const useLinkedInAuth = () => {
   const router = useRouter();
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { colors } = useTheme();
   const { logout, deleteAccount } = useLocalSearchParams();
   const queryClient = useQueryClient();
 
@@ -216,7 +214,6 @@ export const useLinkedInAuth = () => {
     webViewRef,
     linkedInAuthUrl,
     isLoading,
-    colors,
     isLogout,
     isDeleteAccount,
     setIsLoading,
