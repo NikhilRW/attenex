@@ -12,9 +12,9 @@ import { useSignIn } from "@auth/hooks";
 import { signInStyles as styles } from "@auth/styles";
 import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
-import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
 
 const SignIn = () => {
   const {

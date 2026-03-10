@@ -53,10 +53,17 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
+import {
+  PerformanceMeasureView,
+  RenderPassReport,
+  PerformanceProfiler,
+  useResetFlow,
+} from "@shopify/react-native-performance";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
 const ATTENEX_ANDROID_CHANNEL_ID = "attenex";
+const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 Appearance.setColorScheme(null);
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
@@ -94,6 +101,7 @@ export default function RootLayout() {
   const router = useRouter();
   const { isConnected } = useNetworkState();
   const { bottom } = useSafeAreaInsets();
+  const { resetFlow, componentInstanceId } = useResetFlow();
   const systemColorScheme = useColorScheme();
   const { mode } = useThemeStore(
     useShallow((state) => ({
@@ -402,11 +410,12 @@ export default function RootLayout() {
 
   const tanstackOnSuccess = useCallback(() => {
     if (isConnected) {
+      resetFlow({ destination: ROOT_LAYOUT_SCREEN_NAME });
       queryClient
         .resumePausedMutations()
         .then(() => queryClient.invalidateQueries());
     }
-  }, [isConnected]);
+  }, [isConnected, resetFlow]);
 
   useEffect(() => {
     const subscription = Appearance.addChangeListener((state) => {
@@ -419,53 +428,69 @@ export default function RootLayout() {
     };
   }, [mode]);
 
+  const reportPreparedCallback = (e: RenderPassReport) => {
+    console.log(e);
+  };
+
   if (!loaded && !error) {
     return null;
   }
 
   return (
-    <SafeAreaProvider>
-      <StatusBar
-        style={statusBarStyle}
-        hideTransitionAnimation="fade"
-        translucent
-      />
-      <ThemedSafeAreaView style={styles.safeArea}>
-        <ApolloGraphQLProvider>
-          <>
-            <ThemedPaperProvider>
-              <AlertsProvider>
-                <PersistQueryClientProvider
-                  client={queryClient}
-                  onSuccess={tanstackOnSuccess}
-                  persistOptions={{
-                    persister: clientPersister,
-                    maxAge: Infinity, // Keep mutations indefinitely for offline-first
-                    dehydrateOptions: {
-                      // Persist mutations that are queued/in-flight (paused = queued while offline)
-                      shouldDehydrateMutation: (mutation: any) => {
-                        return (
-                          mutation.state.status === "pending" ||
-                          mutation.state.status === "paused"
-                        );
-                      },
-                      // Persist successful query data so screens load instantly after app kill
-                      shouldDehydrateQuery: (query: any) =>
-                        query.state.status === "success",
-                    },
-                  }}
-                >
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(main)" />
-                  </Stack>
-                </PersistQueryClientProvider>
-              </AlertsProvider>
-            </ThemedPaperProvider>
-            <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
-          </>
-        </ApolloGraphQLProvider>
-      </ThemedSafeAreaView>
-    </SafeAreaProvider>
+    <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
+      <PerformanceMeasureView
+        componentInstanceId={componentInstanceId}
+        interactive
+        screenName={ROOT_LAYOUT_SCREEN_NAME}
+      >
+        <SafeAreaProvider>
+          <StatusBar
+            style={statusBarStyle}
+            hideTransitionAnimation="fade"
+            translucent
+          />
+
+          <ThemedSafeAreaView style={styles.safeArea}>
+            <ApolloGraphQLProvider>
+              <>
+                <ThemedPaperProvider>
+                  <AlertsProvider>
+                    <PersistQueryClientProvider
+                      client={queryClient}
+                      onSuccess={tanstackOnSuccess}
+                      persistOptions={{
+                        persister: clientPersister,
+                        maxAge: Infinity, // Keep mutations indefinitely for offline-first
+                        dehydrateOptions: {
+                          // Persist mutations that are queued/in-flight (paused = queued while offline)
+                          shouldDehydrateMutation: (mutation: any) => {
+                            return (
+                              mutation.state.status === "pending" ||
+                              mutation.state.status === "paused"
+                            );
+                          },
+                          // Persist successful query data so screens load instantly after app kill
+                          shouldDehydrateQuery: (query: any) =>
+                            query.state.status === "success",
+                        },
+                      }}
+                    >
+                      <Stack screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="(auth)" />
+                        <Stack.Screen name="(main)" />
+                      </Stack>
+                    </PersistQueryClientProvider>
+                  </AlertsProvider>
+                </ThemedPaperProvider>
+                <FlashMessage
+                  position="bottom"
+                  style={{ marginBottom: bottom }}
+                />
+              </>
+            </ApolloGraphQLProvider>
+          </ThemedSafeAreaView>
+        </SafeAreaProvider>
+      </PerformanceMeasureView>
+    </PerformanceProfiler>
   );
 }
