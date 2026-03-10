@@ -11,6 +11,12 @@ import {
 } from "@react-native-firebase/messaging";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { useNotificationStore } from "@shared/stores/notificationStore";
+import {
+  PerformanceMeasureView,
+  PerformanceProfiler,
+  RenderPassReport,
+  useResetFlow,
+} from "@shopify/react-native-performance";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import * as Linking from "expo-linking";
 import { useNetworkState } from "expo-network";
@@ -53,12 +59,6 @@ import { queryKeys } from "../shared/constants/queryKeys";
 import { queryClient } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "../shared/utils";
 import { setupTanstackForReactNative } from "../shared/utils/tanstack";
-import {
-  PerformanceMeasureView,
-  RenderPassReport,
-  PerformanceProfiler,
-  useResetFlow,
-} from "@shopify/react-native-performance";
 
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
@@ -430,6 +430,7 @@ export default function RootLayout() {
 
   const reportPreparedCallback = (e: RenderPassReport) => {
     console.log(e);
+    // alert("Render Time : "+e.timeToBootJsMillis);
   };
 
   if (!loaded && !error) {
