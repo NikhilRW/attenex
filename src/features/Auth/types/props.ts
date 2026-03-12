@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { ImageSourcePropType, TextInputProps } from "react-native";
+import { TextInputProps } from "react-native";
 
 /**
  * AuthFooter component props
@@ -15,7 +15,7 @@ export interface AuthFooterProps {
  */
 export interface AuthHeaderProps {
   title: string;
-  logoSource: ImageSourcePropType;
+  logoSource: number;
 }
 
 /**

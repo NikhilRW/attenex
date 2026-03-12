@@ -1,7 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { settingsStyles as styles } from "@settings/styles";
 import { ProfileSectionProps } from "@settings/types";
-import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { NitroImage } from "react-native-nitro-image";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -64,9 +64,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
         <ProfileHeaderGradient style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             {userPhotoUrl ? (
-              <Image
-                source={{ uri: userPhotoUrl }}
+              <NitroImage
+                image={{ url: userPhotoUrl }}
                 style={styles.avatarImage}
+                resizeMode="cover"
               />
             ) : (
               <AvatarGradient style={styles.avatar}>

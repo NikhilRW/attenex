@@ -1,16 +1,17 @@
 import { AuthHeaderProps } from "@auth/types/props";
-import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
+import { NitroImage } from "react-native-nitro-image";
 import { StyleSheet } from "react-native-unistyles";
 
 const AuthHeader: React.FC<AuthHeaderProps> = ({ title, logoSource }) => {
     return (
         <View style={styles.headerContainer}>
             <View style={styles.iconContainer}>
-                <Image
-                    source={logoSource}
+                <NitroImage
+                    image={logoSource}
                     style={styles.logo}
+                    resizeMode="contain"
                 />
             </View>
             <Text style={styles.welcomeText}>{title}</Text>

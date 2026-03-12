@@ -1,10 +1,9 @@
 import { Role } from "@role-selection/types";
-import { ImageSourcePropType } from "react-native";
 import { SharedValue } from "react-native-reanimated";
 
 export interface RoleCardProps {
   role: "teacher" | "student";
-  imageSource: ImageSourcePropType;
+  imageSource: number;
   title: string;
   description: string;
   isSelected: boolean;

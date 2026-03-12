@@ -1,8 +1,8 @@
 import { styles } from "@role-selection/styles";
 import { RoleCardProps } from "@role-selection/types";
-import { Image } from "expo-image";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
+import { NitroImage } from "react-native-nitro-image";
 import Animated from "react-native-reanimated";
 
 export const RoleCard: React.FC<RoleCardProps> = ({
@@ -23,10 +23,10 @@ export const RoleCard: React.FC<RoleCardProps> = ({
       <Animated.View
         style={[styles.canvasContainer, { transform: [{ scale }] }]}
       >
-        <Image
-          source={imageSource}
+        <NitroImage
+          image={imageSource}
           style={styles.roleImage}
-          contentFit="contain"
+          resizeMode="contain"
         />
       </Animated.View>
       <View style={styles.labelContainer}>
