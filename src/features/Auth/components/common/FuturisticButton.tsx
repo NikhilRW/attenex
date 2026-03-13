@@ -64,7 +64,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           ) : (
             <Text
               style={[
-                { fontFamily: "GoogleSansFlex_700Bold" },
+                { fontFamily: "GoogleSans_700Bold" },
                 styles.buttonText,
               ]}
             >
