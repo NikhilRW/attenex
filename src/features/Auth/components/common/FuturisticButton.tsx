@@ -62,14 +62,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text
-              style={[
-                { fontFamily: "GoogleSans_700Bold" },
-                styles.buttonText,
-              ]}
-            >
-              {title}
-            </Text>
+            <Text style={[styles.buttonText]}>{title}</Text>
           )}
         </ButtonGradient>
         <View style={styles.buttonGlow} />
@@ -89,8 +82,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   buttonText: {
     color: "#FFF",
-    fontSize: 17.5,
-    letterSpacing: 1,
+    fontSize: 18,
+    letterSpacing: 0.4,
+    fontFamily: "Inter_700Bold",
   },
   buttonGlow: {
     position: "absolute",

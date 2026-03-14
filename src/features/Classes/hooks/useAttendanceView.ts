@@ -4,7 +4,7 @@ import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
-import Clipboard from "@react-native-clipboard/clipboard";
+import { setStringAsync } from "expo-clipboard";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
@@ -198,10 +198,10 @@ export const useAttendanceView = () => {
       .join(", ");
   }, [attendance]);
 
-  const handleCopyRollNumbers = useCallback(() => {
+  const handleCopyRollNumbers = useCallback(async () => {
     const rollNumbers = getPresentRollNumbers();
     if (rollNumbers) {
-      Clipboard.setString(rollNumbers);
+      await setStringAsync(rollNumbers);
       alert("Copied!", "Roll numbers copied to clipboard");
     } else {
       alert("No Data", "No present students with roll numbers");

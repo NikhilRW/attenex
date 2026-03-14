@@ -1,6 +1,6 @@
 import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
 import { handleEmailVerification } from "@auth/utils/common";
-import { GoogleSans_700Bold, useFonts } from "@expo-google-fonts/google-sans";
+import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import {
   FirebaseMessagingTypes,
   getInitialNotification,
@@ -124,7 +124,7 @@ export default function RootLayout() {
   } = useNotificationStore();
 
   const [loaded, error] = useFonts({
-    GoogleSans_700Bold,
+    Inter_700Bold,
   });
 
   useEffect(() => {
@@ -430,7 +430,7 @@ export default function RootLayout() {
 
   const reportPreparedCallback = (e: RenderPassReport) => {
     console.log(e);
-    // alert("Render Time : "+e.timeToBootJsMillis);
+    alert("Render Time : "+e.timeToBootJsMillis);
   };
 
   if (!loaded && !error) {
