@@ -1,57 +1,48 @@
-import { ActivityIndicator, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
-import WebView from "react-native-webview";
-import { LINKEDIN_LOGOUT_REDIRECT_URI } from "../constants";
 import { useLinkedInAuth } from "../hooks";
 import { styles } from "../styles/LinkedInAuth.styles";
-
-const LinkedInLoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
-  color: theme.primary.main,
-}));
+import LinkedInView from "react-native-linkedin-oauth2";
+import { View } from "react-native";
+import { router } from "expo-router";
 
 const LinkedInAuth = () => {
   const {
-    handleLinkedInLogout,
-    handleNavigationStateChange,
     isDeleteAccount,
-    isLoading,
     isLogout,
-    linkedInAuthUrl,
-    setIsLoading,
-    webViewRef,
+    errorHandler,
+    handleSuccess,
+    isVisible,
+    setIsVisible,
+    handleLinkedInLogout,
   } = useLinkedInAuth();
 
   return (
     <View style={styles.container}>
-      {/* Loading overlay shown during WebView loading and auth processing */}
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <LinkedInLoadingIndicator size="large" />
-        </View>
-      )}
-
       {
         isLogout || isDeleteAccount ? (
-          <WebView
-            ref={webViewRef}
-            source={{ uri: LINKEDIN_LOGOUT_REDIRECT_URI }}
-            onNavigationStateChange={handleLinkedInLogout}
-            style={styles.webView}
-            javaScriptEnabled // Required for LinkedIn's interactive login page
-            domStorageEnabled // Required for LinkedIn's session and local storage
-            onLoadStart={() => setIsLoading(true)}
-            onLoadEnd={() => setIsLoading(false)}
+          <LinkedInView
+            logout
+            isVisible={isVisible}
+            onLogout={async () => {
+              setIsVisible(false);
+              await handleLinkedInLogout();
+            }}
+            containerStyle={{ backgroundColor: "#000" }}
           />
         ) : (
-          <WebView
-            ref={webViewRef}
-            source={{ uri: linkedInAuthUrl }}
-            onShouldStartLoadWithRequest={handleNavigationStateChange}
-            // onLoadStart={() => setIsLoading(true)}
-            // onLoadEnd={() => setIsLoading(false)}
-            style={styles.webView}
-            javaScriptEnabled // Required for LinkedIn's interactive login page
-            domStorageEnabled // Required for LinkedIn's session and local storage
+          <LinkedInView
+            isVisible={isVisible}
+            onSuccess={handleSuccess}
+            onClose={() => {
+              setIsVisible(false);
+              router.back();
+            }}
+            clientId={process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID as string}
+            redirectUri={
+              process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI as string
+            }
+            secureMode
+            onError={errorHandler}
+            containerStyle={{ backgroundColor: "#000" }}
           />
         ) /* Placeholder for potential future logout handling */
       }

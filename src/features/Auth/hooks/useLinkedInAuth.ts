@@ -7,26 +7,17 @@ import { logger } from "@shared/utils/logger";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { showMessage } from "react-native-flash-message";
-import WebView from "react-native-webview";
-import {
-  ShouldStartLoadRequest,
-  WebViewNavigation,
-} from "react-native-webview/lib/WebViewTypes";
 
-const LINKEDIN_CLIENT_ID = process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID || "";
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
-const LINKEDIN_SCOPE = "openid profile email"; // Required scopes for user authentication
 
 export const useLinkedInAuth = () => {
   const router = useRouter();
-  const webViewRef = useRef<WebView>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const { logout, deleteAccount } = useLocalSearchParams();
   const queryClient = useQueryClient();
+  const [isVisible, setIsVisible] = useState(true);
 
-  // Logout And DeleteAccount Part.
   const isLogout = logout === "true";
   const isDeleteAccount = deleteAccount === "true";
 
@@ -43,12 +34,6 @@ export const useLinkedInAuth = () => {
     onSuccess: () => {
       queryClient.clear();
     },
-    onMutate: () => {
-      setIsLoading(true);
-    },
-    onSettled: () => {
-      setIsLoading(false);
-    },
     onError: (error) => {
       logger.error("useLinkedInAuth.ts () :: " + error);
       showMessage({
@@ -61,41 +46,16 @@ export const useLinkedInAuth = () => {
     },
   });
 
-  const handleLinkedInLogout = async (event: WebViewNavigation) => {
-    if (
-      event.url.includes("/home") ||
-      event.url.includes("/session_redirect") ||
-      event.url.includes("login")
-    ) {
-      if (isLogout || isDeleteAccount) {
-        await logoutDeleteAccountMutation.mutateAsync(
-          isLogout ? "logout" : "delete-account",
-        );
-        router.replace("/sign-in");
-      }
-    }
+  const handleLinkedInLogout = async () => {
+    await logoutDeleteAccountMutation.mutateAsync(
+      isLogout ? "logout" : "delete-account",
+    );
+    router.replace("/sign-in");
   };
 
-  const linkedInAuthUrl =
-    `https://www.linkedin.com/oauth/v2/authorization?` +
-    `response_type=code&` +
-    `client_id=${LINKEDIN_CLIENT_ID}&` +
-    `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-    `scope=${encodeURIComponent(LINKEDIN_SCOPE)}`;
-
-  const authMutation = useMutation({
+  const { mutateAsync: linkedInLogin } = useMutation({
     mutationKey: mutationKeys.auth.signInLinkedIn,
-    mutationFn: async (url: string) => {
-      setIsLoading(true);
-      // Extract the authorization code from URL query parameters
-      const authCode = new URL(url).searchParams.get("code");
-
-      if (!authCode) {
-        throw new Error("Authentication failed. Please try again.");
-      }
-
-      logger.info("LinkedIn auth code received", "LinkedInAuth");
-
+    mutationFn: async (authCode: string) => {
       const exchange = await linkedinAuthService.exchangeCodeForUser(
         authCode,
         REDIRECT_URI,
@@ -138,9 +98,6 @@ export const useLinkedInAuth = () => {
         }
       });
     },
-    onSettled: () => {
-      setIsLoading(false);
-    },
     onError: (error) => {
       const err = error as any;
 
@@ -182,40 +139,28 @@ export const useLinkedInAuth = () => {
     },
   });
 
-  const handleNavigationStateChange = (event: ShouldStartLoadRequest) => {
-    const { url } = event;
+  const handleSuccess = async (authCode: string) => {
+    await linkedInLogin(authCode);
+  };
 
-    // Check if this is our redirect URL containing the authorization code
-    if (url.startsWith(REDIRECT_URI) && url.includes("code=")) {
-      authMutation.mutateAsync(url);
-      return false; // Block navigation to keep user in app
-    }
-
-    // Check for OAuth errors (user denied access, invalid request, etc.)
-    if (url.includes("error=")) {
-      const error = new URL(url).searchParams.get("error_description");
-      showMessage({
-        message: "Sign-in Cancelled",
-        description: error || "You cancelled the LinkedIn sign-in",
-        type: "warning",
-        duration: 3000,
-        position: "bottom",
-      });
-      router.back(); // Return to sign-in screen
-      return false;
-    }
-
-    return true; // Allow normal navigation within LinkedIn's domain
+  const errorHandler = (error: Error) => {
+    showMessage({
+      message: "Sign-in Cancelled",
+      description: error.message || "You cancelled the LinkedIn sign-in",
+      type: "warning",
+      duration: 3000,
+      position: "bottom",
+    });
+    router.back();
   };
 
   return {
     handleLinkedInLogout,
-    handleNavigationStateChange,
-    webViewRef,
-    linkedInAuthUrl,
-    isLoading,
     isLogout,
     isDeleteAccount,
-    setIsLoading,
+    errorHandler,
+    handleSuccess,
+    isVisible,
+    setIsVisible,
   };
 };
