@@ -254,14 +254,6 @@ export interface StudentCardProps {
 }
 
 /**
- * StudentList component props
- */
-export interface StudentListProps {
-  loading: boolean;
-  filteredAttendance: AttendanceRecord[];
-}
-
-/**
  * TopicInput component props
  */
 export interface TopicInputProps {

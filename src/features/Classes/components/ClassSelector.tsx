@@ -1,9 +1,9 @@
 import { createLectureStyles as styles } from "@classes/styles";
-import { ClassSelectorProps } from "@classes/types";
+import { ClassItem, ClassSelectorProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -88,13 +88,33 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                   <SecondaryIcon name="close" size={20} />
                 </TouchableOpacity>
               </View>
-
-              <ScrollView
-                style={styles.dropdownScroll}
-                nestedScrollEnabled
-                showsVerticalScrollIndicator={true}
-              >
-                {existingClasses.length === 0 ? (
+              <Animated.FlatList<ClassItem>
+                data={existingClasses}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item: cls }) => (
+                  <TouchableOpacity
+                    onPress={() => onSelectClass(cls.name)}
+                    style={[
+                      styles.optionItem,
+                      selectedClass === cls.name && styles.optionItemSelected,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.optionItemText,
+                        selectedClass === cls.name
+                          ? styles.optionItemTextSelected
+                          : null,
+                      ]}
+                    >
+                      {cls.name}
+                    </Text>
+                    {selectedClass === cls.name && (
+                      <PrimaryIcon name="checkmark-circle" size={20} />
+                    )}
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
                   <View style={styles.selectionEmptyState}>
                     <MutedIcon
                       name="school-outline"
@@ -105,33 +125,11 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                       No classes found.{"\n"}Add one below!
                     </Text>
                   </View>
-                ) : (
-                  existingClasses.map((cls) => (
-                    <TouchableOpacity
-                      key={cls.id}
-                      onPress={() => onSelectClass(cls.name)}
-                      style={[
-                        styles.optionItem,
-                        selectedClass === cls.name && styles.optionItemSelected,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.optionItemText,
-                          selectedClass === cls.name
-                            ? styles.optionItemTextSelected
-                            : null,
-                        ]}
-                      >
-                        {cls.name}
-                      </Text>
-                      {selectedClass === cls.name && (
-                        <PrimaryIcon name="checkmark-circle" size={20} />
-                      )}
-                    </TouchableOpacity>
-                  ))
-                )}
-              </ScrollView>
+                }
+                style={styles.dropdownScroll}
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={true}
+              />
 
               <View style={styles.selectionFooter}>
                 <TouchableOpacity

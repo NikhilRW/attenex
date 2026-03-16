@@ -26,5 +26,4 @@ export { RollSummaryModal } from "./RollSummaryModal";
 export { StartLectureButton } from "./StartLectureButton";
 export { default as StatisticsCard } from "./StatisticsCard";
 export { StudentCard } from "./StudentCard";
-export { StudentList } from "./StudentList";
 export { TopicInput } from "./TopicInput";

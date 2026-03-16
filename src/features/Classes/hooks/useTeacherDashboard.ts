@@ -13,8 +13,8 @@ import {
 } from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AppState, NativeEventSubscription } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppState } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import { useAlerts } from "react-native-paper-alerts";
 import {
@@ -46,7 +46,6 @@ export const useTeacherDashboard = () => {
     select: (mutation) => mutation.state.status,
   });
   const latestCreateLectureMutation = data[data.length - 1];
-  const subscriptionRef = useRef<NativeEventSubscription>(null);
   const scrollY = useSharedValue(0);
   const pullProgress = useSharedValue(0);
 
@@ -130,76 +129,60 @@ export const useTeacherDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ended, lectureId]);
 
-  // Setup socket listeners for real-time updates
-  useQuery({
-    queryKey: queryKeys.socket.teacherDashboard,
-    queryFn: () => {
-      try {
-        socketService.connect();
-
-        // Join all lecture rooms
-        (lectures || []).forEach((lecture) => {
-          socketService.joinLecture(lecture.id);
-        });
-
-        // Listen for student join events (use stable callback)
-        const handleStudentJoined = (data: any) => {
-          console.log("Student joined event:", data);
-          // Refresh lecture list to update student count
-          fetchActiveLectures();
-        };
-
-        // Listen for attendance submission events (use stable callback)
-        const handleAttendanceSubmitted = (data: any) => {
-          console.log("Attendance submitted event:", data);
-          // Refresh lecture list to update student count
-          fetchActiveLectures();
-        };
-
-        socketService.onStudentJoined(handleStudentJoined);
-        socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-
-        // Handle app state changes (background/foreground)
-        subscriptionRef.current = AppState.addEventListener(
-          "change",
-          (nextAppState) => {
-            if (nextAppState === "active") {
-              // App came back to foreground - reconnect socket and refresh
-              if (!socketService.isConnected()) {
-                socketService.connect();
-                (lectures || []).forEach((lecture) => {
-                  socketService.joinLecture(lecture.id);
-                });
-                socketService.onStudentJoined(handleStudentJoined);
-                socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-              }
-              if (
-                latestCreateLectureMutation !== "pending" &&
-                latestCreateLectureMutation !== "error"
-              ) {
-                fetchActiveLectures();
-              }
-            }
-          },
-        );
-        return true;
-      } catch (error) {
-        console.log("Error Updating Screen With Sokcet  Updates.", error);
-        return false;
-      }
-    },
-  });
-
   useEffect(() => {
-    return () => {
-      (lectures || []).forEach((lecture) => {
-        socketService.leaveLecture(lecture.id);
-      });
-      socketService.offStudentJoined();
-      socketService.offAttendanceSubmitted();
-      subscriptionRef.current?.remove();
-    };
-  }, [lectures, fetchActiveLectures, ended, latestCreateLectureMutation]);
+    const lectureIds = (lectures || []).map((lecture) => lecture.id);
+
+    try {
+      socketService.connect();
+      lectureIds.forEach((id) => socketService.joinLecture(id));
+
+      const handleStudentJoined = (data: unknown) => {
+        console.log("Student joined event:", data);
+        fetchActiveLectures();
+      };
+
+      const handleAttendanceSubmitted = (data: unknown) => {
+        console.log("Attendance submitted event:", data);
+        fetchActiveLectures();
+      };
+
+      socketService.onStudentJoined(handleStudentJoined);
+      socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+
+      const appStateSubscription = AppState.addEventListener(
+        "change",
+        (nextAppState) => {
+          if (nextAppState !== "active") {
+            return;
+          }
+
+          if (!socketService.isConnected()) {
+            socketService.connect();
+            lectureIds.forEach((id) => socketService.joinLecture(id));
+            socketService.onStudentJoined(handleStudentJoined);
+            socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+          }
+
+          if (
+            latestCreateLectureMutation !== "pending" &&
+            latestCreateLectureMutation !== "error"
+          ) {
+            fetchActiveLectures();
+          }
+        },
+      );
+
+      return () => {
+        lectureIds.forEach((id) => socketService.leaveLecture(id));
+        socketService.offStudentJoined();
+        socketService.offAttendanceSubmitted();
+        appStateSubscription.remove();
+      };
+    } catch (error) {
+      console.log("Error updating dashboard socket listeners.", error);
+      return undefined;
+    }
+  }, [lectures, fetchActiveLectures, latestCreateLectureMutation]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     alert("End Lecture", "Are you sure you want to end this lecture?", [

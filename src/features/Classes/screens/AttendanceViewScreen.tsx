@@ -4,12 +4,24 @@ import {
   AttendanceHeader,
   ManualAttendanceModal,
   RollSummaryModal,
-  StudentList,
+  StudentCard,
 } from "@classes/components";
 import { useAttendanceView } from "@classes/hooks";
 import { attendanceViewStyles as styles } from "@classes/styles";
+import { AttendanceRecord } from "@classes/types";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
+const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
+  color: theme.primary.main,
+}));
+
+const EmptyStateIcon = withUnistyles(Ionicons, (theme) => ({
+  color: theme.text.muted,
+}));
 
 const AttendanceViewScreen = () => {
   const {
@@ -46,19 +58,40 @@ const AttendanceViewScreen = () => {
         onShowSummary={() => setShowRollSummary(true)}
       />
 
-      <ScrollView
+      <Animated.FlatList<AttendanceRecord>
+        data={loading ? [] : filteredAttendance}
+        keyExtractor={(record) => record.id}
+        renderItem={({ item: record, index }) => (
+          <StudentCard record={record} index={index} />
+        )}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
+        
         showsVerticalScrollIndicator={false}
-      >
-        <AttendanceFilter filter={filter} setFilter={setFilter} />
-
-        <StudentList
-          loading={loading}
-          filteredAttendance={filteredAttendance}
-        />
-        <View style={styles.spacerBottom} />
-      </ScrollView>
+        ListHeaderComponent={
+          <AttendanceFilter filter={filter} setFilter={setFilter} />
+        }
+        ListEmptyComponent={
+          loading ? (
+            <View style={styles.loadingContainer}>
+              <LoadingIndicator size="large" />
+            </View>
+          ) : (
+            <Animated.View
+              entering={FadeInUp.delay(300).springify()}
+              style={styles.emptyState}
+            >
+              <EmptyStateIcon
+                name="search-outline"
+                size={48}
+                style={styles.emptyStateIcon}
+              />
+              <Text style={styles.emptyStateText}>No students found</Text>
+            </Animated.View>
+          )
+        }
+        ListFooterComponent={<View style={styles.spacerBottom} />}
+      />
 
       <RollSummaryModal
         visible={showRollSummary}
@@ -79,9 +112,7 @@ const AttendanceViewScreen = () => {
         isSubmitting={isSubmittingManual}
       />
 
-      <AttendanceFloatingButton
-        onPress={() => setShowManualAttendance(true)}
-      />
+      <AttendanceFloatingButton onPress={() => setShowManualAttendance(true)} />
     </View>
   );
 };

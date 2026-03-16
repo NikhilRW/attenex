@@ -1,12 +1,7 @@
 import { colors } from "@/shared/constants/colors";
 import { onlineManager } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { NitroImage } from "react-native-nitro-image";
 import { Button } from "react-native-paper";
 
@@ -63,12 +58,16 @@ const Test = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Nitro Image Experiment</Text>
       <Text style={styles.subtitle}>
-        Render the same local assets with `react-native-nitro-image` and use
-        the repeated grid to sanity-check native rendering performance.
+        Render the same local assets with `react-native-nitro-image` and use the
+        repeated grid to sanity-check native rendering performance.
       </Text>
 
       <View style={styles.buttonRow}>
-        <Button contentStyle={styles.button} mode="contained" onPress={rerunBenchmark}>
+        <Button
+          contentStyle={styles.button}
+          mode="contained"
+          onPress={rerunBenchmark}
+        >
           <Text style={styles.buttonText}>Re-run benchmark</Text>
         </Button>
         <Button
@@ -86,7 +85,7 @@ const Test = () => {
       <View style={styles.metricsCard}>
         <Text style={styles.metricTitle}>Last measured grid mount</Text>
         <Text style={styles.metricText}>
-          Nitro Image: {formatDuration(lastRenderDuration)}
+          Expo Image : {formatDuration(lastRenderDuration)}
         </Text>
         <Text style={styles.metricNote}>
           This is a lightweight UI experiment based on first container layout,
@@ -97,10 +96,18 @@ const Test = () => {
       <Text style={styles.sectionTitle}>Static preview</Text>
       <View style={styles.previewRow}>
         <PreviewCard title="Nitro Image">
-          <NitroImage image={TEACHER_IMAGE} style={styles.previewImage} resizeMode="contain" />
+          <NitroImage
+            image={TEACHER_IMAGE}
+            style={styles.previewImage}
+            resizeMode="contain"
+          />
         </PreviewCard>
         <PreviewCard title="Nitro Image">
-          <NitroImage image={STUDENT_IMAGE} style={styles.previewImage} resizeMode="contain" />
+          <NitroImage
+            image={STUDENT_IMAGE}
+            style={styles.previewImage}
+            resizeMode="contain"
+          />
         </PreviewCard>
       </View>
 

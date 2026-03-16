@@ -87,6 +87,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     scrollContent: {
       padding: 20,
+      gap: 10,
     },
     spacerBottom: {
       height: 40,

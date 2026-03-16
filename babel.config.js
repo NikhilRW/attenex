@@ -4,6 +4,7 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     plugins: [
       // Reanimated plugin must be last
+      'react-native-boost/plugin',
       [
         "react-native-unistyles/plugin",
         {

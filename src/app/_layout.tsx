@@ -411,9 +411,7 @@ export default function RootLayout() {
   const tanstackOnSuccess = useCallback(() => {
     if (isConnected) {
       resetFlow({ destination: ROOT_LAYOUT_SCREEN_NAME });
-      queryClient
-        .resumePausedMutations()
-        .then(() => queryClient.invalidateQueries());
+      queryClient.resumePausedMutations();
     }
   }, [isConnected, resetFlow]);
 
@@ -430,7 +428,7 @@ export default function RootLayout() {
 
   const reportPreparedCallback = (e: RenderPassReport) => {
     console.log(e);
-    alert("Render Time : "+e.timeToBootJsMillis);
+    alert("Render Time : " + e.timeToBootJsMillis);
   };
 
   if (!loaded && !error) {

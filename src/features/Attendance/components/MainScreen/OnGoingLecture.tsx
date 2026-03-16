@@ -39,10 +39,7 @@ const OnGoingLecture = ({
   handleJoin,
 }: OnGoingLectureProps) => {
   return (
-    <LectureCardGradient
-      key={lecture.id}
-      style={styles.lectureCard}
-    >
+    <LectureCardGradient key={lecture.id} style={styles.lectureCard}>
       <View style={styles.lectureCardHeader}>
         <View style={styles.headerLeftContent}>
           <View style={styles.iconContainer}>
@@ -58,9 +55,7 @@ const OnGoingLecture = ({
                 size={12}
                 style={styles.lectureMetaIcon}
               />
-              <Text style={styles.lectureClassName}>
-                {lecture!.className}
-              </Text>
+              <Text style={styles.lectureClassName}>{lecture!.className}</Text>
             </View>
           </View>
         </View>
@@ -84,10 +79,7 @@ const OnGoingLecture = ({
         >
           <Text style={styles.joinButtonText}>Join Class Now</Text>
           {loading ? (
-            <PrimaryTextSpinner
-              size="small"
-              style={styles.joinButtonLoader}
-            />
+            <PrimaryTextSpinner size="small" style={styles.joinButtonLoader} />
           ) : (
             <View style={styles.joinIconContainer}>
               <PrimaryTextIcon name="arrow-forward" size={18} />

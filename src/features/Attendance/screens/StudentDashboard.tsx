@@ -19,12 +19,12 @@ import {
   useSocketManager,
 } from "@attendance/hooks";
 import { styles } from "@attendance/styles";
+import { Lecture } from "@attendance/types";
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import React, { useCallback } from "react";
-import { ScrollView } from "react-native";
 import { useAlerts } from "react-native-paper-alerts";
-
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 
@@ -158,28 +158,37 @@ const StudentDashboard = () => {
       />
     );
   }
+  const lectureData: Lecture[] = user?.className ? (lectures ?? []) : [];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <StudentDashboardHeader
-        user={user}
-        setShowClassModal={setShowClassModal}
-      />
-
-      {!user?.className ? (
-        <NoClassSelected setShowClassModal={setShowClassModal} />
-      ) : !lectures || lectures.length === 0 ? (
-        <NoLectureFound fetchLectures={refreshLectures} />
-      ) : (
-        lectures.map((lecture) => (
+    <>
+      <Animated.FlatList<Lecture>
+        data={lectureData}
+        keyExtractor={(lecture) => lecture.id}
+        renderItem={({ item }) => (
           <OnGoingLecture
-            key={lecture.id}
-            lecture={lecture}
+            lecture={item}
             loading={joinLoading}
             handleJoin={handleJoin}
           />
-        ))
-      )}
+        )}
+        itemLayoutAnimation={LinearTransition.springify()}
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        ListHeaderComponent={
+          <StudentDashboardHeader
+            user={user}
+            setShowClassModal={setShowClassModal}
+          />
+        }
+        ListEmptyComponent={
+          !user?.className ? (
+            <NoClassSelected setShowClassModal={setShowClassModal} />
+          ) : (
+            <NoLectureFound fetchLectures={() => void refreshLectures()} />
+          )
+        }
+      />
 
       {/* Update Class Modal */}
       <ClassUpdateModal
@@ -200,7 +209,7 @@ const StudentDashboard = () => {
         handleRollNoSubmit={() => handleRollNoSubmit(onRollNoSubmit)}
         setPendingLecture={setPendingLecture}
       />
-    </ScrollView>
+    </>
   );
 };
 

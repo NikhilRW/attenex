@@ -9,8 +9,6 @@ import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
-  FadeInDown,
-  LinearTransition,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -21,15 +19,15 @@ import { withUnistyles } from "react-native-unistyles";
 const PendingGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(59, 130, 246, 0.12)", "rgba(0 0 0 / 0.05)"] as const
-      : ["rgba(60 134 252 / 0.15)", "rgba(76 144 254 / 0.05)"] as const,
+      ? (["rgba(59, 130, 246, 0.12)", "rgba(0 0 0 / 0.05)"] as const)
+      : (["rgba(60 134 252 / 0.15)", "rgba(76 144 254 / 0.05)"] as const),
 }));
 
 const DefaultGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const
-      : ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const,
+      ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
+      : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
 }));
 
 const TimeIcon = withUnistyles(Ionicons, (theme) => ({
@@ -42,7 +40,6 @@ const EditIcon = withUnistyles(Ionicons, (theme) => ({
 
 const LectureCard: React.FC<LectureCardProps> = ({
   lecture,
-  index,
   handleViewAttendance,
   handleEditLecture,
   handleEndLecture,
@@ -87,12 +84,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   };
 
   return (
-    <Animated.View
-      key={lecture.id}
-      entering={FadeInDown.delay(300 + index * 100).springify()}
-      layout={LinearTransition.springify()}
-      style={animatedLoadingState}
-    >
+    <Animated.View key={lecture.id} style={animatedLoadingState}>
       <CardGradient
         style={[
           styles.lectureCard,
@@ -141,9 +133,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
               size={16}
               color="#22C55E"
             />
-            <Text style={styles.statText}>
-              {lecture.studentCount} Present
-            </Text>
+            <Text style={styles.statText}>{lecture.studentCount} Present</Text>
           </View>
           <View style={styles.statItem}>
             <Ionicons name="close-circle-outline" size={16} color="#EF4444" />
