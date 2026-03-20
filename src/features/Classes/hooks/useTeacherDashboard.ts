@@ -57,31 +57,15 @@ export const useTeacherDashboard = () => {
       try {
         const res = await lectureService.getAllLectures();
         if (res.success) {
-          const lecturesWithCount = await Promise.all(
-            res.data.map(async (lec: LectureWithCount) => {
-              try {
-                const detailsRes =
-                  await lectureService.getTeacherLectureDetails(lec.id);
-                return {
-                  ...lec,
-                  courseName: (lec as any).className,
-                  studentCount: detailsRes.data.studentCount || 0,
-                  absentCount: detailsRes.data.absentCount || 0,
-                  totalClassStudents: detailsRes.data.totalClassStudents || 0,
-                };
-              } catch {
-                return {
-                  ...lec,
-                  courseName: (lec as any).className,
-                  studentCount: 0,
-                  absentCount: 0,
-                  totalClassStudents: 0,
-                };
-              }
-            }),
-          );
+          const mappedLectures = res.data.map((lec: any) => ({
+            ...lec,
+            courseName: lec.className,
+            studentCount: lec.studentCount || 0,
+            absentCount: lec.absentCount || 0,
+            totalClassStudents: lec.totalClassStudents || 0,
+          }));
 
-          return lecturesWithCount as LectureWithCount[];
+          return mappedLectures as LectureWithCount[];
         }
         return [];
       } catch (error) {
@@ -380,25 +364,27 @@ export const useTeacherDashboard = () => {
   }, [lectures]);
 
   // Gesture Logic
-  const swipeGesture = Gesture.Pan()
-    .activeOffsetY([0, 20]) // only activate for downward vertical movement
-    .failOffsetX([-10, 10]) // fail (yield) if horizontal movement detected first
+  const panGesture = Gesture.Pan()
+    .activeOffsetY([-1000, 20]) // allow upward movement to be ignored by pan
+    .failOffsetX([-20, 20]) // fail if horizontal movement detected first
     .onStart((event) => {
       context.value = { x: event.x, y: event.y };
     })
     .onUpdate((event) => {
-      const dy = event.y - context.value.y;
-      if (dy > 0) {
-        const damping = 0.5;
-        const translateY = dy * damping;
-        if (translateY < 150) {
-          animatedTranslateY.value = translateY;
-          pullProgress.value = interpolate(
-            translateY,
-            [0, 100],
-            [0, 1],
-            Extrapolation.CLAMP,
-          );
+      if (scrollY.value <= 0) {
+        const dy = event.y - context.value.y;
+        if (dy > 0) {
+          const damping = 0.5;
+          const translateY = dy * damping;
+          if (translateY < 150) {
+            animatedTranslateY.value = translateY;
+            pullProgress.value = interpolate(
+              translateY,
+              [0, 100],
+              [0, 1],
+              Extrapolation.CLAMP,
+            );
+          }
         }
       }
     })
@@ -409,6 +395,8 @@ export const useTeacherDashboard = () => {
       animatedTranslateY.value = withSpring(0);
       pullProgress.value = withSpring(0);
     });
+
+  const swipeGesture = Gesture.Simultaneous(panGesture, Gesture.Native());
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: animatedTranslateY.value }],

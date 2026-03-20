@@ -45,8 +45,14 @@ export const useAttendanceJoin = (
       studentRollNo: string;
     }) => {
       const hasPermission = await requestLocationPermission(alert);
+
       if (!hasPermission) {
         return false;
+      }
+
+      if (!user?.rollNo) {
+        onRollNoRequired(lecture);
+        return;
       }
 
       const location = await getCurrentLocation();
@@ -60,6 +66,7 @@ export const useAttendanceJoin = (
         location.longitude,
         studentRollNo,
       );
+
       return {
         res,
         lecture,

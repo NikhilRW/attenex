@@ -1,6 +1,12 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { Request, Response } from "express";
-import { classes, db, lectures } from "../../config/database_setup";
+import {
+  attendance,
+  classes,
+  db,
+  lectures,
+  users,
+} from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 
 interface AuthRequest extends Request {
@@ -51,13 +57,46 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
       .where(eq(lectures.teacherId, userId))
       .orderBy(desc(lectures.createdAt));
 
+    const lecturesWithCounts = await Promise.all(
+      allLectures.map(async (lecture) => {
+        const studentCountRes = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(attendance)
+          .where(eq(attendance.lectureId, lecture.id));
+        const presentCount = studentCountRes[0]?.count || 0;
+
+        let totalClassStudents = 0;
+        if (lecture.className) {
+          const totalStudentsRes = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(
+              and(
+                eq(users.className, lecture.className),
+                eq(users.role, "student"),
+              ),
+            );
+          totalClassStudents = totalStudentsRes[0]?.count || 0;
+        }
+
+        const absentCount = totalClassStudents - presentCount;
+
+        return {
+          ...lecture,
+          studentCount: presentCount,
+          totalClassStudents,
+          absentCount,
+        };
+      }),
+    );
+
     logger.info(
-      `Fetched ${allLectures.length} lectures for teacher: ${userId}`
+      `Fetched ${allLectures.length} lectures for teacher: ${userId}`,
     );
 
     return res.status(200).json({
       success: true,
-      data: allLectures,
+      data: lecturesWithCounts,
     });
   } catch (error: any) {
     logger.error("Error fetching lectures:", error);
