@@ -2,15 +2,14 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { settingsStyles as styles } from "@settings/styles";
 import { ThemeOptionProps } from "@settings/types";
 import * as Haptics from "expo-haptics";
-import React, { useEffect } from "react";
 import { Pressable, Text } from "react-native";
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withSequence,
   withSpring,
-  withTiming,
 } from "react-native-reanimated";
 import { useUnistyles, withUnistyles } from "react-native-unistyles";
 
@@ -31,18 +30,14 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
   label,
 }) => {
   const scale = useSharedValue(1);
-  const rotation = useSharedValue(0);
   const { theme } = useUnistyles();
 
-  useEffect(() => {
+  const rotation = useDerivedValue(() => {
     if (isActive) {
-      rotation.value = withSequence(
-        withSpring(360, { duration: 200, dampingRatio: 4 }),
-      );
-    } else {
-      rotation.value = withTiming(0, { duration: 0 });
+      return withSequence(withSpring(360, { duration: 200, dampingRatio: 4 }));
     }
-  }, [isActive, rotation]);
+    return 0;
+  });
 
   const animatedIconStyle = useAnimatedStyle(() => {
     return {

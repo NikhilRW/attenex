@@ -4,7 +4,7 @@ import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 import {
   useSharedValue,
@@ -17,7 +17,7 @@ export const useLectureEnded = () => {
   const params = useLocalSearchParams();
   const { lectureId, lectureTitle } = params as Record<string, string>;
   const { alert } = useAlerts();
-  const [passcode, setPasscode] = useState<string | null>(null);
+  const [livePasscode, setLivePasscode] = useState<string | null>(null);
   // const [, setLastUpdated] = useState<Date | null>(null);
 
   // Animation for passcode glow effect
@@ -31,10 +31,7 @@ export const useLectureEnded = () => {
   const fetchPasscodeDataQueryFn = async () => {
     try {
       const res = await lectureService.getPasscode(lectureId as string);
-      if (res.success) {
-        setPasscode(res.data.passcode);
-        return res;
-      }
+      if (res.success) return res;
       return null;
     } catch (error: any) {
       logger.error("Failed to fetch passcode:", error);
@@ -52,13 +49,10 @@ export const useLectureEnded = () => {
     queryKey: queryKeys.lectures.passcode(lectureId || ""),
   });
 
-  // Hydrate passcode from prefetched cache on first mount
-  useEffect(() => {
-    if (cachedPasscodeData?.data?.passcode && !passcode) {
-      setPasscode(cachedPasscodeData.data.passcode);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cachedPasscodeData]);
+  const passcode = useMemo(
+    () => livePasscode ?? cachedPasscodeData?.data?.passcode ?? null,
+    [cachedPasscodeData?.data?.passcode, livePasscode],
+  );
 
   useEffect(() => {
     // Connect to socket and join lecture room
@@ -69,7 +63,7 @@ export const useLectureEnded = () => {
     socketService.onPasscodeRefresh((data) => {
       logger.info("Passcode refresh event received:", data);
       if (data.lectureId === lectureId) {
-        setPasscode(data.passcode);
+        setLivePasscode(data.passcode);
         // setLastUpdated(new Date(data.updatedAt));
       }
     });

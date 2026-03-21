@@ -6,7 +6,6 @@ import {
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect } from "react";
 
 export const useVerifyEmail = () => {
   const router = useRouter();
@@ -14,24 +13,24 @@ export const useVerifyEmail = () => {
 
   const sendEmail = async () => {
     if (params.email) {
-      return await sendVerificationEmailRequest(params.email as string);
+      const response = await sendVerificationEmailRequest(
+        params.email as string,
+      );
+      if (response?.data?.success) {
+        handleVerificationEmailResponse(response);
+      }
+      return response;
     }
     return false;
   };
 
-  const { data } = useQuery({
+  useQuery({
     queryFn: sendEmail,
     queryKey: queryKeys.auth.verifyEmail(params.email as string | undefined),
     enabled: true,
     staleTime: StaleTime.SECONDS_25,
     gcTime: GarbageTime.SECONDS_25,
   });
-
-  useEffect(() => {
-    if (data) {
-      handleVerificationEmailResponse(data);
-    }
-  }, [data]);
 
   const handleBackToSignIn = () => {
     router.replace("/(auth)/sign-in");

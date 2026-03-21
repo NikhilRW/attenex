@@ -5,7 +5,6 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
@@ -48,29 +47,14 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
-  const shimmerTranslate = useSharedValue(-1);
+  if (isPending) {
+    opacity.value = withRepeat(
+      withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+  }
   const CardGradient = isPending ? PendingGradient : DefaultGradient;
-
-  useEffect(() => {
-    if (isPending) {
-      // Pulse animation
-      opacity.value = withRepeat(
-        withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-        -1,
-        true,
-      );
-
-      // Shimmer effect
-      shimmerTranslate.value = withRepeat(
-        withTiming(1, { duration: 1500, easing: Easing.linear }),
-        -1,
-        false,
-      );
-    } else {
-      opacity.value = withTiming(1, { duration: 300 });
-      shimmerTranslate.value = -1;
-    }
-  }, [isPending, opacity, shimmerTranslate]);
 
   const animatedLoadingState = useAnimatedStyle(() => {
     return {

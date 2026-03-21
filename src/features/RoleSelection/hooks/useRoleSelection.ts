@@ -8,25 +8,21 @@ import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { showMessage } from "react-native-flash-message";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 
 export const useRoleSelection = () => {
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<Role>(null);
-  const [, setHoveredRole] = useState<Role>(null);
   const { user, updateUser } = useAuthStore();
+  const [selectedRole, setSelectedRole] = useState<Role>(
+    (user?.role as Role) ?? null,
+  );
+  const [, setHoveredRole] = useState<Role>(null);
   const { isConnected } = useNetworkState();
 
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
-
-  useEffect(() => {
-    if (user && user.role) {
-      setSelectedRole(user.role as Role);
-    }
-  }, [user]);
 
   const handleTeacherPress = useCallback(() => {
     setHoveredRole("teacher");
