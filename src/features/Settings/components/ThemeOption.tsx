@@ -31,6 +31,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
 }) => {
   const scale = useSharedValue(1);
   const { theme } = useUnistyles();
+  
 
   const rotation = useDerivedValue(() => {
     if (isActive) {
