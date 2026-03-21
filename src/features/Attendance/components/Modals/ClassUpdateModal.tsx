@@ -107,7 +107,6 @@ const ClassUpdateModal = ({
                   value={className}
                   onChangeText={setClassName}
                   placeholder="e.g., Computer Science 101"
-                  autoFocus={true}
                 />
               </View>
             </View>

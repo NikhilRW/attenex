@@ -3,10 +3,8 @@ import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import React, { useEffect } from "react";
 import { Pressable } from "react-native";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
-
 import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { StaleTime } from "@shared/constants/tanstackConfig";
@@ -17,6 +15,7 @@ import Animated, {
   FadeOut,
   LinearTransition,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withSpring,
   withTiming,
@@ -36,13 +35,15 @@ const CustomTabBar = ({
   const { isAuthenticated } = useAuthStore();
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
-  let role = user?.role;
+  const role = user?.role;
 
   const handleTabPrefetch = (routeName: string) => {
     if (routeName.includes("attendance") && role === "student") {
       const className = (user as any)?.className;
       if (className) {
-        const queryState = queryClient.getQueryState(queryKeys.lectures.student);
+        const queryState = queryClient.getQueryState(
+          queryKeys.lectures.student,
+        );
         const isDataFresh =
           queryState?.dataUpdatedAt != null &&
           Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
@@ -144,12 +145,12 @@ const CustomTabBar = ({
         style={[styles.activeBackground, activatedBackgroundStyle]}
       />
 
-      {filteredRoutes.map((name, idx) => {
+      {filteredRoutes.map((name) => {
         const routeIndex = routeNames.indexOf(name);
         const isActivated = index === routeIndex;
         return (
           <TabBarButton
-            key={`index-${idx}`}
+            key={name}
             name={name}
             isActivated={isActivated}
             onPress={() => navigation.navigate(name)}
@@ -178,14 +179,13 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
 }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(isActivated ? 1 : 0.6);
-  const backgroundOpacity = useSharedValue(isActivated ? 1 : 0);
+  // const backgroundOpacity = useSharedValue(isActivated ? 1 : 0);
   const iconScale = useSharedValue(1);
 
-  useEffect(() => {
+  useDerivedValue(() => {
     opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
-    backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
+    // backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
     iconScale.value = withSpring(isActivated ? 1.1 : 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActivated]);
 
   const handlePressIn = () => {
@@ -229,10 +229,7 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   );
 };
 
-export const getIconForRoute = (
-  routeName: string,
-  activated: boolean,
-) => {
+const getIconForRoute = (routeName: string, activated: boolean) => {
   if (routeName.includes("attendance")) {
     return (
       <TabFontAwesome6

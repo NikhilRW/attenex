@@ -80,7 +80,6 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                   placeholder="e.g., Computer Science 101"
                   value={newClassName}
                   onChangeText={setNewClassName}
-                  autoFocus
                 />
               </View>
             </View>

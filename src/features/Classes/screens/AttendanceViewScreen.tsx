@@ -10,7 +10,7 @@ import { useAttendanceView } from "@classes/hooks";
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { AttendanceRecord } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import React from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
@@ -48,6 +48,13 @@ const AttendanceViewScreen = () => {
     router,
   } = useAttendanceView();
 
+  const renderAttendanceItem = useCallback(
+    ({ item: record, index }: { item: AttendanceRecord; index: number }) => (
+      <StudentCard record={record} index={index} />
+    ),
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <AttendanceHeader
@@ -61,12 +68,10 @@ const AttendanceViewScreen = () => {
       <Animated.FlatList<AttendanceRecord>
         data={loading ? [] : filteredAttendance}
         keyExtractor={(record) => record.id}
-        renderItem={({ item: record, index }) => (
-          <StudentCard record={record} index={index} />
-        )}
+        renderItem={renderAttendanceItem}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        
+
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <AttendanceFilter filter={filter} setFilter={setFilter} />

@@ -8,6 +8,7 @@ import { teacherDashboardStyles as styles } from "@classes/styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { Skia } from "@shopify/react-native-skia";
+import { useCallback } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   GestureDetector,
@@ -53,9 +54,9 @@ const TeacherDashboard = () => {
     handleViewAttendance,
     lectures,
     navigateToCreate,
+    onScroll,
     pullIndicatorStyle,
     pullProgress,
-    scrollY,
     searchQuery,
     setEditDuration,
     setEditModalVisible,
@@ -67,6 +68,27 @@ const TeacherDashboard = () => {
     animatedContainerStyle,
     swipeGesture,
   } = useTeacherDashboard();
+
+  const renderLectureItem = useCallback(
+    ({ item: lecture, index }: { item: LectureWithCount; index: number }) => (
+      <LectureCard
+        key={lecture.id}
+        lecture={lecture}
+        index={index}
+        handleViewAttendance={handleViewAttendance}
+        handleEditLecture={handleEditLecture}
+        handleEndLecture={handleEndLecture}
+        handleDeleteLecture={handleDeleteLecture}
+        isLectureCreating
+      />
+    ),
+    [
+      handleDeleteLecture,
+      handleEditLecture,
+      handleEndLecture,
+      handleViewAttendance,
+    ],
+  );
 
   return (
     <View style={styles.container}>
@@ -85,15 +107,10 @@ const TeacherDashboard = () => {
               style={styles.scrollView}
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
-              onScroll={(e) => {
-                scrollY.value = e.nativeEvent.contentOffset.y;
-              }}
+              onScroll={onScroll}
               scrollEventThrottle={16}
               itemLayoutAnimation={LinearTransition.springify()}
-              extraData={(e: LectureWithCount) => [
-                e.id.includes("temp"),
-                searchQuery,
-              ]}
+              extraData={searchQuery}
               ListHeaderComponent={
                 <View>
                   {/* Main Header Section */}
@@ -151,20 +168,7 @@ const TeacherDashboard = () => {
                   )}
                 </Animated.View>
               }
-              renderItem={({ item: lecture, index }) => {
-                return (
-                  <LectureCard
-                    key={lecture.id}
-                    lecture={lecture}
-                    index={index}
-                    handleViewAttendance={handleViewAttendance}
-                    handleEditLecture={handleEditLecture}
-                    handleEndLecture={handleEndLecture}
-                    handleDeleteLecture={handleDeleteLecture}
-                    isLectureCreating
-                  />
-                );
-              }}
+              renderItem={renderLectureItem}
             />
           </GestureDetector>
         </Animated.View>

@@ -20,6 +20,7 @@ import { useAlerts } from "react-native-paper-alerts";
 import {
   Extrapolation,
   interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -402,6 +403,10 @@ export const useTeacherDashboard = () => {
     transform: [{ translateY: animatedTranslateY.value }],
   }));
 
+  const onScroll = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
+
   const pullIndicatorStyle = useAnimatedStyle(() => ({
     opacity: pullProgress.value,
     transform: [
@@ -480,6 +485,7 @@ export const useTeacherDashboard = () => {
   return {
     pullIndicatorStyle,
     pullProgress,
+    onScroll,
     scrollY,
     totalActive,
     totalStudents,

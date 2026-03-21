@@ -2,7 +2,7 @@ import { createLectureStyles as styles } from "@classes/styles";
 import { ClassItem, ClassSelectorProps } from "@classes/types";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useCallback } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
@@ -38,6 +38,31 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
   onSelectClass,
   onAddNewClass,
 }) => {
+  const renderClassItem = useCallback(
+    ({ item: cls }: { item: ClassItem }) => (
+      <TouchableOpacity
+        onPress={() => onSelectClass(cls.name)}
+        style={[
+          styles.optionItem,
+          selectedClass === cls.name && styles.optionItemSelected,
+        ]}
+      >
+        <Text
+          style={[
+            styles.optionItemText,
+            selectedClass === cls.name ? styles.optionItemTextSelected : null,
+          ]}
+        >
+          {cls.name}
+        </Text>
+        {selectedClass === cls.name && (
+          <PrimaryIcon name="checkmark-circle" size={20} />
+        )}
+      </TouchableOpacity>
+    ),
+    [onSelectClass, selectedClass],
+  );
+
   return (
     <View style={[styles.inputGroup, styles.inputGroupClassSelector]}>
       <Text style={styles.label}>Class Name</Text>
@@ -91,29 +116,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
               <Animated.FlatList<ClassItem>
                 data={existingClasses}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item: cls }) => (
-                  <TouchableOpacity
-                    onPress={() => onSelectClass(cls.name)}
-                    style={[
-                      styles.optionItem,
-                      selectedClass === cls.name && styles.optionItemSelected,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.optionItemText,
-                        selectedClass === cls.name
-                          ? styles.optionItemTextSelected
-                          : null,
-                      ]}
-                    >
-                      {cls.name}
-                    </Text>
-                    {selectedClass === cls.name && (
-                      <PrimaryIcon name="checkmark-circle" size={20} />
-                    )}
-                  </TouchableOpacity>
-                )}
+                renderItem={renderClassItem}
                 ListEmptyComponent={
                   <View style={styles.selectionEmptyState}>
                     <MutedIcon

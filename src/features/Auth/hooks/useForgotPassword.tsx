@@ -3,15 +3,19 @@ import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
 import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Keyboard } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 export const useForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
   const emailParam = useLocalSearchParams().email;
+  const [email, setEmail] = useState(() =>
+    typeof emailParam === "string" ? emailParam : "",
+  );
+  const [emailSent, setEmailSent] = useState(() =>
+    typeof emailParam === "string" ? isSuccess : false,
+  );
 
   const sendEmail = async () => {
     if (!email.trim()) {
@@ -83,13 +87,6 @@ export const useForgotPassword = () => {
       paddingBottom: keyboard.height.value + 50,
     };
   });
-
-  useEffect(() => {
-    if (emailParam) {
-      setEmail(emailParam as string);
-      setEmailSent(isSuccess);
-    }
-  }, [emailParam, isSuccess]);
 
   const handleRequestReset = async () => {
     await mutateAsync();

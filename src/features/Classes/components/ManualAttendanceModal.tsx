@@ -90,7 +90,6 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                   onChangeText={setManualRollNo}
                   autoCapitalize="characters"
                   autoCorrect={false}
-                  autoFocus={true}
                 />
               </View>
             </View>

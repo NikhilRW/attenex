@@ -12,7 +12,7 @@ const STUDENT_IMAGE = require("@assets/images/student.png") as number;
 const SAMPLE_IMAGES = [LOGO_IMAGE, TEACHER_IMAGE, STUDENT_IMAGE];
 
 const Test = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(onlineManager.isOnline());
+  const [isOnline, setIsOnline] = useState<boolean>(() => onlineManager.isOnline());
   const [runId, setRunId] = useState(0);
   const [lastRenderDuration, setLastRenderDuration] = useState<number>();
 
@@ -113,15 +113,19 @@ const Test = () => {
 
       <Text style={styles.sectionTitle}>Repeated grid benchmark</Text>
       <View key={runId} onLayout={captureBenchmarkLayout} style={styles.grid}>
-        {benchmarkImages.map((imageSource, index) => (
-          <View key={`${runId}-${index}`} style={styles.gridItem}>
-            <NitroImage
-              image={imageSource}
-              style={styles.gridImage}
-              resizeMode="contain"
-            />
-          </View>
-        ))}
+        {benchmarkImages.map((imageSource, index) => {
+          // unique key combination for benchmark tests
+          const uniqueId = `benchmark-${runId}-${imageSource}-${index}`;
+          return (
+            <View key={uniqueId} style={styles.gridItem}>
+              <NitroImage
+                image={imageSource}
+                style={styles.gridImage}
+                resizeMode="contain"
+              />
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );

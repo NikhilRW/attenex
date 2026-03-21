@@ -20,7 +20,7 @@ const VerifyEmail = () => {
   const { handleBackToSignIn } = useVerifyEmail();
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <FuturisticBackground />
 
       <View style={styles.content}>
