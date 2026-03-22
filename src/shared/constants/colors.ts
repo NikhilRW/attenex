@@ -118,3 +118,4 @@ export const lightTheme = {
   },
 } as const;
 
+export { darkTheme as colors };

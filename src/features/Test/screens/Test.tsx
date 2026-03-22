@@ -12,7 +12,9 @@ const STUDENT_IMAGE = require("@assets/images/student.png") as number;
 const SAMPLE_IMAGES = [LOGO_IMAGE, TEACHER_IMAGE, STUDENT_IMAGE];
 
 const Test = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(() => onlineManager.isOnline());
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    onlineManager.isOnline(),
+  );
   const [runId, setRunId] = useState(0);
   const [lastRenderDuration, setLastRenderDuration] = useState<number>();
 
