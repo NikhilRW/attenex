@@ -59,8 +59,6 @@ export const darkTheme = {
   },
 } as const;
 
-export type ThemeColors = typeof darkTheme;
-
 export const lightTheme = {
   // Background Layers
   background: {
@@ -120,5 +118,3 @@ export const lightTheme = {
   },
 } as const;
 
-// Default export for backward compatibility if needed, though we should migrate to useTheme
-export const colors = darkTheme;

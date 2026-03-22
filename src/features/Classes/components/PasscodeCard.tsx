@@ -47,8 +47,11 @@ export const PasscodeCard: React.FC<PasscodeCardProps> = ({
         ) : passcode ? (
           <>
             <View style={styles.passcodeDigits}>
-              {passcode.split("").map((digit) => (
-                <View key={`passcode-${digit}`} style={styles.passcodeDigit}>
+              {passcode.split("").map((digit, index) => (
+                <View
+                  key={`passcode-${index}-${digit}`}
+                  style={styles.passcodeDigit}
+                >
                   <Text style={styles.passcodeDigitText}>{digit}</Text>
                 </View>
               ))}

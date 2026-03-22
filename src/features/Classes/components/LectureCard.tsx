@@ -5,6 +5,7 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
+import { useEffect } from "react";
 import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
@@ -48,13 +49,21 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
-  if (isPending) {
-    opacity.value = withRepeat(
-      withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-  }
+  // TODO: why used useEffect
+
+  useEffect(() => {
+    if (isPending) {
+      opacity.value = withRepeat(
+        withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+        -1,
+        true,
+      );
+      return;
+    }
+
+    opacity.value = withTiming(1, { duration: 150 });
+  }, [isPending, opacity]);
+
   const CardGradient = isPending ? PendingGradient : DefaultGradient;
 
   const animatedLoadingState = useAnimatedStyle(() => {

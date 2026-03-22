@@ -1,15 +1,14 @@
+import { lectureService } from "@classes/services/lectureService";
 import Entypo from "@react-native-vector-icons/entypo";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Pressable } from "react-native";
-import { StyleSheet, withUnistyles } from "react-native-unistyles";
-import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { StaleTime } from "@shared/constants/tanstackConfig";
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { Pressable } from "react-native";
 import Animated, {
   Easing,
   FadeOut,
@@ -20,6 +19,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const BUTTON_WIDTH = 80;
@@ -27,6 +27,15 @@ const TabEntypo = withUnistyles(Entypo);
 const TabFontAwesome6 = withUnistyles(FontAwesome6);
 const TabIonicons = withUnistyles(Ionicons);
 const TabMaterialCommunityIcons = withUnistyles(MaterialCommunityIcons);
+
+const isFreshQuery = (
+  dataUpdatedAt: number | undefined,
+  staleTimeMs: number,
+) => {
+  return (
+    dataUpdatedAt != null && Date.now() - dataUpdatedAt < staleTimeMs
+  );
+};
 
 const CustomTabBar = ({
   state: { index, routeNames },
@@ -41,12 +50,11 @@ const CustomTabBar = ({
     if (routeName.includes("attendance") && role === "student") {
       const className = (user as any)?.className;
       if (className) {
-        const queryState = queryClient.getQueryState(
-          queryKeys.lectures.student,
+        const queryState = queryClient.getQueryState(queryKeys.lectures.student);
+        const isDataFresh = isFreshQuery(
+          queryState?.dataUpdatedAt,
+          StaleTime.SECONDS_30,
         );
-        const isDataFresh =
-          queryState?.dataUpdatedAt != null &&
-          Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
         if (!isDataFresh) {
           queryClient.prefetchQuery({
             queryKey: queryKeys.lectures.student,
@@ -61,9 +69,10 @@ const CustomTabBar = ({
     }
     if (routeName.includes("classes") && role === "teacher") {
       const queryState = queryClient.getQueryState(queryKeys.classes.teacher);
-      const isDataFresh =
-        queryState?.dataUpdatedAt != null &&
-        Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+      const isDataFresh = isFreshQuery(
+        queryState?.dataUpdatedAt,
+        StaleTime.SECONDS_30,
+      );
       if (!isDataFresh) {
         queryClient.prefetchQuery({
           queryKey: queryKeys.classes.teacher,

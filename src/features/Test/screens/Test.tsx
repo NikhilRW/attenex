@@ -20,8 +20,12 @@ const Test = () => {
   const hasCapturedLayoutRef = useRef(false);
 
   const benchmarkImages = useMemo(
-    () => Array.from({ length: 36 }, (_, index) => SAMPLE_IMAGES[index % 3]),
-    [],
+    () =>
+      Array.from({ length: 36 }, (_, index) => ({
+        id: `benchmark-${index}-${runId}`,
+        imageSource: SAMPLE_IMAGES[index % 3],
+      })),
+    [runId],
   );
 
   const toggleOnlineMode = () => {
@@ -110,11 +114,9 @@ const Test = () => {
 
       <Text style={styles.sectionTitle}>Repeated grid benchmark</Text>
       <View key={runId} onLayout={captureBenchmarkLayout} style={styles.grid}>
-        {benchmarkImages.map((imageSource, index) => {
-          // unique key combination for benchmark tests
-          const uniqueId = `benchmark-${runId}-${imageSource}-${index}`;
+        {benchmarkImages.map(({ id, imageSource }) => {
           return (
-            <View key={uniqueId} style={styles.gridItem}>
+            <View key={id} style={styles.gridItem}>
               <NitroImage
                 image={imageSource}
                 style={styles.gridImage}
@@ -153,7 +155,7 @@ const formatDuration = (duration?: number) => {
 
 export default Test;
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     padding: 20,
     gap: 16,

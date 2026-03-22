@@ -54,10 +54,12 @@ assets/models/*.bin
 .agents/
 .github/skills
 backend/personal/
-# backend/
+backend/
 
 rnsec-report.html
 rnsec-report.json
 
 UNISTYLES_MIGRATION_CHECKLIST.md
 IMPROVEMENTS.md
+
+skills-lock.json

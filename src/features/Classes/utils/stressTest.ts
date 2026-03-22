@@ -4,7 +4,7 @@ const STRESS_ENABLED_VALUES = new Set(["1", "true", "yes", "on"]);
 const DEFAULT_LECTURE_COUNT = 2000;
 const MAX_LECTURE_COUNT = 20000;
 
-export interface TeacherDashboardStressOptions {
+interface TeacherDashboardStressOptions {
   enabled: boolean;
   lectureCount: number;
 }

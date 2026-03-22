@@ -13,9 +13,7 @@ export const useForgotPassword = () => {
   const [email, setEmail] = useState(() =>
     typeof emailParam === "string" ? emailParam : "",
   );
-  const [emailSent, setEmailSent] = useState(() =>
-    typeof emailParam === "string" ? isSuccess : false,
-  );
+  const [emailSent, setEmailSent] = useState(false);
 
   const sendEmail = async () => {
     if (!email.trim()) {
@@ -46,9 +44,7 @@ export const useForgotPassword = () => {
       await http.post("/api/users/forgot-password", {
         email: email.trim().toLowerCase(),
       });
-
       setEmailSent(true);
-
       showMessage({
         message: "Email Sent!",
         description: "Check your inbox for the password reset link",
@@ -56,13 +52,12 @@ export const useForgotPassword = () => {
         duration: 4000,
         position: "bottom",
       });
-
       return true;
     } catch (error: any) {
+      setEmailSent(false);
       const errorMessage =
         error.response?.data?.error ||
         "Unable to send reset email. Please try again.";
-
       showMessage({
         message: "Request Failed",
         description: errorMessage,
@@ -74,7 +69,7 @@ export const useForgotPassword = () => {
     }
   };
 
-  const { mutateAsync, isSuccess, isPending } = useMutation({
+  const { mutateAsync: handleRequestReset, isPending } = useMutation({
     mutationFn: sendEmail,
     mutationKey: mutationKeys.auth.sendForgotPasswordEmail,
   });
@@ -87,10 +82,6 @@ export const useForgotPassword = () => {
       paddingBottom: keyboard.height.value + 50,
     };
   });
-
-  const handleRequestReset = async () => {
-    await mutateAsync();
-  };
 
   return {
     handleRequestReset,

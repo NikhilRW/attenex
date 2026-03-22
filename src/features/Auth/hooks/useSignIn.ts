@@ -21,9 +21,10 @@ export const useSignIn = () => {
     useShallow((state) => ({
       isAuthenticated: state.isAuthenticated,
       isLoading: state.isLoading,
-    }))
+    })),
   );
 
+  // Redirect to main stack if user is already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       const path = getStartingScreenPath();
@@ -31,6 +32,10 @@ export const useSignIn = () => {
         router.replace(path);
       }
     }
+  }, [authLoading, isAuthenticated, router]);
+
+  // Show verification success message once
+  useEffect(() => {
     if (params.verified === "true") {
       showMessage({
         message: "Email Verified",
@@ -39,8 +44,10 @@ export const useSignIn = () => {
         duration: 3000,
         position: "bottom",
       });
+      // Remove param to prevent toast on re-render/refocus
+      router.setParams({ verified: undefined });
     }
-  }, [authLoading, isAuthenticated, params.verified,router]);
+  }, [params.verified, router]);
 
   const {
     control,

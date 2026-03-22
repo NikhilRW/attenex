@@ -3,8 +3,7 @@ import CustomTabBar from "@shared/components/CustomTabBar";
 import { Tabs } from "expo-router";
 import React from "react";
 
-const _layout = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+const MainLayout = () => {
   useOfflineMutations();
   return (
     <Tabs
@@ -14,4 +13,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default MainLayout;

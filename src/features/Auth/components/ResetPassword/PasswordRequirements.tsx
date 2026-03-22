@@ -37,7 +37,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
       <View style={styles.requirementsContainer}>
         <Text style={styles.requirementsTitle}>Password Requirements:</Text>
         {requirements.map((req, index) => (
-          <View key={index} style={styles.requirementItem}>
+          <View key={`${req.label}-${index}`} style={styles.requirementItem}>
             <RequirementIcon
               name={req.valid ? "checkmark-circle" : "ellipse-outline"}
               size={16}

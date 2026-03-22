@@ -10,12 +10,14 @@ import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
+import { useWindowDimensions } from "react-native";
 import { useAlerts } from "react-native-paper-alerts";
 import { CreateLectureVariables } from "../types/params";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { height } = useWindowDimensions();
   const [lectureName, setLectureName] = useState("");
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [duration, setDuration] = useState(60);
@@ -221,7 +223,10 @@ export const useCreateLectureScreen = () => {
 
   const handleCloseNewClassModal = () => setShowNewClassModal(false);
 
-  const minHeightScrollView = useMemo(() => getMinHeightForScrollView(), []);
+  const minHeightScrollView = useMemo(
+    () => getMinHeightForScrollView(height),
+    [height],
+  );
 
   return {
     // State

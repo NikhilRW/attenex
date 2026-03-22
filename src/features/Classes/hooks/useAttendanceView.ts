@@ -4,9 +4,9 @@ import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types";
-import { setStringAsync } from "expo-clipboard";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { setStringAsync } from "expo-clipboard";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -55,71 +55,60 @@ export const useAttendanceView = () => {
     enabled: false,
   });
 
-  useQuery({
-    queryFn: () => {
-      // Connect to socket and join lecture room for real-time updates
-      socketService.connect();
-      socketService.joinLecture(lectureId);
-
-      // Listen for student joined events
-      const handleStudentJoined = (data: any) => {
-        console.log("Student joined event received:", data);
-        if (data.lectureId === lectureId) {
-          refetchAttendance();
-        }
-      };
-
-      // Listen for student absent events
-      const handleStudentLeaved = (data: any) => {
-        console.log("Student leave data received:", data);
-        if (data.lectureId === lectureId) {
-          refetchAttendance();
-        }
-      };
-
-      // Listen for attendance submission events
-      const handleAttendanceSubmitted = (data: any) => {
-        console.log("Attendance submitted event received:", data);
-        if (data.lectureId === lectureId) {
-          refetchAttendance();
-        }
-      };
-
-      socketService.onStudentJoined(handleStudentJoined);
-      socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-      socketService.onStudentLeaved(handleStudentLeaved);
-
-      // Handle app state changes (background/foreground)
-      appStateSubsription.current = AppState.addEventListener(
-        "change",
-        (nextAppState) => {
-          if (nextAppState === "active") {
-            if (!socketService.isConnected()) {
-              socketService.connect();
-              socketService.joinLecture(lectureId);
-              socketService.onStudentJoined(handleStudentJoined);
-              socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
-              socketService.onStudentLeaved(handleStudentLeaved);
-            }
-            refetchAttendance();
-          }
-        },
-      );
-      return "data-fetched";
-    },
-    queryKey: queryKeys.socket.attendanceView(lectureId),
-  });
-
-  // Clean up on unmount
   useEffect(() => {
+    // 1. Connect and Join
+    socketService.connect();
+    socketService.joinLecture(lectureId);
+
+    // 2. Define Handlers
+    const handleStudentJoined = (data: any) => {
+      console.log("Student joined event received:", data);
+      if (data.lectureId === lectureId) {
+        refetchAttendance();
+      }
+    };
+
+    const handleStudentLeaved = (data: any) => {
+      console.log("Student leave data received:", data);
+      if (data.lectureId === lectureId) {
+        refetchAttendance();
+      }
+    };
+
+    const handleAttendanceSubmitted = (data: any) => {
+      console.log("Attendance submitted event received:", data);
+      if (data.lectureId === lectureId) {
+        refetchAttendance();
+      }
+    };
+
+    // 3. Attach Listeners
+    socketService.onStudentJoined(handleStudentJoined);
+    socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+    socketService.onStudentLeaved(handleStudentLeaved);
+
+    // 4. AppState Listener for Reconnection (without duplicating listeners)
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        if (!socketService.isConnected()) {
+          socketService.connect();
+          socketService.joinLecture(lectureId);
+          // Listeners should still be attached to the singleton instance
+        }
+        refetchAttendance();
+      }
+    });
+    appStateSubsription.current = subscription;
+
+    // 5. Cleanup
     return () => {
       socketService.leaveLecture(lectureId);
       socketService.offStudentJoined();
       socketService.offAttendanceSubmitted();
       socketService.offStudentLeaved();
-      appStateSubsription.current?.remove();
+      subscription.remove();
     };
-  }, [lectureId]);
+  }, [lectureId, refetchAttendance]);
 
   // Ensure connection when screen regains focus + initial data fetch with freshness check
   useFocusEffect(

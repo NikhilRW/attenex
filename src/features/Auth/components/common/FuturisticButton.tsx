@@ -45,7 +45,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
         onPressOut={async () => await handlePressOut()}
         disabled={disabled || loading}
         activeOpacity={0.9}
-        style={{ elevation: 4 }}
+        style={styles.buttonPressable}
       >
         <ButtonGradient
           uniProps={(theme) => ({
@@ -62,7 +62,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Text style={[styles.buttonText]}>{title}</Text>
+            <Text style={styles.buttonText}>{title}</Text>
           )}
         </ButtonGradient>
         <View style={styles.buttonGlow} />
@@ -86,6 +86,9 @@ const styles = StyleSheet.create((theme) => ({
     letterSpacing: 0.4,
     fontFamily: "Inter_700Bold",
   },
+  buttonPressable: {
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.24)",
+  },
   buttonGlow: {
     position: "absolute",
     top: 0,
@@ -97,7 +100,7 @@ const styles = StyleSheet.create((theme) => ({
     shadowOpacity: 0.5,
     shadowRadius: 20,
     zIndex: -1,
-    elevation: 10,
+    boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.25)",
     shadowColor: theme.primary.main,
   },
 }));

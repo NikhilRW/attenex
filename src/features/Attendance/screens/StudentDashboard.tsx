@@ -74,6 +74,17 @@ const StudentDashboard = () => {
     alert,
   );
 
+  const renderLectureItem = useCallback(
+    ({ item }: { item: Lecture }) => (
+      <OnGoingLecture
+        lecture={item}
+        loading={joinLoading}
+        handleJoin={handleJoin}
+      />
+    ),
+    [handleJoin, joinLoading],
+  );
+
   // Class management
   const {
     className,
@@ -165,13 +176,7 @@ const StudentDashboard = () => {
       <Animated.FlatList<Lecture>
         data={lectureData}
         keyExtractor={(lecture) => lecture.id}
-        renderItem={({ item }) => (
-          <OnGoingLecture
-            lecture={item}
-            loading={joinLoading}
-            handleJoin={handleJoin}
-          />
-        )}
+        renderItem={renderLectureItem}
         itemLayoutAnimation={LinearTransition.springify()}
         style={styles.container}
         contentContainerStyle={styles.scrollContent}

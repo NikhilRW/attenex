@@ -3,7 +3,7 @@ import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type ThemeMode = "dark" | "light" | "system";
+type ThemeMode = "dark" | "light" | "system";
 
 interface ThemeStore {
   mode: ThemeMode;

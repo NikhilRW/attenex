@@ -43,22 +43,3 @@ export const mutationKeys = {
     updateName: ["user", "update-name"] as const,
   },
 } as const;
-
-// Backward compatibility aliases
-export const legacyMutationKeys = {
-  lectureJoin: mutationKeys.lectures.join,
-  studentAttendanceSubmit: mutationKeys.attendance.submit,
-  handleClassJoin: mutationKeys.classes.join,
-  createLecture: mutationKeys.lectures.create,
-  updateLectureByTeacher: mutationKeys.lectures.update,
-  rollNoSubmitStudent: mutationKeys.user.submitRollNo,
-  updateStudentClass: mutationKeys.user.updateClass,
-  sendForgotPasswordEmail: mutationKeys.auth.sendForgotPasswordEmail,
-  logoutDeleteAccountLinkedin: mutationKeys.auth.logoutDeleteLinkedin,
-  signInLinkedIn: mutationKeys.auth.signInLinkedIn,
-  manualAttendanceTeacher: mutationKeys.attendance.manual,
-  handleCreateNewClass: mutationKeys.classes.create,
-  updateUserRole: mutationKeys.user.updateRole,
-  deleteAccountSettings: mutationKeys.auth.deleteAccount,
-  logoutUser: mutationKeys.auth.logout,
-};
