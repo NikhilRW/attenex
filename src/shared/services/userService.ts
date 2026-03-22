@@ -20,8 +20,7 @@ export const userService = {
       }
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
-        const token = await getDeviceToken();
-        await this.updateUserToken(token);
+        await this.updateUserToken(null);
       }
       if (role === "student") {
         // Ensure className is subscribed if role is changed to student
@@ -29,7 +28,8 @@ export const userService = {
         if (className) {
           await subscribeToClassName(className);
         }
-        await this.updateUserToken("");
+        const token = await getDeviceToken();
+        await this.updateUserToken(token);
       }
       return response.data;
     } catch (error: any) {
@@ -61,7 +61,7 @@ export const userService = {
       );
     }
   },
-  async updateUserToken(token: string) {
+  async updateUserToken(token: string | null) {
     try {
       const response = await http.post("/api/users/update-device-token", {
         token,

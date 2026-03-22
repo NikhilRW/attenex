@@ -33,7 +33,7 @@ export interface UseAttendanceJoinReturn {
   proceedWithJoin: (data: {
     lecture: Lecture;
     studentRollNo: string;
-  }) => Promise<false | { res: any; lecture: Lecture }>;
+  }) => Promise<false | { res: any; lecture: Lecture } | undefined>;
 }
 
 export interface UseAttendanceSubmitReturn {
@@ -74,5 +74,5 @@ export interface UseRollNoManagementReturn {
 }
 
 export interface UseLectureDetailsParamReturn {
-  fetchingLectureDetails: boolean;
+  isFetchingLectureDetails: boolean;
 }

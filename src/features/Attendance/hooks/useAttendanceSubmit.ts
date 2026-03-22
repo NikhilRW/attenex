@@ -25,6 +25,7 @@ export const useAttendanceSubmit = (
         res: any;
         lecture: Lecture;
       }
+    | undefined
   >,
 ): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");

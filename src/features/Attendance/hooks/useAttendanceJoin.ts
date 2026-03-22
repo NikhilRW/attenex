@@ -72,17 +72,17 @@ export const useAttendanceJoin = (
         lecture,
       };
     },
-    [alert],
+    [alert, onRollNoRequired, user?.rollNo],
   );
 
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
     mutationFn: proceedWithJoinMutation,
     mutationKey: mutationKeys.lectures.join,
     onSuccess: async (data) => {
-      if (data === false) {
+      if (data === undefined || data === false) {
         return false;
       }
-      const { res, lecture } = data;
+      const { res, lecture } = data as any;
       if (res.success) {
         setJoinedLecture(lecture);
         setStatus("joined");

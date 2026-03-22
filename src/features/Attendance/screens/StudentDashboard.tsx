@@ -85,7 +85,7 @@ const StudentDashboard = () => {
   } = useClassManagement(refreshLectures);
 
   // Handle lecture details from URL params (notification join)
-  const { fetchingLectureDetails } = useLectureDetailsParam(
+  const { isFetchingLectureDetails } = useLectureDetailsParam(
     lectures,
     handleJoin,
   );
@@ -123,7 +123,7 @@ const StudentDashboard = () => {
   }, [joinedLecture, setJoinedLecture, setStatus, refreshLectures, user?.role]);
 
   // Show loading screen while fetching lecture details
-  if (fetchingLectureDetails) {
+  if (isFetchingLectureDetails) {
     return <LoadingScreen />;
   }
 

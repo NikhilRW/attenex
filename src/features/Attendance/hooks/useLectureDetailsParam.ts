@@ -1,6 +1,4 @@
 import { lectureService } from "@/features/Classes/services/lectureService";
-import { queryKeys } from "@/shared/constants/queryKeys";
-import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
@@ -8,8 +6,8 @@ import {
 import { Lecture } from "@attendance/types/common";
 import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert } from "@attendance/utils/alertUtils";
-import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 
 /**
@@ -20,47 +18,33 @@ export const useLectureDetailsParam = (
   onJoinLecture: (lecture: any) => Promise<void>,
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
-  
-    const { alert } = useAlerts();
+  const { alert } = useAlerts();
+  const [isFetchingLectureDetails, setIsFetchingLectureDetails] =
+    useState(false);
 
-  const {
-    data: lectureDetails,
-    refetch,
-    isFetching: fetchingLectureDetails,
-  } = useQuery({
-    queryFn: async () => {
-      if (lectureId) {
-        return await lectureService.getStudentLectureDetails(
-          lectureId as string,
-        );
-      }
-      return null;
-    },
-    queryKey: lectureId
-      ? queryKeys.lectures.studentDetail(lectureId as string)
-      : queryKeys.lectures.all,
-    staleTime: StaleTime.SECONDS_30,
-    gcTime: GarbageTime.SECONDS_30,
-  });
-
-  const fetchAndJoinLecture = async () => {
+  const fetchAndJoinLecture = useCallback(async () => {
     if (lectureId) {
+      setIsFetchingLectureDetails(true);
+      console.log("HERE");
+
       // First check if we already have the lecture in our list
       const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
-
       if (lectureToJoin) {
+        setIsFetchingLectureDetails(false);
         await onJoinLecture(lectureToJoin);
       } else {
-        // Fetch lecture details from API if not in list
         try {
-          console.log(LOG_MESSAGES.FETCHING_DETAILS, lectureId);
-          let res = lectureDetails;
-          if (res === null) {
-            refetch();
-          }
-          res = lectureDetails;
+          const res = (await lectureService.getStudentLectureDetails(
+            lectureId as string,
+          )) as any;
+
           if (res.success && res.data) {
-            console.log(LOG_MESSAGES.DETAILS_FETCHED, res.data);
+            setIsFetchingLectureDetails(false);
+            console.log(
+              LOG_MESSAGES.DETAILS_FETCHED,
+              "useLectureDetailsParams",
+              res.data,
+            );
             const lectureData = {
               id: res.data.id,
               title: res.data.title,
@@ -78,7 +62,6 @@ export const useLectureDetailsParam = (
             // Still try to join with minimal data
             await onJoinLecture({ id: lectureId });
           }
-          return true;
         } catch (error: any) {
           console.error(LOG_MESSAGES.DETAILS_ERROR, error);
           showErrorAlert(
@@ -86,23 +69,18 @@ export const useLectureDetailsParam = (
             error.message || ALERT_MESSAGES.LECTURE_DETAILS_FAILED.message,
             alert,
           );
-          // Fallback: try to join with just the ID
-          await onJoinLecture({ id: lectureId });
-          return false;
+          setIsFetchingLectureDetails(false);
         }
       }
     }
-    return false;
-  };
+  }, [alert, lectureId, lectures, onJoinLecture]);
 
-  useQuery({
-    queryFn: fetchAndJoinLecture,
-    queryKey: queryKeys.lectures.joinWithNotification,
-    enabled: true,
-    retry: false,
-  });
-
+  useEffect(() => {
+    if (lectureId) {
+      fetchAndJoinLecture();
+    }
+  }, [fetchAndJoinLecture, lectureId]);
   return {
-    fetchingLectureDetails,
+    isFetchingLectureDetails,
   };
 };

@@ -28,7 +28,7 @@ import { queryClient } from "../constants/tanstackConfig";
 const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
 const ATTENEX_ANDROID_CHANNEL_ID = "attenex";
-// TODO: fix the after clicking notification the lecture is not joined
+
 export const useNotificationBootstrap = () => {
   const router = useRouter();
 
@@ -183,9 +183,9 @@ export const useNotificationBootstrap = () => {
             remoteMessage?.data?.lectureId,
           );
           if (remoteMessage?.data?.lectureId) {
-            // router.navigate(
-            //   `/attendance?lectureId=${remoteMessage.data.lectureId}`
-            // );
+            router.navigate(
+              `/attendance?lectureId=${remoteMessage.data.lectureId}`,
+            );
           }
         },
       );
