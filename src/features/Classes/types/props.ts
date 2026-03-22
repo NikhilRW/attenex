@@ -8,6 +8,7 @@ import {
   LectureWithCount,
 } from "./common";
 import { CreateLectureVariables } from "./params";
+import { RefObject } from "react";
 
 /**
  * AttendanceFilter component props
@@ -138,6 +139,7 @@ export interface LectureCardProps {
   handleEndLecture: (lectureId: string, lectureTitle: string) => void;
   handleDeleteLecture: (lecture: LectureWithCount) => void;
   isLectureCreating: boolean;
+  lectureRowHeightRef: RefObject<number>;
 }
 
 /**

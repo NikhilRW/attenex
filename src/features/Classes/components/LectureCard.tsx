@@ -5,7 +5,7 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, TouchableOpacity, View } from "react-native";
+import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -43,6 +43,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleEditLecture,
   handleEndLecture,
   handleDeleteLecture,
+  lectureRowHeightRef,
 }) => {
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
@@ -67,8 +68,18 @@ const LectureCard: React.FC<LectureCardProps> = ({
     return result.data.attendance;
   };
 
+  const handleLayout = (e: LayoutChangeEvent) => {
+    if (lectureRowHeightRef.current === 0) {
+      lectureRowHeightRef.current = e.nativeEvent.layout.height;
+    }
+  };
+
   return (
-    <Animated.View key={lecture.id} style={animatedLoadingState}>
+    <Animated.View
+      onLayout={handleLayout}
+      key={lecture.id}
+      style={animatedLoadingState}
+    >
       <CardGradient
         style={[
           styles.lectureCard,

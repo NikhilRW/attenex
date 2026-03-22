@@ -4,6 +4,10 @@ import { StaleTime } from "@/shared/constants/tanstackConfig";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
+import {
+  generateMockLectures,
+  getTeacherDashboardStressOptions,
+} from "@classes/utils/stressTest";
 import { socketService } from "@shared/services/socketService";
 import {
   useMutation,
@@ -13,7 +17,7 @@ import {
 } from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import { useAlerts } from "react-native-paper-alerts";
@@ -27,10 +31,22 @@ import {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
+const DEFAULT_LECTURE_ROW_HEIGHT = 236;
+
 export const useTeacherDashboard = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { ended, lectureId } = useLocalSearchParams();
+  const lectureRowHeightRef = useRef(0);
+  const params = useLocalSearchParams<{
+    ended?: string;
+    lectureId?: string;
+    stress?: string;
+    mock?: string;
+    count?: string;
+    lectures?: string;
+    size?: string;
+  }>();
+  const { ended, lectureId } = params;
   const { alert } = useAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -52,6 +68,26 @@ export const useTeacherDashboard = () => {
 
   const context = useSharedValue({ x: 0, y: 0 });
   const animatedTranslateY = useSharedValue(0);
+
+  const stressOptions = useMemo(
+    () =>
+      getTeacherDashboardStressOptions({
+        stress: params.stress,
+        mock: params.mock,
+        count: params.count,
+        lectures: params.lectures,
+        size: params.size,
+      }),
+    [params.count, params.lectures, params.mock, params.size, params.stress],
+  );
+
+  const mockLectures = useMemo(
+    () =>
+      stressOptions.enabled
+        ? generateMockLectures(stressOptions.lectureCount)
+        : [],
+    [stressOptions.enabled, stressOptions.lectureCount],
+  );
 
   const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
     useCallback(async () => {
@@ -84,8 +120,17 @@ export const useTeacherDashboard = () => {
     enabled: false,
   });
 
+  const effectiveLectures = useMemo(
+    () => (stressOptions.enabled ? mockLectures : (lectures ?? [])),
+    [lectures, mockLectures, stressOptions.enabled],
+  );
+
   useFocusEffect(
     useCallback(() => {
+      if (stressOptions.enabled) {
+        return;
+      }
+
       if (
         latestCreateLectureMutation !== "pending" &&
         latestCreateLectureMutation !== "error"
@@ -101,20 +146,32 @@ export const useTeacherDashboard = () => {
           fetchActiveLectures();
         }
       }
-    }, [fetchActiveLectures, latestCreateLectureMutation, queryClient]),
+    }, [
+      fetchActiveLectures,
+      latestCreateLectureMutation,
+      queryClient,
+      stressOptions.enabled,
+    ]),
   );
 
   useEffect(() => {
+    if (stressOptions.enabled) {
+      return;
+    }
+
     const main = async () => {
       if (ended === "true" && lectureId) {
         fetchActiveLectures();
       }
     };
     main();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ended, lectureId]);
+  }, [ended, fetchActiveLectures, lectureId, stressOptions.enabled]);
 
   useEffect(() => {
+    if (stressOptions.enabled) {
+      return;
+    }
+
     const lectureIds = (lectures || []).map((lecture) => lecture.id);
 
     try {
@@ -167,7 +224,12 @@ export const useTeacherDashboard = () => {
       console.log("Error updating dashboard socket listeners.", error);
       return undefined;
     }
-  }, [lectures, fetchActiveLectures, latestCreateLectureMutation]);
+  }, [
+    lectures,
+    fetchActiveLectures,
+    latestCreateLectureMutation,
+    stressOptions.enabled,
+  ]);
 
   const handleEndLecture = async (id: string, lectureTitle: string) => {
     alert("End Lecture", "Are you sure you want to end this lecture?", [
@@ -344,25 +406,25 @@ export const useTeacherDashboard = () => {
 
   // Filter logic - memoized to prevent recalculation on every render
   const filteredLectures = useMemo(() => {
-    return (lectures || []).filter((l) => {
+    return effectiveLectures.filter((l) => {
       return (
         l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     });
-  }, [lectures, searchQuery]);
+  }, [effectiveLectures, searchQuery]);
 
   // Stats - memoized to prevent recalculation on every render
   const totalActive = useMemo(() => {
-    return (lectures || []).filter((l) => l.status === "active").length;
-  }, [lectures]);
+    return effectiveLectures.filter((l) => l.status === "active").length;
+  }, [effectiveLectures]);
 
   const totalStudents = useMemo(() => {
-    return (lectures || []).reduce(
+    return effectiveLectures.reduce(
       (acc, curr) => acc + Number(curr.studentCount),
       0,
     );
-  }, [lectures]);
+  }, [effectiveLectures]);
 
   // Gesture Logic
   const panGesture = Gesture.Pan()
@@ -421,6 +483,35 @@ export const useTeacherDashboard = () => {
       },
     ],
   }));
+
+  const keyExtractor = useCallback(
+    (lecture: LectureWithCount) => lecture.id,
+    [],
+  );
+
+  const getItemLayout = useCallback(
+    (_: ArrayLike<LectureWithCount> | null | undefined, index: number) => {
+      const rowHeight =
+        lectureRowHeightRef.current || DEFAULT_LECTURE_ROW_HEIGHT;
+      return {
+        length: rowHeight,
+        offset: rowHeight * index,
+        index,
+      };
+    },
+    [lectureRowHeightRef],
+  );
+
+  const flatListPerformanceProps = useMemo(
+    () => ({
+      removeClippedSubviews: true,
+      initialNumToRender: 8,
+      maxToRenderPerBatch: 8,
+      updateCellsBatchingPeriod: 40,
+      windowSize: 16,
+    }),
+    [],
+  );
 
   const { mutateAsync: deleteLecture } = useMutation<
     { success: boolean },
@@ -489,7 +580,7 @@ export const useTeacherDashboard = () => {
     scrollY,
     totalActive,
     totalStudents,
-    lectures,
+    lectures: effectiveLectures,
     navigateToCreate,
     searchQuery,
     setSearchQuery,
@@ -507,5 +598,9 @@ export const useTeacherDashboard = () => {
     handleDeleteLecture,
     animatedContainerStyle,
     swipeGesture,
+    lectureRowHeightRef,
+    keyExtractor,
+    getItemLayout,
+    flatListPerformanceProps,
   };
 };

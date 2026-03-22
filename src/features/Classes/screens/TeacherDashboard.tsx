@@ -67,12 +67,15 @@ const TeacherDashboard = () => {
     handleDeleteLecture,
     animatedContainerStyle,
     swipeGesture,
+    lectureRowHeightRef,
+    keyExtractor,
+    getItemLayout,
+    flatListPerformanceProps,
   } = useTeacherDashboard();
 
   const renderLectureItem = useCallback(
     ({ item: lecture, index }: { item: LectureWithCount; index: number }) => (
       <LectureCard
-        key={lecture.id}
         lecture={lecture}
         index={index}
         handleViewAttendance={handleViewAttendance}
@@ -80,6 +83,7 @@ const TeacherDashboard = () => {
         handleEndLecture={handleEndLecture}
         handleDeleteLecture={handleDeleteLecture}
         isLectureCreating
+        lectureRowHeightRef={lectureRowHeightRef}
       />
     ),
     [
@@ -87,6 +91,7 @@ const TeacherDashboard = () => {
       handleEditLecture,
       handleEndLecture,
       handleViewAttendance,
+      lectureRowHeightRef,
     ],
   );
 
@@ -104,11 +109,14 @@ const TeacherDashboard = () => {
           <GestureDetector gesture={swipeGesture}>
             <Animated.FlatList
               data={filteredLectures}
+              keyExtractor={keyExtractor}
+              getItemLayout={getItemLayout}
               style={styles.scrollView}
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
               onScroll={onScroll}
               scrollEventThrottle={16}
+              {...flatListPerformanceProps}
               itemLayoutAnimation={LinearTransition.springify()}
               extraData={searchQuery}
               ListHeaderComponent={
