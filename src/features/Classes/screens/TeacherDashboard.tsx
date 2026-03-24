@@ -1,9 +1,9 @@
 import {
   HeaderSection,
-  LectureCard,
-  LectureEditModal,
-  PullIndicator,
-} from "@classes/components";
+} from "@classes/components/HeaderSection";
+import LectureCard from "@classes/components/LectureCard";
+import { LectureEditModal } from "@classes/components/LectureEditModal";
+import PullIndicator from "@classes/components/PullIndicator";
 import { teacherDashboardStyles as styles } from "@classes/styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";

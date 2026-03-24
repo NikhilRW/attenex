@@ -1,4 +1,4 @@
-import { styles } from "@attendance/styles";
+import styles  from "@attendance/styles/StudentDashboard.styles";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";

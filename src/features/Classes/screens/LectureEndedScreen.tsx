@@ -1,10 +1,10 @@
 import {
   LectureEndedDoneButton,
-  LectureEndedHeader,
-  LectureEndedSuccessIcon,
-  LectureEndedTitle,
-  PasscodeCard,
-} from "@classes/components";
+} from "@classes/components/LectureEndedDoneButton";
+import { LectureEndedHeader } from "@classes/components/LectureEndedHeader";
+import { LectureEndedSuccessIcon } from "@classes/components/LectureEndedSuccessIcon";
+import { LectureEndedTitle } from "@classes/components/LectureEndedTitle";
+import { PasscodeCard } from "@classes/components/PasscodeCard";
 import { useLectureEnded } from "@classes/hooks";
 import { lectureEndedStyles as styles } from "@classes/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";

@@ -2,7 +2,7 @@ import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import { userService } from "../services/userService";
 import * as Haptics from "expo-haptics";
 import { UserRole } from "@/features/Settings/types";
-import { lectureService } from "@/features/Classes";
+import { lectureService } from "@/features/Classes/services";
 import {
   Accuracy,
   getCurrentPositionAsync,

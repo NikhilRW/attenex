@@ -1,4 +1,4 @@
-import { styles } from "@attendance/styles";
+import styles from "@attendance/styles/StudentDashboard.styles";
 import { StudentDashboardHeaderProps } from "@attendance/types/props";
 import React from "react";
 import { Text, View } from "react-native";

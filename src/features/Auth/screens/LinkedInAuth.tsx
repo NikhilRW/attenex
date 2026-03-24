@@ -1,4 +1,4 @@
-import { useLinkedInAuth } from "../hooks";
+import { useLinkedInAuth } from "../hooks/useLinkedInAuth";
 import { styles } from "../styles/LinkedInAuth.styles";
 import LinkedInView from "react-native-linkedin-oauth2";
 import { View } from "react-native";

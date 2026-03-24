@@ -1,4 +1,4 @@
-import { forgotPasswordStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/ForgotPassword.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
 import React from "react";

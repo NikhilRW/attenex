@@ -1,13 +1,11 @@
-import {
-  FuturisticButton,
-  FuturisticInput,
-  InvalidResetPasswordLink,
-  PasswordRequirements,
-  ResetPasswordFormHeader,
-  VerifyingResetPasswordLink,
-} from "@auth/components";
-import { useResetPassword } from "@auth/hooks";
-import { resetPasswordStyles as styles } from "@auth/styles";
+import FuturisticButton from "@auth/components/common/FuturisticButton";
+import FuturisticInput from "@auth/components/common/FuturisticInput";
+import InvalidResetPasswordLink from "@auth/components/ResetPassword/InvalidResetPasswordLink";
+import PasswordRequirements from "@auth/components/ResetPassword/PasswordRequirements";
+import ResetPasswordFormHeader from "@auth/components/ResetPassword/ResetPasswordFormHeader";
+import VerifyingResetPasswordLink from "@auth/components/ResetPassword/VerifyingResetPasswordLink";
+import { useResetPassword } from "@auth/hooks/useResetPassword";
+import { styles } from "@auth/styles/ResetPassword.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { Controller } from "react-hook-form";

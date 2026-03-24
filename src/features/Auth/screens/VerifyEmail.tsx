@@ -1,11 +1,9 @@
-import {
-  FuturisticButton,
-  VerifyEmailHelp,
-  VerifyEmailIcon,
-  VerifyEmailMessage,
-} from "@auth/components";
-import { useVerifyEmail } from "@auth/hooks";
-import { verifyEmailStyles as styles } from "@auth/styles";
+import FuturisticButton  from "@auth/components/common/FuturisticButton";
+import VerifyEmailHelp  from "@auth/components/VerifyEmail/VerifyEmailHelp";
+import  VerifyEmailIcon  from "@auth/components/VerifyEmail/VerifyEmailIcon";
+import VerifyEmailMessage  from "@auth/components/VerifyEmail/VerifyEmailMessage";
+import { useVerifyEmail } from "@auth/hooks/useVerifyEmail";
+import { styles } from "@auth/styles/VerifyEmail.style";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { View } from "react-native";

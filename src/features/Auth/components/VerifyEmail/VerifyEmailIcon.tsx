@@ -1,4 +1,4 @@
-import { verifyEmailStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/VerifyEmail.style";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import { View } from "react-native";

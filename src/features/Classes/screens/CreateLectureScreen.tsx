@@ -1,10 +1,10 @@
 import {
   CreateLectureFormCard,
-  CreateLectureHeader,
-  NewClassModal,
-} from "@classes/components";
-import { useCreateLectureScreen } from "@classes/hooks";
+} from "@classes/components/CreateLectureFormCard";
+import { CreateLectureHeader } from "@classes/components/CreateLectureHeader";
+import { NewClassModal } from "@classes/components/NewClassModal";
 import { DURATION_OPTIONS } from "@classes/constants";
+import { useCreateLectureScreen } from "@classes/hooks";
 import { createLectureStyles as styles } from "@classes/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";

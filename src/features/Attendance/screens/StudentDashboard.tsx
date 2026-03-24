@@ -1,25 +1,21 @@
-import {
-  ClassUpdateModal,
-  LectureEnded,
-  LectureOngoing,
-  LoadingScreen,
-  NoClassSelected,
-  NoLectureFound,
-  OnGoingLecture,
-  RollnoModal,
-  StudentDashboardHeader,
-} from "@attendance/components";
-import {
-  useAttendanceJoin,
-  useAttendanceSubmit,
-  useClassManagement,
-  useLectureDetailsParam,
-  useLectureManagement,
-  useRollNoManagement,
-  useSocketManager,
-} from "@attendance/hooks";
-import { styles } from "@attendance/styles";
-import { Lecture } from "@attendance/types";
+import ClassUpdateModal from "@attendance/components/Modals/ClassUpdateModal";
+import LectureEnded from "@attendance/components/LectureAttending/LectureEnded";
+import LectureOngoing from "@attendance/components/LectureAttending/LectureOngoing";
+import LoadingScreen from "@attendance/components/MainScreen/LoadingScreen";
+import NoClassSelected from "@attendance/components/MainScreen/NoClassSelected";
+import NoLectureFound from "@attendance/components/MainScreen/NoLectureFound";
+import OnGoingLecture from "@attendance/components/MainScreen/OnGoingLecture";
+import RollnoModal from "@attendance/components/Modals/RollnoModal";
+import StudentDashboardHeader from "@attendance/components/MainScreen/StudentDashboardHeader";
+import { useAttendanceJoin } from "@attendance/hooks/useAttendanceJoin";
+import { useAttendanceSubmit } from "@attendance/hooks/useAttendanceSubmit";
+import { useClassManagement } from "@attendance/hooks/useClassManagement";
+import { useLectureDetailsParam } from "@attendance/hooks/useLectureDetailsParam";
+import { useLectureManagement } from "@attendance/hooks/useLectureManagement";
+import { useRollNoManagement } from "@attendance/hooks/useRollNoManagement";
+import { useSocketManager } from "@attendance/hooks/useSocketManager";
+import styles from "@attendance/styles/StudentDashboard.styles";
+import { Lecture } from "@attendance/types/common";
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import React, { useCallback } from "react";

@@ -1,4 +1,4 @@
-import { styles } from "@attendance/styles";
+import styles from "@attendance/styles/StudentDashboard.styles";
 import { RollnoModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";

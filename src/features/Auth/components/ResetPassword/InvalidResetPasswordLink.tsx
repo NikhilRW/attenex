@@ -1,5 +1,5 @@
 import FuturisticButton from "@auth/components/common/FuturisticButton";
-import { resetPasswordStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/ForgotPassword.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useRouter } from "expo-router";

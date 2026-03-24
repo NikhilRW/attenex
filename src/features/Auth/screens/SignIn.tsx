@@ -1,20 +1,17 @@
-import {
-  AuthFooter,
-  AuthHeader,
-  AuthOptions,
-  FuturisticButton,
-  FuturisticDivider,
-  FuturisticInput,
-  SocialLoginButtons,
-} from "@auth/components";
-import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants";
-import { useSignIn } from "@auth/hooks";
-import { signInStyles as styles } from "@auth/styles";
-import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils";
+import AuthFooter from "@auth/components/common/AuthFooter";
+import AuthHeader from "@auth/components/common/AuthHeader";
+import AuthOptions from "@auth/components/common/AuthOptions";
+import FuturisticButton from "@auth/components/common/FuturisticButton";
+import FuturisticDivider from "@auth/components/common/FuturisticDivider";
+import FuturisticInput from "@auth/components/common/FuturisticInput";
+import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
+import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants/images";
+import { useSignIn } from "@auth/hooks/useSignIn";
+import { styles } from "@auth/styles/SignIn.styles";
+import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-
 
 const SignIn = () => {
   const {

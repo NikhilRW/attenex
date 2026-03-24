@@ -1,4 +1,4 @@
-import { authOptionStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/AuthOption.styles";
 import { AuthOptionsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";

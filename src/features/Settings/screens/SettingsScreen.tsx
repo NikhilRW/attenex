@@ -1,9 +1,9 @@
 import {
   AppearanceSection,
-  DangerZoneSection,
-  ProfileSection,
-  RoleSection,
-} from "@settings/components";
+} from "@settings/components/AppearanceSection";
+import { DangerZoneSection } from "@settings/components/DangerZoneSection";
+import { ProfileSection } from "@settings/components/ProfileSection";
+import { RoleSection } from "@settings/components/RoleSection";
 import { useSettings } from "@settings/hooks";
 import { settingsStyles as styles } from "@settings/styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";

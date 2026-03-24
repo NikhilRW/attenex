@@ -1,4 +1,4 @@
-import { resetPasswordStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/ForgotPassword.styles";
 import { ResetPasswordFormHeaderProps } from "@auth/types/props";
 import React from "react";
 import { Text } from "react-native";

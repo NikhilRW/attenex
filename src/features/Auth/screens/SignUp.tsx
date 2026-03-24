@@ -1,14 +1,12 @@
-import {
-  AuthFooter,
-  AuthHeader,
-  FuturisticButton,
-  FuturisticDivider,
-  FuturisticInput,
-  SocialLoginButtons,
-} from "@auth/components";
-import { useSignUp } from "@auth/hooks";
-import { signUpStyles as styles } from "@auth/styles";
-import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils";
+import AuthFooter from "@auth/components/common/AuthFooter";
+import AuthHeader from "@auth/components/common/AuthHeader";
+import FuturisticButton from "@auth/components/common/FuturisticButton";
+import FuturisticDivider from "@auth/components/common/FuturisticDivider";
+import FuturisticInput from "@auth/components/common/FuturisticInput";
+import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
+import { useSignUp } from "@auth/hooks/useSignUp";
+import { styles } from "@auth/styles/SignUp.styles";
+import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { Controller } from "react-hook-form";

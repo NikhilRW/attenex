@@ -1,4 +1,4 @@
-import { verifyEmailStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/VerifyEmail.style";
 import React from "react";
 import { Text, View } from "react-native";
 

@@ -1,4 +1,4 @@
-import { styles } from "@attendance/styles";
+import styles from "@attendance/styles/StudentDashboard.styles";
 import { ClassInfoProps } from "@attendance/types/props";
 import { User } from "@backend/config/database_setup";
 import Ionicons from "@react-native-vector-icons/ionicons";

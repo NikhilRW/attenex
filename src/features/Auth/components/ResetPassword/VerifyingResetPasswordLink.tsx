@@ -1,4 +1,4 @@
-import { resetPasswordStyles as styles } from "@auth/styles";
+import { styles } from "@auth/styles/ForgotPassword.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";

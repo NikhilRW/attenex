@@ -1,11 +1,11 @@
 import {
   AttendanceFilter,
-  AttendanceFloatingButton,
-  AttendanceHeader,
-  ManualAttendanceModal,
-  RollSummaryModal,
-  StudentCard,
-} from "@classes/components";
+} from "@classes/components/AttendanceFilter";
+import { AttendanceFloatingButton } from "@classes/components/AttendanceFloatingButton";
+import { AttendanceHeader } from "@classes/components/AttendanceHeader";
+import { ManualAttendanceModal } from "@classes/components/ManualAttendanceModal";
+import { RollSummaryModal } from "@classes/components/RollSummaryModal";
+import { StudentCard } from "@classes/components/StudentCard";
 import { useAttendanceView } from "@classes/hooks";
 import { attendanceViewStyles as styles } from "@classes/styles";
 import { AttendanceRecord } from "@classes/types";

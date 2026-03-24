@@ -1,5 +1,5 @@
-import { styles } from "@attendance/styles";
-import { LectureEndedProps } from "@attendance/types";
+import styles from "@attendance/styles/StudentDashboard.styles";
+import { LectureEndedProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -69,9 +69,7 @@ const LectureEnded = ({
         </Text>
 
         <View style={styles.passcodeCard}>
-          <Text style={styles.passcodeLabel}>
-            Enter Passcode to Verify
-          </Text>
+          <Text style={styles.passcodeLabel}>Enter Passcode to Verify</Text>
           <UniTextInput
             style={styles.passcodeInput}
             placeholder="Enter 4-digit Passcode"
