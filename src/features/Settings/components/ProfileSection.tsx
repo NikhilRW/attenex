@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { settingsStyles as styles } from "@settings/styles";
-import { ProfileSectionProps } from "@settings/types";
+import { styles } from "@settings/styles/Settings.styles";
+import { ProfileSectionProps } from "@settings/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {

@@ -1,17 +1,24 @@
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { ManualAttendanceModalProps } from "@classes/types";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
+import { ManualAttendanceModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ActivityIndicator, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
 const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const
-      : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const,
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));
 
 const SubmitButtonGradient = withUnistyles(LinearGradient, (theme) => ({
@@ -78,11 +85,16 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
 
             <View style={[styles.modalBody, styles.modalBodyTop]}>
               <Text style={[styles.modalLabel, styles.modalLabelDescription]}>
-                Enter the student&apos;s roll number to manually mark them present.
+                Enter the student&apos;s roll number to manually mark them
+                present.
               </Text>
 
               <View style={styles.inputContainer}>
-                <InputIcon name="id-card-outline" size={20} style={styles.inputIcon} />
+                <InputIcon
+                  name="id-card-outline"
+                  size={20}
+                  style={styles.inputIcon}
+                />
                 <ModalInput
                   style={styles.input}
                   placeholder="e.g 66"

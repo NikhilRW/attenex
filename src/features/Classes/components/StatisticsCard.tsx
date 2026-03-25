@@ -1,5 +1,5 @@
-import { teacherDashboardStyles as styles } from "@classes/styles";
-import { StatisticsCardProps } from "@classes/types";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { StatisticsCardProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -9,22 +9,22 @@ import { withUnistyles } from "react-native-unistyles";
 const BlueGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"] as const
-      : ["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"] as const,
+      ? (["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"] as const)
+      : (["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"] as const),
 }));
 
 const GreenGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"] as const
-      : ["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"] as const,
+      ? (["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"] as const)
+      : (["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"] as const),
 }));
 
 const AmberGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"] as const
-      : ["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"] as const,
+      ? (["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"] as const)
+      : (["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"] as const),
 }));
 
 const StatisticsCard: React.FC<StatisticsCardProps> = ({

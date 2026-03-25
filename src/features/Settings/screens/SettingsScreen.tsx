@@ -1,11 +1,9 @@
-import {
-  AppearanceSection,
-} from "@settings/components/AppearanceSection";
+import { AppearanceSection } from "@settings/components/AppearanceSection";
 import { DangerZoneSection } from "@settings/components/DangerZoneSection";
 import { ProfileSection } from "@settings/components/ProfileSection";
 import { RoleSection } from "@settings/components/RoleSection";
-import { useSettings } from "@settings/hooks";
-import { settingsStyles as styles } from "@settings/styles";
+import { useSettings } from "@settings/hooks/useSettings";
+import { styles } from "@settings/styles/Settings.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";

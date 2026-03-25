@@ -1,11 +1,9 @@
-import {
-  CreateLectureFormCard,
-} from "@classes/components/CreateLectureFormCard";
+import { CreateLectureFormCard } from "@classes/components/CreateLectureFormCard";
 import { CreateLectureHeader } from "@classes/components/CreateLectureHeader";
 import { NewClassModal } from "@classes/components/NewClassModal";
-import { DURATION_OPTIONS } from "@classes/constants";
-import { useCreateLectureScreen } from "@classes/hooks";
-import { createLectureStyles as styles } from "@classes/styles";
+import { DURATION_OPTIONS } from "@classes/constants/common";
+import { useCreateLectureScreen } from "@classes/hooks/useCreateLectureScreen";
+import { styles } from "@classes/styles/CreateLecture.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";

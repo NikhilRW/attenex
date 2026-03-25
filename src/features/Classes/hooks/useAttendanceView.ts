@@ -3,7 +3,7 @@ import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
-import { AttendanceRecord, FilterType } from "@classes/types";
+import { AttendanceRecord, FilterType } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { setStringAsync } from "expo-clipboard";

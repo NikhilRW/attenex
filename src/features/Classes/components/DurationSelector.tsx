@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { DurationSelectorProps } from "@classes/types";
+import { styles } from "@classes/styles/CreateLecture.styles";
+import { DurationSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -39,7 +39,6 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   onChangeCustomDuration,
   options,
 }) => {
-
   const selectedDurationLabel =
     duration === -1
       ? "Custom"
@@ -48,16 +47,9 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   return (
     <>
       <View style={[styles.inputGroupLarge, styles.inputGroupDuration]}>
-        <Text style={styles.label}>
-          Duration
-        </Text>
-        <TouchableOpacity
-          onPress={onToggleDropdown}
-          style={styles.dropdown}
-        >
-          <Text style={styles.dropdownText}>
-            {selectedDurationLabel}
-          </Text>
+        <Text style={styles.label}>Duration</Text>
+        <TouchableOpacity onPress={onToggleDropdown} style={styles.dropdown}>
+          <Text style={styles.dropdownText}>{selectedDurationLabel}</Text>
           <AddCircleIcon name={"add-circle-sharp"} size={20} />
         </TouchableOpacity>
       </View>
@@ -65,9 +57,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
       {/* Custom Duration Input */}
       {duration === -1 && (
         <View style={[styles.inputGroup, styles.customDurationGroup]}>
-          <Text style={styles.label}>
-            Custom Duration (minutes)
-          </Text>
+          <Text style={styles.label}>Custom Duration (minutes)</Text>
           <DurationTextInput
             style={styles.textInput}
             placeholder="Enter minutes"
@@ -97,7 +87,11 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[styles.modalContent, styles.modalSurface, styles.modalSurfaceFlat]}
+              style={[
+                styles.modalContent,
+                styles.modalSurface,
+                styles.modalSurfaceFlat,
+              ]}
             >
               <View style={styles.modalHeaderRow}>
                 <Text style={[styles.modalTitle, styles.modalTitleInline]}>
@@ -124,7 +118,9 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                     <Text
                       style={[
                         styles.optionItemText,
-                        duration === option.value ? styles.optionItemTextSelected : null,
+                        duration === option.value
+                          ? styles.optionItemTextSelected
+                          : null,
                       ]}
                     >
                       {option.label}

@@ -1,10 +1,10 @@
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { StudentCardProps } from "@classes/types";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
+import { StudentCardProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
 const PresentAvatar = withUnistyles(LinearGradient, () => ({
@@ -43,7 +43,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
   return (
     <Animated.View
       entering={FadeInDown.delay(300 + index * 50).springify()}
-      layout={Layout.springify()}
+      layout={LinearTransition.springify()}
       style={[
         styles.studentCard,
         record.status === "present"
@@ -73,14 +73,20 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         {/* Info */}
         <View style={styles.infoContainer}>
           <View style={styles.nameRow}>
-            <Text style={styles.studentName} ellipsizeMode="tail" numberOfLines={1}>
+            <Text
+              style={styles.studentName}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
               {record.studentName.length > 20
                 ? record.studentName.substr(0, 20) + "..."
                 : record.studentName}
             </Text>
           </View>
 
-          <Text style={styles.rollNo}>{record.studentRollNo || "No Roll No"}</Text>
+          <Text style={styles.rollNo}>
+            {record.studentRollNo || "No Roll No"}
+          </Text>
 
           <View style={styles.metaRow}>
             {record.joinTime ? (
@@ -110,9 +116,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
             ) : (
               <View style={styles.metaItem}>
                 <MetaIcon name="close-circle-outline" size={12} />
-                <Text style={styles.metaText}>
-                  Did not attend
-                </Text>
+                <Text style={styles.metaText}>Did not attend</Text>
               </View>
             )}
           </View>
@@ -122,15 +126,21 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         <View style={styles.statusContainer}>
           {record.status === "present" ? (
             <View style={styles.rollBadge}>
-              <Text style={styles.rollText}>{record.studentRollNo || "N/A"}</Text>
+              <Text style={styles.rollText}>
+                {record.studentRollNo || "N/A"}
+              </Text>
             </View>
           ) : record.status === "incomplete" ? (
             <View style={[styles.absentBadge, styles.absentBadgeIncomplete]}>
-              <Text style={[styles.absentText, styles.absentTextIncomplete]}>INC</Text>
+              <Text style={[styles.absentText, styles.absentTextIncomplete]}>
+                INC
+              </Text>
             </View>
           ) : (
             <View style={[styles.absentBadge, styles.absentBadgeAbsent]}>
-              <Text style={[styles.absentText, styles.absentTextAbsent]}>ABS</Text>
+              <Text style={[styles.absentText, styles.absentTextAbsent]}>
+                ABS
+              </Text>
             </View>
           )}
         </View>

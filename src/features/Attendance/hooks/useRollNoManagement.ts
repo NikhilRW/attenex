@@ -1,7 +1,7 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
 import { useAuthStore } from "@/shared/stores/authStore";
-import { logger } from "@/shared/utils";
+import { logger } from "@shared/utils/logger";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";

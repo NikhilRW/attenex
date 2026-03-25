@@ -1,6 +1,6 @@
-import { ThemeOption } from "@settings/components/ThemeOption";
-import { settingsStyles as styles } from "@settings/styles";
-import { RoleSectionProps } from "@settings/types";
+import { ThemeOption } from "./ThemeOption";
+import { styles } from "@settings/styles/Settings.styles";
+import { RoleSectionProps } from "@settings/types/props";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";

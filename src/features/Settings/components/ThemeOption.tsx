@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { settingsStyles as styles } from "@settings/styles";
-import { ThemeOptionProps } from "@settings/types";
+import { styles } from "@settings/styles/Settings.styles";
+import { ThemeOptionProps } from "@settings/types/props";
 import * as Haptics from "expo-haptics";
 import { Pressable, Text } from "react-native";
 import Animated, {
@@ -31,7 +31,6 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
 }) => {
   const scale = useSharedValue(1);
   const { theme } = useUnistyles();
-  
 
   const rotation = useDerivedValue(() => {
     if (isActive) {

@@ -1,5 +1,5 @@
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { AttendanceHeaderProps } from "@classes/types";
+import styles from "@classes/styles/AttendanceViewScreen.styles";
+import { AttendanceHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -9,8 +9,8 @@ import { withUnistyles } from "react-native-unistyles";
 const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? [theme.background.secondary, theme.background.primary] as const
-      : ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.8)"] as const,
+      ? ([theme.background.secondary, theme.background.primary] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.8)"] as const),
 }));
 
 const BackIcon = withUnistyles(Ionicons, (theme) => ({
@@ -43,14 +43,22 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
   return (
     <HeaderGradient style={styles.header}>
       <View style={styles.headerTop}>
-        <TouchableOpacity onPress={onBack} style={[styles.backButton, styles.headerButton]}>
+        <TouchableOpacity
+          onPress={onBack}
+          style={[styles.backButton, styles.headerButton]}
+        >
           <BackIcon name="chevron-back" size={24} />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>Attendance</Text>
-          <Text style={styles.headerSubtitle} numberOfLines={1}>{lectureTitle}</Text>
+          <Text style={styles.headerSubtitle} numberOfLines={1}>
+            {lectureTitle}
+          </Text>
         </View>
-        <TouchableOpacity onPress={onShowSummary} style={[styles.summaryButton, styles.headerButton]}>
+        <TouchableOpacity
+          onPress={onShowSummary}
+          style={[styles.summaryButton, styles.headerButton]}
+        >
           <SummaryIcon name="list" size={20} />
         </TouchableOpacity>
       </View>

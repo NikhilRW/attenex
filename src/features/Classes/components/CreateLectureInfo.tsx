@@ -1,4 +1,4 @@
-import { classesStyles as styles } from "@classes/styles";
+import styles from "@classes/styles/Classes.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import { Text } from "react-native";

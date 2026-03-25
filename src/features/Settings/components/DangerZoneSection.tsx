@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { settingsStyles as styles } from "@settings/styles";
-import { DangerZoneSectionProps } from "@settings/types";
+import { styles } from "@settings/styles/Settings.styles";
+import { DangerZoneSectionProps } from "@settings/types/props";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -25,7 +25,9 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
       entering={FadeInDown.delay(400).springify()}
       style={styles.section}
     >
-      <Text style={[styles.sectionTitle, styles.sectionTitleDanger]}>DANGER ZONE</Text>
+      <Text style={[styles.sectionTitle, styles.sectionTitleDanger]}>
+        DANGER ZONE
+      </Text>
       <View style={[styles.card, styles.dangerCard]}>
         {!userProvider && (
           <>
@@ -39,7 +41,9 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
                 </View>
                 <View>
                   <Text style={styles.dangerLabel}>Change Password</Text>
-                  <Text style={styles.dangerSub}>Change your account password</Text>
+                  <Text style={styles.dangerSub}>
+                    Change your account password
+                  </Text>
                 </View>
               </View>
               <ChevronIcon name="chevron-forward" size={20} />

@@ -1,5 +1,6 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { ClassItem, ClassSelectorProps } from "@classes/types";
+import styles from "@classes/styles/CreateLecture.styles";
+import { ClassItem } from "@classes/types/common";
+import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback } from "react";

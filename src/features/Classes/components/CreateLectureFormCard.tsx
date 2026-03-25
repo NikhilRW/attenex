@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { CreateLectureFormCardProps } from "@classes/types";
+import styles from "@classes/styles/CreateLecture.styles";
+import { CreateLectureFormCardProps } from "@classes/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
@@ -10,12 +10,15 @@ import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
 import { TopicInput } from "./TopicInput";
 
-const CreateLectureCardGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
-  colors:
-    rt.colorScheme === "dark"
-      ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
-      : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
-}));
+const CreateLectureCardGradient = withUnistyles(
+  LinearGradient,
+  (_theme, rt) => ({
+    colors:
+      rt.colorScheme === "dark"
+        ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
+        : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
+  }),
+);
 
 export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   selectedClass,
@@ -40,9 +43,7 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
 
   return (
     <CreateLectureCardGradient style={styles.card}>
-      <Text style={styles.cardEyebrow}>
-        Class Details
-      </Text>
+      <Text style={styles.cardEyebrow}>Class Details</Text>
 
       <ClassSelector
         selectedClass={selectedClass}
@@ -57,9 +58,7 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
 
       <View style={styles.sectionDivider} />
 
-      <Text style={styles.cardEyebrow}>
-        Time & Duration
-      </Text>
+      <Text style={styles.cardEyebrow}>Time & Duration</Text>
 
       <DurationSelector
         duration={duration}

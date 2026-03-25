@@ -1,5 +1,5 @@
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { RollSummaryModalProps } from "@classes/types";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
+import { RollSummaryModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -10,8 +10,8 @@ import { withUnistyles } from "react-native-unistyles";
 const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
     rt.colorScheme === "dark"
-      ? ["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const
-      : ["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const,
+      ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
+      : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));
 
 const CopyGradient = withUnistyles(LinearGradient, (theme) => ({

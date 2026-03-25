@@ -1,10 +1,8 @@
-import {
-  HeaderSection,
-} from "@classes/components/HeaderSection";
+import { HeaderSection } from "@classes/components/HeaderSection";
 import LectureCard from "@classes/components/LectureCard";
 import { LectureEditModal } from "@classes/components/LectureEditModal";
 import PullIndicator from "@classes/components/PullIndicator";
-import { teacherDashboardStyles as styles } from "@classes/styles";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { Skia } from "@shopify/react-native-skia";
@@ -21,7 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
-import { LectureWithCount } from "../types";
+import { LectureWithCount } from "@classes/types/common";
 
 const SearchIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,

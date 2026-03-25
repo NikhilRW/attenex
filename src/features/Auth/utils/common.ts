@@ -1,4 +1,4 @@
-import { getStartingScreenPath } from "@/shared/utils";
+import { getStartingScreenPath } from "@/shared/utils/navigation";
 import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
 import { User } from "@backend/config/database_setup";

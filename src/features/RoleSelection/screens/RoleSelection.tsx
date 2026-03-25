@@ -1,11 +1,9 @@
-import {
-  ConfirmButton,
-  RoleCard,
-  RoleSelectionHeader,
-} from "@role-selection/components";
-import { STUDENT_IMG, TEACHER_IMG } from "@role-selection/constants";
-import { useRoleSelection } from "@role-selection/hooks";
-import { styles } from "@role-selection/styles";
+import { ConfirmButton } from "@role-selection/components/ConfirmButton";
+import { RoleCard } from "@role-selection/components/RoleCard";
+import { RoleSelectionHeader } from "@role-selection/components/RoleSelectionHeader";
+import { STUDENT_IMG, TEACHER_IMG } from "@role-selection/constants/common";
+import { useRoleSelection } from "@role-selection/hooks/useRoleSelection";
+import { styles } from "@role-selection/styles/RoleSelection.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { View } from "react-native";

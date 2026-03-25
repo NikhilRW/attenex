@@ -1,5 +1,5 @@
-import { lectureEndedStyles as styles } from "@classes/styles";
-import { PasscodeCardProps } from "@classes/types";
+import { styles } from "@classes/styles/LectureEndedScreen.styles";
+import { PasscodeCardProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

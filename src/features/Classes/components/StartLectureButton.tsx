@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { StartLectureButtonProps } from "@classes/types";
+import { styles } from "@classes/styles/CreateLecture.styles";
+import { StartLectureButtonProps } from "@classes/types/props";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
@@ -14,10 +14,7 @@ export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
 }) => {
   return (
     <TouchableOpacity
-      style={[
-        styles.primaryButton,
-        loading && styles.primaryButtonDisabled,
-      ]}
+      style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
       onPress={onPress}
       disabled={loading}
     >

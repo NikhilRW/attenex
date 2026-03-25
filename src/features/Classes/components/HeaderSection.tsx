@@ -1,6 +1,6 @@
 import StatisticsCard from "@classes/components/StatisticsCard";
-import { teacherDashboardStyles as styles } from "@classes/styles";
-import { HeaderSectionProps } from "@classes/types";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { HeaderSectionProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";

@@ -36,7 +36,7 @@ import {
 } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 import { queryClient } from "../shared/constants/tanstackConfig";
-import { clientPersister } from "../shared/utils";
+import { clientPersister } from "@shared/utils/mmkvStorage";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 Appearance.setColorScheme(null);

@@ -1,4 +1,4 @@
-import { styles } from "@role-selection/styles";
+import { styles } from "@role-selection/styles/RoleSelection.styles";
 import React from "react";
 import { Text, View } from "react-native";
 

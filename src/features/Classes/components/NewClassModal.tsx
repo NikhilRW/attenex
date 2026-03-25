@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { NewClassModalProps } from "@classes/types";
+import { styles } from "@classes/styles/CreateLecture.styles";
+import { NewClassModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -53,7 +53,11 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
           <NewClassGradient
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[styles.modalContent, styles.modalSurfaceElevated, styles.modalSurfaceFlat]}
+            style={[
+              styles.modalContent,
+              styles.modalSurfaceElevated,
+              styles.modalSurfaceFlat,
+            ]}
           >
             <View style={styles.modalHeaderRow}>
               <View>
@@ -70,9 +74,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
             </View>
 
             <View style={styles.modalBody}>
-              <Text style={styles.modalLabel}>
-                Class Name
-              </Text>
+              <Text style={styles.modalLabel}>Class Name</Text>
 
               <View style={styles.modalInputRow}>
                 <NewClassInput
@@ -92,13 +94,18 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                 <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.modalButtonWrapper} onPress={handleCreateClass}>
+              <TouchableOpacity
+                style={styles.modalButtonWrapper}
+                onPress={handleCreateClass}
+              >
                 <PrimaryGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.modalButton}
                 >
-                  <Text style={styles.modalButtonTextPrimary}>Create Class</Text>
+                  <Text style={styles.modalButtonTextPrimary}>
+                    Create Class
+                  </Text>
                 </PrimaryGradient>
               </TouchableOpacity>
             </View>

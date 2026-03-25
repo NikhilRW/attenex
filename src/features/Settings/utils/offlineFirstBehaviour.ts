@@ -1,5 +1,5 @@
 import { userService } from "@/shared/services/userService";
-import { mmkvStorage } from "@/shared/utils";
+import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { defineTask } from "expo-task-manager";
 import { BACKGROUND_TASK_IDENTIFIER } from "../constants/common";
 

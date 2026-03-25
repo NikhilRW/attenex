@@ -1,5 +1,6 @@
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { AttendanceFilterProps, FilterType } from "@classes/types";
+import styles from "@classes/styles/AttendanceViewScreen.styles";
+import { AttendanceFilterProps } from "@classes/types/props";
+import { FilterType } from "@classes/types/common";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -13,37 +14,35 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
       entering={FadeInDown.delay(200).springify()}
       style={styles.filterContainer}
     >
-      {(["all", "present", "incomplete", "absent"] as FilterType[]).map(
-        (f) => (
-          <TouchableOpacity
-            key={f}
+      {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
+        <TouchableOpacity
+          key={f}
+          style={[
+            styles.filterButton,
+            filter === f
+              ? f === "present"
+                ? styles.filterButtonPresent
+                : f === "incomplete"
+                  ? styles.filterButtonIncomplete
+                  : f === "absent"
+                    ? styles.filterButtonAbsent
+                    : styles.filterButtonAll
+              : styles.filterButtonInactive,
+          ]}
+          onPress={() => setFilter(f)}
+        >
+          <Text
             style={[
-              styles.filterButton,
+              styles.filterButtonText,
               filter === f
-                ? f === "present"
-                  ? styles.filterButtonPresent
-                  : f === "incomplete"
-                    ? styles.filterButtonIncomplete
-                    : f === "absent"
-                      ? styles.filterButtonAbsent
-                      : styles.filterButtonAll
-                : styles.filterButtonInactive,
+                ? styles.filterButtonTextActive
+                : styles.filterButtonTextInactive,
             ]}
-            onPress={() => setFilter(f)}
           >
-            <Text
-              style={[
-                styles.filterButtonText,
-                filter === f
-                  ? styles.filterButtonTextActive
-                  : styles.filterButtonTextInactive,
-              ]}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        )
-      )}
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </Animated.View>
   );
 };

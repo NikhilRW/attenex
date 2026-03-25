@@ -1,14 +1,12 @@
-import {
-  AttendanceFilter,
-} from "@classes/components/AttendanceFilter";
+import { AttendanceFilter } from "@classes/components/AttendanceFilter";
 import { AttendanceFloatingButton } from "@classes/components/AttendanceFloatingButton";
 import { AttendanceHeader } from "@classes/components/AttendanceHeader";
 import { ManualAttendanceModal } from "@classes/components/ManualAttendanceModal";
 import { RollSummaryModal } from "@classes/components/RollSummaryModal";
 import { StudentCard } from "@classes/components/StudentCard";
-import { useAttendanceView } from "@classes/hooks";
-import { attendanceViewStyles as styles } from "@classes/styles";
-import { AttendanceRecord } from "@classes/types";
+import { useAttendanceView } from "@classes/hooks/useAttendanceView";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
+import { AttendanceRecord } from "@classes/types/common";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React, { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -71,7 +69,6 @@ const AttendanceViewScreen = () => {
         renderItem={renderAttendanceItem}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <AttendanceFilter filter={filter} setFilter={setFilter} />

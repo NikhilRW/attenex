@@ -1,11 +1,8 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
-import { lectureService } from "@classes/services";
-import {
-  ClassItem,
-  CreateLectureAPIResponse,
-  LectureWithCount,
-} from "@classes/types";
+import { lectureService } from "@classes/services/lectureService";
+import { ClassItem, LectureWithCount } from "@classes/types/common";
+import { CreateLectureAPIResponse } from "@classes/types/api";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";

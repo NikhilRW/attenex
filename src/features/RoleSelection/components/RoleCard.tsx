@@ -1,5 +1,5 @@
-import { styles } from "@role-selection/styles";
-import { RoleCardProps } from "@role-selection/types";
+import { roleSelectionStyles as styles } from "@role-selection/styles/RoleSelection.styles";
+import { RoleCardProps } from "@role-selection/types/props";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { NitroImage } from "react-native-nitro-image";

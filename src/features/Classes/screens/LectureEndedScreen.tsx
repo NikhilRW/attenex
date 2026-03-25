@@ -1,29 +1,25 @@
-import {
-  LectureEndedDoneButton,
-} from "@classes/components/LectureEndedDoneButton";
+import { LectureEndedDoneButton } from "@classes/components/LectureEndedDoneButton";
 import { LectureEndedHeader } from "@classes/components/LectureEndedHeader";
 import { LectureEndedSuccessIcon } from "@classes/components/LectureEndedSuccessIcon";
 import { LectureEndedTitle } from "@classes/components/LectureEndedTitle";
 import { PasscodeCard } from "@classes/components/PasscodeCard";
-import { useLectureEnded } from "@classes/hooks";
-import { lectureEndedStyles as styles } from "@classes/styles";
+import { useLectureEnded } from "@classes/hooks/useLectureEnded";
+import { styles } from "@classes/styles/LectureEndedScreen.styles";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { ScrollView, View } from "react-native";
 
 const LectureEndedScreen = () => {
-  const {
-    lectureTitle,
-    passcode,
-    loading,
-    fetchPasscodeData,
-    handleDone,
-  } = useLectureEnded();
+  const { lectureTitle, passcode, loading, fetchPasscodeData, handleDone } =
+    useLectureEnded();
 
   return (
     <View style={styles.container}>
       <FuturisticBackground />
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollView}
+      >
         <View style={styles.contentContainer}>
           <LectureEndedHeader onDone={handleDone} />
 

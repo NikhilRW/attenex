@@ -1,9 +1,9 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
-import { Role } from "@role-selection/types";
+import { Role } from "@role-selection/types/common";
 import { useAuthStore } from "@shared/stores/authStore";
-import { logger } from "@shared/utils";
+import { logger } from "@shared/utils/logger";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useNetworkState } from "expo-network";

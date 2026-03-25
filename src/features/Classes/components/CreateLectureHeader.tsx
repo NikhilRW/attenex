@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { CreateLectureHeaderProps } from "@classes/types";
+import { styles } from "@classes/styles/CreateLecture.styles";
+import { CreateLectureHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";

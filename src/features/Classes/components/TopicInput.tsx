@@ -1,5 +1,5 @@
-import { createLectureStyles as styles } from "@classes/styles";
-import { TopicInputProps } from "@classes/types";
+import { styles } from "@classes/styles/CreateLecture.styles";
+import { TopicInputProps } from "@classes/types/props";
 import React from "react";
 import { Text, TextInput, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
@@ -14,9 +14,7 @@ export const TopicInput: React.FC<TopicInputProps> = ({
 }) => {
   return (
     <View style={[styles.inputGroup, styles.inputGroupTopic]}>
-      <Text style={styles.label}>
-        Lecture Topic
-      </Text>
+      <Text style={styles.label}>Lecture Topic</Text>
       <TopicInputField
         style={styles.textInput}
         placeholder="Enter lecture topic"

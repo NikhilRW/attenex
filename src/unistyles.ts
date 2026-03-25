@@ -1,7 +1,6 @@
 import { darkTheme, lightTheme } from "@shared/constants/colors";
 import { StyleSheet } from "react-native-unistyles";
-import { useThemeStore } from "./shared/hooks";
-
+import{ useThemeStore  } from "./shared/hooks/useTheme";
 const appThemes = {
   dark: darkTheme,
   light: lightTheme,

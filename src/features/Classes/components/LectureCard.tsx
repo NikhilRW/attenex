@@ -1,6 +1,6 @@
 import { lectureService } from "@classes/services/lectureService";
-import { teacherDashboardStyles as styles } from "@classes/styles";
-import { LectureCardProps } from "@classes/types";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { LectureCardProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
