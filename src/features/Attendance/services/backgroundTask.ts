@@ -3,7 +3,7 @@ import { Accuracy, requestBackgroundPermissionsAsync, startLocationUpdatesAsync,
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import { sendPing } from "./attendanceService";
 
-export const LOCATION_TASK_NAME = "background-location-task";
+const LOCATION_TASK_NAME = "background-location-task";
 
 defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error) {

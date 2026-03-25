@@ -6,7 +6,3 @@ export type RegisterGoogleUserResponse = {
   user: User;
   token: string;
 };
-export type loginUserRequest = {
-  email: string;
-  password: string;
-};

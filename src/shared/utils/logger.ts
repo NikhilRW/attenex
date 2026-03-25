@@ -1,4 +1,4 @@
-export class Logger {
+class Logger {
   private getTimestamp(): string {
     return new Date().toISOString();
   }

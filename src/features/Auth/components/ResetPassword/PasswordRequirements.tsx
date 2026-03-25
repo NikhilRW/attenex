@@ -2,7 +2,7 @@ import { styles } from "@auth/styles/ResetPassword.styles";
 import { PasswordRequirementsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -13,7 +13,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
   password,
   confirmPassword,
 }) => {
-  const requirements = [
+  const requirements = useMemo(() => [
     { label: "At least 8 characters", valid: password.length >= 8 },
     { label: "One uppercase letter", valid: /(?=.*[A-Z])/.test(password) },
     { label: "One lowercase letter", valid: /(?=.*[a-z])/.test(password) },
@@ -22,7 +22,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
       label: "Passwords match",
       valid: !!password && password === confirmPassword,
     },
-  ];
+  ],[confirmPassword,password]);
 
   return (
     <RequirementsSurface
@@ -36,8 +36,8 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
     >
       <View style={styles.requirementsContainer}>
         <Text style={styles.requirementsTitle}>Password Requirements:</Text>
-        {requirements.map((req, index) => (
-          <View key={`${req.label}-${index}`} style={styles.requirementItem}>
+        {requirements.map((req) => (
+          <View key={`${req.label}`} style={styles.requirementItem}>
             <RequirementIcon
               name={req.valid ? "checkmark-circle" : "ellipse-outline"}
               size={16}

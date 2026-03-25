@@ -1,4 +1,4 @@
-import { AlertFunction } from "../types";
+import { AlertFunction } from "../types/common";
 
 /**
  * Show a success alert

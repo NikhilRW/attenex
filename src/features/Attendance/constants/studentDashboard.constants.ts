@@ -9,12 +9,6 @@ export const ALERT_DELAY = 100; // Delay before showing alerts
 // Validation constants
 export const PASSCODE_LENGTH = 4;
 
-// Location accuracy
-export const LOCATION_ACCURACY = {
-  HIGHEST: "highest" as const,
-  HIGH: "high" as const,
-};
-
 // Alert messages
 export const ALERT_MESSAGES = {
   PERMISSION_DENIED: {

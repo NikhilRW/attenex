@@ -3,6 +3,7 @@ import { styles } from "../styles/LinkedInAuth.styles";
 import LinkedInView from "react-native-linkedin-oauth2";
 import { View } from "react-native";
 import { router } from "expo-router";
+import { LINKEDIN_CONFIG } from "../constants/linkedin";
 
 const LinkedInAuth = () => {
   const {
@@ -26,6 +27,7 @@ const LinkedInAuth = () => {
               setIsVisible(false);
               await handleLinkedInLogout();
             }}
+            onError={errorHandler}
             containerStyle={{ backgroundColor: "#000" }}
           />
         ) : (
@@ -36,10 +38,8 @@ const LinkedInAuth = () => {
               setIsVisible(false);
               router.back();
             }}
-            clientId={process.env.EXPO_PUBLIC_LINKEDIN_CLIENT_ID as string}
-            redirectUri={
-              process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI as string
-            }
+            clientId={LINKEDIN_CONFIG.CLIENT_ID}
+            redirectUri={LINKEDIN_CONFIG.REDIRECT_URI}
             secureMode
             onError={errorHandler}
             containerStyle={{ backgroundColor: "#000" }}

@@ -16,6 +16,7 @@ const InvalidResetPasswordLink = () => {
   return (
     <View style={styles.container}>
       <FuturisticBackground />
+      {/* AGENT: Add here correct styles */}
       <View style={styles.errorContainer}>
         <View style={[styles.iconContainer, styles.errorIconContainer]}>
           <ErrorIcon name="close-circle-outline" size={64} />

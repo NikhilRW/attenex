@@ -9,9 +9,11 @@ import {
   requestForegroundPermissionsAsync,
 } from "expo-location";
 import {
-  CreateLectureVariables,
   LectureWithCount,
-} from "@/features/Classes/types";
+} from "@/features/Classes/types/common";
+import {
+  CreateLectureVariables
+} from '@classes/types/params';
 
 export const nameUpdateMutateFn = async (username: string) => {
   impactAsync(ImpactFeedbackStyle.Medium);

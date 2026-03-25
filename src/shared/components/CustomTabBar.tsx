@@ -1,4 +1,4 @@
-import { lectureService } from "@classes/services/lectureService";
+eimport { lectureService } from "@classes/services/lectureService";
 import Entypo from "@react-native-vector-icons/entypo";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";

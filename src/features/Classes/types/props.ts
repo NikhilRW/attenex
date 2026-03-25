@@ -48,17 +48,6 @@ export interface ClassSelectorProps {
   onAddNewClass: () => void;
 }
 
-/**
- * CreateLectureForm component props
- */
-export interface CreateLectureFormProps {
-  lectureName: string;
-  setLectureName: (value: string) => void;
-  className: string;
-  setClassName: (value: string) => void;
-  isCreating: boolean;
-  onCreateLecture: () => void;
-}
 
 /**
  * DurationOption interface for duration selectors

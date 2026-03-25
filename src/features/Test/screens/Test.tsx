@@ -1,6 +1,6 @@
 import { colors } from "@/shared/constants/colors";
 import { onlineManager } from "@tanstack/react-query";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { NitroImage } from "react-native-nitro-image";
 import { Button } from "react-native-paper";
@@ -18,8 +18,12 @@ const Test = () => {
   const [runId, setRunId] = useState(0);
   const [lastRenderDuration, setLastRenderDuration] = useState<number>();
 
-  const benchmarkStartedAtRef = useRef<number | null>(performance.now());
+  const benchmarkStartedAtRef = useRef<number | null>(null);
   const hasCapturedLayoutRef = useRef(false);
+
+  useEffect(() => {
+    benchmarkStartedAtRef.current = performance.now();
+  }, []);
 
   const benchmarkImages = useMemo(
     () =>
