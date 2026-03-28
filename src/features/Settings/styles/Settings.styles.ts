@@ -51,7 +51,7 @@ export const styles = StyleSheet.create((theme) => {
       overflow: "hidden",
     },
     cardSurface: {
-      backgroundColor: theme.surface.cardBg,
+      backgroundColor: theme.surface.glassCardBg,
       borderColor: theme.surface.glassBorder,
     },
     dangerCard: {
@@ -172,7 +172,7 @@ export const styles = StyleSheet.create((theme) => {
       borderColor: theme.primary.main,
     },
     optionCardInactive: {
-      backgroundColor: theme.surface.cardBg,
+      backgroundColor: theme.surface.glassCardBg,
       borderColor: theme.surface.glassBorder,
     },
     roleCard: {

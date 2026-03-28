@@ -1,4 +1,4 @@
-import styles from "@classes/styles/CreateLecture.styles";
+import {styles} from "@classes/styles/CreateLecture.styles";
 import { ClassItem } from "@classes/types/common";
 import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";

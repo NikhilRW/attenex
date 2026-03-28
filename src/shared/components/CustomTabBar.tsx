@@ -1,4 +1,4 @@
-eimport { lectureService } from "@classes/services/lectureService";
+import { lectureService } from "@classes/services/lectureService";
 import Entypo from "@react-native-vector-icons/entypo";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";
@@ -145,7 +145,7 @@ const CustomTabBar = ({
     <Animated.View
       style={[
         styles.container,
-        (isEmptyTabBar || !isAuthenticated) && styles.hidden,
+      (isEmptyTabBar || !isAuthenticated) && styles.hidden,
       ]}
     >
       <Animated.View
@@ -313,16 +313,11 @@ const styles = StyleSheet.create((theme) => ({
       },
     ],
     marginHorizontal: "auto",
-    // justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: 10,
     borderRadius: 30,
     elevation: 0,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 4 },
-    // shadowOpacity: 0,
-    // shadowRadius: 8,
     zIndex: 2,
     borderWidth: 1,
     backgroundColor: theme.surface.cardBg,

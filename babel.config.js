@@ -4,12 +4,12 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     plugins: [
       // Reanimated plugin must be last
-      [
-        "react-native-boost/plugin",
-        {
-          silent: true,
-        },
-      ],
+      // [
+      //   "react-native-boost/plugin",
+      //   {
+      //     silent: true,
+      //   },
+      // ],
       [
         "react-native-unistyles/plugin",
         {

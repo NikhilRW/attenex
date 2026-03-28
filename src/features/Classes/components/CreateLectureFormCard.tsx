@@ -1,4 +1,4 @@
-import styles from "@classes/styles/CreateLecture.styles";
+import {styles} from "@classes/styles/CreateLecture.styles";
 import { CreateLectureFormCardProps } from "@classes/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";

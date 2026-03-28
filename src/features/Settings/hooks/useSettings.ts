@@ -3,7 +3,6 @@ import { queryKeys } from "@/shared/constants/queryKeys";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import type { UserRole } from "@settings/types/common";
-import { resetPassword } from "@settings/utils/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import type { User } from "@shared/stores/authStore";
@@ -13,6 +12,9 @@ import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
+import { resetPassword } from "../utils/common";
+
+
 // TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();

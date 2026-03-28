@@ -7,6 +7,7 @@ const styles = StyleSheet.create((theme, rt) => {
     container: {
       flex: 1,
       backgroundColor: theme.background.secondary,
+      
     },
     screenContainer: {
       flex: 1,
@@ -19,6 +20,7 @@ const styles = StyleSheet.create((theme, rt) => {
     scrollContent: {
       padding: 20,
       paddingTop: 30,
+      paddingBottom: 70,
     },
     headerSection: {
       marginBottom: 24,

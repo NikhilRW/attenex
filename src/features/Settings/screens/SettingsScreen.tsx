@@ -59,6 +59,7 @@ const SettingsScreen = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        
         <ProfileSection
           displayName={displayName}
           onDisplayNameChange={setDisplayName}

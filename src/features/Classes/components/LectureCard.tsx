@@ -6,10 +6,14 @@ import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
+
 import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
+import { yellowA700 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import Animated, {
   Easing,
+  useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -49,8 +53,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
-  // TODO: why used useEffect
-
+  
   useEffect(() => {
     if (isPending) {
       opacity.value = withRepeat(
