@@ -1,6 +1,8 @@
 import { ErrorRequestHandler } from "express";
 import { logger } from "../utils/logger";
 
+// TODO: centralize error handling processes.
+
 /**
  * Central error handling middleware for express.
  * Normalizes error responses and logs them.
