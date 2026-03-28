@@ -6,14 +6,10 @@ import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
-
 import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
-import { yellowA700 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import Animated, {
   Easing,
-  useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withRepeat,
   withTiming,
