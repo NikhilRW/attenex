@@ -18,7 +18,8 @@ import styles from "@attendance/styles/StudentDashboard.styles";
 import { Lecture } from "@attendance/types/common";
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
-import React, { useCallback } from "react";
+import { markPerformance } from "@shared/utils/performance";
+import React, { useCallback, useEffect } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 import Animated, { LinearTransition } from "react-native-reanimated";
 
@@ -27,6 +28,17 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 const StudentDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const { alert } = useAlerts();
+
+  useEffect(() => {
+    markPerformance("student-dashboard-mount");
+    const interactionHandle = requestIdleCallback(() => {
+      markPerformance("student-dashboard-interactive");
+    });
+
+    return () => {
+      cancelIdleCallback(interactionHandle);
+    };
+  }, []);
 
   // Roll number management
   const {

@@ -17,7 +17,14 @@ import {
 } from "@tanstack/react-query";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AppState } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import { useAlerts } from "react-native-paper-alerts";
@@ -57,6 +64,7 @@ export const useTeacherDashboard = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const data = useMutationState({
     filters: { mutationKey: mutationKeys.lectures.create },
@@ -408,11 +416,11 @@ export const useTeacherDashboard = () => {
   const filteredLectures = useMemo(() => {
     return effectiveLectures.filter((l) => {
       return (
-        l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.courseName.toLowerCase().includes(searchQuery.toLowerCase())
+        l.title.toLowerCase().includes(deferredSearchQuery.toLowerCase()) ||
+        l.courseName.toLowerCase().includes(deferredSearchQuery.toLowerCase())
       );
     });
-  }, [effectiveLectures, searchQuery]);
+  }, [effectiveLectures, deferredSearchQuery]);
 
   // Stats - memoized to prevent recalculation on every render
   const totalActive = useMemo(() => {

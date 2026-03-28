@@ -1,4 +1,4 @@
-import styles from "@classes/styles/AttendanceViewScreen.styles";
+import {styles} from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceFloatingButtonProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";

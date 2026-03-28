@@ -1,4 +1,4 @@
-import styles from "@classes/styles/AttendanceViewScreen.styles";
+import {styles} from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";

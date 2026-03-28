@@ -3,16 +3,10 @@
  * Based on React Native best practices for FPS and TTI measurement
  */
 
-import { InteractionManager } from "react-native";
-
 export const markPerformance = (markName: string) => {
   if (__DEV__) {
     console.log(`[Performance] Mark: ${markName} at ${Date.now()}`);
   }
-};
-
-export const deferWork = (callback: () => void) => {
-  return InteractionManager.runAfterInteractions(callback);
 };
 
 export const logRenderTime = (

@@ -1,7 +1,7 @@
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { LocationCoords } from "@attendance/types/studentDashboard.types";
 import * as Location from "expo-location";
-import { AlertFunction } from "../types";
+import { AlertFunction } from "../types/common";
 
 /**
  * Request location permissions from the user

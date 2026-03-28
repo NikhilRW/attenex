@@ -1,4 +1,4 @@
-import styles from "@classes/styles/AttendanceViewScreen.styles";
+import {styles} from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceFilterProps } from "@classes/types/props";
 import { FilterType } from "@classes/types/common";
 import React from "react";

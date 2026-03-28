@@ -10,6 +10,7 @@ export enum StaleTime {
   MINUTES_2 = 120000,
   MINUTES_5 = 300000,
   DAYS_1 = 86400000,
+  HALF_DAY = 43200000,
   DAYS_5 = 432000000,
   INFINITE = Infinity,
 }
@@ -60,9 +61,9 @@ export const queryClient = new QueryClient({
         return failureCount < 2;
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      refetchOnMount: true,
+      refetchOnMount: false,
     },
     mutations: {
       networkMode: "offlineFirst", // Queue mutations when offline, auto-retry when online

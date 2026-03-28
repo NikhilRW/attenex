@@ -9,7 +9,7 @@ import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.t
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { Lecture } from "../types";
+import { Lecture } from "../types/common";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh

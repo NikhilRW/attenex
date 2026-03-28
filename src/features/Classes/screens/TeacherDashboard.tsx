@@ -5,8 +5,9 @@ import PullIndicator from "@classes/components/PullIndicator";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { FuturisticBackground } from "@shared/components/FuturisticBackground";
+import { markPerformance } from "@shared/utils/performance";
 import { Skia } from "@shopify/react-native-skia";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   GestureDetector,
@@ -70,6 +71,17 @@ const TeacherDashboard = () => {
     getItemLayout,
     flatListPerformanceProps,
   } = useTeacherDashboard();
+
+  useEffect(() => {
+    markPerformance("teacher-dashboard-mount");
+    const interactionHandle = requestIdleCallback(() => {
+      markPerformance("teacher-dashboard-interactive");
+    });
+
+    return () => {
+      cancelIdleCallback(interactionHandle);
+    };
+  }, []);
 
   const renderLectureItem = useCallback(
     ({ item: lecture, index }: { item: LectureWithCount; index: number }) => (

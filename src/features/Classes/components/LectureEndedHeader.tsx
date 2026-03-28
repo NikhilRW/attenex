@@ -1,4 +1,4 @@
-import styles from "@classes/styles/LectureEndedScreen.styles";
+import { styles } from "@classes/styles/LectureEndedScreen.styles";
 import { LectureEndedHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";

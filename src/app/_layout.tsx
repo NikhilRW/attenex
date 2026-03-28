@@ -4,6 +4,7 @@ import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
 import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
 import { useNotificationBootstrap } from "@shared/hooks/useNotificationBootstrap";
 import { useThemeStore } from "@shared/hooks/useTheme";
+import { markPerformance } from "@shared/utils/performance";
 import {
   PerformanceMeasureView,
   PerformanceProfiler,
@@ -35,7 +36,7 @@ import {
   withUnistyles,
 } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
-import { queryClient } from "../shared/constants/tanstackConfig";
+import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "@shared/utils/mmkvStorage";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
@@ -101,6 +102,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded || error) {
+      markPerformance("fonts-loaded");
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
@@ -156,7 +158,7 @@ export default function RootLayout() {
                       onSuccess={tanstackOnSuccess}
                       persistOptions={{
                         persister: clientPersister,
-                        maxAge: Infinity, // Keep mutations indefinitely for offline-first
+                        maxAge: Infinity, // Keep persisted queries bounded for mobile
                         dehydrateOptions: {
                           // Persist mutations that are queued/in-flight (paused = queued while offline)
                           shouldDehydrateMutation: (mutation: any) => {
@@ -165,9 +167,13 @@ export default function RootLayout() {
                               mutation.state.status === "paused"
                             );
                           },
-                          // Persist successful query data so screens load instantly after app kill
-                          shouldDehydrateQuery: (query: any) =>
-                            query.state.status === "success",
+                          // Persist successful, fresh query data so screens load instantly after app kill
+                          shouldDehydrateQuery: (query: any) => {
+                            const isFresh =
+                              Date.now() - query.state.dataUpdatedAt <
+                              StaleTime.HALF_DAY;
+                            return query.state.status === "success" && isFresh;
+                          },
                         },
                       }}
                     >
