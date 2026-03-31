@@ -3,7 +3,7 @@ import Entypo from "@react-native-vector-icons/entypo";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { StaleTime } from "@shared/constants/tanstackConfig";
 import { useAuthStore } from "@shared/stores/authStore";

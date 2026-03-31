@@ -40,7 +40,6 @@ import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "@shared/utils/mmkvStorage";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
-Appearance.setColorScheme(null);
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -196,3 +195,7 @@ export default function RootLayout() {
     </PerformanceProfiler>
   );
 }
+
+    // "@react-navigation/bottom-tabs": "^7.4.0",
+    // "@react-navigation/elements": "^2.6.3",
+    // "@react-navigation/native": "^7.1.8",
