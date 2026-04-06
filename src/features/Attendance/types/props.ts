@@ -39,6 +39,7 @@ export interface OnGoingLectureProps {
   lecture: Lecture;
   loading: boolean;
   handleJoin: (lecture: Lecture) => Promise<void>;
+  lectureHeightRef: React.RefObject<number>;
 }
 
 export interface StudentDashboardHeaderProps {

@@ -1,9 +1,10 @@
+import { logger } from "@/shared/utils/logger";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { OnGoingLectureProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback } from "react";
+import { ActivityIndicator, LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const LectureCardGradient = withUnistyles(LinearGradient, (_, rt) => ({
@@ -37,9 +38,17 @@ const OnGoingLecture = ({
   lecture,
   loading,
   handleJoin,
+  lectureHeightRef,
 }: OnGoingLectureProps) => {
+  
+  const handleLayout = useCallback((e: LayoutChangeEvent) => {
+    if(e.nativeEvent.layout.height === 0) return;
+    logger.info(`Lecture ${lecture.id} layout height retreived : `, e.nativeEvent.layout);
+    lectureHeightRef.current = e.nativeEvent.layout.height;
+  }, [lectureHeightRef,lecture.id]); 
+
   return (
-    <LectureCardGradient key={lecture.id} style={styles.lectureCard}>
+    <LectureCardGradient key={lecture.id} style={styles.lectureCard} onLayout={handleLayout}>
       <View style={styles.lectureCardHeader}>
         <View style={styles.headerLeftContent}>
           <View style={styles.iconContainer}>

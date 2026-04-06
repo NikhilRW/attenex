@@ -16,18 +16,26 @@ import { useRollNoManagement } from "@attendance/hooks/useRollNoManagement";
 import { useSocketManager } from "@attendance/hooks/useSocketManager";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { Lecture } from "@attendance/types/common";
+import {
+  generateMockStudentLectures,
+  getStudentDashboardStressOptions,
+} from "@attendance/utils/stressTest";
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { markPerformance } from "@shared/utils/performance";
-import React, { useCallback, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 import Animated, { LinearTransition } from "react-native-reanimated";
 
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 
+const DEFAULT_LECTURE_ROW_HEIGHT = 220;
+
 const StudentDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const { alert } = useAlerts();
+  const lectureHeight = useRef<number>(0);
 
   useEffect(() => {
     markPerformance("student-dashboard-mount");
@@ -39,6 +47,34 @@ const StudentDashboard = () => {
       cancelIdleCallback(interactionHandle);
     };
   }, []);
+
+  const params = useLocalSearchParams<{
+    stress?: string;
+    mock?: string;
+    count?: string;
+    lectures?: string;
+    size?: string;
+  }>();
+
+  const stressOptions = useMemo(
+    () =>
+      getStudentDashboardStressOptions({
+        stress: params.stress,
+        mock: params.mock,
+        count: params.count,
+        lectures: params.lectures,
+        size: params.size,
+      }),
+    [params.count, params.lectures, params.mock, params.size, params.stress],
+  );
+
+  const mockLectures = useMemo(
+    () =>
+      stressOptions.enabled
+        ? generateMockStudentLectures(stressOptions.lectureCount)
+        : [],
+    [stressOptions.enabled, stressOptions.lectureCount],
+  );
 
   // Roll number management
   const {
@@ -82,15 +118,51 @@ const StudentDashboard = () => {
     alert,
   );
 
+  const handleJoinAction = useCallback(
+    async (lecture: Lecture) => {
+      if (stressOptions.enabled) {
+        return;
+      }
+      return handleJoin(lecture);
+    },
+    [handleJoin, stressOptions.enabled],
+  );
+
   const renderLectureItem = useCallback(
     ({ item }: { item: Lecture }) => (
       <OnGoingLecture
         lecture={item}
         loading={joinLoading}
-        handleJoin={handleJoin}
+        handleJoin={handleJoinAction}
+        lectureHeightRef={lectureHeight}
       />
     ),
-    [handleJoin, joinLoading],
+    [handleJoinAction, joinLoading],
+  );
+
+  const keyExtractor = useCallback((lecture: Lecture) => lecture.id, []);
+
+  const getItemLayout = useCallback(
+    (_: ArrayLike<Lecture> | null | undefined, index: number) => {
+      const rowHeight = lectureHeight.current || DEFAULT_LECTURE_ROW_HEIGHT;
+      return {
+        length: rowHeight,
+        offset: rowHeight * index,
+        index,
+      };
+    },
+    [],
+  );
+
+  const flatListPerformanceProps = useMemo(
+    () => ({
+      removeClippedSubviews: true,
+      initialNumToRender: 8,
+      maxToRenderPerBatch: 8,
+      updateCellsBatchingPeriod: 40,
+      windowSize: 12,
+    }),
+    [],
   );
 
   // Class management
@@ -177,17 +249,25 @@ const StudentDashboard = () => {
       />
     );
   }
-  const lectureData: Lecture[] = user?.className ? (lectures ?? []) : [];
+  const lectureData: Lecture[] = stressOptions.enabled
+    ? mockLectures
+    : user?.className
+      ? (lectures ?? [])
+      : [];
 
   return (
     <>
       <Animated.FlatList<Lecture>
         data={lectureData}
-        keyExtractor={(lecture) => lecture.id}
+        keyExtractor={keyExtractor}
         renderItem={renderLectureItem}
+        getItemLayout={getItemLayout}
         itemLayoutAnimation={LinearTransition.springify()}
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        {...flatListPerformanceProps}
         ListHeaderComponent={
           <StudentDashboardHeader
             user={user}
