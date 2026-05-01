@@ -168,7 +168,6 @@ export const lectures = pgTable(
       .references(() => classes.id)
       .notNull(), // Class this lecture belongs to (references class id)
     title: text("title").notNull(), // Lecture title/topic
-    sessionToken: uuid("session_token").defaultRandom(), // Unique token for this session
     passcode: varchar("passcode", { length: 4 }), // 4-digit passcode that refreshes every 10 seconds
     passcodeUpdatedAt: timestamp("passcode_updated_at", { withTimezone: true }), // Last time passcode was refreshed
     duration: numeric("duration").default("60").notNull(), // Duration in minutes
@@ -206,6 +205,7 @@ export const attendanceAttempts = pgTable(
     attemptTime: timestamp("attempt_time", { withTimezone: true }).defaultNow(), // When attempt occurred
     distanceMeters: numeric("distance_meters"), // How far they were from teacher (for geofencing)
     success: boolean("success").notNull(), // Whether the attempt succeeded
+    // TODO: think what we can do with this data ipAddress and deviceInfo
     ipAddress: text("ip_address"), // Client IP for security/audit
     deviceInfo: jsonb("device_info"), // Device details for debugging (OS, browser, etc.)
   },
@@ -237,7 +237,6 @@ export const attendance = pgTable(
     checkScore: numeric("check_score").default("0"), // Number of valid presence checks passed
     method: attendanceMethodEnum("method").default("auto"), // How attendance was marked
     locationSnapshot: jsonb("location_snapshot"), // GPS snapshot: { lat, lng, accuracy }
-    extra: jsonb("extra"), // Additional metadata (future extensibility)
   },
   (table) => [
     uniqueIndex("attendance_unique_idx").on(table.lectureId, table.studentId), // One attendance per student per lecture
@@ -278,6 +277,8 @@ export const attendancePings = pgTable(
  * Logs when a student leaves or enters the geofence radius during a lecture.
  * Used to detect "Leave and Return" cheating patterns.
  */
+
+// TODO: where is this geofence used in our application.
 export const geofenceLogs = pgTable(
   "geofence_logs",
   {
@@ -443,3 +444,5 @@ export type AttendanceAttempt = typeof attendanceAttempts.$inferSelect;
 export type NewAttendanceAttempt = typeof attendanceAttempts.$inferInsert;
 
 export default db;
+
+// TODO: nested with queries of drizzle has been used ?
