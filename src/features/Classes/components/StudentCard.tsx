@@ -4,7 +4,10 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  LinearTransition,
+} from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
 const PresentAvatar = withUnistyles(LinearGradient, () => ({
@@ -23,6 +26,15 @@ const MetaIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));
 
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
   const AvatarGradient =
     record.status === "present"
@@ -30,15 +42,6 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
       : record.status === "incomplete"
         ? IncompleteAvatar
         : AbsentAvatar;
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
     <Animated.View
@@ -148,3 +151,5 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
     </Animated.View>
   );
 };
+
+export const MemoizedStudentCard = React.memo(StudentCard);

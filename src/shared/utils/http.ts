@@ -26,9 +26,7 @@ http.interceptors.request.use(async (config) => {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 
-    if (__DEV__) {
-      console.log("[HTTP Request]", config.method?.toUpperCase(), config.url);
-    }
+    console.log("[HTTP Request]", config.method?.toUpperCase(), config.url);
 
     return config;
   } catch {
@@ -39,15 +37,11 @@ http.interceptors.request.use(async (config) => {
 // Response interceptor to handle errors and 401 unauthorized
 http.interceptors.response.use(
   (response) => {
-    if (__DEV__) {
-      console.log("[HTTP Response]", response.status, response.config.url);
-    }
+    console.log("[HTTP Response]", response.status, response.config.url);
     return response;
   },
   async (error) => {
-    if (__DEV__) {
-      console.error("[HTTP Error]", error.response?.status, error.config?.url);
-    }
+    console.error("[HTTP Error]", error.response?.status, error.config?.url);
 
     // Only logout on 401 Unauthorized (invalid/expired token)
     if (error.response?.status === 401) {

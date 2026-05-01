@@ -8,6 +8,7 @@ import { queryKeys } from "@shared/constants/queryKeys";
 import { StaleTime } from "@shared/constants/tanstackConfig";
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
+import React, { useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
 import Animated, {
   Easing,
@@ -32,29 +33,34 @@ const isFreshQuery = (
   dataUpdatedAt: number | undefined,
   staleTimeMs: number,
 ) => {
-  return (
-    dataUpdatedAt != null && Date.now() - dataUpdatedAt < staleTimeMs
-  );
+  return dataUpdatedAt != null && Date.now() - dataUpdatedAt < staleTimeMs;
 };
 
 const CustomTabBar = ({
   state: { index, routeNames },
   navigation,
 }: BottomTabBarProps) => {
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   const role = user?.role;
 
-  const handleTabPrefetch = (routeName: string) => {
-    if (routeName.includes("attendance") && role === "student") {
-      const className = (user as any)?.className;
-      if (className) {
-        const queryState = queryClient.getQueryState(queryKeys.lectures.student);
+  const handleTabPrefetch = useCallback(
+    (routeName: string) => {
+      if (routeName.includes("attendance") && role === "student") {
+        const className = (user as any)?.className;
+        if (!className) {
+          return;
+        }
+
+        const queryState = queryClient.getQueryState(
+          queryKeys.lectures.student,
+        );
         const isDataFresh = isFreshQuery(
           queryState?.dataUpdatedAt,
           StaleTime.SECONDS_30,
         );
+
         if (!isDataFresh) {
           queryClient.prefetchQuery({
             queryKey: queryKeys.lectures.student,
@@ -66,65 +72,77 @@ const CustomTabBar = ({
           });
         }
       }
-    }
-    if (routeName.includes("classes") && role === "teacher") {
-      const queryState = queryClient.getQueryState(queryKeys.classes.teacher);
-      const isDataFresh = isFreshQuery(
-        queryState?.dataUpdatedAt,
-        StaleTime.SECONDS_30,
-      );
-      if (!isDataFresh) {
-        queryClient.prefetchQuery({
-          queryKey: queryKeys.classes.teacher,
-          queryFn: async () => {
-            const res = await lectureService.getTeacherClasses();
-            return res.success ? [...res.data] : [];
-          },
-          staleTime: StaleTime.SECONDS_30,
-        });
-      }
-    }
-  };
 
-  // Filter routes based on user role
-  const filteredRoutes = routeNames
-    .filter((name) => {
-      // Hide role-selection if user already has a role
-      // TODO: to temporarily disable test screen.
-      if (!__DEV__ && name.includes("test")) {
-        return false;
-      }
+      if (routeName.includes("classes") && role === "teacher") {
+        const queryState = queryClient.getQueryState(queryKeys.classes.teacher);
+        const isDataFresh = isFreshQuery(
+          queryState?.dataUpdatedAt,
+          StaleTime.SECONDS_30,
+        );
 
-      if (role && name.includes("role-selection")) {
-        return false;
+        if (!isDataFresh) {
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.classes.teacher,
+            queryFn: async () => {
+              const res = await lectureService.getTeacherClasses();
+              return res.success ? [...res.data] : [];
+            },
+            staleTime: StaleTime.SECONDS_30,
+          });
+        }
       }
-      if (role === "student" && name.includes("classes")) {
-        return false; // Hide classes tab for students
-      }
-      if (
-        role === "teacher" &&
-        (name.includes("attendance") ||
-          name.includes("create-") ||
-          name.includes("lecture-ended"))
-      ) {
-        return false; // Hide attendance tab for teachers
-      }
+    },
+    [queryClient, role, user],
+  );
 
-      if (!role) {
-        return false; // If no role, only show nothing
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      // Ensure settings always comes last
-      if (a.includes("settings")) return 1;
-      if (b.includes("settings")) return -1;
-      return 0;
-    });
+  const filteredRoutes = useMemo(() => {
+    return routeNames
+      .filter((name) => {
+        if (!role) {
+          return false;
+        }
+
+        if (!__DEV__ && name.includes("test")) {
+          return false;
+        }
+
+        if (role && name.includes("role-selection")) {
+          return false;
+        }
+        if (role === "student" && name.includes("classes")) {
+          return false;
+        }
+        if (
+          role === "teacher" &&
+          (name.includes("attendance") ||
+            name.includes("create-") ||
+            name.includes("lecture-ended"))
+        ) {
+          return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (a.includes("settings")) return 1;
+        if (b.includes("settings")) return -1;
+        return 0;
+      });
+  }, [role, routeNames]);
+
+  const handleNavigate = useCallback(
+    (routeName: string) => {
+      navigation.navigate(routeName);
+    },
+    [navigation],
+  );
 
   // Find the active tab index in the filtered routes
   const activeRouteName = routeNames[index];
-  const activeFilteredIndex = filteredRoutes.indexOf(activeRouteName);
+  const activeFilteredIndex = useMemo(
+    () => filteredRoutes.indexOf(activeRouteName),
+    [activeRouteName, filteredRoutes],
+  );
 
   const isEmptyTabBar = filteredRoutes.length === 0;
 
@@ -145,7 +163,7 @@ const CustomTabBar = ({
     <Animated.View
       style={[
         styles.container,
-      (isEmptyTabBar || !isAuthenticated) && styles.hidden,
+        (isEmptyTabBar || !isAuthenticated) && styles.hidden,
       ]}
     >
       <Animated.View
@@ -162,8 +180,8 @@ const CustomTabBar = ({
             key={name}
             name={name}
             isActivated={isActivated}
-            onPress={() => navigation.navigate(name)}
-            onPrefetch={() => handleTabPrefetch(name)}
+            onPress={handleNavigate}
+            onPrefetch={handleTabPrefetch}
           />
         );
       })}
@@ -176,67 +194,69 @@ export default CustomTabBar;
 interface TabBarButtonProps {
   name: string;
   isActivated: boolean;
-  onPress: () => void;
-  onPrefetch?: () => void;
+  onPress: (routeName: string) => void;
+  onPrefetch?: (routeName: string) => void;
 }
 
-const TabBarButton: React.FC<TabBarButtonProps> = ({
-  name,
-  isActivated,
-  onPress,
-  onPrefetch,
-}) => {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(isActivated ? 1 : 0.6);
-  // const backgroundOpacity = useSharedValue(isActivated ? 1 : 0);
-  const iconScale = useSharedValue(1);
+const TabBarButton = React.memo(
+  ({ name, isActivated, onPress, onPrefetch }: TabBarButtonProps) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(isActivated ? 1 : 0.6);
+    // const backgroundOpacity = useSharedValue(isActivated ? 1 : 0);
+    const iconScale = useSharedValue(1);
 
-  useDerivedValue(() => {
-    opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
-    // backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
-    iconScale.value = withSpring(isActivated ? 1.1 : 1);
-  }, [isActivated]);
+    useDerivedValue(() => {
+      opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
+      // backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
+      iconScale.value = withSpring(isActivated ? 1.1 : 1);
+    }, [isActivated]);
 
-  const handlePressIn = () => {
-    scale.value = withSpring(0.9, {});
-    onPrefetch?.();
-  };
+    const handlePressIn = useCallback(() => {
+      scale.value = withSpring(0.9, {});
+      onPrefetch?.(name);
+    }, [name, onPrefetch, scale]);
 
-  const handlePressOut = () => {
-    scale.value = withSpring(1, {});
-  };
+    const handlePressOut = useCallback(() => {
+      scale.value = withSpring(1, {});
+    }, [scale]);
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+    const handlePress = useCallback(() => {
+      onPress(name);
+    }, [name, onPress]);
 
-  const animatedIconStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: iconScale.value }],
-  }));
+    const animatedContainerStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
 
-  return (
-    <AnimatedPressable
-      style={[styles.navigationButton, animatedContainerStyle]}
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
-      <Animated.View layout={LinearTransition} style={animatedIconStyle}>
-        {getIconForRoute(name, isActivated)}
-      </Animated.View>
-      {!isActivated && (
-        <Animated.Text
-          key={"key-" + name}
-          exiting={FadeOut.duration(300).easing(Easing.inOut(Easing.quad))}
-          style={styles.tabLabel(isActivated)}
-        >
-          {name.split("/index")[0]}
-        </Animated.Text>
-      )}
-    </AnimatedPressable>
-  );
-};
+    const animatedIconStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: iconScale.value }],
+    }));
+
+    return (
+      <AnimatedPressable
+        style={[styles.navigationButton, animatedContainerStyle]}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <Animated.View layout={LinearTransition} style={animatedIconStyle}>
+          {getIconForRoute(name, isActivated)}
+        </Animated.View>
+        {!isActivated && (
+          <Animated.Text
+            key={"key-" + name}
+            exiting={FadeOut.duration(300).easing(Easing.inOut(Easing.quad))}
+            style={styles.tabLabel(isActivated)}
+          >
+            {name.split("/index")[0]}
+          </Animated.Text>
+        )}
+      </AnimatedPressable>
+    );
+  },
+);
+TabBarButton.displayName = "TabBarButton";
 
 const getIconForRoute = (routeName: string, activated: boolean) => {
   if (routeName.includes("attendance")) {

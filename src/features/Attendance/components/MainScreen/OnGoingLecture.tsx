@@ -1,10 +1,15 @@
-import { logger } from "@/shared/utils/logger";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { OnGoingLectureProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback } from "react";
-import { ActivityIndicator, LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  LayoutChangeEvent,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const LectureCardGradient = withUnistyles(LinearGradient, (_, rt) => ({
@@ -40,15 +45,27 @@ const OnGoingLecture = ({
   handleJoin,
   lectureHeightRef,
 }: OnGoingLectureProps) => {
-  
-  const handleLayout = useCallback((e: LayoutChangeEvent) => {
-    if(e.nativeEvent.layout.height === 0) return;
-    logger.info(`Lecture ${lecture.id} layout height retreived : `, e.nativeEvent.layout);
-    lectureHeightRef.current = e.nativeEvent.layout.height;
-  }, [lectureHeightRef,lecture.id]); 
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      if (e.nativeEvent.layout.height === 0) {
+        return;
+      }
+
+      lectureHeightRef.current = e.nativeEvent.layout.height;
+    },
+    [lectureHeightRef],
+  );
+
+  const handlePress = useCallback(() => {
+    void handleJoin(lecture);
+  }, [handleJoin, lecture]);
 
   return (
-    <LectureCardGradient key={lecture.id} style={styles.lectureCard} onLayout={handleLayout}>
+    <LectureCardGradient
+      key={lecture.id}
+      style={styles.lectureCard}
+      onLayout={handleLayout}
+    >
       <View style={styles.lectureCardHeader}>
         <View style={styles.headerLeftContent}>
           <View style={styles.iconContainer}>
@@ -77,7 +94,7 @@ const OnGoingLecture = ({
       <View style={styles.divider} />
 
       <TouchableOpacity
-        onPress={async () => await handleJoin(lecture)}
+        onPress={handlePress}
         disabled={loading}
         activeOpacity={0.8}
       >
@@ -100,4 +117,4 @@ const OnGoingLecture = ({
   );
 };
 
-export default OnGoingLecture;
+export default React.memo(OnGoingLecture);

@@ -39,6 +39,44 @@ import {
 import { scheduleOnRN } from "react-native-worklets";
 
 const DEFAULT_LECTURE_ROW_HEIGHT = 236;
+const TEACHER_QUERY_FRESH_MS = StaleTime.SECONDS_30;
+
+type LectureApiItem = Omit<
+  LectureWithCount,
+  "courseName" | "studentCount" | "absentCount" | "totalClassStudents"
+> & {
+  className?: string;
+  courseName?: string;
+  studentCount?: number | string | null;
+  absentCount?: number | string | null;
+  totalClassStudents?: number | string | null;
+};
+
+type LectureMutationResponse = {
+  success: boolean;
+  message?: string;
+};
+
+type UpdateLectureVariables = {
+  lectureId: string;
+  title: string;
+  duration: number;
+};
+
+type LectureRollbackContext = {
+  previousLectures?: LectureWithCount[];
+} | null;
+
+const getIsFreshQuery = (dataUpdatedAt: number | undefined) =>
+  dataUpdatedAt != null && Date.now() - dataUpdatedAt < TEACHER_QUERY_FRESH_MS;
+
+const mapLectureWithCount = (lecture: LectureApiItem): LectureWithCount => ({
+  ...lecture,
+  courseName: lecture.courseName ?? lecture.className ?? "",
+  studentCount: Number(lecture.studentCount ?? 0),
+  absentCount: Number(lecture.absentCount ?? 0),
+  totalClassStudents: Number(lecture.totalClassStudents ?? 0),
+});
 
 export const useTeacherDashboard = () => {
   const router = useRouter();
@@ -89,7 +127,7 @@ export const useTeacherDashboard = () => {
     [params.count, params.lectures, params.mock, params.size, params.stress],
   );
 
-  const mockLectures = useMemo(
+  const mockLectures = useMemo<LectureWithCount[]>(
     () =>
       stressOptions.enabled
         ? generateMockLectures(stressOptions.lectureCount)
@@ -97,29 +135,16 @@ export const useTeacherDashboard = () => {
     [stressOptions.enabled, stressOptions.lectureCount],
   );
 
-  const fetchActiveLecturesQueryFn: () => Promise<LectureWithCount[]> =
-    useCallback(async () => {
-      try {
-        const res = await lectureService.getAllLectures();
-        if (res.success) {
-          const mappedLectures = res.data.map((lec: any) => ({
-            ...lec,
-            courseName: lec.className,
-            studentCount: lec.studentCount || 0,
-            absentCount: lec.absentCount || 0,
-            totalClassStudents: lec.totalClassStudents || 0,
-          }));
+  const fetchActiveLecturesQueryFn = useCallback(async (): Promise<
+    LectureWithCount[]
+  > => {
+    const res = await lectureService.getAllLectures();
+    return res.success ? (res.data ?? []).map(mapLectureWithCount) : [];
+  }, []);
 
-          return mappedLectures as LectureWithCount[];
-        }
-        return [];
-      } catch (error) {
-        console.log("Error fetching lectures", error);
-        return [];
-      }
-    }, []);
-
-  const { data: lectures, refetch: fetchActiveLectures } = useQuery({
+  const { data: lectures, refetch: fetchActiveLectures } = useQuery<
+    LectureWithCount[]
+  >({
     queryKey: queryKeys.lectures.teacher,
     queryFn: fetchActiveLecturesQueryFn,
     networkMode: "offlineFirst",
@@ -128,7 +153,7 @@ export const useTeacherDashboard = () => {
     enabled: false,
   });
 
-  const effectiveLectures = useMemo(
+  const effectiveLectures = useMemo<LectureWithCount[]>(
     () => (stressOptions.enabled ? mockLectures : (lectures ?? [])),
     [lectures, mockLectures, stressOptions.enabled],
   );
@@ -146,9 +171,7 @@ export const useTeacherDashboard = () => {
         const queryState = queryClient.getQueryState(
           queryKeys.lectures.teacher,
         );
-        const isDataFresh =
-          queryState?.dataUpdatedAt != null &&
-          Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
+        const isDataFresh = getIsFreshQuery(queryState?.dataUpdatedAt);
 
         if (!isDataFresh) {
           fetchActiveLectures();
@@ -167,12 +190,9 @@ export const useTeacherDashboard = () => {
       return;
     }
 
-    const main = async () => {
-      if (ended === "true" && lectureId) {
-        fetchActiveLectures();
-      }
-    };
-    main();
+    if (ended === "true" && lectureId) {
+      fetchActiveLectures();
+    }
   }, [ended, fetchActiveLectures, lectureId, stressOptions.enabled]);
 
   useEffect(() => {
@@ -186,13 +206,11 @@ export const useTeacherDashboard = () => {
       socketService.connect();
       lectureIds.forEach((id) => socketService.joinLecture(id));
 
-      const handleStudentJoined = (data: unknown) => {
-        console.log("Student joined event:", data);
+      const handleStudentJoined = () => {
         fetchActiveLectures();
       };
 
-      const handleAttendanceSubmitted = (data: unknown) => {
-        console.log("Attendance submitted event:", data);
+      const handleAttendanceSubmitted = () => {
         fetchActiveLectures();
       };
 
@@ -228,8 +246,7 @@ export const useTeacherDashboard = () => {
         socketService.offAttendanceSubmitted();
         appStateSubscription.remove();
       };
-    } catch (error) {
-      console.log("Error updating dashboard socket listeners.", error);
+    } catch {
       return undefined;
     }
   }, [
@@ -239,86 +256,72 @@ export const useTeacherDashboard = () => {
     stressOptions.enabled,
   ]);
 
-  const handleEndLecture = async (id: string, lectureTitle: string) => {
-    alert("End Lecture", "Are you sure you want to end this lecture?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "End",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            if (!isConnected) {
-              showInternetNotConnected();
-              return;
+  const handleEndLecture = useCallback(
+    (id: string, lectureTitle: string) => {
+      alert("End Lecture", "Are you sure you want to end this lecture?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "End",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (!isConnected) {
+                showInternetNotConnected();
+                return;
+              }
+              const res = await lectureService.endLecture(id);
+              if (res.success) {
+                fetchActiveLectures();
+                // Prefetch passcode so lecture-ended screen loads instantly
+                queryClient.prefetchQuery({
+                  queryKey: queryKeys.lectures.passcode(id),
+                  queryFn: async () => {
+                    const res = await lectureService.getPasscode(id);
+                    // Return the full response so useLectureEnded can extract passcode
+                    return res.success ? res : null;
+                  },
+                });
+                // Navigate to lecture ended screen
+                router.push({
+                  pathname: "/(main)/classes/lecture-ended",
+                  params: {
+                    lectureId: id,
+                    lectureTitle: lectureTitle,
+                  },
+                });
+              }
+            } catch (error: any) {
+              alert("Error", error.message || "Failed to end lecture");
             }
-            const res = await lectureService.endLecture(id);
-            if (res.success) {
-              fetchActiveLectures();
-              // Prefetch passcode so lecture-ended screen loads instantly
-              queryClient.prefetchQuery({
-                queryKey: queryKeys.lectures.passcode(id),
-                queryFn: async () => {
-                  const res = await lectureService.getPasscode(id);
-                  // Return the full response so useLectureEnded can extract passcode
-                  return res.success ? res : null;
-                },
-              });
-              // Navigate to lecture ended screen
-              router.push({
-                pathname: "/(main)/classes/lecture-ended",
-                params: {
-                  lectureId: id,
-                  lectureTitle: lectureTitle,
-                },
-              });
-            }
-          } catch (error: any) {
-            alert("Error", error.message || "Failed to end lecture");
-          }
+          },
         },
-      },
-    ]);
-  };
+      ]);
+    },
+    [alert, fetchActiveLectures, isConnected, queryClient, router],
+  );
 
-  const handleEditLecture = (lecture: LectureWithCount) => {
-    if (lecture.status !== "active") {
-      alert("Cannot Edit", "Only active lectures can be edited.");
-      return;
-    }
-    setEditingLecture(lecture);
-    setEditTitle(lecture.title);
-    setEditDuration(lecture.duration);
-    setEditModalVisible(true);
-  };
-
-  const handleUpdateLecture = async () => {
-    if (!editingLecture) return;
-    if (!editTitle.trim()) {
-      alert("Error", "Title cannot be empty");
-      return;
-    }
-    const durationNum = parseInt(editDuration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      alert("Error", "Duration must be a positive number");
-      return;
-    }
-    const res = await updateLecture({
-      lectureId: editingLecture.id,
-      duration: durationNum,
-      title: editTitle.trim(),
-    });
-    return res;
-  };
+  const handleEditLecture = useCallback(
+    (lecture: LectureWithCount) => {
+      if (lecture.status !== "active") {
+        alert("Cannot Edit", "Only active lectures can be edited.");
+        return;
+      }
+      setEditingLecture(lecture);
+      setEditTitle(lecture.title);
+      setEditDuration(lecture.duration);
+      setEditModalVisible(true);
+    },
+    [alert],
+  );
 
   const { mutateAsync: updateLecture } = useMutation<
-    any,
-    any,
-    { lectureId: string; title: string; duration: number },
-    { previousLectures: LectureWithCount[] } | null
+    LectureMutationResponse,
+    Error,
+    UpdateLectureVariables,
+    LectureRollbackContext
   >({
     mutationKey: mutationKeys.lectures.update,
     onMutate: async (_, context) => {
-      // Snapshot the previous value
       const previousLectures = (await context.client.getQueryData(
         queryKeys.lectures.teacher,
       )) as LectureWithCount[];
@@ -327,34 +330,32 @@ export const useTeacherDashboard = () => {
         return null;
       }
 
-      const toBeEditedLecutre = previousLectures.find(
+      const lectureToUpdate = previousLectures.find(
         (lecture) => lecture.id === editingLecture?.id,
       );
 
-      if (!toBeEditedLecutre) {
+      if (!lectureToUpdate) {
         return { previousLectures };
       }
 
       const optimisticUpdatedLecture: LectureWithCount = {
-        ...toBeEditedLecutre,
+        ...lectureToUpdate,
         title: editTitle,
         duration: editDuration,
       };
 
-      // Optimistically update to the new value
       context.client.setQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
         (old) => {
-          if (old) {
-            return [
-              ...old.filter(
-                (lecture) => lecture.id !== optimisticUpdatedLecture.id,
-              ),
-              optimisticUpdatedLecture,
-            ];
-          } else {
+          if (!old) {
             return [];
           }
+
+          return old.map((lecture) =>
+            lecture.id === optimisticUpdatedLecture.id
+              ? optimisticUpdatedLecture
+              : lecture,
+          );
         },
       );
 
@@ -383,24 +384,45 @@ export const useTeacherDashboard = () => {
     },
   });
 
-  const handleViewAttendance = (lecture: LectureWithCount) => {
-    router.push({
-      pathname: "/(main)/classes/attendance",
-      params: {
-        lectureId: lecture.id,
-        lectureTitle: lecture.title,
-      },
-    });
-  };
+  const handleUpdateLecture = useCallback(async () => {
+    if (!editingLecture) return;
+    if (!editTitle.trim()) {
+      alert("Error", "Title cannot be empty");
+      return;
+    }
+    const durationNum = parseInt(editDuration);
+    if (isNaN(durationNum) || durationNum <= 0) {
+      alert("Error", "Duration must be a positive number");
+      return;
+    }
 
-  const handleFetchTeacherClasses = async () => {
+    return updateLecture({
+      lectureId: editingLecture.id,
+      duration: durationNum,
+      title: editTitle.trim(),
+    });
+  }, [alert, editDuration, editTitle, editingLecture, updateLecture]);
+
+  const handleViewAttendance = useCallback(
+    (lecture: LectureWithCount) => {
+      router.push({
+        pathname: "/(main)/classes/attendance",
+        params: {
+          lectureId: lecture.id,
+          lectureTitle: lecture.title,
+        },
+      });
+    },
+    [router],
+  );
+
+  const handleFetchTeacherClasses = useCallback(async () => {
     const response = await lectureService.getTeacherClasses();
     return response.data;
-  };
+  }, []);
 
-  const navigateToCreate = () => {
+  const navigateToCreate = useCallback(() => {
     if (!isNavigating) {
-      // Prefetch teacher classes so dropdown is instant on create-lecture screen
       queryClient.prefetchQuery({
         queryKey: queryKeys.classes.teacher,
         queryFn: handleFetchTeacherClasses,
@@ -410,27 +432,33 @@ export const useTeacherDashboard = () => {
       router.push("/(main)/classes/create-lecture");
       setTimeout(() => setIsNavigating(false), 1000);
     }
-  };
+  }, [handleFetchTeacherClasses, isNavigating, queryClient, router]);
 
-  // Filter logic - memoized to prevent recalculation on every render
-  const filteredLectures = useMemo(() => {
-    return effectiveLectures.filter((l) => {
+  const normalizedSearchQuery = deferredSearchQuery.trim().toLowerCase();
+
+  const filteredLectures = useMemo<LectureWithCount[]>(() => {
+    if (!normalizedSearchQuery) {
+      return effectiveLectures;
+    }
+
+    return effectiveLectures.filter((l: LectureWithCount) => {
       return (
-        l.title.toLowerCase().includes(deferredSearchQuery.toLowerCase()) ||
-        l.courseName.toLowerCase().includes(deferredSearchQuery.toLowerCase())
+        l.title.toLowerCase().includes(normalizedSearchQuery) ||
+        l.courseName.toLowerCase().includes(normalizedSearchQuery)
       );
     });
-  }, [effectiveLectures, deferredSearchQuery]);
+  }, [effectiveLectures, normalizedSearchQuery]);
 
-  // Stats - memoized to prevent recalculation on every render
-  const totalActive = useMemo(() => {
-    return effectiveLectures.filter((l) => l.status === "active").length;
-  }, [effectiveLectures]);
-
-  const totalStudents = useMemo(() => {
+  const dashboardStats = useMemo(() => {
     return effectiveLectures.reduce(
-      (acc, curr) => acc + Number(curr.studentCount),
-      0,
+      (stats, lecture: LectureWithCount) => ({
+        totalActive:
+          lecture.status === "active"
+            ? stats.totalActive + 1
+            : stats.totalActive,
+        totalStudents: stats.totalStudents + Number(lecture.studentCount),
+      }),
+      { totalActive: 0, totalStudents: 0 },
     );
   }, [effectiveLectures]);
 
@@ -522,12 +550,12 @@ export const useTeacherDashboard = () => {
   );
 
   const { mutateAsync: deleteLecture } = useMutation<
-    { success: boolean },
-    LectureWithCount,
+    LectureMutationResponse,
+    Error,
     {
       lecture: LectureWithCount;
     },
-    any
+    LectureRollbackContext
   >({
     onMutate: (variables, context) => {
       const previousLectures = context.client.getQueryData<LectureWithCount[]>(
@@ -544,6 +572,10 @@ export const useTeacherDashboard = () => {
       return { previousLectures };
     },
     onError(_, __, onMutateResult, context) {
+      if (!onMutateResult?.previousLectures) {
+        return;
+      }
+
       context.client.setQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
         onMutateResult.previousLectures,
@@ -552,42 +584,45 @@ export const useTeacherDashboard = () => {
     mutationKey: mutationKeys.lectures.delete,
   });
 
-  const handleDeleteLecture = (lecture: LectureWithCount) => {
-    if (lecture.status !== "ended") {
-      alert(
-        "Cannot Delete",
-        "Only ended lectures can be deleted. Please end the lecture first.",
-      );
-      return;
-    }
+  const handleDeleteLecture = useCallback(
+    (lecture: LectureWithCount) => {
+      if (lecture.status !== "ended") {
+        alert(
+          "Cannot Delete",
+          "Only ended lectures can be deleted. Please end the lecture first.",
+        );
+        return;
+      }
 
-    alert(
-      "Delete Lecture",
-      `Are you sure you want to delete "${lecture.title}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteLecture({ lecture });
-            } catch (error: any) {
-              alert("Error", error.message || "Failed to delete lecture");
-            }
+      alert(
+        "Delete Lecture",
+        `Are you sure you want to delete "${lecture.title}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await deleteLecture({ lecture });
+              } catch (error: any) {
+                alert("Error", error.message || "Failed to delete lecture");
+              }
+            },
           },
-        },
-      ],
-    );
-  };
+        ],
+      );
+    },
+    [alert, deleteLecture],
+  );
 
   return {
     pullIndicatorStyle,
     pullProgress,
     onScroll,
     scrollY,
-    totalActive,
-    totalStudents,
+    totalActive: dashboardStats.totalActive,
+    totalStudents: dashboardStats.totalStudents,
     lectures: effectiveLectures,
     navigateToCreate,
     searchQuery,

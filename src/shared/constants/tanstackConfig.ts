@@ -30,9 +30,7 @@ const queryCache = new QueryCache({
     logger.error(`Query error [${query.queryHash}]:`, error);
   },
   onSuccess: (_, query) => {
-    if (__DEV__) {
-      logger.debug(`Query success [${query.queryHash}]`);
-    }
+    logger.debug(`Query success [${query.queryHash}]`);
   },
 });
 
@@ -41,9 +39,7 @@ const mutationCache = new MutationCache({
     logger.error(`Mutation error [${mutation.options.mutationKey}]:`, error);
   },
   onSuccess: (_data, _variables, _context, mutation) => {
-    if (__DEV__) {
-      logger.debug(`Mutation success [${mutation.options.mutationKey}]`);
-    }
+    logger.debug(`Mutation success [${mutation.options.mutationKey}]`);
   },
 });
 

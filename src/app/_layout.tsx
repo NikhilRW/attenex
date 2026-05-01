@@ -126,7 +126,6 @@ export default function RootLayout() {
 
   const reportPreparedCallback = (e: RenderPassReport) => {
     console.log(e);
-    alert("Render Time : " + e.timeToBootJsMillis);
   };
 
   if (!loaded && !error) {

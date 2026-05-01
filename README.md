@@ -20,7 +20,8 @@ Attenex is a React Native mobile application built on the Expo New Architecture.
 
 | Feature | Description |
 |---|---|
-| 👥 **Role-Based Client** | Distinct navigation sub-trees and UI flows based on user role (Teacher vs. Student) |
+| 👥 **Role-Based Client** | Distinct 
+sub-trees and UI flows based on user role (Teacher vs. Student) |
 | 🧠 **State Management** | Local global state via Zustand; server state, offline 
 ence, and re-fetching via TanStack Query |
 | ⚡ **Performance Optimizations** | `react-native-nitro-modules` (NitroImage), Reanimated + Unistyles, and Shopify RN performance profiling |

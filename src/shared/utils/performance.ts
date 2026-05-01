@@ -4,9 +4,7 @@
  */
 
 export const markPerformance = (markName: string) => {
-  if (__DEV__) {
-    console.log(`[Performance] Mark: ${markName} at ${Date.now()}`);
-  }
+  console.log(`[Performance] Mark: ${markName} at ${Date.now()}`);
 };
 
 export const logRenderTime = (

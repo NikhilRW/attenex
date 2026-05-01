@@ -9,9 +9,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { setStringAsync } from "expo-clipboard";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AppState, NativeEventSubscription } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppState } from "react-native";
 import { useAlerts } from "react-native-paper-alerts";
+
+const getMatchesFilter = (record: AttendanceRecord, filter: FilterType) =>
+  filter === "all" || record.status === filter;
+
+const getRollNumberSortValue = (rollNumber: string) => {
+  const value = parseInt(rollNumber, 10);
+  return Number.isNaN(value) ? null : value;
+};
 
 export const useAttendanceView = () => {
   const router = useRouter();
@@ -24,7 +32,6 @@ export const useAttendanceView = () => {
   const [showRollSummary, setShowRollSummary] = useState(false);
   const [showManualAttendance, setShowManualAttendance] = useState(false);
   const [manualRollNo, setManualRollNo] = useState("");
-  const appStateSubsription = useRef<NativeEventSubscription>(null);
   const { isConnected } = useNetworkState();
 
   const { alert } = useAlerts();
@@ -56,51 +63,43 @@ export const useAttendanceView = () => {
   });
 
   useEffect(() => {
-    // 1. Connect and Join
     socketService.connect();
     socketService.joinLecture(lectureId);
 
-    // 2. Define Handlers
     const handleStudentJoined = (data: any) => {
-      console.log("Student joined event received:", data);
       if (data.lectureId === lectureId) {
         refetchAttendance();
       }
     };
 
     const handleStudentLeaved = (data: any) => {
-      console.log("Student leave data received:", data);
       if (data.lectureId === lectureId) {
         refetchAttendance();
       }
     };
 
     const handleAttendanceSubmitted = (data: any) => {
-      console.log("Attendance submitted event received:", data);
       if (data.lectureId === lectureId) {
         refetchAttendance();
       }
     };
 
-    // 3. Attach Listeners
     socketService.onStudentJoined(handleStudentJoined);
     socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
     socketService.onStudentLeaved(handleStudentLeaved);
 
-    // 4. AppState Listener for Reconnection (without duplicating listeners)
     const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        if (!socketService.isConnected()) {
-          socketService.connect();
-          socketService.joinLecture(lectureId);
-          // Listeners should still be attached to the singleton instance
-        }
-        refetchAttendance();
+      if (nextAppState !== "active") {
+        return;
       }
-    });
-    appStateSubsription.current = subscription;
 
-    // 5. Cleanup
+      if (!socketService.isConnected()) {
+        socketService.connect();
+        socketService.joinLecture(lectureId);
+      }
+      refetchAttendance();
+    });
+
     return () => {
       socketService.leaveLecture(lectureId);
       socketService.offStudentJoined();
@@ -133,69 +132,74 @@ export const useAttendanceView = () => {
   );
 
   const filteredAttendance = useMemo(() => {
-    console.log(JSON.stringify(attendance));
-    return attendance
-      ? attendance.filter((record) => {
-          const matchesFilter =
-            filter === "all"
-              ? true
-              : filter === "present"
-                ? record.status === "present"
-                : filter === "incomplete"
-                  ? record.status === "incomplete"
-                  : record.status === "absent";
+    if (!attendance?.length) {
+      return [];
+    }
 
-          const matchesSearch =
-            record.studentName
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            (record.studentRollNo &&
-              record.studentRollNo
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()));
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
-          return matchesFilter && matchesSearch;
-        })
-      : [];
+    return attendance.filter((record) => {
+      if (!getMatchesFilter(record, filter)) {
+        return false;
+      }
+
+      if (!normalizedSearchQuery) {
+        return true;
+      }
+
+      return (
+        record.studentName.toLowerCase().includes(normalizedSearchQuery) ||
+        record.studentRollNo?.toLowerCase().includes(normalizedSearchQuery)
+      );
+    });
   }, [attendance, filter, searchQuery]);
 
-  const presentCount = useMemo(() => {
-    return (attendance || []).filter((r) => r.status === "present").length;
-  }, [attendance]);
+  const attendanceSummary = useMemo(() => {
+    const presentRollNumbers: string[] = [];
 
-  const incompleteCount = useMemo(() => {
-    return (attendance || []).filter((r) => r.status === "incomplete").length;
-  }, [attendance]);
-
-  const absentCount = useMemo(() => {
-    return (attendance || []).filter((r) => r.status === "absent").length;
-  }, [attendance]);
-
-  const getPresentRollNumbers = useCallback(() => {
-    return (attendance || [])
-      .filter((r) => r.status === "present")
-      .map((r) => r.studentRollNo)
-      .filter((roll) => roll !== null && roll !== "")
-      .sort((a, b) => {
-        const numA = parseInt(a!);
-        const numB = parseInt(b!);
-        if (!isNaN(numA) && !isNaN(numB)) {
-          return numA - numB;
+    const counts = (attendance || []).reduce(
+      (summary, record) => {
+        if (record.status === "present") {
+          summary.presentCount += 1;
+          if (record.studentRollNo) {
+            presentRollNumbers.push(record.studentRollNo);
+          }
+        } else if (record.status === "incomplete") {
+          summary.incompleteCount += 1;
+        } else if (record.status === "absent") {
+          summary.absentCount += 1;
         }
-        return a!.localeCompare(b!);
-      })
-      .join(", ");
+
+        return summary;
+      },
+      { presentCount: 0, incompleteCount: 0, absentCount: 0 },
+    );
+
+    presentRollNumbers.sort((a, b) => {
+      const numA = getRollNumberSortValue(a);
+      const numB = getRollNumberSortValue(b);
+
+      if (numA !== null && numB !== null) {
+        return numA - numB;
+      }
+
+      return a.localeCompare(b);
+    });
+
+    return {
+      ...counts,
+      presentRollNumbers: presentRollNumbers.join(", "),
+    };
   }, [attendance]);
 
   const handleCopyRollNumbers = useCallback(async () => {
-    const rollNumbers = getPresentRollNumbers();
-    if (rollNumbers) {
-      await setStringAsync(rollNumbers);
+    if (attendanceSummary.presentRollNumbers) {
+      await setStringAsync(attendanceSummary.presentRollNumbers);
       alert("Copied!", "Roll numbers copied to clipboard");
     } else {
       alert("No Data", "No present students with roll numbers");
     }
-  }, [getPresentRollNumbers, alert]);
+  }, [alert, attendanceSummary.presentRollNumbers]);
 
   const manualAttendance = async () => {
     if (!manualRollNo.trim()) {
@@ -246,10 +250,10 @@ export const useAttendanceView = () => {
     manualRollNo,
     setManualRollNo,
     isSubmittingManual,
-    presentCount,
-    incompleteCount,
-    absentCount,
-    getPresentRollNumbers,
+    presentCount: attendanceSummary.presentCount,
+    incompleteCount: attendanceSummary.incompleteCount,
+    absentCount: attendanceSummary.absentCount,
+    presentRollNumbers: attendanceSummary.presentRollNumbers,
     handleCopyRollNumbers,
     handleManualAttendance,
     router,

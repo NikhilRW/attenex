@@ -21,7 +21,7 @@ module.exports = function (api) {
     env: {
       production: {
         plugins: [
-          "transform-remove-console", // Remove console logs in production
+          // "transform-remove-console", // Remove console logs in production
           [
             "react-native-unistyles/plugin",
             {

@@ -3,7 +3,7 @@ import { AttendanceFloatingButton } from "@classes/components/AttendanceFloating
 import { AttendanceHeader } from "@classes/components/AttendanceHeader";
 import { ManualAttendanceModal } from "@classes/components/ManualAttendanceModal";
 import { RollSummaryModal } from "@classes/components/RollSummaryModal";
-import { StudentCard } from "@classes/components/StudentCard";
+import { MemoizedStudentCard } from "@classes/components/StudentCard";
 import { useAttendanceView } from "@classes/hooks/useAttendanceView";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceRecord } from "@classes/types/common";
@@ -20,6 +20,14 @@ const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
 const EmptyStateIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));
+
+const flatListPerformanceProps = {
+  removeClippedSubviews: true,
+  initialNumToRender: 10,
+  maxToRenderPerBatch: 10,
+  updateCellsBatchingPeriod: 40,
+  windowSize: 12,
+};
 
 const AttendanceViewScreen = () => {
   const {
@@ -40,15 +48,17 @@ const AttendanceViewScreen = () => {
     presentCount,
     incompleteCount,
     absentCount,
-    getPresentRollNumbers,
+    presentRollNumbers,
     handleCopyRollNumbers,
     handleManualAttendance,
     router,
   } = useAttendanceView();
 
+  const keyExtractor = useCallback((record: AttendanceRecord) => record.id, []);
+
   const renderAttendanceItem = useCallback(
     ({ item: record, index }: { item: AttendanceRecord; index: number }) => (
-      <StudentCard record={record} index={index} />
+      <MemoizedStudentCard record={record} index={index} />
     ),
     [],
   );
@@ -65,11 +75,12 @@ const AttendanceViewScreen = () => {
 
       <Animated.FlatList<AttendanceRecord>
         data={loading ? [] : filteredAttendance}
-        keyExtractor={(record) => record.id}
+        keyExtractor={keyExtractor}
         renderItem={renderAttendanceItem}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        {...flatListPerformanceProps}
         ListHeaderComponent={
           <AttendanceFilter filter={filter} setFilter={setFilter} />
         }
@@ -98,7 +109,7 @@ const AttendanceViewScreen = () => {
       <RollSummaryModal
         visible={showRollSummary}
         onClose={() => setShowRollSummary(false)}
-        presentRollNumbers={getPresentRollNumbers()}
+        presentRollNumbers={presentRollNumbers}
         presentCount={presentCount}
         incompleteCount={incompleteCount}
         absentCount={absentCount}

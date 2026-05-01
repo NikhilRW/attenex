@@ -5,7 +5,7 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
@@ -49,7 +49,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
-  
+
   useEffect(() => {
     if (isPending) {
       opacity.value = withRepeat(
@@ -71,16 +71,56 @@ const LectureCard: React.FC<LectureCardProps> = ({
     };
   });
 
-  const fetchLectureAttendance = async () => {
+  const formattedCreatedTime = useMemo(
+    () =>
+      new Date(lecture.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    [lecture.createdAt],
+  );
+
+  const fetchLectureAttendance = useCallback(async () => {
     const result = await lectureService.fetchLectureAttendance(lecture.id);
     return result.data.attendance;
-  };
+  }, [lecture.id]);
 
-  const handleLayout = (e: LayoutChangeEvent) => {
-    if (lectureRowHeightRef.current === 0) {
-      lectureRowHeightRef.current = e.nativeEvent.layout.height;
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      if (lectureRowHeightRef.current === 0) {
+        lectureRowHeightRef.current = e.nativeEvent.layout.height;
+      }
+    },
+    [lectureRowHeightRef],
+  );
+
+  const handlePrefetchAttendance = useCallback(() => {
+    if (isPending) {
+      return;
     }
-  };
+
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.attendance.teacher(lecture.id),
+      queryFn: fetchLectureAttendance,
+      staleTime: 20000,
+    });
+  }, [fetchLectureAttendance, isPending, lecture.id, queryClient]);
+
+  const handleViewPress = useCallback(() => {
+    handleViewAttendance(lecture);
+  }, [handleViewAttendance, lecture]);
+
+  const handleEditPress = useCallback(() => {
+    handleEditLecture(lecture);
+  }, [handleEditLecture, lecture]);
+
+  const handleEndPress = useCallback(() => {
+    handleEndLecture(lecture.id, lecture.title);
+  }, [handleEndLecture, lecture.id, lecture.title]);
+
+  const handleDeletePress = useCallback(() => {
+    handleDeleteLecture(lecture);
+  }, [handleDeleteLecture, lecture]);
 
   return (
     <Animated.View
@@ -146,12 +186,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
           </View>
           <View style={styles.statItem}>
             <TimeIcon name="time-outline" size={16} />
-            <Text style={styles.statText}>
-              {new Date(lecture.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
+            <Text style={styles.statText}>{formattedCreatedTime}</Text>
           </View>
         </View>
 
@@ -161,16 +196,8 @@ const LectureCard: React.FC<LectureCardProps> = ({
           <TouchableOpacity
             disabled={isPending}
             style={[styles.actionBtn, styles.actionBtnPrimary]}
-            onPressIn={() => {
-              if (!isPending) {
-                queryClient.prefetchQuery({
-                  queryKey: queryKeys.attendance.teacher(lecture.id),
-                  queryFn: fetchLectureAttendance,
-                  staleTime: 20000,
-                });
-              }
-            }}
-            onPress={() => handleViewAttendance(lecture)}
+            onPressIn={handlePrefetchAttendance}
+            onPress={handleViewPress}
           >
             <Text style={styles.actionBtnText}>View Attendance</Text>
             <Ionicons name="arrow-forward" size={16} color="#3B82F6" />
@@ -182,14 +209,14 @@ const LectureCard: React.FC<LectureCardProps> = ({
                 <TouchableOpacity
                   disabled={isPending}
                   style={[styles.iconBtn, styles.iconBtnNeutral]}
-                  onPress={() => handleEditLecture(lecture)}
+                  onPress={handleEditPress}
                 >
                   <EditIcon name="create-outline" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   disabled={isPending}
                   style={[styles.iconBtn, styles.iconBtnDanger]}
-                  onPress={() => handleEndLecture(lecture.id, lecture.title)}
+                  onPress={handleEndPress}
                 >
                   <Ionicons name="stop" size={20} color="#EF4444" />
                 </TouchableOpacity>
@@ -198,7 +225,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
             {lecture.status === "ended" && (
               <TouchableOpacity
                 style={[styles.iconBtn, styles.iconBtnDanger]}
-                onPress={() => handleDeleteLecture(lecture)}
+                onPress={handleDeletePress}
               >
                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
               </TouchableOpacity>
@@ -210,4 +237,4 @@ const LectureCard: React.FC<LectureCardProps> = ({
   );
 };
 
-export default LectureCard;
+export default React.memo(LectureCard);
