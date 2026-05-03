@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
+  const isDark = rt.themeName === "dark";
 
   return {
     container: {
@@ -208,7 +208,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       position: "absolute",
     },
     modalSurface: {
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+      borderColor: theme.border.modal,
       borderWidth: 1,
     },
     modalSurfaceFlat: {
@@ -216,7 +216,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       overflow: "hidden",
     },
     modalSurfaceElevated: {
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+      borderColor: theme.border.modal,
       borderWidth: 1,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.2,
@@ -228,7 +228,9 @@ export const styles = StyleSheet.create((theme, rt) => {
       justifyContent: "space-between",
       padding: 20,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+      borderBottomColor: isDark
+        ? "rgba(255,255,255,0.05)"
+        : "rgba(125,125,125,0.3)",
     },
     modalTitle: {
       fontSize: 24,
@@ -269,7 +271,7 @@ export const styles = StyleSheet.create((theme, rt) => {
         : "rgba(255, 255, 255, 0.8)",
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
       paddingHorizontal: 16,
       height: 56,
       marginBottom: 8,
@@ -284,7 +286,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
       fontWeight: "500",
     },
     modalInputText: {
@@ -312,7 +314,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     modalButtonSecondary: {
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+      borderColor: theme.border.secondary,
     },
     modalButtonWrapper: {
       flex: 1,

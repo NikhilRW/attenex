@@ -1,13 +1,12 @@
 import { StyleSheet } from "react-native-unistyles";
 
 const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
+  const isDark = rt.themeName === "dark";
 
   return {
     container: {
       flex: 1,
       backgroundColor: theme.background.secondary,
-      
     },
     screenContainer: {
       flex: 1,
@@ -423,7 +422,7 @@ const styles = StyleSheet.create((theme, rt) => {
       maxWidth: 400,
     },
     modalSurfaceElevated: {
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+      borderColor: theme.border.modal,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.2,
       shadowRadius: 20,
@@ -505,7 +504,7 @@ const styles = StyleSheet.create((theme, rt) => {
         : "rgba(255, 255, 255, 0.8)",
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
       paddingHorizontal: 16,
       height: 56,
     },
@@ -539,7 +538,7 @@ const styles = StyleSheet.create((theme, rt) => {
     modalButtonSecondary: {
       backgroundColor: "transparent",
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+      borderColor: theme.border.secondary,
     },
     modalButtonPrimary: {
       borderWidth: 0,

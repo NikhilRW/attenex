@@ -1,4 +1,4 @@
-import {styles} from "@classes/styles/AttendanceViewScreen.styles";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -8,7 +8,7 @@ import { withUnistyles } from "react-native-unistyles";
 
 const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? ([theme.background.secondary, theme.background.primary] as const)
       : (["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.8)"] as const),
 }));

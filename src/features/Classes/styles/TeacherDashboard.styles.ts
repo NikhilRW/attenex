@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
+  const isDark = rt.themeName === "dark";
 
   return {
     container: {
@@ -385,7 +385,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderWidth: 1,
     },
     modalSurface: {
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+      borderColor: theme.border.modal,
     },
     modalTitle: {
       fontSize: 24,
@@ -422,7 +422,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       height: 56,
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
@@ -448,7 +448,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     modalBtnSecondary: {
       backgroundColor: "transparent",
       borderWidth: 1,
-      borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+      borderColor: theme.border.secondary,
     },
     modalBtnText: {
       fontSize: 16,

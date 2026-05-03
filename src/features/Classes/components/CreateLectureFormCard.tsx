@@ -1,4 +1,4 @@
-import {styles} from "@classes/styles/CreateLecture.styles";
+import { styles } from "@classes/styles/CreateLecture.styles";
 import { CreateLectureFormCardProps } from "@classes/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -14,7 +14,7 @@ const CreateLectureCardGradient = withUnistyles(
   LinearGradient,
   (_theme, rt) => ({
     colors:
-      rt.colorScheme === "dark"
+      rt.themeName === "dark"
         ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
         : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
   }),

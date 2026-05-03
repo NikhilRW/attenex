@@ -10,6 +10,11 @@ export const darkTheme = {
     gradientEnd: "rgba(0,0,0,0.8)",
   },
 
+  border: {
+    modal: "rgba(255, 255, 255, 0.1)",
+    secondary:"rgba(255, 255, 255, 0.1)",
+  },
+
   // Primary Brand Colors
   primary: {
     main: "#00D4FF",
@@ -68,6 +73,11 @@ export const lightTheme = {
     tertiary: "#C7C4C4",
     overlay: "rgba(255, 255, 255, 0.3)",
     gradientEnd: "rgba(255,255,255,0.8)",
+  },
+
+  border: {
+    modal: "rgba(125,125,125,0.3)",
+    secondary: "rgba(0, 0, 0, 0.1)",
   },
 
   // Primary Brand Colors

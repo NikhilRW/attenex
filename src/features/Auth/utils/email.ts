@@ -1,6 +1,5 @@
-import http from "@shared/utils/http";
+import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
-import { AxiosResponse } from "axios";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 
@@ -11,7 +10,7 @@ export const sendVerificationEmailRequest = async (email: string) => {
 };
 
 export const handleVerificationEmailResponse = async (
-  response: AxiosResponse<any, any>
+  response: HttpResponse<any>,
 ) => {
   try {
     if (response.data.success) {
@@ -36,7 +35,7 @@ export const handleVerificationEmailResponse = async (
     }
   } catch (error) {
     logger.error(
-      "Could not send email :: sendVerificationEmail() :: email.ts : " + error
+      "Could not send email :: sendVerificationEmail() :: email.ts : " + error,
     );
     showMessage({
       message: "Error",

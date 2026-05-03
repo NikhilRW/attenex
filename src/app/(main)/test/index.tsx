@@ -1,8 +1,18 @@
-import React from "react";
-import Test from "@test/screens/Test";
+import { useAuthStore } from "@/shared/stores/authStore";
+import { Redirect } from "expo-router";
 
-const index = () => {
-  return <Test />;
+const TestRoute = () => {
+  const user = useAuthStore((state) => state.user);
+
+  return user ? (
+    user.role === "teacher" ? (
+      <Redirect href={"/(main)/classes"} />
+    ) : (
+      <Redirect href={"/(main)/attendance"} />
+    )
+  ) : (
+    <Redirect href={"/(auth)/sign-in"} />
+  );
 };
 
-export default index;
+export default TestRoute;

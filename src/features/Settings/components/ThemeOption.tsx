@@ -68,9 +68,8 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[
-        styles.optionCard,
+        styles.optionCard(isActive),
         animatedContainerStyle,
-        isActive ? styles.optionCardActive : styles.optionCardInactive,
       ]}
     >
       <Animated.View

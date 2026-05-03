@@ -14,7 +14,7 @@ import { withUnistyles } from "react-native-unistyles";
 
 const LectureCardGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(8, 145, 178, 0.15)", "rgba(8, 145, 178, 0.3)"] as const)
       : (["rgba(8, 145, 178, 0.1)", "rgba(8, 145, 178, 0.3)"] as const),
 }));

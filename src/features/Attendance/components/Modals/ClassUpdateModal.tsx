@@ -1,4 +1,4 @@
-import styles  from "@attendance/styles/StudentDashboard.styles";
+import styles from "@attendance/styles/StudentDashboard.styles";
 import { ClassUpdateModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,7 +16,7 @@ import { withUnistyles } from "react-native-unistyles";
 
 const ClassModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
       : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));

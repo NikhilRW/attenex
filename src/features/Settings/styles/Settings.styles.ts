@@ -158,7 +158,7 @@ export const styles = StyleSheet.create((theme) => {
       flexDirection: "row",
       gap: 12,
     },
-    optionCard: {
+    optionCard:(isActive: boolean) => ({
       flex: 1,
       padding: 16,
       borderRadius: 20,
@@ -166,15 +166,9 @@ export const styles = StyleSheet.create((theme) => {
       alignItems: "center",
       gap: 12,
       position: "relative",
-    },
-    optionCardActive: {
-      backgroundColor: "rgba(0, 212, 255, 0.15)",
-      borderColor: theme.primary.main,
-    },
-    optionCardInactive: {
-      backgroundColor: theme.surface.glassCardBg,
-      borderColor: theme.surface.glassBorder,
-    },
+      backgroundColor: isActive ? "rgba(0, 212, 255, 0.15)" : theme.surface.glassCardBg,
+      borderColor: isActive ? theme.primary.main : theme.surface.glassBorder,
+    }),
     roleCard: {
       flex: 1,
       padding: 16,

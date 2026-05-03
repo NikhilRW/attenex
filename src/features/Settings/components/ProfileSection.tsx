@@ -16,7 +16,7 @@ import { withUnistyles } from "react-native-unistyles";
 
 const ProfileHeaderGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(255,255,255,0.05)", "transparent"] as const)
       : (["rgba(0,0,0,0.02)", "transparent"] as const),
 }));

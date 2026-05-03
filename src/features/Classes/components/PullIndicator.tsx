@@ -32,7 +32,7 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
         <Canvas style={styles.pullIndicatorCanvas}>
           <ProgressPath
             color={
-              rt.colorScheme === "dark"
+              rt.themeName === "dark"
                 ? "rgba(255,255,255,0.1)"
                 : "rgba(0,0,0,0.05)"
             }

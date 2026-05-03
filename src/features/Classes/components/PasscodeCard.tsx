@@ -9,7 +9,7 @@ import { withUnistyles } from "react-native-unistyles";
 
 const PasscodeSurface = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
       : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
 }));

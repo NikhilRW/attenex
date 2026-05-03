@@ -2,18 +2,12 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { Redirect } from "expo-router";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 
-const ShouldGoToTestScreen = false;
-
 export default function Index() {
   const { isAuthenticated, isLoading } = useAuthStore();
 
   // Wait for auth state to be loaded
   if (isLoading) {
     return null;
-  }
-
-  if (ShouldGoToTestScreen) {
-    return <Redirect href={"/test"} />;
   }
 
   // Redirect based on authentication status

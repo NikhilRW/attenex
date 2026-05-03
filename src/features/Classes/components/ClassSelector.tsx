@@ -1,4 +1,4 @@
-import {styles} from "@classes/styles/CreateLecture.styles";
+import { styles } from "@classes/styles/CreateLecture.styles";
 import { ClassItem } from "@classes/types/common";
 import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
@@ -24,9 +24,11 @@ const MutedIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));
 
+const AnimatedView = withUnistyles(Animated.View);
+
 const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
       : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));
@@ -90,7 +92,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
             style={styles.modalBackdrop}
             onPress={onToggleDropdown}
           />
-          <Animated.View
+          <AnimatedView
             entering={FadeInUp.springify()}
             style={styles.modalAnimatedWrapper}
           >
@@ -145,7 +147,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                 </TouchableOpacity>
               </View>
             </SelectionModalGradient>
-          </Animated.View>
+          </AnimatedView>
         </View>
       </Modal>
     </View>

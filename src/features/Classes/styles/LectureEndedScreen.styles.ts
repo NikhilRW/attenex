@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
+  const isDark = rt.themeName === "dark";
 
   return {
     container: {

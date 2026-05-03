@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme, rt) => {
-  const isDark = rt.colorScheme === "dark";
+  const isDark = rt.themeName === "dark";
 
   return {
     container: {
@@ -343,7 +343,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderWidth: 1,
     },
     modalSurface: {
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.8)",
+      borderColor: theme.border.modal,
     },
     modalHeader: {
       flexDirection: "row",
@@ -393,7 +393,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
     },
     rollNumberText: {
       fontSize: 16,
@@ -475,7 +475,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
-      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+      borderColor: theme.border.modal,
     },
     inputIcon: {
       marginRight: 12,
@@ -516,7 +516,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     cancelButtonNarrow: {
       width: "30%",
       backgroundColor: "transparent",
-      borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+      borderColor: theme.border.secondary,
     },
     cancelButtonText: {
       fontSize: 16,

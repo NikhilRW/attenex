@@ -8,21 +8,21 @@ import { withUnistyles } from "react-native-unistyles";
 
 const BlueGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(59, 130, 246, 0.2)", "rgba(59, 130, 246, 0.1)"] as const)
       : (["rgba(59, 130, 246, 0.1)", "rgba(59, 130, 246, 0.05)"] as const),
 }));
 
 const GreenGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(16, 185, 129, 0.2)", "rgba(16, 185, 129, 0.1)"] as const)
       : (["rgba(16, 185, 129, 0.1)", "rgba(16, 185, 129, 0.05)"] as const),
 }));
 
 const AmberGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
-    rt.colorScheme === "dark"
+    rt.themeName === "dark"
       ? (["rgba(245, 158, 11, 0.2)", "rgba(245, 158, 11, 0.1)"] as const)
       : (["rgba(245, 158, 11, 0.1)", "rgba(245, 158, 11, 0.05)"] as const),
 }));
