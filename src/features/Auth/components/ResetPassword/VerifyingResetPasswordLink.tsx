@@ -1,5 +1,4 @@
 import { styles } from "@auth/styles/ResetPassword.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
@@ -11,7 +10,6 @@ const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
 const VerifyingResetPasswordLink = () => {
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
       <View style={styles.loadingContainer}>
         <LoadingIndicator size="large" />
         <Text style={styles.loadingText}>Verifying link...</Text>

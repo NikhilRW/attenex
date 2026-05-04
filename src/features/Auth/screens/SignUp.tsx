@@ -7,7 +7,6 @@ import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
 import { useSignUp } from "@auth/hooks/useSignUp";
 import { styles } from "@auth/styles/SignUp.styles";
 import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -27,8 +26,6 @@ const SignUp = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}

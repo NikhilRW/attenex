@@ -4,7 +4,6 @@ import { RoleSelectionHeader } from "@role-selection/components/RoleSelectionHea
 import { STUDENT_IMG, TEACHER_IMG } from "@role-selection/constants/common";
 import { useRoleSelection } from "@role-selection/hooks/useRoleSelection";
 import { styles } from "@role-selection/styles/RoleSelection.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,8 +23,6 @@ const RoleSelection = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <RoleSelectionHeader />
 
       <View style={styles.modelsContainer}>

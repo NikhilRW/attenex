@@ -6,7 +6,6 @@ import ResetPasswordFormHeader from "@auth/components/ResetPassword/ResetPasswor
 import VerifyingResetPasswordLink from "@auth/components/ResetPassword/VerifyingResetPasswordLink";
 import { useResetPassword } from "@auth/hooks/useResetPassword";
 import { styles } from "@auth/styles/ResetPassword.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -44,8 +43,6 @@ const ResetPassword = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}

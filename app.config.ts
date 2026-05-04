@@ -103,7 +103,7 @@ export default (): ExpoConfig => ({
       {
         icon: "./assets/images/notification_icon.png",
         color: "#000000",
-        sounds: ["./assets/wavs/custom_sound.wav"],
+        sounds: ["assets/mp3s/notification.mp3"],
       },
     ],
     "./plugins/androidManifestPlugin.js",

@@ -20,6 +20,16 @@ import {
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+const styles = StyleSheet.create((_, rt) => ({
+  container: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: rt.insets.top,
+    bottom: 0,
+  },
+}));
+
 export const FuturisticBackground = () => {
   const { theme: colors, rt } = useUnistyles();
   const isDark = rt.themeName === "dark";
@@ -90,8 +100,8 @@ export const FuturisticBackground = () => {
   }
 
   return (
-    <View style={StyleSheet.absoluteFillObject}>
-      <Canvas style={StyleSheet.absoluteFillObject}>
+    <View pointerEvents="none" style={styles.container}>
+      <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}
         <Rect
           x={0}

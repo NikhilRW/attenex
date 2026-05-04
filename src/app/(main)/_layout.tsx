@@ -8,7 +8,10 @@ const MainLayout = () => {
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        sceneStyle: { backgroundColor: "transparent" },
+      }}
     />
   );
 };

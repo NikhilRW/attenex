@@ -16,9 +16,8 @@ import { showMessage } from "react-native-flash-message";
 export const useResetPassword = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-
-  const [token, setToken] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const token = typeof params.token === "string" ? params.token : "";
+  const email = typeof params.email === "string" ? params.email : "";
   const [userName, setUserName] = useState<string>("");
 
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -41,10 +40,7 @@ export const useResetPassword = () => {
   const confirmPassword = watch("confirmPassword");
 
   const verifyToken = async () => {
-    const tokenParam = params.token as string;
-    const emailParam = params.email as string;
-
-    if (!tokenParam || !emailParam) {
+    if (!token || !email) {
       showMessage({
         message: "Invalid Link",
         description: "The reset link is invalid or incomplete",
@@ -55,13 +51,10 @@ export const useResetPassword = () => {
       return false;
     }
 
-    setToken(tokenParam);
-    setEmail(emailParam);
-
     try {
       const response = await http.post("/api/users/verify-reset-token", {
-        email: emailParam,
-        token: tokenParam,
+        email,
+        token,
       });
 
       setUserName(response.data.userName || "");
@@ -84,7 +77,8 @@ export const useResetPassword = () => {
 
   const { data: isValid, isFetching: isVerifying } = useQuery({
     queryFn: verifyToken,
-    queryKey: queryKeys.auth.resetPassword(token),
+    queryKey: queryKeys.auth.resetPassword(token, email),
+    enabled: !!token && !!email,
     staleTime: StaleTime.SECONDS_3,
   });
 

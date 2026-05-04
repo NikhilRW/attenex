@@ -9,7 +9,6 @@ import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants/images";
 import { useSignIn } from "@auth/hooks/useSignIn";
 import { styles } from "@auth/styles/SignIn.styles";
 import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
@@ -30,8 +29,6 @@ const SignIn = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}

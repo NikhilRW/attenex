@@ -18,10 +18,10 @@ export const useLectureManagement = (
   joinedLecture: Lecture | null,
 ): UseLectureManagementReturn => {
   const { user } = useAuthStore();
+  const userClassName = user?.className;
 
   const fetchLectures = useCallback(async () => {
     try {
-      const userClassName = (user as any)?.className;
       console.log(LOG_MESSAGES.FETCHING_LECTURES, {
         userId: user?.id,
         className: userClassName,
@@ -47,14 +47,14 @@ export const useLectureManagement = (
       console.log(LOG_MESSAGES.FETCH_ERROR, error);
       return [];
     }
-  }, [user]);
+  }, [user?.id, userClassName]);
 
   const shouldQueryBeEnabled =
-    joinedLecture !== null || user?.role === "teacher" ? false : true;
+    joinedLecture === null && user?.role !== "teacher" && !!userClassName;
 
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
-    queryKey: queryKeys.lectures.student,
+    queryKey: queryKeys.lectures.studentByClass(userClassName || ""),
     refetchInterval: () => {
       return joinedLecture !== null || user?.role === "teacher"
         ? 0

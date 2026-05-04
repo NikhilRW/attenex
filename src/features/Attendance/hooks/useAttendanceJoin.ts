@@ -24,6 +24,47 @@ import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { useAlerts } from "react-native-paper-alerts";
 
+const isLocationTooFarError = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const errorWithResponse = error as {
+    message?: unknown;
+    response?: {
+      status?: number;
+      data?: {
+        message?: unknown;
+      };
+    };
+  };
+
+  if (errorWithResponse.response?.status === 403) {
+    return true;
+  }
+
+  const message =
+    typeof errorWithResponse.message === "string"
+      ? errorWithResponse.message
+      : errorWithResponse.response?.data?.message;
+
+  return (
+    typeof message === "string" &&
+    message.toLowerCase().includes("too far from the class")
+  );
+};
+
+const retryJoinUnlessLocationTooFar = (
+  failureCount: number,
+  error: unknown,
+) => {
+  if (isLocationTooFarError(error)) {
+    return false;
+  }
+
+  return failureCount < 3;
+};
+
 /**
  * Custom hook to manage joining and leaving lectures
  */
@@ -78,6 +119,7 @@ export const useAttendanceJoin = (
   const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
     mutationFn: proceedWithJoinMutation,
     mutationKey: mutationKeys.lectures.join,
+    retry: retryJoinUnlessLocationTooFar,
     onSuccess: async (data) => {
       if (data === undefined || data === false) {
         return false;
@@ -113,11 +155,11 @@ export const useAttendanceJoin = (
       console.log(error);
       setJoinedLecture(null);
       setStatus("idle");
-      showErrorAlert(
-        ALERT_MESSAGES.JOIN_FAILED.title,
-        error.message || ALERT_MESSAGES.JOIN_FAILED.message,
-        alert,
-      );
+      const errorMessage =
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : ALERT_MESSAGES.JOIN_FAILED.message;
+      showErrorAlert(ALERT_MESSAGES.JOIN_FAILED.title, errorMessage, alert);
       return false;
     },
   });
@@ -137,6 +179,7 @@ export const useAttendanceJoin = (
   const { mutateAsync: handleJoin } = useMutation({
     mutationFn: handleJoinMutateFn,
     mutationKey: mutationKeys.classes.join,
+    retry: retryJoinUnlessLocationTooFar,
   });
 
   const handleLeaveLecture = useCallback(

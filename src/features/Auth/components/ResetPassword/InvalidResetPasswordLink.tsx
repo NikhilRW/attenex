@@ -1,7 +1,6 @@
 import FuturisticButton from "@auth/components/common/FuturisticButton";
 import { styles } from "@auth/styles/ResetPassword.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
@@ -15,7 +14,6 @@ const InvalidResetPasswordLink = () => {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
       {/* AGENT: Add here correct styles */}
       <View style={styles.errorContainer}>
         <View style={[styles.iconContainer, styles.errorIconContainer]}>

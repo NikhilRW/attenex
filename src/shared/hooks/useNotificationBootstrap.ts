@@ -62,7 +62,7 @@ export const useNotificationBootstrap = () => {
             title,
             body,
             data: remoteMessage.data,
-            sound: "default" as const,
+            sound: "notification.mp3",
             color: getNotificationAccentColor(),
             attachments: [
               {
@@ -83,7 +83,7 @@ export const useNotificationBootstrap = () => {
           enableVibrate: true,
           vibrationPattern: [0, 250, 200, 250],
           lightColor: getCurrentTheme().primary.main,
-          sound: "default",
+          sound: "notification.mp3",
         }).catch(() => {
           // Ignore channel creation failures to avoid blocking app startup.
         });

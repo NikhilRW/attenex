@@ -4,7 +4,6 @@ import { NewClassModal } from "@classes/components/NewClassModal";
 import { DURATION_OPTIONS } from "@classes/constants/common";
 import { useCreateLectureScreen } from "@classes/hooks/useCreateLectureScreen";
 import { styles } from "@classes/styles/CreateLecture.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
@@ -38,8 +37,6 @@ const CreateLectureScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <CreateLectureHeader onBack={handleGoBack} />
 
       <KeyboardAvoidingView

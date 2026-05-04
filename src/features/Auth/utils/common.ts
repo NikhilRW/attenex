@@ -14,7 +14,6 @@ import { logger } from "@shared/utils/logger";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
-import { LinkedInProfile } from "react-native-linkedin-oauth2";
 
 /**
  * Authentication Utility Functions
@@ -201,7 +200,6 @@ export const handleLinkedInSignIn = () => {
   }
 };
 
-
 export const handleEmailSignIn = async (data: SignInFormData) => {
   try {
     const {
@@ -253,13 +251,12 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
           return res.success ? [...res.data] : [];
         },
       });
-    } else if (user.role === "student" && (user as any).className) {
+    } else if (user.role === "student" && user.className) {
+      const className = user.className;
       queryClient.prefetchQuery({
-        queryKey: queryKeys.lectures.student,
+        queryKey: queryKeys.lectures.studentByClass(className),
         queryFn: async () => {
-          const res = await lectureService.getStudentLectures(
-            (user as any).className,
-          );
+          const res = await lectureService.getStudentLectures(className);
           return res.success ? res.data : [];
         },
       });

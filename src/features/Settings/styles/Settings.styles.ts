@@ -158,7 +158,7 @@ export const styles = StyleSheet.create((theme) => {
       flexDirection: "row",
       gap: 12,
     },
-    optionCard:(isActive: boolean) => ({
+    optionCard: (isActive: boolean) => ({
       flex: 1,
       padding: 16,
       borderRadius: 20,
@@ -166,7 +166,9 @@ export const styles = StyleSheet.create((theme) => {
       alignItems: "center",
       gap: 12,
       position: "relative",
-      backgroundColor: isActive ? "rgba(0, 212, 255, 0.15)" : theme.surface.glassCardBg,
+      backgroundColor: isActive
+        ? "rgba(0, 212, 255, 0.15)"
+        : theme.surface.glassCardBg,
       borderColor: isActive ? theme.primary.main : theme.surface.glassBorder,
     }),
     roleCard: {
@@ -178,29 +180,19 @@ export const styles = StyleSheet.create((theme) => {
       gap: 12,
       position: "relative",
     },
-    roleIcon: {
+    optionIconContainer: (isActive: boolean) => ({
       width: 48,
       height: 48,
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-    },
-    optionIconActive: {
-      backgroundColor: theme.primary.main,
-    },
-    optionIconInactive: {
-      backgroundColor: theme.surface.glass,
-    },
-    roleText: {
+      backgroundColor: isActive ? theme.primary.main : theme.surface.glass,
+    }),
+    optionText: (isActive: boolean) => ({
       fontSize: 14,
       fontWeight: "700",
-    },
-    optionTextActive: {
-      color: theme.text.primary,
-    },
-    optionTextInactive: {
-      color: theme.text.secondary,
-    },
+      color: isActive ? theme.text.primary : theme.text.secondary,
+    }),
     checkIcon: {
       position: "absolute",
       top: 12,

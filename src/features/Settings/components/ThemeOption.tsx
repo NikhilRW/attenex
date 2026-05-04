@@ -11,13 +11,11 @@ import Animated, {
   withSequence,
   withSpring,
 } from "react-native-reanimated";
-import { useUnistyles, withUnistyles } from "react-native-unistyles";
+import { withUnistyles } from "react-native-unistyles";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-const OptionIcon = withUnistyles(Ionicons, (theme) => ({
-  color: theme.text.muted,
-}));
+const OptionIcon = withUnistyles(Ionicons);
 
 const CheckIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.primary.main,
@@ -30,7 +28,6 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
   label,
 }) => {
   const scale = useSharedValue(1);
-  const { theme } = useUnistyles();
 
   const rotation = useDerivedValue(() => {
     if (isActive) {
@@ -67,32 +64,20 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={[
-        styles.optionCard(isActive),
-        animatedContainerStyle,
-      ]}
+      style={[styles.optionCard(isActive), animatedContainerStyle]}
     >
       <Animated.View
-        style={[
-          styles.roleIcon,
-          animatedIconStyle,
-          isActive ? styles.optionIconActive : styles.optionIconInactive,
-        ]}
+        style={[styles.optionIconContainer(isActive), animatedIconStyle]}
       >
         <OptionIcon
           name={icon as any}
           size={24}
-          color={isActive ? "#FFF" : theme.text.muted}
+          uniProps={(theme) => ({
+            color: isActive ? "#FFF" : theme.text.muted,
+          })}
         />
       </Animated.View>
-      <Text
-        style={[
-          styles.roleText,
-          isActive ? styles.optionTextActive : styles.optionTextInactive,
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={styles.optionText(isActive)}>{label}</Text>
       {isActive && (
         <Animated.View
           entering={FadeInDown.springify()}

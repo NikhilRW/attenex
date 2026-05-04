@@ -52,10 +52,10 @@ const CustomTabBar = ({
         if (!className) {
           return;
         }
+        const studentLecturesQueryKey =
+          queryKeys.lectures.studentByClass(className);
 
-        const queryState = queryClient.getQueryState(
-          queryKeys.lectures.student,
-        );
+        const queryState = queryClient.getQueryState(studentLecturesQueryKey);
         const isDataFresh = isFreshQuery(
           queryState?.dataUpdatedAt,
           StaleTime.SECONDS_30,
@@ -63,7 +63,7 @@ const CustomTabBar = ({
 
         if (!isDataFresh) {
           queryClient.prefetchQuery({
-            queryKey: queryKeys.lectures.student,
+            queryKey: studentLecturesQueryKey,
             queryFn: async () => {
               const res = await lectureService.getStudentLectures(className);
               return res.success ? res.data || [] : [];

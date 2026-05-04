@@ -4,7 +4,6 @@ import { LectureEditModal } from "@classes/components/LectureEditModal";
 import PullIndicator from "@classes/components/PullIndicator";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { markPerformance } from "@shared/utils/performance";
 import { Skia } from "@shopify/react-native-skia";
 import { useCallback, useEffect } from "react";
@@ -107,7 +106,6 @@ const TeacherDashboard = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
       <GestureHandlerRootView style={styles.screenFill}>
         <Animated.View style={[styles.screenFill, animatedContainerStyle]}>
           <PullIndicator

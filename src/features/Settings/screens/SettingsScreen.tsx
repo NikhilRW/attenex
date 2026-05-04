@@ -1,10 +1,10 @@
+import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { AppearanceSection } from "@settings/components/AppearanceSection";
 import { DangerZoneSection } from "@settings/components/DangerZoneSection";
 import { ProfileSection } from "@settings/components/ProfileSection";
 import { RoleSection } from "@settings/components/RoleSection";
 import { useSettings } from "@settings/hooks/useSettings";
 import { styles } from "@settings/styles/Settings.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -39,7 +39,7 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
+      {user?.role === "student" && <FuturisticBackground />}
       <HeaderGradient
         style={styles.header}
         uniProps={(theme, rt) => ({
@@ -59,7 +59,6 @@ const SettingsScreen = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        
         <ProfileSection
           displayName={displayName}
           onDisplayNameChange={setDisplayName}

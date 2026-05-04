@@ -4,7 +4,7 @@ import { lectureService } from "@classes/services/lectureService";
 import { ClassItem, LectureWithCount } from "@classes/types/common";
 import { CreateLectureAPIResponse } from "@classes/types/api";
 import { getMinHeightForScrollView } from "@classes/utils/common";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
@@ -13,7 +13,6 @@ import { CreateLectureVariables } from "../types/params";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { height } = useWindowDimensions();
   const [lectureName, setLectureName] = useState("");
   const [selectedClass, setSelectedClass] = useState<string>("");
@@ -63,6 +62,10 @@ export const useCreateLectureScreen = () => {
     { previousLectures: LectureWithCount[] | undefined }
   >({
     onMutate: async (_, context) => {
+      await context.client.cancelQueries({
+        queryKey: queryKeys.lectures.teacher,
+      });
+
       const previousLectures = context.client.getQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
       );
@@ -90,9 +93,6 @@ export const useCreateLectureScreen = () => {
           }
         },
       );
-      await context.client.cancelQueries({
-        queryKey: queryKeys.lectures.teacher,
-      });
       navigateToTeacherDashboard();
       return { previousLectures };
     },
@@ -100,9 +100,6 @@ export const useCreateLectureScreen = () => {
       if (data && data.success) {
         alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
-          queryKey: queryKeys.lectures.teacher,
-        });
-        await context.client.fetchQuery({
           queryKey: queryKeys.lectures.teacher,
         });
       } else {
@@ -143,12 +140,15 @@ export const useCreateLectureScreen = () => {
     { previousClasses: ClassItem[] } | null
   >({
     mutationKey: mutationKeys.classes.create,
-    onMutate: (params, context) => {
+    onMutate: async (params, context) => {
       if (!params.trim()) {
         alert("Error", "Please enter a class name");
         return null;
       }
       const newClassNameParam = params.trim();
+      await context.client.cancelQueries({
+        queryKey: queryKeys.classes.teacher,
+      });
       const previousClasses = context.client.getQueryData<ClassItem[]>(
         queryKeys.classes.teacher,
       );
@@ -173,9 +173,9 @@ export const useCreateLectureScreen = () => {
         previousClasses: previousClasses!,
       };
     },
-    onSuccess: (res, _, onMutateResult, context) => {
+    onSuccess: async (res, _, onMutateResult, context) => {
       if (res.success) {
-        queryClient.invalidateQueries({
+        await context.client.invalidateQueries({
           queryKey: queryKeys.classes.teacher,
         });
       } else if (onMutateResult?.previousClasses) {
@@ -186,7 +186,14 @@ export const useCreateLectureScreen = () => {
         alert("Class not Added sucessfully");
       }
     },
-    onError(error) {
+    onError(error, _, onMutateResult, context) {
+      if (onMutateResult?.previousClasses) {
+        context.client.setQueryData<ClassItem[]>(
+          queryKeys.classes.teacher,
+          onMutateResult.previousClasses,
+        );
+      }
+
       if ((error as any).response?.status === 409) {
         alert("Info", "Class name added already exists");
       } else {

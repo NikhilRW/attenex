@@ -4,10 +4,14 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { View } from "react-native";
 import Animated, { useDerivedValue } from "react-native-reanimated";
-import { useUnistyles, withUnistyles } from "react-native-unistyles";
+import { withUnistyles } from "react-native-unistyles";
 
 const ProgressPath = withUnistyles(Path, (theme) => ({
   color: theme.primary.main,
+}));
+
+const ProgressTrackPath = withUnistyles(Path, (_theme, rt) => ({
+  color: rt.themeName === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
 }));
 
 const AddIcon = withUnistyles(Ionicons, (theme) => ({
@@ -24,24 +28,12 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
     [pullProgress],
   );
 
-  const { theme, rt } = useUnistyles();
-
   return (
     <Animated.View style={[styles.pullIndicator, pullIndicatorStyle]}>
       <View style={styles.pullIndicatorOuter}>
         <Canvas style={styles.pullIndicatorCanvas}>
+          <ProgressTrackPath path={circlePath} style="stroke" strokeWidth={4} />
           <ProgressPath
-            color={
-              rt.themeName === "dark"
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)"
-            }
-            path={circlePath}
-            style="stroke"
-            strokeWidth={4}
-          />
-          <Path
-            color={theme.primary.main}
             path={circlePath}
             style="stroke"
             strokeWidth={4}

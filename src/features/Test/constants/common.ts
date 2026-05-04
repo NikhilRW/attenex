@@ -7,10 +7,10 @@ export const codeStr = `
   
   
     return (
-      <View style={{flex:1,justifyContent: "center", alignItems: "center"}}>
-      <Text>Hello World!</Text>
-      <Button title="Click Me" onPress={()=>{ToastAndroid.show('Here',10)}} />
-      </View>
+      // <View style={{flex:1,justifyContent: "center", alignItems: "center"}}>
+      // <Text>Hello World!</Text>
+      // <Button title="Click Me" onPress={()=>{ToastAndroid.show('Here',10)}} />
+      // </View>
     )
   }
 

@@ -1,4 +1,5 @@
 import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
+import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
 import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
@@ -12,12 +13,13 @@ import {
   useResetFlow,
 } from "@shopify/react-native-performance";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import Constants from "expo-constants";
 import { useNetworkState } from "expo-network";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect } from "react";
-import { Appearance, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
@@ -30,16 +32,15 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import {
-  StyleSheet,
-  UnistylesRuntime,
-  withUnistyles,
-} from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
 import { clientPersister } from "@shared/utils/mmkvStorage";
+import { useAuthStore } from "@/shared/stores/authStore";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
+const QUERY_PERSIST_MAX_AGE_MS = StaleTime.DAYS_5;
+const QUERY_PERSIST_BUSTER = `attenex-${Constants.expoConfig?.version ?? "1"}`;
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -68,7 +69,10 @@ const ThemedPaperProvider = withUnistyles(PaperProvider, (theme, rt) => {
 const styles = StyleSheet.create((_, rt) => ({
   safeArea: {
     flex: 1,
-    backgroundColor: rt.themeName === "dark" ? "black" : "rgb(232 232 232)",
+    backgroundColor: rt.themeName === "dark" ? "black" : "white",
+  },
+  stackContent: {
+    backgroundColor: "transparent",
   },
 }));
 
@@ -106,23 +110,14 @@ export default function RootLayout() {
     }
   }, [loaded, error]);
 
+  const user = useAuthStore((state) => state.user);
+
   const tanstackOnSuccess = useCallback(() => {
     if (isConnected) {
       resetFlow({ destination: ROOT_LAYOUT_SCREEN_NAME });
       queryClient.resumePausedMutations();
     }
   }, [isConnected, resetFlow]);
-
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener((state) => {
-      if (mode === "system") {
-        UnistylesRuntime.setTheme(state.colorScheme as "dark" | "light");
-      }
-    });
-    return () => {
-      subscription.remove();
-    };
-  }, [mode]);
 
   const reportPreparedCallback = (e: RenderPassReport) => {
     console.log(e);
@@ -147,6 +142,7 @@ export default function RootLayout() {
           />
 
           <ThemedSafeAreaView style={styles.safeArea}>
+            {user?.role !== "student" && <FuturisticBackground />}
             <ApolloGraphQLProvider>
               <>
                 <ThemedPaperProvider>
@@ -156,7 +152,8 @@ export default function RootLayout() {
                       onSuccess={tanstackOnSuccess}
                       persistOptions={{
                         persister: clientPersister,
-                        maxAge: Infinity, // Keep persisted queries bounded for mobile
+                        maxAge: QUERY_PERSIST_MAX_AGE_MS,
+                        buster: QUERY_PERSIST_BUSTER,
                         dehydrateOptions: {
                           // Persist mutations that are queued/in-flight (paused = queued while offline)
                           shouldDehydrateMutation: (mutation: any) => {
@@ -175,7 +172,12 @@ export default function RootLayout() {
                         },
                       }}
                     >
-                      <Stack screenOptions={{ headerShown: false }}>
+                      <Stack
+                        screenOptions={{
+                          headerShown: false,
+                          contentStyle: styles.stackContent,
+                        }}
+                      >
                         <Stack.Screen name="(auth)" />
                         <Stack.Screen name="(main)" />
                       </Stack>
@@ -194,7 +196,3 @@ export default function RootLayout() {
     </PerformanceProfiler>
   );
 }
-
-    // "@react-navigation/bottom-tabs": "^7.4.0",
-    // "@react-navigation/elements": "^2.6.3",
-    // "@react-navigation/native": "^7.1.8",

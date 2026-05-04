@@ -1,10 +1,9 @@
-import  AuthHeader  from "@auth/components/common/AuthHeader";
-import  BackButton  from "@auth/components/common/BackButton";
-import  EmailSent  from "@auth/components/ForgotPassword/EmailSent";
-import  ForgotPasswordForm  from "@auth/components/ForgotPassword/ForgotPasswordForm";
+import AuthHeader from "@auth/components/common/AuthHeader";
+import BackButton from "@auth/components/common/BackButton";
+import EmailSent from "@auth/components/ForgotPassword/EmailSent";
+import ForgotPasswordForm from "@auth/components/ForgotPassword/ForgotPasswordForm";
 import { useForgotPassword } from "@auth/hooks/useForgotPassword";
 import { styles } from "@auth/styles/ForgotPassword.styles";
-import { FuturisticBackground } from "@shared/components/FuturisticBackground";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -28,8 +27,6 @@ const ForgotPassword = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
-
       <Animated.ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

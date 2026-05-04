@@ -13,9 +13,9 @@ export const queryKeys = {
       token
         ? (["auth", "verify-email", token] as const)
         : (["auth", "verify-email"] as const),
-    resetPassword: (token?: string) =>
-      token
-        ? (["auth", "reset-password", token] as const)
+    resetPassword: (token?: string, email?: string) =>
+      token && email
+        ? (["auth", "reset-password", token, email] as const)
         : (["auth", "reset-password"] as const),
     forgotPassword: ["auth", "forgot-password"] as const,
   },
@@ -25,6 +25,8 @@ export const queryKeys = {
     all: ["lectures"] as const,
     teacher: ["lectures", "teacher"] as const,
     student: ["lectures", "student"] as const,
+    studentByClass: (className: string) =>
+      ["lectures", "student", "class", className] as const,
     detail: (id: string) => ["lectures", "detail", id] as const,
     studentDetail: (id: string) => ["lectures", "student-detail", id] as const,
     passcode: (id: string) => ["lectures", "passcode", id] as const,
@@ -70,29 +72,3 @@ export const queryKeys = {
     fetctLectureForStudent: ["fetch-lectures-for-student"] as const,
   },
 } as const;
-
-// Backward compatibility aliases
-// export const legacyQueryKeys = {
-//   linkedin: queryKeys.auth.linkedin,
-//   resetPassword: queryKeys.auth.resetPassword,
-//   verifyEmail: queryKeys.auth.verifyEmail,
-//   joinLectureWithNotification: queryKeys.lectures.joinWithNotification,
-//   sendForgotPasswordEmail: queryKeys.auth.forgotPassword,
-//   fetctLectureForStudent: queryKeys._legacy.fetctLectureForStudent,
-//   getStudentLectureDetails: {
-//     all: ["get-student-lecture-details"] as const,
-//     withId: (id: string) => queryKeys.lectures.studentDetail(id),
-//   },
-//   fetchAttendanceForTeacher: {
-//     all: ["fetch-attendance-for-teacher"] as const,
-//     withLectureId: (lectureId: string) =>
-//       queryKeys.attendance.teacher(lectureId),
-//   },
-//   existingClassesForTeacher: queryKeys._legacy.existingClassesForTeacher,
-//   socketAttendanceViewTeacher: queryKeys._legacy.socketAttendanceViewTeacher,
-//   teacherLectures: queryKeys._legacy.teacherLectures,
-//   teacherDashboardSocketUpdates:
-//     queryKeys._legacy.teacherDashboardSocketUpdates,
-//   fetchPasscodedForLectureEnded:
-//     queryKeys._legacy.fetchPasscodedForLectureEnded,
-// };

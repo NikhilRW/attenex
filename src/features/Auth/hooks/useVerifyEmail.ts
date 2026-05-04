@@ -1,36 +1,36 @@
-import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
 import {
   handleVerificationEmailResponse,
   sendVerificationEmailRequest,
 } from "@auth/utils/email";
-import { queryKeys } from "@shared/constants/queryKeys";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 
 export const useVerifyEmail = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const email = params.email as string | undefined;
+  const sentEmailRef = useRef<string | null>(null);
 
-  const sendEmail = async () => {
-    if (params.email) {
-      const response = await sendVerificationEmailRequest(
-        params.email as string,
-      );
+  const { mutate: sendEmail } = useMutation({
+    mutationKey: mutationKeys.auth.sendVerificationEmail,
+    mutationFn: sendVerificationEmailRequest,
+    onSuccess: (response) => {
       if (response?.data?.success) {
         handleVerificationEmailResponse(response);
       }
-      return response;
-    }
-    return false;
-  };
-
-  useQuery({
-    queryFn: sendEmail,
-    queryKey: queryKeys.auth.verifyEmail(params.email as string | undefined),
-    enabled: true,
-    staleTime: StaleTime.SECONDS_25,
-    gcTime: GarbageTime.SECONDS_25,
+    },
   });
+
+  useEffect(() => {
+    if (!email || sentEmailRef.current === email) {
+      return;
+    }
+
+    sentEmailRef.current = email;
+    sendEmail(email);
+  }, [email, sendEmail]);
 
   const handleBackToSignIn = () => {
     router.replace("/(auth)/sign-in");
@@ -38,6 +38,6 @@ export const useVerifyEmail = () => {
 
   return {
     handleBackToSignIn,
-    email: params.email as string | undefined,
+    email,
   };
 };

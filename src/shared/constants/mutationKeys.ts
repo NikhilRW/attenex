@@ -10,6 +10,7 @@ export const mutationKeys = {
     logout: ["auth", "logout"] as const,
     deleteAccount: ["auth", "delete-account"] as const,
     logoutDeleteLinkedin: ["auth", "logout-delete-linkedin"] as const,
+    sendVerificationEmail: ["auth", "send-verification-email"] as const,
     sendForgotPasswordEmail: ["auth", "forgot-password-email"] as const,
   },
 

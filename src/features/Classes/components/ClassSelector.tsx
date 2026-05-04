@@ -3,7 +3,7 @@ import { ClassItem } from "@classes/types/common";
 import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
@@ -25,6 +25,7 @@ const MutedIcon = withUnistyles(Ionicons, (theme) => ({
 }));
 
 const AnimatedView = withUnistyles(Animated.View);
+const CLASS_ITEM_HEIGHT = 56;
 
 const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
@@ -64,6 +65,28 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
       </TouchableOpacity>
     ),
     [onSelectClass, selectedClass],
+  );
+
+  const keyExtractor = useCallback((item: ClassItem) => item.id, []);
+
+  const getItemLayout = useCallback(
+    (_: ArrayLike<ClassItem> | null | undefined, index: number) => ({
+      length: CLASS_ITEM_HEIGHT,
+      offset: CLASS_ITEM_HEIGHT * index,
+      index,
+    }),
+    [],
+  );
+
+  const flatListPerformanceProps = useMemo(
+    () => ({
+      removeClippedSubviews: true,
+      initialNumToRender: 10,
+      maxToRenderPerBatch: 10,
+      updateCellsBatchingPeriod: 40,
+      windowSize: 8,
+    }),
+    [],
   );
 
   return (
@@ -118,8 +141,9 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
               </View>
               <Animated.FlatList<ClassItem>
                 data={existingClasses}
-                keyExtractor={(item) => item.id}
+                keyExtractor={keyExtractor}
                 renderItem={renderClassItem}
+                getItemLayout={getItemLayout}
                 ListEmptyComponent={
                   <View style={styles.selectionEmptyState}>
                     <MutedIcon
@@ -135,6 +159,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                 style={styles.dropdownScroll}
                 nestedScrollEnabled
                 showsVerticalScrollIndicator={true}
+                {...flatListPerformanceProps}
               />
 
               <View style={styles.selectionFooter}>
