@@ -1,8 +1,10 @@
-import { handleEmailSignUp } from "@auth/utils/common";
+import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { handleEmailSignUp, handleGoogleSignIn } from "@auth/utils/common";
 import { SignUpFormData, signUpSchema } from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,6 +15,14 @@ export const useSignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLinkedInModalVisible, setIsLinkedInModalVisible] = useState(false);
+  const signUpMutation = useMutation({
+    mutationKey: mutationKeys.auth.signUpEmail,
+    mutationFn: handleEmailSignUp,
+  });
+  const googleSignInMutation = useMutation({
+    mutationKey: mutationKeys.auth.signInGoogle,
+    mutationFn: handleGoogleSignIn,
+  });
 
   // Redirect to main stack if user is already authenticated
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
@@ -27,7 +37,7 @@ export const useSignUp = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -40,7 +50,11 @@ export const useSignUp = () => {
 
   const onSignUp = async (data: SignUpFormData) => {
     Keyboard.dismiss();
-    return await handleEmailSignUp(data);
+    await signUpMutation.mutateAsync(data);
+  };
+
+  const handleGooglePress = async () => {
+    await googleSignInMutation.mutateAsync();
   };
 
   const handleSignIn = () => {
@@ -51,12 +65,14 @@ export const useSignUp = () => {
     control,
     handleSubmit: handleSubmit(onSignUp),
     errors,
-    isSubmitting,
+    isSubmitting: isFormSubmitting || signUpMutation.isPending,
+    isGoogleLoading: googleSignInMutation.isPending,
     showPassword,
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
     handleSignIn,
+    handleGooglePress,
     isLinkedInModalVisible,
     setIsLinkedInModalVisible,
   };

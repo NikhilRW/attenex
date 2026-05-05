@@ -11,6 +11,7 @@ import {
 } from "../utils/offlineMutationFuncs";
 import { defaultFaliureCount } from "../utils/tanstack";
 import { queryKeys } from "../constants/queryKeys";
+import { sendVerificationEmailRequest } from "@/features/Auth/utils/email";
 
 export const useOfflineMutations = () => {
   const queryClient = useQueryClient();
@@ -85,5 +86,6 @@ export const useOfflineMutations = () => {
         });
       },
     });
+
   }, [queryClient]);
 };

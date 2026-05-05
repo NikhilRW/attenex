@@ -9,7 +9,7 @@ import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
 import { googleAuth } from "@shared/utils/google-auth";
-import http from "@shared/utils/http";
+import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
@@ -200,7 +200,13 @@ export const handleLinkedInSignIn = () => {
   }
 };
 
-export const handleEmailSignIn = async (data: SignInFormData) => {
+export const handleEmailSignIn = async ({
+  data,
+  sendEmail,
+}: {
+  data: SignInFormData;
+  sendEmail: (email: string) => Promise<HttpResponse<any>>;
+}) => {
   try {
     const {
       data: { token, user },
@@ -218,9 +224,10 @@ export const handleEmailSignIn = async (data: SignInFormData) => {
         message: "Email Not Verified",
         description: "Please verify your email before signing in.",
         type: "warning",
-        duration: 3000,
+        duration: 1000,
         position: "bottom",
       });
+      await sendEmail(data.email);
       router.replace(`/verify-email?email=${encodeURIComponent(data.email!)}`);
       return;
     }

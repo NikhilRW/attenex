@@ -1,3 +1,4 @@
+import { useOfflineMutations } from "@/features/Auth/hooks/useAuthOfflineMutations";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -20,7 +21,8 @@ import React from "react";
  *
  * All screens have headers hidden for a clean, full-screen auth experience.
  */
-const _layout = () => {
+const Layout = () => {
+  useOfflineMutations();
   return (
     <Stack
       initialRouteName="sign-in/index" // Default to sign-in screen
@@ -64,4 +66,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default Layout;

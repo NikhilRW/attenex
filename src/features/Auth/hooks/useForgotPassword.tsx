@@ -15,7 +15,39 @@ export const useForgotPassword = () => {
   );
   const [emailSent, setEmailSent] = useState(false);
 
-  const sendEmail = async () => {
+  const resetEmailMutation = useMutation({
+    mutationFn: async (normalizedEmail: string) => {
+      await http.post("/api/users/forgot-password", {
+        email: normalizedEmail,
+      });
+    },
+    mutationKey: mutationKeys.auth.sendForgotPasswordEmail,
+    onSuccess: () => {
+      setEmailSent(true);
+      showMessage({
+        message: "Email Sent!",
+        description: "Check your inbox for the password reset link",
+        type: "success",
+        duration: 4000,
+        position: "bottom",
+      });
+    },
+    onError: (error: any) => {
+      setEmailSent(false);
+      const errorMessage =
+        error.response?.data?.error ||
+        "Unable to send reset email. Please try again.";
+      showMessage({
+        message: "Request Failed",
+        description: errorMessage,
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+    },
+  });
+
+  const handleRequestReset = () => {
     if (!email.trim()) {
       showMessage({
         message: "Email Required",
@@ -38,41 +70,11 @@ export const useForgotPassword = () => {
       return;
     }
 
-    try {
-      Keyboard.dismiss();
-
-      await http.post("/api/users/forgot-password", {
-        email: email.trim().toLowerCase(),
-      });
-      setEmailSent(true);
-      showMessage({
-        message: "Email Sent!",
-        description: "Check your inbox for the password reset link",
-        type: "success",
-        duration: 4000,
-        position: "bottom",
-      });
-      return true;
-    } catch (error: any) {
-      setEmailSent(false);
-      const errorMessage =
-        error.response?.data?.error ||
-        "Unable to send reset email. Please try again.";
-      showMessage({
-        message: "Request Failed",
-        description: errorMessage,
-        type: "danger",
-        duration: 3000,
-        position: "bottom",
-      });
-      return undefined;
-    }
+    Keyboard.dismiss();
+    resetEmailMutation.mutate(email.trim().toLowerCase());
   };
 
-  const { mutateAsync: handleRequestReset, isPending } = useMutation({
-    mutationFn: sendEmail,
-    mutationKey: mutationKeys.auth.sendForgotPasswordEmail,
-  });
+  const { isPending } = resetEmailMutation;
 
   const keyboard = useAnimatedKeyboard();
 

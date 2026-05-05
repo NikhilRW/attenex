@@ -6,12 +6,16 @@
 export const mutationKeys = {
   // Auth mutations
   auth: {
+    signInEmail: ["auth", "sign-in-email"] as const,
+    signUpEmail: ["auth", "sign-up-email"] as const,
+    signInGoogle: ["auth", "sign-in-google"] as const,
     signInLinkedIn: ["auth", "sign-in-linkedin"] as const,
     logout: ["auth", "logout"] as const,
     deleteAccount: ["auth", "delete-account"] as const,
     logoutDeleteLinkedin: ["auth", "logout-delete-linkedin"] as const,
     sendVerificationEmail: ["auth", "send-verification-email"] as const,
     sendForgotPasswordEmail: ["auth", "forgot-password-email"] as const,
+    resetPassword: ["auth", "reset-password"] as const,
   },
 
   // Lecture mutations

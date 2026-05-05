@@ -5,8 +5,9 @@ import {
   resetPasswordSchema,
 } from "@auth/validation/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { mutationKeys } from "@shared/constants/mutationKeys";
 import http from "@shared/utils/http";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,7 +19,6 @@ export const useResetPassword = () => {
   const params = useLocalSearchParams();
   const token = typeof params.token === "string" ? params.token : "";
   const email = typeof params.email === "string" ? params.email : "";
-  const [userName, setUserName] = useState<string>("");
 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -27,7 +27,7 @@ export const useResetPassword = () => {
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -48,7 +48,7 @@ export const useResetPassword = () => {
         duration: 3000,
         position: "bottom",
       });
-      return false;
+      return { isValid: false, userName: "" };
     }
 
     try {
@@ -57,8 +57,7 @@ export const useResetPassword = () => {
         token,
       });
 
-      setUserName(response.data.userName || "");
-      return true;
+      return { isValid: true, userName: response.data.userName || "" };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
@@ -71,27 +70,29 @@ export const useResetPassword = () => {
         duration: 4000,
         position: "bottom",
       });
-      return false;
+      return { isValid: false, userName: "" };
     }
   };
 
-  const { data: isValid, isFetching: isVerifying } = useQuery({
+  const { data: resetTokenVerification, isFetching: isVerifying } = useQuery({
     queryFn: verifyToken,
     queryKey: queryKeys.auth.resetPassword(token, email),
     enabled: !!token && !!email,
     staleTime: StaleTime.SECONDS_3,
   });
+  const isValid = resetTokenVerification?.isValid ?? false;
+  const userName = resetTokenVerification?.userName ?? "";
 
-  const onSubmit = async (data: ResetPasswordFormData) => {
-    try {
-      Keyboard.dismiss();
-
+  const resetPasswordMutation = useMutation({
+    mutationKey: mutationKeys.auth.resetPassword,
+    mutationFn: async (data: ResetPasswordFormData) => {
       await http.post("/api/users/reset-password", {
         email: email,
         token: token,
         newPassword: data.newPassword,
       });
-
+    },
+    onSuccess: () => {
       showMessage({
         message: "Password Reset Successfully!",
         description: "You can now sign in with your new password",
@@ -101,7 +102,8 @@ export const useResetPassword = () => {
       });
 
       router.replace("/(auth)/sign-in");
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       const errorMessage =
         error.response?.data?.error ||
         "Unable to reset password. Please try again.";
@@ -113,14 +115,19 @@ export const useResetPassword = () => {
         duration: 3000,
         position: "bottom",
       });
-    }
+    },
+  });
+
+  const onSubmit = (data: ResetPasswordFormData) => {
+    Keyboard.dismiss();
+    resetPasswordMutation.mutate(data);
   };
 
   return {
     control,
     handleSubmit: handleSubmit(onSubmit),
     errors,
-    isSubmitting,
+    isSubmitting: isFormSubmitting || resetPasswordMutation.isPending,
     newPassword,
     confirmPassword,
     userName,

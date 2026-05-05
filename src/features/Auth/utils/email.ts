@@ -4,6 +4,8 @@ import { router } from "expo-router";
 import { showMessage } from "react-native-flash-message";
 
 export const sendVerificationEmailRequest = async (email: string) => {
+  // manual error.
+  throw new Error("fsnofs");
   return await http.post(`/api/users/send-verification-email`, {
     email,
   });

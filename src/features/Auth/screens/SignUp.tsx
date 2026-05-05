@@ -6,7 +6,7 @@ import FuturisticInput from "@auth/components/common/FuturisticInput";
 import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
 import { useSignUp } from "@auth/hooks/useSignUp";
 import { styles } from "@auth/styles/SignUp.styles";
-import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
+import { handleLinkedInSignIn } from "@auth/utils/common";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -17,11 +17,13 @@ const SignUp = () => {
     handleSubmit,
     errors,
     isSubmitting,
+    isGoogleLoading,
     showPassword,
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
     handleSignIn,
+    handleGooglePress,
   } = useSignUp();
 
   return (
@@ -40,8 +42,9 @@ const SignUp = () => {
           />
 
           <SocialLoginButtons
-            onGooglePress={handleGoogleSignIn}
+            onGooglePress={handleGooglePress}
             onLinkedInPress={handleLinkedInSignIn}
+            isGoogleLoading={isGoogleLoading}
           />
 
           <FuturisticDivider text="OR REGISTER WITH EMAIL" />

@@ -8,7 +8,7 @@ import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
 import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants/images";
 import { useSignIn } from "@auth/hooks/useSignIn";
 import { styles } from "@auth/styles/SignIn.styles";
-import { handleGoogleSignIn, handleLinkedInSignIn } from "@auth/utils/common";
+import { handleLinkedInSignIn } from "@auth/utils/common";
 import { Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
@@ -19,12 +19,14 @@ const SignIn = () => {
     errors,
     isSubmitting,
     isAuthenticated,
+    isGoogleLoading,
     showPassword,
     setShowPassword,
     rememberMe,
     setRememberMe,
     handleForgotPassword,
     handleSignUp,
+    handleGooglePress,
   } = useSignIn();
 
   return (
@@ -43,8 +45,9 @@ const SignIn = () => {
           />
 
           <SocialLoginButtons
-            onGooglePress={handleGoogleSignIn}
+            onGooglePress={handleGooglePress}
             onLinkedInPress={handleLinkedInSignIn}
+            isGoogleLoading={isGoogleLoading}
           />
 
           <FuturisticDivider text="OR ACCESS WITH EMAIL" />
@@ -105,12 +108,6 @@ const SignIn = () => {
             linkText="Create Account"
             onLinkPress={handleSignUp}
           />
-          {/* Not Implementing PCKE For Now. */}
-          {/* <LinkedInAuthComponent
-            authType={authType}
-            isLinkedInModalVisible={isLinkedInModalVisible}
-            setIsLinkedInModalVisible={setIsLinkedInModalVisible}
-          /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
