@@ -48,7 +48,6 @@ export interface ClassSelectorProps {
   onAddNewClass: () => void;
 }
 
-
 /**
  * DurationOption interface for duration selectors
  */
@@ -173,6 +172,7 @@ export interface ManualAttendanceModalProps {
   onClose: () => void;
   manualRollNo: string;
   setManualRollNo: (text: string) => void;
+  errorMessage?: string;
   onSubmit: () => void;
   isSubmitting: boolean;
 }

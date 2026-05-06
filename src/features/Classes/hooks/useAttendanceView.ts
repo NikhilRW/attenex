@@ -1,7 +1,6 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
-import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
@@ -11,14 +10,38 @@ import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppState } from "react-native";
+import { showMessage } from "react-native-flash-message";
 import { useAlerts } from "react-native-paper-alerts";
 
 const getMatchesFilter = (record: AttendanceRecord, filter: FilterType) =>
   filter === "all" || record.status === filter;
 
+const DEFAULT_MANUAL_ATTENDANCE_ERROR =
+  "Unable to mark attendance for this roll number.";
+
 const getRollNumberSortValue = (rollNumber: string) => {
   const value = parseInt(rollNumber, 10);
   return Number.isNaN(value) ? null : value;
+};
+
+const getManualAttendanceErrorMessage = (error: unknown) => {
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (error && typeof error === "object") {
+    const errorData = error as { error?: unknown; message?: unknown };
+
+    if (typeof errorData.message === "string") {
+      return errorData.message;
+    }
+
+    if (typeof errorData.error === "string") {
+      return errorData.error;
+    }
+  }
+
+  return DEFAULT_MANUAL_ATTENDANCE_ERROR;
 };
 
 export const useAttendanceView = () => {
@@ -32,6 +55,7 @@ export const useAttendanceView = () => {
   const [showRollSummary, setShowRollSummary] = useState(false);
   const [showManualAttendance, setShowManualAttendance] = useState(false);
   const [manualRollNo, setManualRollNo] = useState("");
+  const [manualAttendanceError, setManualAttendanceError] = useState("");
   const { isConnected } = useNetworkState();
 
   const { alert } = useAlerts();
@@ -201,36 +225,60 @@ export const useAttendanceView = () => {
     }
   }, [alert, attendanceSummary.presentRollNumbers]);
 
+  const handleManualRollNoChange = useCallback(
+    (value: string) => {
+      setManualRollNo(value);
+
+      if (manualAttendanceError) {
+        setManualAttendanceError("");
+      }
+    },
+    [manualAttendanceError],
+  );
+
+  const handleShowManualAttendanceChange = useCallback((visible: boolean) => {
+    setShowManualAttendance(visible);
+
+    if (!visible) {
+      setManualAttendanceError("");
+    }
+  }, []);
+
   const manualAttendance = async () => {
-    if (!manualRollNo.trim()) {
-      alert("Error", "Please enter student roll number");
-      return;
+    const trimmedRollNo = manualRollNo.trim();
+
+    if (!trimmedRollNo) {
+      throw new Error("Please enter student roll number.");
     }
+
     if (!isConnected) {
-      showInternetNotConnected();
-      return;
+      throw new Error("Kindly have an active internet connection first.");
     }
-    const res = await lectureService.addManualAttendance(
-      lectureId,
-      manualRollNo.trim(),
-    );
-    return res;
+
+    return lectureService.addManualAttendance(lectureId, trimmedRollNo);
   };
 
-  const { mutateAsync: handleManualAttendance, isPending: isSubmittingManual } =
+  const { mutate: handleManualAttendance, isPending: isSubmittingManual } =
     useMutation({
       mutationKey: mutationKeys.attendance.manual,
       mutationFn: manualAttendance,
       onSuccess: async (data) => {
-        if (data.success) {
-          alert("Success", data.message);
+        if (data?.success) {
+          showMessage({
+            message: data.message || "Attendance marked successfully.",
+            type: "success",
+          });
           setManualRollNo("");
+          setManualAttendanceError("");
           setShowManualAttendance(false);
           await refetchAttendance();
+          return;
         }
+
+        setManualAttendanceError(getManualAttendanceErrorMessage(data));
       },
       onError: (error) => {
-        alert("Error", error.message || "Failed to add manual attendance");
+        setManualAttendanceError(getManualAttendanceErrorMessage(error));
       },
     });
 
@@ -246,9 +294,10 @@ export const useAttendanceView = () => {
     showRollSummary,
     setShowRollSummary,
     showManualAttendance,
-    setShowManualAttendance,
+    setShowManualAttendance: handleShowManualAttendanceChange,
     manualRollNo,
-    setManualRollNo,
+    setManualRollNo: handleManualRollNoChange,
+    manualAttendanceError,
     isSubmittingManual,
     presentCount: attendanceSummary.presentCount,
     incompleteCount: attendanceSummary.incompleteCount,

@@ -477,6 +477,10 @@ export const styles = StyleSheet.create((theme, rt) => {
         : "rgba(255, 255, 255, 0.8)",
       borderColor: theme.border.modal,
     },
+    inputContainerError: {
+      borderColor: theme.status.error,
+      marginBottom: 8,
+    },
     inputIcon: {
       marginRight: 12,
     },
@@ -486,6 +490,13 @@ export const styles = StyleSheet.create((theme, rt) => {
       height: "100%",
       color: theme.text.primary,
       fontWeight: "500",
+    },
+    manualAttendanceError: {
+      color: theme.status.error,
+      fontSize: 13,
+      fontWeight: "600",
+      lineHeight: 18,
+      marginBottom: 24,
     },
     modalActions: {
       flexDirection: "row",
@@ -517,6 +528,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       width: "30%",
       backgroundColor: "transparent",
       borderColor: theme.border.secondary,
+      borderWidth: 2,
     },
     cancelButtonText: {
       fontSize: 16,

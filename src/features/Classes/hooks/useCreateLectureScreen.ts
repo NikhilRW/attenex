@@ -56,12 +56,12 @@ export const useCreateLectureScreen = () => {
   });
 
   const { mutateAsync: handleCreateLecture, isPending: loading } = useMutation<
-    CreateLectureAPIResponse,
+    CreateLectureAPIResponse | undefined,
     Error,
     CreateLectureVariables,
-    { previousLectures: LectureWithCount[] | undefined }
+    { previousLectures: LectureWithCount[] | undefined; tempLectureId?: string }
   >({
-    onMutate: async (_, context) => {
+    onMutate: async (variables, context) => {
       await context.client.cancelQueries({
         queryKey: queryKeys.lectures.teacher,
       });
@@ -70,16 +70,28 @@ export const useCreateLectureScreen = () => {
         queryKeys.lectures.teacher,
       );
 
-      const newLecture = {
-        id: "temp-" + new Date().getTime(),
-        title: lectureName,
-        courseName: selectedClass,
+      const optimisticTitle = variables.lectureName.trim();
+      const optimisticClass = variables.selectedClass.trim();
+
+      if (!optimisticTitle || !optimisticClass) {
+        return { previousLectures };
+      }
+
+      const tempLectureId = "temp-" + new Date().getTime();
+      const optimisticDuration =
+        variables.duration === -1
+          ? variables.customDuration.trim()
+          : String(variables.duration);
+      const newLecture: LectureWithCount = {
+        id: tempLectureId,
+        title: optimisticTitle,
+        courseName: optimisticClass,
         createdAt: new Date().toISOString(),
         studentCount: 0,
         absentCount: 0,
-        totalClassStudents: 1,
+        totalClassStudents: 0,
         status: "active" as const,
-        duration: "10",
+        duration: optimisticDuration,
       };
 
       // Optimistically update to the new value
@@ -94,29 +106,77 @@ export const useCreateLectureScreen = () => {
         },
       );
       navigateToTeacherDashboard();
-      return { previousLectures };
+      return { previousLectures, tempLectureId };
     },
     onSuccess: async (data, _, onMutateResult, context) => {
-      if (data && data.success) {
+      if (!onMutateResult?.tempLectureId) {
+        return;
+      }
+
+      if (data?.success && data.data?.lecture) {
+        const createdLecture = data.data.lecture;
+        const lectureWithCount: LectureWithCount = {
+          id: createdLecture.id,
+          title: createdLecture.title,
+          courseName: createdLecture.className,
+          createdAt:
+            createdLecture.createdAt instanceof Date
+              ? createdLecture.createdAt.toISOString()
+              : createdLecture.createdAt,
+          studentCount: 0,
+          absentCount: 0,
+          totalClassStudents: 0,
+          status: createdLecture.status === "ended" ? "ended" : "active",
+          duration: createdLecture.duration,
+        };
+
+        context.client.setQueryData<LectureWithCount[]>(
+          queryKeys.lectures.teacher,
+          (old) => {
+            if (!old) {
+              return [lectureWithCount];
+            }
+
+            let replacedTempLecture = false;
+            const lecturesWithoutDuplicate = old.filter(
+              (lecture) => lecture.id !== lectureWithCount.id,
+            );
+            const nextLectures = lecturesWithoutDuplicate.map((lecture) => {
+              if (lecture.id !== onMutateResult.tempLectureId) {
+                return lecture;
+              }
+
+              replacedTempLecture = true;
+              return lectureWithCount;
+            });
+
+            return replacedTempLecture
+              ? nextLectures
+              : [lectureWithCount, ...nextLectures];
+          },
+        );
         alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
           queryKey: queryKeys.lectures.teacher,
+          refetchType: "none",
         });
       } else {
         context.client.setQueryData(
           queryKeys.lectures.teacher,
           onMutateResult.previousLectures,
         );
-        alert("Error", "Failed to create lecture kindly try again", [
-          { text: "OK" },
-        ]);
+        if (data) {
+          alert("Error", "Failed to create lecture kindly try again", [
+            { text: "OK" },
+          ]);
+        }
       }
     },
     onError(error, _, onMutateResult, context) {
       alert("Error", error.message || "Failed to create lecture");
       context.client.setQueryData(
         queryKeys.lectures.teacher,
-        onMutateResult!.previousLectures,
+        onMutateResult?.previousLectures,
       );
     },
     mutationKey: mutationKeys.lectures.create,

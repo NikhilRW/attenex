@@ -9,7 +9,6 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { defaultRouteInfo } from "expo-router/build/global-state/routeInfo";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";

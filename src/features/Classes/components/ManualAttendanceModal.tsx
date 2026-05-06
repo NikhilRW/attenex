@@ -50,13 +50,17 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   onClose,
   manualRollNo,
   setManualRollNo,
+  errorMessage,
   onSubmit,
   isSubmitting,
 }) => {
+  const hasError = Boolean(errorMessage);
+
   return (
     <Modal
       visible={visible}
       transparent
+      style={{ zIndex: 1000 }}
       animationType="fade"
       onRequestClose={onClose}
     >
@@ -89,7 +93,12 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                 present.
               </Text>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  hasError && styles.inputContainerError,
+                ]}
+              >
                 <InputIcon
                   name="id-card-outline"
                   size={20}
@@ -104,6 +113,9 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                   autoCorrect={false}
                 />
               </View>
+              {hasError ? (
+                <Text style={styles.manualAttendanceError}>{errorMessage}</Text>
+              ) : null}
             </View>
 
             <View style={[styles.modalFooter, styles.modalFooterCompact]}>

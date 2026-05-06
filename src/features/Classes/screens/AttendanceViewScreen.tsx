@@ -44,6 +44,7 @@ const AttendanceViewScreen = () => {
     setShowManualAttendance,
     manualRollNo,
     setManualRollNo,
+    manualAttendanceError,
     isSubmittingManual,
     presentCount,
     incompleteCount,
@@ -121,6 +122,7 @@ const AttendanceViewScreen = () => {
         onClose={() => setShowManualAttendance(false)}
         manualRollNo={manualRollNo}
         setManualRollNo={setManualRollNo}
+        errorMessage={manualAttendanceError}
         onSubmit={handleManualAttendance}
         isSubmitting={isSubmittingManual}
       />

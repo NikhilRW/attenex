@@ -1,6 +1,9 @@
-import { useOfflineMutations } from "@/features/Auth/hooks/useAuthOfflineMutations";
+import { setupAuthOfflineMutations } from "@/features/Auth/utils/tanstack";
+import { queryClient } from "@/shared/constants/tanstackConfig";
 import { Stack } from "expo-router";
 import React from "react";
+
+setupAuthOfflineMutations(queryClient);
 
 /**
  * Authentication Layout Configuration
@@ -22,7 +25,6 @@ import React from "react";
  * All screens have headers hidden for a clean, full-screen auth experience.
  */
 const Layout = () => {
-  useOfflineMutations();
   return (
     <Stack
       initialRouteName="sign-in/index" // Default to sign-in screen
@@ -36,19 +38,6 @@ const Layout = () => {
 
       {/* User Registration Screen */}
       <Stack.Screen name="sign-up/index" options={{ headerShown: false }} />
-
-      {/* LinkedIn OAuth Authentication Screen
-       *
-       * This screen contains a WebView that handles the complete LinkedIn OAuth flow:
-       * 1. Loads LinkedIn authorization URL with app credentials
-       * 2. User authenticates on LinkedIn's website
-       * 3. LinkedIn redirects back with authorization code
-       * 4. WebView intercepts the redirect URL
-       * 5. Code is sent to backend for token exchange
-       * 6. User data is stored and navigation continues to main app
-       *
-       * Security: Client secret never touches the frontend
-       */}
       <Stack.Screen name="linkedin/index" options={{ headerShown: false }} />
       <Stack.Screen
         name="forgot-password/index"

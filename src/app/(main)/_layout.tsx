@@ -1,10 +1,12 @@
-import { useOfflineMutations } from "@/shared/hooks/useOfflineMutations";
+import { queryClient } from "@/shared/constants/tanstackConfig";
+import { setupMainOfflineMutations } from "@/shared/utils/tanstack";
 import CustomTabBar from "@shared/components/CustomTabBar";
 import { Tabs } from "expo-router";
 import React from "react";
 
+setupMainOfflineMutations(queryClient);
+
 const MainLayout = () => {
-  useOfflineMutations();
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
