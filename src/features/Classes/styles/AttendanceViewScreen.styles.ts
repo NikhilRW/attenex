@@ -317,7 +317,6 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     modalOverlay: {
       flex: 1,
-      backgroundColor: theme.background.overlay,
       justifyContent: "center",
       alignItems: "center",
       padding: 20,

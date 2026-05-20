@@ -1,9 +1,10 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { RollnoModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const RollnoModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
@@ -34,13 +35,13 @@ const RollnoModal = ({
   setPendingLecture,
 }: RollnoModalProps) => {
   return (
-    <Modal
+    <UniModal
       visible={showRollNoModal}
-      transparent
       animationType="fade"
+      presentationStyle="fullScreen"
       onRequestClose={() => setShowRollNoModal(false)}
     >
-      <View style={styles.modalOverlay}>
+      <View style={styles.modalContainer}>
         <RollnoModalGradient
           style={styles.modalContent}
           start={{ x: 0, y: 0 }}
@@ -67,10 +68,7 @@ const RollnoModal = ({
               Please enter your roll number to continue
             </Text>
             <UniTextInput
-              style={[
-                styles.modalInput,
-                styles.modalInputField,
-              ]}
+              style={[styles.modalInput, styles.modalInputField]}
               value={rollNo}
               onChangeText={setRollNo}
               placeholder="e.g., 2021001"
@@ -95,15 +93,27 @@ const RollnoModal = ({
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.modalButtonWrapper} onPress={handleRollNoSubmit}>
-              <PrimaryGradient style={[styles.modalButton, styles.modalButtonPrimary]}>
-                <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Submit</Text>
+            <TouchableOpacity
+              style={styles.modalButtonWrapper}
+              onPress={handleRollNoSubmit}
+            >
+              <PrimaryGradient
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+              >
+                <Text
+                  style={[
+                    styles.modalButtonText,
+                    styles.modalButtonTextPrimary,
+                  ]}
+                >
+                  Submit
+                </Text>
               </PrimaryGradient>
             </TouchableOpacity>
           </View>
         </RollnoModalGradient>
       </View>
-    </Modal>
+    </UniModal>
   );
 };
 

@@ -19,20 +19,27 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useAuthStore } from "../stores/authStore";
 
 const styles = StyleSheet.create((_, rt) => ({
-  container: {
+  container: (isStudent: boolean) => ({
     position: "absolute",
     left: 0,
     right: 0,
-    top: rt.insets.top,
+    top: isStudent ? 0 : rt.insets.top,
     bottom: 0,
-  },
+  }),
 }));
 
 export const FuturisticBackground = () => {
-  const { theme: colors, rt } = useUnistyles();
-  const isDark = rt.themeName === "dark";
+  const {
+    theme: colors,
+    rt: { themeName },
+  } = useUnistyles();
+  const isDark = themeName === "dark";
+  const user = useAuthStore((state) => state.user);
+  const isStudent = user?.role === "student";
+
   const { width, height } = useWindowDimensions();
 
   const time1 = useSharedValue(0);
@@ -96,11 +103,11 @@ export const FuturisticBackground = () => {
   });
 
   if (!isDark) {
-    return null;
+    return <></>;
   }
 
   return (
-    <View pointerEvents="none" style={styles.container}>
+    <View pointerEvents="none" style={styles.container(isStudent)}>
       <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}
         <Rect

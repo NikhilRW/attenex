@@ -1,9 +1,10 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { NewClassModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -38,12 +39,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <UniModal visible={visible} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <Animated.View
           entering={FadeInUp.duration(400)}
@@ -112,6 +108,6 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
           </NewClassGradient>
         </Animated.View>
       </View>
-    </Modal>
+    </UniModal>
   );
 };

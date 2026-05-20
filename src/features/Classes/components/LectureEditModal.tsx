@@ -1,14 +1,15 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import { LectureEditModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
-const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
+const ModalSurface = withUnistyles(LinearGradient, (_, { themeName }) => ({
   colors:
-    rt.themeName === "dark"
+    themeName === "dark"
       ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
       : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));
@@ -35,9 +36,8 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
   handleUpdateLecture,
 }) => {
   return (
-    <Modal
+    <UniModal
       visible={editModalVisible}
-      transparent
       animationType="fade"
       onRequestClose={() => setEditModalVisible(false)}
     >
@@ -121,6 +121,6 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
           </ModalSurface>
         </Animated.View>
       </View>
-    </Modal>
+    </UniModal>
   );
 };

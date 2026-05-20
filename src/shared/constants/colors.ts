@@ -12,7 +12,7 @@ export const darkTheme = {
 
   border: {
     modal: "rgba(255, 255, 255, 0.1)",
-    secondary:"rgba(255, 255, 255, 0.1)",
+    secondary: "rgba(255, 255, 255, 0.1)",
   },
 
   // Primary Brand Colors
@@ -71,7 +71,7 @@ export const lightTheme = {
     primary: "#F8FAFC",
     secondary: "#FFFFFF",
     tertiary: "#C7C4C4",
-    overlay: "rgba(255, 255, 255, 0.3)",
+    overlay: "rgba(255, 255, 255, 0.1)",
     gradientEnd: "rgba(255,255,255,0.8)",
   },
 

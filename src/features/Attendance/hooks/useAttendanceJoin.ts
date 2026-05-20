@@ -50,14 +50,14 @@ const isLocationTooFarError = (error: unknown) => {
 
   return (
     typeof message === "string" &&
-    message.toLowerCase().includes("too far from the class")
+    message.toLowerCase().includes("you are too far from the class")
   );
 };
 
 const retryJoinUnlessLocationTooFar = (
   failureCount: number,
   error: unknown,
-) => {
+): boolean => {
   if (isLocationTooFarError(error)) {
     return false;
   }
@@ -116,7 +116,11 @@ export const useAttendanceJoin = (
     [alert, onRollNoRequired, user?.rollNo],
   );
 
-  const { mutateAsync: proceedWithJoin, isPending: loading } = useMutation({
+  const {
+    mutateAsync: proceedWithJoin,
+    variables,
+    isPending: loading,
+  } = useMutation({
     mutationFn: proceedWithJoinMutation,
     mutationKey: mutationKeys.lectures.join,
     retry: retryJoinUnlessLocationTooFar,
@@ -163,6 +167,7 @@ export const useAttendanceJoin = (
       return false;
     },
   });
+  const loadingLectureId = variables?.lecture.id;
 
   const handleJoinMutateFn = useCallback(
     async (lecture: Lecture) => {
@@ -203,11 +208,12 @@ export const useAttendanceJoin = (
   return {
     joinedLecture,
     status,
-    loading,
+    loadingLectureId,
     handleJoin,
     handleLeaveLecture,
     setJoinedLecture,
     setStatus,
     proceedWithJoin,
+    loading,
   };
 };

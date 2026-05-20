@@ -1,4 +1,4 @@
-import styles  from "@attendance/styles/StudentDashboard.styles";
+import styles from "@attendance/styles/StudentDashboard.styles";
 import { LectureOngoingProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,7 +22,6 @@ const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
 const LectureOngoing = ({
   handleLeaveLecture,
   joinedLecture,
-  loading,
 }: LectureOngoingProps) => {
   const insets = useSafeAreaInsets();
   return (
@@ -59,13 +58,14 @@ const LectureOngoing = ({
             <Text style={styles.trackingBadgeText}>Tracking Active</Text>
           </View>
 
-          <Text style={styles.waitText}>Wait for your teacher to end the class</Text>
+          <Text style={styles.waitText}>
+            Wait for your teacher to end the class
+          </Text>
         </View>
 
         <TouchableOpacity
           onPress={handleLeaveLecture}
           style={styles.leaveButtonWrapper}
-          disabled={loading}
         >
           <DangerGradient style={styles.leaveButton}>
             <PrimaryTextIcon name="exit-outline" size={20} />

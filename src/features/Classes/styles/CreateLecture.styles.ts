@@ -40,7 +40,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderRadius: 24,
       padding: 24,
       marginBottom: 32,
-      overflow: "visible",
+      overflow: "hidden",
       borderColor: theme.surface.glassBorder,
     },
     cardEyebrow: {
@@ -116,6 +116,8 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     dropdownScroll: {
       maxHeight: 240,
+      paddingHorizontal: 9,
+      marginTop: 9,
     },
     dropdownItem: {
       padding: 16,
@@ -188,7 +190,6 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     modalOverlay: {
       flex: 1,
-      backgroundColor: theme.background.overlay,
       justifyContent: "center",
       alignItems: "center",
       padding: 24,
@@ -391,6 +392,13 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontSize: 16,
       fontWeight: "600",
       color: theme.primary.main,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: rt.insets.bottom,
+      paddingHorizontal: 12,
     },
   };
 });

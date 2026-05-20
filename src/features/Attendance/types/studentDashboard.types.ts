@@ -25,7 +25,6 @@ export interface UseLectureManagementReturn {
 export interface UseAttendanceJoinReturn {
   joinedLecture: Lecture | null;
   status: JoinStatus;
-  loading: boolean;
   handleJoin: (lecture: Lecture) => Promise<void>;
   handleLeaveLecture: (onLectureLeft: () => void) => Promise<void>;
   setJoinedLecture: Dispatch<SetStateAction<Lecture | null>>;
@@ -34,6 +33,8 @@ export interface UseAttendanceJoinReturn {
     lecture: Lecture;
     studentRollNo: string;
   }) => Promise<false | { res: any; lecture: Lecture } | undefined>;
+  loadingLectureId: string | undefined;
+  loading: boolean;
 }
 
 export interface UseAttendanceSubmitReturn {

@@ -8,8 +8,6 @@ import { useThemeStore } from "@shared/hooks/useTheme";
 import { markPerformance } from "@shared/utils/performance";
 import {
   PerformanceMeasureView,
-  PerformanceProfiler,
-  RenderPassReport,
   useResetFlow,
 } from "@shopify/react-native-performance";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -119,80 +117,76 @@ export default function RootLayout() {
     }
   }, [isConnected, resetFlow]);
 
-  const reportPreparedCallback = (e: RenderPassReport) => {
-    console.log(e);
-  };
-
   if (!loaded && !error) {
     return null;
   }
 
   return (
-    <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
-      <PerformanceMeasureView
-        componentInstanceId={componentInstanceId}
-        interactive
-        screenName={ROOT_LAYOUT_SCREEN_NAME}
-      >
-        <SafeAreaProvider>
-          <StatusBar
-            style={statusBarStyle}
-            hideTransitionAnimation="fade"
-            translucent
-          />
+    // <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
+    <PerformanceMeasureView
+      componentInstanceId={componentInstanceId}
+      interactive
+      screenName={ROOT_LAYOUT_SCREEN_NAME}
+    >
+      <SafeAreaProvider>
+        <StatusBar
+          style={statusBarStyle}
+          hideTransitionAnimation="fade"
+          translucent
+        />
 
-          <ThemedSafeAreaView style={styles.safeArea}>
-            {user?.role !== "student" && <FuturisticBackground />}
-            <ApolloGraphQLProvider>
-              <>
-                <ThemedPaperProvider>
-                  <AlertsProvider>
-                    <PersistQueryClientProvider
-                      client={queryClient}
-                      onSuccess={tanstackOnSuccess}
-                      persistOptions={{
-                        persister: clientPersister,
-                        maxAge: QUERY_PERSIST_MAX_AGE_MS,
-                        buster: QUERY_PERSIST_BUSTER,
-                        dehydrateOptions: {
-                          // Persist mutations that are queued/in-flight (paused = queued while offline)
-                          shouldDehydrateMutation: (mutation: any) => {
-                            return (
-                              mutation.state.status === "pending" ||
-                              mutation.state.status === "paused"
-                            );
-                          },
-                          // Persist successful, fresh query data so screens load instantly after app kill
-                          shouldDehydrateQuery: (query: any) => {
-                            const isFresh =
-                              Date.now() - query.state.dataUpdatedAt <
-                              StaleTime.HALF_DAY;
-                            return query.state.status === "success" && isFresh;
-                          },
+        <ThemedSafeAreaView style={styles.safeArea}>
+          {user?.role !== "student" && <FuturisticBackground />}
+          <ApolloGraphQLProvider>
+            <>
+              <ThemedPaperProvider>
+                <AlertsProvider>
+                  <PersistQueryClientProvider
+                    client={queryClient}
+                    onSuccess={tanstackOnSuccess}
+                    persistOptions={{
+                      persister: clientPersister,
+                      maxAge: QUERY_PERSIST_MAX_AGE_MS,
+                      buster: QUERY_PERSIST_BUSTER,
+                      dehydrateOptions: {
+                        // Persist mutations that are queued/in-flight (paused = queued while offline)
+                        shouldDehydrateMutation: (mutation: any) => {
+                          return (
+                            mutation.state.status === "pending" ||
+                            mutation.state.status === "paused"
+                          );
                         },
+                        // Persist successful, fresh query data so screens load instantly after app kill
+                        shouldDehydrateQuery: (query: any) => {
+                          const isFresh =
+                            Date.now() - query.state.dataUpdatedAt <
+                            StaleTime.HALF_DAY;
+                          return query.state.status === "success" && isFresh;
+                        },
+                      },
+                    }}
+                  >
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        contentStyle: styles.stackContent,
                       }}
                     >
-                      <Stack
-                        screenOptions={{
-                          headerShown: false,
-                          contentStyle: styles.stackContent,
-                        }}
-                      >
-                        <Stack.Screen name="(auth)" />
-                        <Stack.Screen name="(main)" />
-                      </Stack>
-                    </PersistQueryClientProvider>
-                  </AlertsProvider>
-                </ThemedPaperProvider>
-                <FlashMessage
-                  position="bottom"
-                  style={{ marginBottom: bottom }}
-                />
-              </>
-            </ApolloGraphQLProvider>
-          </ThemedSafeAreaView>
-        </SafeAreaProvider>
-      </PerformanceMeasureView>
-    </PerformanceProfiler>
+                      <Stack.Screen name="(auth)" />
+                      <Stack.Screen name="(main)" />
+                    </Stack>
+                  </PersistQueryClientProvider>
+                </AlertsProvider>
+              </ThemedPaperProvider>
+              <FlashMessage
+                position="bottom"
+                style={{ marginBottom: bottom }}
+              />
+            </>
+          </ApolloGraphQLProvider>
+        </ThemedSafeAreaView>
+      </SafeAreaProvider>
+    </PerformanceMeasureView>
+    // </PerformanceProfiler>
   );
 }

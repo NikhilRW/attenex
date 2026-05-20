@@ -1,9 +1,10 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { RollSummaryModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -36,12 +37,7 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   onCopy,
 }) => {
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <UniModal visible={visible} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <Animated.View
           entering={FadeInUp.duration(400)}
@@ -109,6 +105,6 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
           </ModalSurface>
         </Animated.View>
       </View>
-    </Modal>
+    </UniModal>
   );
 };

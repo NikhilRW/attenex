@@ -41,9 +41,10 @@ const PrimaryTextSpinner = withUnistyles(ActivityIndicator, (theme) => ({
 
 const OnGoingLecture = ({
   lecture,
-  loading,
+  currentLectureJoining,
   handleJoin,
   lectureHeightRef,
+  joining,
 }: OnGoingLectureProps) => {
   const handleLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -95,7 +96,7 @@ const OnGoingLecture = ({
 
       <TouchableOpacity
         onPress={handlePress}
-        disabled={loading}
+        disabled={joining}
         activeOpacity={0.8}
       >
         <PrimaryGradient
@@ -104,7 +105,7 @@ const OnGoingLecture = ({
           style={styles.joinButton}
         >
           <Text style={styles.joinButtonText}>Join Class Now</Text>
-          {loading ? (
+          {currentLectureJoining && joining ? (
             <PrimaryTextSpinner size="small" style={styles.joinButtonLoader} />
           ) : (
             <View style={styles.joinIconContainer}>
@@ -117,4 +118,4 @@ const OnGoingLecture = ({
   );
 };
 
-export default React.memo(OnGoingLecture);
+export default OnGoingLecture;

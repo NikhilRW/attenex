@@ -12,9 +12,9 @@ import { TopicInput } from "./TopicInput";
 
 const CreateLectureCardGradient = withUnistyles(
   LinearGradient,
-  (_theme, rt) => ({
+  (_theme, { themeName }) => ({
     colors:
-      rt.themeName === "dark"
+      themeName === "dark"
         ? (["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"] as const)
         : (["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"] as const),
   }),
@@ -40,7 +40,6 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   onCreateLecture,
 }: CreateLectureFormCardProps) => {
   const { alert } = useAlerts();
-
   return (
     <CreateLectureCardGradient style={styles.card}>
       <Text style={styles.cardEyebrow}>Class Details</Text>

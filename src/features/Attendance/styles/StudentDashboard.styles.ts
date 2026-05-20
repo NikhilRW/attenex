@@ -405,7 +405,6 @@ const styles = StyleSheet.create((theme, rt) => {
     // Modal Styles
     modalOverlay: {
       flex: 1,
-      backgroundColor: theme.background.overlay,
       justifyContent: "center",
       alignItems: "center",
       padding: 20,
@@ -414,7 +413,6 @@ const styles = StyleSheet.create((theme, rt) => {
       width: "100%",
       maxWidth: 400,
       borderRadius: 24,
-      borderWidth: 1,
       overflow: "hidden",
     },
     modalAnimatedWrapper: {
@@ -553,7 +551,7 @@ const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "600",
     },
     modalButtonTextPrimary: {
-      color: "white",
+      color: theme.text.primary,
     },
     modalButtonTextSecondary: {
       color: theme.text.secondary,
@@ -570,6 +568,13 @@ const styles = StyleSheet.create((theme, rt) => {
     trackingText: {
       fontSize: 14,
       fontStyle: "italic",
+    },
+    modalContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      flex: 1,
+      paddingHorizontal: 12,
+      marginBottom: rt.insets.bottom,
     },
   };
 });

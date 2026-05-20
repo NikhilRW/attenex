@@ -92,12 +92,13 @@ const StudentDashboard = () => {
   const {
     joinedLecture,
     status,
-    loading: joinLoading,
+    loadingLectureId,
     handleJoin,
     handleLeaveLecture,
     setJoinedLecture,
     setStatus,
     proceedWithJoin,
+    loading: joining,
   } = useAttendanceJoin(requestRollNo);
 
   // Lecture management
@@ -132,12 +133,13 @@ const StudentDashboard = () => {
     ({ item }: { item: Lecture }) => (
       <OnGoingLecture
         lecture={item}
-        loading={joinLoading}
+        currentLectureJoining={loadingLectureId === item.id}
+        joining={joining}
         handleJoin={handleJoinAction}
         lectureHeightRef={lectureHeight}
       />
     ),
-    [handleJoinAction, joinLoading],
+    [handleJoinAction, loadingLectureId, joining],
   );
 
   const keyExtractor = useCallback((lecture: Lecture) => lecture.id, []);
@@ -227,7 +229,6 @@ const StudentDashboard = () => {
       <LectureOngoing
         joinedLecture={joinedLecture!}
         handleLeaveLecture={() => handleLeaveLecture(onLeaveLecture)}
-        loading={joinLoading}
       />
     );
   }

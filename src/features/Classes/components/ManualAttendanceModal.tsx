@@ -1,3 +1,4 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { ManualAttendanceModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
@@ -5,7 +6,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   ActivityIndicator,
-  Modal,
   Text,
   TextInput,
   TouchableOpacity,
@@ -57,10 +57,8 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   const hasError = Boolean(errorMessage);
 
   return (
-    <Modal
+    <UniModal
       visible={visible}
-      transparent
-      style={{ zIndex: 1000 }}
       animationType="fade"
       onRequestClose={onClose}
     >
@@ -155,6 +153,6 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
           </ModalSurface>
         </Animated.View>
       </View>
-    </Modal>
+    </UniModal>
   );
 };

@@ -1,9 +1,10 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { DurationSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -68,9 +69,8 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
         </View>
       )}
 
-      <Modal
+      <UniModal
         visible={showDropdown}
-        transparent
         animationType="fade"
         onRequestClose={onToggleDropdown}
       >
@@ -134,7 +134,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
             </SelectionModalGradient>
           </Animated.View>
         </View>
-      </Modal>
+      </UniModal>
     </>
   );
 };

@@ -1,10 +1,11 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { ClassItem } from "@classes/types/common";
 import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useMemo } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -104,17 +105,13 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
         <AddCircleIcon name={"add-circle-sharp"} size={20} />
       </TouchableOpacity>
 
-      <Modal
+      <UniModal
         visible={showDropdown}
-        transparent
+        presentationStyle="fullScreen"
         animationType="fade"
         onRequestClose={onToggleDropdown}
       >
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity
-            style={styles.modalBackdrop}
-            onPress={onToggleDropdown}
-          />
+        <View style={styles.modalContainer}>
           <AnimatedView
             entering={FadeInUp.springify()}
             style={styles.modalAnimatedWrapper}
@@ -174,7 +171,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
             </SelectionModalGradient>
           </AnimatedView>
         </View>
-      </Modal>
+      </UniModal>
     </View>
   );
 };

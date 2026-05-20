@@ -1,3 +1,4 @@
+import { UniModal } from "@/shared/components/UnistylesComponents";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { ClassUpdateModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
@@ -5,7 +6,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   ActivityIndicator,
-  Modal,
   Text,
   TextInput,
   TouchableOpacity,
@@ -50,9 +50,8 @@ const ClassUpdateModal = ({
   classUpdateLoading,
 }: ClassUpdateModalProps) => {
   return (
-    <Modal
+    <UniModal
       visible={showClassModal}
-      transparent
       animationType="fade"
       onRequestClose={() => setShowClassModal(false)}
     >
@@ -155,7 +154,7 @@ const ClassUpdateModal = ({
           </ClassModalGradient>
         </Animated.View>
       </View>
-    </Modal>
+    </UniModal>
   );
 };
 

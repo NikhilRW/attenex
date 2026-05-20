@@ -18,7 +18,7 @@ export interface LectureEndedProps {
 export interface LectureOngoingProps {
   handleLeaveLecture: () => Promise<void>;
   joinedLecture: Lecture;
-  loading: boolean;
+  joining?: boolean;
 }
 
 // MainScreen Components
@@ -37,9 +37,10 @@ export interface NoLectureFoundProps {
 
 export interface OnGoingLectureProps {
   lecture: Lecture;
-  loading: boolean;
+  currentLectureJoining: boolean;
   handleJoin: (lecture: Lecture) => Promise<void>;
   lectureHeightRef: React.RefObject<number>;
+  joining: boolean;
 }
 
 export interface StudentDashboardHeaderProps {
