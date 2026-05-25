@@ -7,12 +7,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mutationKeys } from "@shared/constants/mutationKeys";
 import http from "@shared/utils/http";
+import { showMessage } from "@shared/utils/toasts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
-import { showMessage } from "react-native-flash-message";
 
 export const useResetPassword = () => {
   const router = useRouter();

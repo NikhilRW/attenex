@@ -1,4 +1,6 @@
+import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
 import { AlertFunction } from "../types/common";
+import { selectionAsync } from "expo-haptics";
 
 /**
  * Show a success alert
@@ -56,11 +58,12 @@ export const showDestructiveAlert = (
   onConfirm: () => void,
 ) => {
   alert(title, message, [
-    { text: "Cancel", style: "cancel" },
+    { text: "Cancel", style: "cancel", onPress: selectionAsync },
     {
       text: confirmText,
       style: "destructive",
-      onPress: onConfirm,
+      // TODO: add heavy impact here
+      onPress: triggerImpactHapticOnCallback(onConfirm),
     },
   ]);
 };

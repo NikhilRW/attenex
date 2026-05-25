@@ -3,12 +3,12 @@ import { CreateLectureFormCardProps } from "@classes/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { useAlerts } from "react-native-paper-alerts";
 import { withUnistyles } from "react-native-unistyles";
 import { ClassSelector } from "./ClassSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
 import { TopicInput } from "./TopicInput";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 const CreateLectureCardGradient = withUnistyles(
   LinearGradient,
@@ -39,7 +39,7 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   loading,
   onCreateLecture,
 }: CreateLectureFormCardProps) => {
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   return (
     <CreateLectureCardGradient style={styles.card}>
       <Text style={styles.cardEyebrow}>Class Details</Text>

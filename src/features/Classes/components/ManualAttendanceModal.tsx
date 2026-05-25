@@ -1,16 +1,11 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { ManualAttendanceModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -57,11 +52,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
   const hasError = Boolean(errorMessage);
 
   return (
-    <UniModal
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <UniModal visible={visible} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <Animated.View
           entering={FadeInUp.duration(400)}
@@ -80,7 +71,11 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                 </View>
                 <Text style={styles.modalTitle}>Add Manual Attendance</Text>
               </View>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <TouchableOpacity
+                haptic="selection"
+                onPress={onClose}
+                style={styles.closeButton}
+              >
                 <CloseIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
@@ -119,6 +114,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
             <View style={[styles.modalFooter, styles.modalFooterCompact]}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButtonNarrow]}
+                haptic="selection"
                 onPress={onClose}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -126,6 +122,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
 
               <TouchableOpacity
                 onPress={onSubmit}
+                haptic="impact"
                 disabled={isSubmitting}
                 style={styles.submitButtonWide}
               >

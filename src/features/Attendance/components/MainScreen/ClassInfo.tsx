@@ -1,10 +1,11 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { ClassInfoProps } from "@attendance/types/props";
 import { User } from "@backend/config/database_setup";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const ClassInfoGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
@@ -23,11 +24,7 @@ const ClassInfo = ({ user, setShowClassModal }: ClassInfoProps) => {
     <ClassInfoGradient style={styles.classInfoCard}>
       <View style={styles.classInfoHeader}>
         <View style={styles.classInfoLeft}>
-          <PrimaryIcon
-            name="school"
-            size={24}
-            style={styles.classInfoIcon}
-          />
+          <PrimaryIcon name="school" size={24} style={styles.classInfoIcon} />
           <View>
             <Text style={styles.classInfoLabel}>Your Class</Text>
             <Text style={styles.classInfoValue}>
@@ -38,6 +35,7 @@ const ClassInfo = ({ user, setShowClassModal }: ClassInfoProps) => {
         <TouchableOpacity
           onPress={() => setShowClassModal(true)}
           style={styles.editClassButton}
+          haptic="selection"
         >
           <PrimaryIcon name="pencil" size={18} />
         </TouchableOpacity>

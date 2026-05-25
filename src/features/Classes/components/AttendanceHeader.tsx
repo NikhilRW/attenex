@@ -1,9 +1,10 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceHeaderProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
@@ -46,6 +47,7 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
         <TouchableOpacity
           onPress={onBack}
           style={[styles.backButton, styles.headerButton]}
+          haptic="selection"
         >
           <BackIcon name="chevron-back" size={24} />
         </TouchableOpacity>
@@ -58,6 +60,7 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
         <TouchableOpacity
           onPress={onShowSummary}
           style={[styles.summaryButton, styles.headerButton]}
+          haptic="selection"
         >
           <SummaryIcon name="list" size={20} />
         </TouchableOpacity>
@@ -74,7 +77,7 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <TouchableOpacity haptic="selection" onPress={() => setSearchQuery("")}>
               <ClearIcon name="close-circle" size={18} />
             </TouchableOpacity>
           )}

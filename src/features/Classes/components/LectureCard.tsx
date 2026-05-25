@@ -1,3 +1,4 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { lectureService } from "@classes/services/lectureService";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import { LectureCardProps } from "@classes/types/props";
@@ -5,12 +6,15 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useMemo } from "react";
-import { LayoutChangeEvent, Text, TouchableOpacity, View } from "react-native";
+import { LayoutChangeEvent, Text, View } from "react-native";
 import Animated, {
   Easing,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
@@ -39,6 +43,7 @@ const EditIcon = withUnistyles(Ionicons, (theme) => ({
 }));
 
 const LectureCard: React.FC<LectureCardProps> = ({
+  index,
   lecture,
   handleViewAttendance,
   handleEditLecture,
@@ -49,6 +54,20 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const queryClient = useQueryClient();
   const isPending = lecture.id.includes("temp");
   const opacity = useSharedValue(1);
+  const focusProgress = useSharedValue(1);
+
+  useFocusEffect(
+    useCallback(() => {
+      focusProgress.value = 0;
+      focusProgress.value = withDelay(
+        Math.min(index * 45, 180),
+        withTiming(1, {
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+        }),
+      );
+    }, [focusProgress, index]),
+  );
 
   useEffect(() => {
     if (isPending) {
@@ -66,8 +85,18 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const CardGradient = isPending ? PendingGradient : DefaultGradient;
 
   const animatedLoadingState = useAnimatedStyle(() => {
+    const focusOpacity = interpolate(focusProgress.value, [0, 1], [0, 1]);
+
     return {
-      opacity: opacity.value,
+      opacity: opacity.value * focusOpacity,
+      transform: [
+        {
+          translateY: interpolate(focusProgress.value, [0, 1], [18, 0]),
+        },
+        {
+          scale: interpolate(focusProgress.value, [0, 1], [0.985, 1]),
+        },
+      ],
     };
   });
 
@@ -198,6 +227,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
             style={[styles.actionBtn, styles.actionBtnPrimary]}
             onPressIn={handlePrefetchAttendance}
             onPress={handleViewPress}
+            haptic="impact"
           >
             <Text style={styles.actionBtnText}>View Attendance</Text>
             <Ionicons name="arrow-forward" size={16} color="#3B82F6" />
@@ -210,6 +240,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   disabled={isPending}
                   style={[styles.iconBtn, styles.iconBtnNeutral]}
                   onPress={handleEditPress}
+                  haptic="impact"
                 >
                   <EditIcon name="create-outline" size={20} />
                 </TouchableOpacity>
@@ -217,6 +248,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   disabled={isPending}
                   style={[styles.iconBtn, styles.iconBtnDanger]}
                   onPress={handleEndPress}
+                  haptic="impact"
                 >
                   <Ionicons name="stop" size={20} color="#EF4444" />
                 </TouchableOpacity>
@@ -226,6 +258,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
               <TouchableOpacity
                 style={[styles.iconBtn, styles.iconBtnDanger]}
                 onPress={handleDeletePress}
+                haptic="impact"
               >
                 <Ionicons name="trash-outline" size={20} color="#EF4444" />
               </TouchableOpacity>

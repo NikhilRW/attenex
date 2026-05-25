@@ -1,8 +1,9 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import styles  from "@attendance/styles/StudentDashboard.styles";
 import { NoClassSelectedProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const MutedIcon = withUnistyles(Ionicons, (theme) => ({
@@ -17,6 +18,7 @@ const NoClassSelected = ({ setShowClassModal }: NoClassSelectedProps) => {
       <TouchableOpacity
         onPress={() => setShowClassModal(true)}
         style={[styles.refreshButton, styles.refreshButtonFilled]}
+        haptic="impact"
       >
         <Text style={[styles.refreshText, styles.refreshTextOnPrimary]}>Select Class</Text>
       </TouchableOpacity>

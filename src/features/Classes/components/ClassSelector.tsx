@@ -1,3 +1,4 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { ClassItem } from "@classes/types/common";
@@ -5,7 +6,7 @@ import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useMemo } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -51,6 +52,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
           styles.optionItem,
           selectedClass === cls.name && styles.optionItemSelected,
         ]}
+        haptic="selection"
       >
         <Text
           style={[
@@ -93,7 +95,11 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
   return (
     <View style={[styles.inputGroup, styles.inputGroupClassSelector]}>
       <Text style={styles.label}>Class Name</Text>
-      <TouchableOpacity onPress={onToggleDropdown} style={styles.dropdown}>
+      <TouchableOpacity
+        haptic="selection"
+        onPress={onToggleDropdown}
+        style={styles.dropdown}
+      >
         <Text
           style={[
             styles.dropdownText,
@@ -130,6 +136,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                   Select Class
                 </Text>
                 <TouchableOpacity
+                  haptic="selection"
                   onPress={onToggleDropdown}
                   style={styles.modalCloseButton}
                 >
@@ -163,6 +170,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                 <TouchableOpacity
                   onPress={onAddNewClass}
                   style={styles.addClassCta}
+                  haptic="impact"
                 >
                   <PrimaryIcon name="add-circle" size={20} />
                   <Text style={styles.addClassCtaText}>Add New Class</Text>

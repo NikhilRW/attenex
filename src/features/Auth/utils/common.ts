@@ -11,9 +11,9 @@ import { subscribeToClassName } from "@shared/utils/fcm";
 import { googleAuth } from "@shared/utils/google-auth";
 import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
+import { showMessage } from "@shared/utils/toasts";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { showMessage } from "react-native-flash-message";
 
 /**
  * Authentication Utility Functions

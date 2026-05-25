@@ -6,13 +6,11 @@ import { RoleSection } from "@settings/components/RoleSection";
 import { useSettings } from "@settings/hooks/useSettings";
 import { styles } from "@settings/styles/Settings.styles";
 import { useThemeStore } from "@shared/hooks/useTheme";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
+import { View } from "react-native";
 import { useShallow } from "zustand/shallow";
-
-const HeaderGradient = withUnistyles(LinearGradient);
+import { useSlideAnimation } from "../hooks/useSlideAnimation";
+import Animated from "react-native-reanimated";
+import SettingsHeader from "../components/SettingsHeader";
 
 const SettingsScreen = () => {
   const { mode, setTheme } = useThemeStore(
@@ -37,25 +35,15 @@ const SettingsScreen = () => {
     handleResetPassword,
   } = useSettings();
 
+  const { contentAnimatedStyle, headerAnimatedStyle } = useSlideAnimation();
+
   return (
     <View style={styles.container}>
       {user?.role === "student" && <FuturisticBackground />}
-      <HeaderGradient
-        style={styles.header}
-        uniProps={(theme, rt) => ({
-          colors:
-            rt.themeName === "dark"
-              ? ([theme.background.secondary, "transparent"] as const)
-              : (["rgba(255,255,255,0.95)", "rgba(255,255,255,0.0)"] as const),
-        })}
-      >
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Settings</Text>
-          <Text style={styles.subtitle}>Preferences & Account</Text>
-        </View>
-      </HeaderGradient>
+      <SettingsHeader headerAnimatedStyle={headerAnimatedStyle} />
 
-      <ScrollView
+      <Animated.ScrollView
+        style={contentAnimatedStyle}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
@@ -87,7 +75,7 @@ const SettingsScreen = () => {
         />
 
         <View style={styles.bottomSpacer} />
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };

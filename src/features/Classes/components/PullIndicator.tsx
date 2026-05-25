@@ -4,11 +4,7 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { View } from "react-native";
 import Animated, { useDerivedValue } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
-
-const ProgressPath = withUnistyles(Path, (theme) => ({
-  color: theme.primary.main,
-}));
+import { useUnistyles, withUnistyles } from "react-native-unistyles";
 
 const ProgressTrackPath = withUnistyles(Path, (_theme, rt) => ({
   color: rt.themeName === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
@@ -27,18 +23,20 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
     () => pullProgress.value,
     [pullProgress],
   );
+  const { theme } = useUnistyles();
 
   return (
     <Animated.View style={[styles.pullIndicator, pullIndicatorStyle]}>
       <View style={styles.pullIndicatorOuter}>
         <Canvas style={styles.pullIndicatorCanvas}>
           <ProgressTrackPath path={circlePath} style="stroke" strokeWidth={4} />
-          <ProgressPath
+          <Path
             path={circlePath}
             style="stroke"
             strokeWidth={4}
             start={0}
             end={actualPullProgress}
+            color={theme.primary.main}
             strokeCap="round"
           />
         </Canvas>
@@ -46,7 +44,6 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
           <AddIcon name="add" size={24} />
         </View>
       </View>
-      {/* <Text style={[styles.pullText, { color: colors.text.secondary, marginTop: 8 }]}>Create New Lecture</Text> */}
     </Animated.View>
   );
 };

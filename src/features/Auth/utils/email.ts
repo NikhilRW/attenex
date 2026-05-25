@@ -1,7 +1,7 @@
 import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
+import { showMessage } from "@shared/utils/toasts";
 import { router } from "expo-router";
-import { showMessage } from "react-native-flash-message";
 
 export const sendVerificationEmailRequest = async (email: string) => {
   return await http.post(`/api/users/send-verification-email`, {

@@ -1,11 +1,9 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { styles } from "@role-selection/styles/RoleSelection.styles";
 import { ConfirmButtonProps } from "@role-selection/types/props";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
-
-const ConfirmGradient = withUnistyles(LinearGradient);
+import { ActivityIndicator, Text } from "react-native";
 
 export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
   selectedRole,
@@ -33,8 +31,10 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
       onPress={onConfirm}
       disabled={!selectedRole || isUpdating}
       activeOpacity={0.8}
+      haptic="impact"
+      // TODO: add the custom impact level with correct type. 
     >
-      <ConfirmGradient
+      <UniLinearGradient
         uniProps={(theme) => ({
           colors:
             selectedRole && !isUpdating
@@ -57,7 +57,7 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
             {getButtonText()}
           </Text>
         )}
-      </ConfirmGradient>
+      </UniLinearGradient>
     </TouchableOpacity>
   );
 };

@@ -3,23 +3,28 @@ import LectureCard from "@classes/components/LectureCard";
 import { LectureEditModal } from "@classes/components/LectureEditModal";
 import PullIndicator from "@classes/components/PullIndicator";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { LectureWithCount } from "@classes/types/common";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { markPerformance } from "@shared/utils/performance";
 import { Skia } from "@shopify/react-native-skia";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import Animated, {
-  FadeInDown,
-  FadeInUp,
+  Easing,
+  interpolate,
   LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
-import { LectureWithCount } from "@classes/types/common";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const SearchIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
@@ -39,8 +44,10 @@ const SearchInput = withUnistyles(TextInput, (theme) => ({
 
 const circlePath = Skia.Path.Make();
 circlePath.addCircle(30, 30, 25);
+const DASHBOARD_CONTENT_FOCUS_ANIMATION_DURATION_MS = 360;
 
 const TeacherDashboard = () => {
+  const focusProgress = useSharedValue(1);
   const {
     editDuration,
     editModalVisible,
@@ -70,6 +77,43 @@ const TeacherDashboard = () => {
     getItemLayout,
     flatListPerformanceProps,
   } = useTeacherDashboard();
+
+  useFocusEffect(
+    useCallback(() => {
+      focusProgress.value = 0;
+      focusProgress.value = withTiming(1, {
+        duration: DASHBOARD_CONTENT_FOCUS_ANIMATION_DURATION_MS,
+        easing: Easing.out(Easing.cubic),
+      });
+    }, [focusProgress]),
+  );
+
+  const searchAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(focusProgress.value, [0, 0.35, 1], [0, 0, 1]),
+    transform: [
+      {
+        translateY: interpolate(focusProgress.value, [0, 0.35, 1], [20, 20, 0]),
+      },
+    ],
+  }));
+
+  const sectionTitleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(focusProgress.value, [0, 0.5, 1], [0, 0, 1]),
+    transform: [
+      {
+        translateY: interpolate(focusProgress.value, [0, 0.5, 1], [14, 14, 0]),
+      },
+    ],
+  }));
+
+  const emptyStateAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(focusProgress.value, [0, 0.55, 1], [0, 0, 1]),
+    transform: [
+      {
+        translateY: interpolate(focusProgress.value, [0, 0.55, 1], [18, 18, 0]),
+      },
+    ],
+  }));
 
   useEffect(() => {
     markPerformance("teacher-dashboard-mount");
@@ -139,8 +183,7 @@ const TeacherDashboard = () => {
 
                   {/* Search Bar */}
                   <Animated.View
-                    entering={FadeInDown.delay(200).springify()}
-                    style={styles.searchContainer}
+                    style={[styles.searchContainer, searchAnimatedStyle]}
                   >
                     <SearchIcon name="search" size={20} />
                     <SearchInput
@@ -150,24 +193,28 @@ const TeacherDashboard = () => {
                       onChangeText={setSearchQuery}
                     />
                     {searchQuery.length > 0 && (
-                      <TouchableOpacity onPress={() => setSearchQuery("")}>
+                      <TouchableOpacity
+                        onPress={() => setSearchQuery("")}
+                        haptic="selection"
+                      >
                         <ClearIcon name="close-circle" size={20} />
                       </TouchableOpacity>
                     )}
                   </Animated.View>
 
                   {/* Section Title */}
-                  <View style={styles.listContainer}>
+                  <Animated.View
+                    style={[styles.listContainer, sectionTitleAnimatedStyle]}
+                  >
                     <Text style={styles.sectionTitle}>
                       {searchQuery ? "Search Results" : "Recent Lectures"}
                     </Text>
-                  </View>
+                  </Animated.View>
                 </View>
               }
               ListEmptyComponent={
                 <Animated.View
-                  entering={FadeInUp.springify()}
-                  style={styles.emptyState}
+                  style={[styles.emptyState, emptyStateAnimatedStyle]}
                 >
                   <EmptyStateIcon
                     name="search-outline"

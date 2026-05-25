@@ -1,6 +1,7 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
@@ -15,6 +16,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { selectionAsync } from "expo-haptics";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -27,7 +29,6 @@ import {
 } from "react";
 import { AppState } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
-import { useAlerts } from "react-native-paper-alerts";
 import {
   Extrapolation,
   interpolate,
@@ -92,7 +93,7 @@ export const useTeacherDashboard = () => {
     size?: string;
   }>();
   const { ended, lectureId } = params;
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingLecture, setEditingLecture] = useState<LectureWithCount | null>(
@@ -259,7 +260,7 @@ export const useTeacherDashboard = () => {
   const handleEndLecture = useCallback(
     (id: string, lectureTitle: string) => {
       alert("End Lecture", "Are you sure you want to end this lecture?", [
-        { text: "Cancel", style: "cancel" },
+        { text: "Cancel", style: "cancel", onPress: selectionAsync },
         {
           text: "End",
           style: "destructive",
@@ -598,7 +599,7 @@ export const useTeacherDashboard = () => {
         "Delete Lecture",
         `Are you sure you want to delete "${lecture.title}"?`,
         [
-          { text: "Cancel", style: "cancel" },
+          { text: "Cancel", style: "cancel",onPress: selectionAsync  },
           {
             text: "Delete",
             style: "destructive",

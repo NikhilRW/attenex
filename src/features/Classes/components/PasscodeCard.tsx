@@ -1,9 +1,10 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/LectureEndedScreen.styles";
 import { PasscodeCardProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -70,6 +71,7 @@ export const PasscodeCard: React.FC<PasscodeCardProps> = ({
             style={styles.refreshButton}
             onPress={onRefresh}
             disabled={loading}
+            haptic="impact"
           >
             <RefreshIcon name="refresh" size={20} style={styles.refreshIcon} />
             <Text style={styles.refreshButtonText}>Refresh</Text>

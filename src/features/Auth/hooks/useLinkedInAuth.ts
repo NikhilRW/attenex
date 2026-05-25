@@ -5,10 +5,10 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
 import { logger } from "@shared/utils/logger";
 import { getStartingScreenPath } from "@shared/utils/navigation";
+import { showMessage } from "@shared/utils/toasts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { showMessage } from "react-native-flash-message";
 
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
 

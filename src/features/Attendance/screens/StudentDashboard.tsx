@@ -14,6 +14,7 @@ import { useLectureDetailsParam } from "@attendance/hooks/useLectureDetailsParam
 import { useLectureManagement } from "@attendance/hooks/useLectureManagement";
 import { useRollNoManagement } from "@attendance/hooks/useRollNoManagement";
 import { useSocketManager } from "@attendance/hooks/useSocketManager";
+import { useStudentDashboardEmptyAnimation } from "@attendance/hooks/useStudentDashboardFocusAnimation";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { Lecture } from "@attendance/types/common";
 import {
@@ -25,8 +26,8 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { markPerformance } from "@shared/utils/performance";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 import Animated, { LinearTransition } from "react-native-reanimated";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 
@@ -34,8 +35,9 @@ const DEFAULT_LECTURE_ROW_HEIGHT = 220;
 
 const StudentDashboard = () => {
   const user = useAuthStore((state) => state.user);
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   const lectureHeight = useRef<number>(0);
+  const emptyStateAnimatedStyle = useStudentDashboardEmptyAnimation();
 
   useEffect(() => {
     markPerformance("student-dashboard-mount");
@@ -130,9 +132,10 @@ const StudentDashboard = () => {
   );
 
   const renderLectureItem = useCallback(
-    ({ item }: { item: Lecture }) => (
+    ({ item, index }: { item: Lecture; index: number }) => (
       <OnGoingLecture
         lecture={item}
+        index={index}
         currentLectureJoining={loadingLectureId === item.id}
         joining={joining}
         handleJoin={handleJoinAction}
@@ -276,11 +279,13 @@ const StudentDashboard = () => {
           />
         }
         ListEmptyComponent={
-          !user?.className ? (
-            <NoClassSelected setShowClassModal={setShowClassModal} />
-          ) : (
-            <NoLectureFound fetchLectures={() => void refreshLectures()} />
-          )
+          <Animated.View style={emptyStateAnimatedStyle}>
+            {!user?.className ? (
+              <NoClassSelected setShowClassModal={setShowClassModal} />
+            ) : (
+              <NoLectureFound fetchLectures={() => void refreshLectures()} />
+            )}
+          </Animated.View>
         }
       />
 

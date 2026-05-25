@@ -1,15 +1,12 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { useStudentDashboardLectureAnimation } from "@attendance/hooks/useStudentDashboardFocusAnimation";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { OnGoingLectureProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback } from "react";
-import {
-  ActivityIndicator,
-  LayoutChangeEvent,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, LayoutChangeEvent, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
 const LectureCardGradient = withUnistyles(LinearGradient, (_, rt) => ({
@@ -40,12 +37,15 @@ const PrimaryTextSpinner = withUnistyles(ActivityIndicator, (theme) => ({
 }));
 
 const OnGoingLecture = ({
+  index,
   lecture,
   currentLectureJoining,
   handleJoin,
   lectureHeightRef,
   joining,
 }: OnGoingLectureProps) => {
+  const lectureAnimatedStyle = useStudentDashboardLectureAnimation(index);
+
   const handleLayout = useCallback(
     (e: LayoutChangeEvent) => {
       if (e.nativeEvent.layout.height === 0) {
@@ -62,59 +62,63 @@ const OnGoingLecture = ({
   }, [handleJoin, lecture]);
 
   return (
-    <LectureCardGradient
-      key={lecture.id}
-      style={styles.lectureCard}
-      onLayout={handleLayout}
-    >
-      <View style={styles.lectureCardHeader}>
-        <View style={styles.headerLeftContent}>
-          <View style={styles.iconContainer}>
-            <PrimaryIcon name="easel" size={22} />
-          </View>
-          <View style={styles.lectureInfo}>
-            <Text style={styles.lectureCardTitle} numberOfLines={1}>
-              {lecture.title}
-            </Text>
-            <View style={styles.lectureMetaRow}>
-              <SecondaryIcon
-                name="school-outline"
-                size={12}
-                style={styles.lectureMetaIcon}
-              />
-              <Text style={styles.lectureClassName}>{lecture!.className}</Text>
+    <Animated.View style={lectureAnimatedStyle} onLayout={handleLayout}>
+      <LectureCardGradient key={lecture.id} style={styles.lectureCard}>
+        <View style={styles.lectureCardHeader}>
+          <View style={styles.headerLeftContent}>
+            <View style={styles.iconContainer}>
+              <PrimaryIcon name="easel" size={22} />
+            </View>
+            <View style={styles.lectureInfo}>
+              <Text style={styles.lectureCardTitle} numberOfLines={1}>
+                {lecture.title}
+              </Text>
+              <View style={styles.lectureMetaRow}>
+                <SecondaryIcon
+                  name="school-outline"
+                  size={12}
+                  style={styles.lectureMetaIcon}
+                />
+                <Text style={styles.lectureClassName}>
+                  {lecture!.className}
+                </Text>
+              </View>
             </View>
           </View>
+          <View style={styles.liveBadge}>
+            <View style={styles.liveDot} />
+            <Text style={styles.liveBadgeText}>LIVE</Text>
+          </View>
         </View>
-        <View style={styles.liveBadge}>
-          <View style={styles.liveDot} />
-          <Text style={styles.liveBadgeText}>LIVE</Text>
-        </View>
-      </View>
 
-      <View style={styles.divider} />
+        <View style={styles.divider} />
 
-      <TouchableOpacity
-        onPress={handlePress}
-        disabled={joining}
-        activeOpacity={0.8}
-      >
-        <PrimaryGradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.joinButton}
+        <TouchableOpacity
+          onPress={handlePress}
+          disabled={joining}
+          activeOpacity={0.8}
+          haptic="impact"
         >
-          <Text style={styles.joinButtonText}>Join Class Now</Text>
-          {currentLectureJoining && joining ? (
-            <PrimaryTextSpinner size="small" style={styles.joinButtonLoader} />
-          ) : (
-            <View style={styles.joinIconContainer}>
-              <PrimaryTextIcon name="arrow-forward" size={18} />
-            </View>
-          )}
-        </PrimaryGradient>
-      </TouchableOpacity>
-    </LectureCardGradient>
+          <PrimaryGradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.joinButton}
+          >
+            <Text style={styles.joinButtonText}>Join Class Now</Text>
+            {currentLectureJoining && joining ? (
+              <PrimaryTextSpinner
+                size="small"
+                style={styles.joinButtonLoader}
+              />
+            ) : (
+              <View style={styles.joinIconContainer}>
+                <PrimaryTextIcon name="arrow-forward" size={18} />
+              </View>
+            )}
+          </PrimaryGradient>
+        </TouchableOpacity>
+      </LectureCardGradient>
+    </Animated.View>
   );
 };
 

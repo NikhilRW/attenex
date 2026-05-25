@@ -1,17 +1,17 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
+import { showMessage } from "@shared/utils/toasts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { setStringAsync } from "expo-clipboard";
 import { useNetworkState } from "expo-network";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppState } from "react-native";
-import { showMessage } from "react-native-flash-message";
-import { useAlerts } from "react-native-paper-alerts";
 
 const getMatchesFilter = (record: AttendanceRecord, filter: FilterType) =>
   filter === "all" || record.status === filter;
@@ -58,7 +58,7 @@ export const useAttendanceView = () => {
   const [manualAttendanceError, setManualAttendanceError] = useState("");
   const { isConnected } = useNetworkState();
 
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
 
   const fetchAttendance: () => Promise<AttendanceRecord[]> =
     useCallback(async () => {

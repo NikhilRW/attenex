@@ -1,15 +1,14 @@
 import { FuturisticButtonProps } from "@auth/types/props";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text,TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { StyleSheet, withUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
+import { triggerImpactHapticOn } from "@/shared/utils/haptics";
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
 
-const ButtonGradient = withUnistyles(LinearGradient);
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,
@@ -30,6 +29,8 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   const handlePressOut = async () => {
     if (loading) return;
     buttonScale.value = withSpring(1);
+    // TODO: think about the parameter.
+    triggerImpactHapticOn()("" as any);
     await onPress();
   };
 
@@ -47,7 +48,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
         activeOpacity={0.9}
         style={styles.buttonPressable}
       >
-        <ButtonGradient
+        <UniLinearGradient
           uniProps={(theme) => ({
             colors: (gradient ?? [theme.primary.main, theme.accent.blue]) as [
               string,
@@ -65,11 +66,13 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
             <Text style={styles.buttonText}>{title}</Text>
           )}
           <View style={styles.buttonGlow} />
-        </ButtonGradient>
+        </UniLinearGradient>
       </TouchableOpacity>
     </Animated.View>
   );
 };
+
+// TODO: get it to the right place.
 
 const styles = StyleSheet.create((theme) => ({
   button: {

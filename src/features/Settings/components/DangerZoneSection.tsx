@@ -2,9 +2,10 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { styles } from "@settings/styles/Settings.styles";
 import { DangerZoneSectionProps } from "@settings/types/props";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const DangerIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.accent.red,
@@ -34,6 +35,7 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
             <TouchableOpacity
               style={styles.dangerRow}
               onPress={onResetPassword}
+              haptic="impact"
             >
               <View style={styles.rowLeft}>
                 <View style={[styles.iconBox, styles.iconBoxDanger]}>
@@ -53,7 +55,11 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
           </>
         )}
 
-        <TouchableOpacity style={styles.dangerRow} onPress={onLogout}>
+        <TouchableOpacity
+          haptic="impact"
+          style={styles.dangerRow}
+          onPress={onLogout}
+        >
           <View style={styles.rowLeft}>
             <View style={[styles.iconBox, styles.iconBoxDanger]}>
               <DangerIcon name="log-out" size={20} />
@@ -68,7 +74,11 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
 
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.dangerRow} onPress={onDeleteAccount}>
+        <TouchableOpacity
+          haptic="impact"
+          style={styles.dangerRow}
+          onPress={onDeleteAccount}
+        >
           <View style={styles.rowLeft}>
             <View style={[styles.iconBox, styles.iconBoxDanger]}>
               <DangerIcon name="warning" size={20} />

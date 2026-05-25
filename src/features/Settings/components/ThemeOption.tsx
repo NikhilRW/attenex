@@ -1,7 +1,7 @@
+import { triggerImpactHapticOn } from "@/shared/utils/haptics";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { styles } from "@settings/styles/Settings.styles";
 import { ThemeOptionProps } from "@settings/types/props";
-import * as Haptics from "expo-haptics";
 import { Pressable, Text } from "react-native";
 import Animated, {
   FadeInDown,
@@ -58,10 +58,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
 
   return (
     <AnimatedPressable
-      onPress={() => {
-        Haptics.selectionAsync();
-        onPress();
-      }}
+      onPress={triggerImpactHapticOn(onPress)}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.optionCard(isActive), animatedContainerStyle]}
@@ -70,6 +67,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
         style={[styles.optionIconContainer(isActive), animatedIconStyle]}
       >
         <OptionIcon
+          // TODO: correct type add it
           name={icon as any}
           size={24}
           uniProps={(theme) => ({

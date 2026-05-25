@@ -1,6 +1,12 @@
 // Attenex Color Palette - Digital Trust Blue Theme
+export const staticColors = {
+  white: "#FFFFFF",
+  black: "#000000",
+} as const;
 
 export const darkTheme = {
+  static: staticColors,
+
   // Background Layers
   background: {
     primary: "#0A0E27",
@@ -66,6 +72,8 @@ export const darkTheme = {
 } as const;
 
 export const lightTheme = {
+  static: staticColors,
+
   // Background Layers
   background: {
     primary: "#F8FAFC",

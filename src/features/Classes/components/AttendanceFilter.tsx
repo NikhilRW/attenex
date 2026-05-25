@@ -1,8 +1,9 @@
-import {styles} from "@classes/styles/AttendanceViewScreen.styles";
-import { AttendanceFilterProps } from "@classes/types/props";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { FilterType } from "@classes/types/common";
+import { AttendanceFilterProps } from "@classes/types/props";
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
@@ -17,6 +18,7 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
       {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
         <TouchableOpacity
           key={f}
+          haptic="selection"
           style={[
             styles.filterButton,
             filter === f

@@ -1,4 +1,5 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { joinLecture } from "@attendance/services/attendanceService";
 import {
@@ -22,7 +23,6 @@ import {
 import { useAuthStore } from "@shared/stores/authStore";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 
 const isLocationTooFarError = (error: unknown) => {
   if (!error || typeof error !== "object") {
@@ -75,7 +75,7 @@ export const useAttendanceJoin = (
   const [joinedLecture, setJoinedLecture] = useState<Lecture | null>(null);
   const [status, setStatus] = useState<JoinStatus>("idle");
 
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
 
   const proceedWithJoinMutation = useCallback(
     async ({

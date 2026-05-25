@@ -9,7 +9,7 @@ import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { validateRollNo } from "@attendance/utils/validationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 /**
  * Custom hook to manage roll number handling
@@ -18,7 +18,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const [rollNo, setRollNo] = useState("");
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   const { updateUser, user } = useAuthStore();
 
   const handleRollNoSubmitMutateFn = async (

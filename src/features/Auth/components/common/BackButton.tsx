@@ -1,8 +1,8 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@auth/styles/ForgotPassword.styles";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { TouchableOpacity } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const BackIcon = withUnistyles(Ionicons, (theme) => ({
@@ -11,8 +11,17 @@ const BackIcon = withUnistyles(Ionicons, (theme) => ({
 
 const BackButton: React.FC = () => {
   const router = useRouter();
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
   return (
-    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+    <TouchableOpacity
+      style={styles.backButton}
+      onPress={handleBackPress}
+      haptic="selection"
+    >
       <BackIcon name="arrow-back" size={24} />
     </TouchableOpacity>
   );

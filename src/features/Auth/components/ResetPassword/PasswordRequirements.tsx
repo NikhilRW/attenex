@@ -1,12 +1,11 @@
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { styles } from "@auth/styles/ResetPassword.styles";
 import { PasswordRequirementsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
-const RequirementsSurface = withUnistyles(LinearGradient);
 const RequirementIcon = withUnistyles(Ionicons);
 
 const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
@@ -25,7 +24,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
   ],[confirmPassword,password]);
 
   return (
-    <RequirementsSurface
+    <UniLinearGradient
       uniProps={(_theme, rt) => ({
         colors:
           rt.themeName === "dark"
@@ -49,7 +48,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
           </View>
         ))}
       </View>
-    </RequirementsSurface>
+    </UniLinearGradient>
   );
 };
 

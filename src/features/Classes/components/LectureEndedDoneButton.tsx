@@ -1,9 +1,10 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/LectureEndedScreen.styles";
 import { LectureEndedDoneButtonProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -19,7 +20,7 @@ export const LectureEndedDoneButton: React.FC<LectureEndedDoneButtonProps> = ({
       entering={FadeInUp.delay(600).springify()}
       style={styles.doneButtonContainer}
     >
-      <TouchableOpacity onPress={onDone} activeOpacity={0.8}>
+      <TouchableOpacity onPress={onDone} haptic="impact" activeOpacity={0.8}>
         <DoneGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}

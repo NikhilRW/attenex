@@ -4,8 +4,9 @@ import { RollnoModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const RollnoModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
@@ -57,6 +58,7 @@ const RollnoModal = ({
                 setPendingLecture(null);
                 setRollNo("");
               }}
+              haptic="selection"
               style={styles.closeButton}
             >
               <PrimaryTextIcon name="close" size={24} />
@@ -85,6 +87,8 @@ const RollnoModal = ({
                 setPendingLecture(null);
                 setRollNo("");
               }}
+              // TODO: ask ai is it right to have like this here selection and thier impact let's see.
+              haptic="selection"
             >
               <Text
                 style={[styles.modalButtonText, styles.modalButtonTextPrimary]}
@@ -96,6 +100,7 @@ const RollnoModal = ({
             <TouchableOpacity
               style={styles.modalButtonWrapper}
               onPress={handleRollNoSubmit}
+              haptic="impact"
             >
               <PrimaryGradient
                 style={[styles.modalButton, styles.modalButtonPrimary]}

@@ -1,4 +1,5 @@
 import { lectureService } from "@/features/Classes/services/lectureService";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
@@ -8,7 +9,6 @@ import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard
 import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -19,7 +19,7 @@ export const useLectureDetailsParam = (
 ): UseLectureDetailsParamReturn => {
   const { lectureId } = useLocalSearchParams();
   const router = useRouter();
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   const [isFetchingLectureDetails, setIsFetchingLectureDetails] =
     useState(false);
   const handledLectureId = useRef<string | null>(null);

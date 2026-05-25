@@ -3,15 +3,10 @@ import { LectureEndedProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUnistyles } from "react-native-unistyles";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const PrimaryGradient = withUnistyles(LinearGradient, (theme) => ({
   colors: [theme.primary.main, theme.accent.blue] as const,
@@ -78,7 +73,11 @@ const LectureEnded = ({
             keyboardType="numeric"
             maxLength={4}
           />
-          <TouchableOpacity onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={loading}
+            haptic="impact"
+          >
             <PrimaryGradient style={styles.submitButton}>
               {loading ? (
                 <PrimaryTextSpinner />

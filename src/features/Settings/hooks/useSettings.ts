@@ -11,9 +11,9 @@ import * as Haptics from "expo-haptics";
 import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 import { resetPassword } from "../utils/common";
-
+import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 // TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
@@ -22,7 +22,7 @@ export const useSettings = () => {
   const queryClient = useQueryClient();
   const [displayName, setDisplayName] = useState(user?.name || "");
   const [role, setRole] = useState<UserRole>(user?.role || "teacher");
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
   const { isConnected } = useNetworkState();
 
   const { isPending: savingRole, mutateAsync: updateRole } = useMutation<
@@ -125,9 +125,12 @@ export const useSettings = () => {
     },
   });
 
+  // TODO: have all normal alert buttons have haptic feedback 
+
   const { mutateAsync: logoutUser } = useMutation({
     mutationKey: mutationKeys.auth.logout,
     mutationFn: async () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       if (!isConnected) {
         showInternetNotConnected();
         return;
@@ -143,11 +146,11 @@ export const useSettings = () => {
   const handleLogout = useCallback(async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
+      { text: "Cancel", style: "cancel", onPress: Haptics.selectionAsync },
       {
         text: "Logout",
         style: "destructive",
-        onPress: logoutUser,
+        onPress: triggerImpactHapticOnCallback(logoutUser),
       },
     ]);
   }, [alert, logoutUser]);
@@ -166,11 +169,12 @@ export const useSettings = () => {
   const handleDeleteAccount = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     alert("Delete Account", "This will remove your account forever.", [
-      { text: "Cancel", style: "cancel" },
+      { text: "Cancel", style: "cancel", onPress: Haptics.selectionAsync },
       {
         text: "Delete",
         style: "destructive",
-        onPress: deleteUserAccount,
+        // TODO: add heavy impact here.
+        onPress: triggerImpactHapticOnCallback(deleteUserAccount),
       },
     ]);
   }, [alert, deleteUserAccount]);

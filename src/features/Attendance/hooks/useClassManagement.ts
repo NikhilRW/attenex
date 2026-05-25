@@ -1,4 +1,5 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { userService } from "@/shared/services/userService";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { UseClassManagementReturn } from "@attendance/types/studentDashboard.types";
@@ -8,7 +9,6 @@ import { useAuthStore } from "@shared/stores/authStore";
 import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage class updates
@@ -21,7 +21,7 @@ export const useClassManagement = (
     (user as any)?.className || storage.getString("userClassName") || "";
   const [className, setClassName] = useState(defaultClassName);
   const [showClassModal, setShowClassModal] = useState(false);
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
 
   const handleUpdateClassMutateFn = async () => {
     if (!validateClassName(className)) {

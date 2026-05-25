@@ -1,14 +1,14 @@
-import {styles} from "@classes/styles/AttendanceViewScreen.styles";
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceFloatingButtonProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "@shared/components/TouchableOpacity";
 
 export const AttendanceFloatingButton: React.FC<
   AttendanceFloatingButtonProps
 > = ({ onPress }) => {
   return (
-    <TouchableOpacity style={styles.fab} onPress={onPress}>
+    <TouchableOpacity style={styles.fab} haptic="impact" onPress={onPress}>
       <Ionicons name="person-add" size={24} color="white" />
     </TouchableOpacity>
   );

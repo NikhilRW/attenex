@@ -37,6 +37,7 @@ export interface NoLectureFoundProps {
 
 export interface OnGoingLectureProps {
   lecture: Lecture;
+  index: number;
   currentLectureJoining: boolean;
   handleJoin: (lecture: Lecture) => Promise<void>;
   lectureHeightRef: React.RefObject<number>;

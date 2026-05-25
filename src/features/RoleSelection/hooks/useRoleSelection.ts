@@ -4,12 +4,12 @@ import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { Role } from "@role-selection/types/common";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils/logger";
+import { showMessage } from "@shared/utils/toasts";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useNetworkState } from "expo-network";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { showMessage } from "react-native-flash-message";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 
 export const useRoleSelection = () => {

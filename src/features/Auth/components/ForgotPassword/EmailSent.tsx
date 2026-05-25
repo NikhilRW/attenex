@@ -1,10 +1,11 @@
-import FuturisticButton  from "@auth/components/common/FuturisticButton";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import FuturisticButton from "@auth/components/common/FuturisticButton";
 import { styles } from "@auth/styles/ForgotPassword.styles";
 import { EmailSentProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 const MailIcon = withUnistyles(Ionicons, (theme) => ({
@@ -18,6 +19,11 @@ const EmailSent: React.FC<EmailSentProps> = ({
   handleRequestReset,
 }) => {
   const router = useRouter();
+
+  const handleResendEmail = () => {
+    setEmailSent(false);
+    handleRequestReset();
+  };
 
   return (
     <View style={styles.successContainer}>
@@ -37,11 +43,9 @@ const EmailSent: React.FC<EmailSentProps> = ({
       <View style={styles.helpContainer}>
         <Text style={styles.helpText}>Didn&apos;t receive the email?</Text>
         <TouchableOpacity
-          onPress={() => {
-            setEmailSent(false);
-            handleRequestReset();
-          }}
+          onPress={handleResendEmail}
           style={styles.resendButton}
+          haptic="selection"
         >
           <Text style={styles.resendText}>Resend Email</Text>
         </TouchableOpacity>

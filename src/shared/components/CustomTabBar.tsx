@@ -262,7 +262,7 @@ const getIconForRoute = (routeName: string, activated: boolean) => {
   if (routeName.includes("attendance")) {
     return (
       <TabFontAwesome6
-        name="calendar"
+        name={activated ? "calendar-plus" : "calendar"}
         size={25}
         uniProps={(theme) => ({
           color: activated ? theme.primary.main : theme.text.secondary,
@@ -292,7 +292,7 @@ const getIconForRoute = (routeName: string, activated: boolean) => {
   } else if (routeName.includes("settings")) {
     return (
       <TabIonicons
-        name="settings-outline"
+        name={activated ? "settings" : "settings-outline"}
         size={25}
         uniProps={(theme) => ({
           color: activated ? theme.primary.main : theme.text.secondary,

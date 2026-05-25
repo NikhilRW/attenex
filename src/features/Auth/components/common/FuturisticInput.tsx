@@ -1,13 +1,9 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { FuturisticInputProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 
 const ThemedInputField = withUnistyles(TextInput, (theme) => ({
@@ -16,7 +12,6 @@ const ThemedInputField = withUnistyles(TextInput, (theme) => ({
 const EyeIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.secondary,
 }));
-const InputBorder = withUnistyles(LinearGradient);
 
 const FuturisticInput: React.FC<FuturisticInputProps> = ({
   label,
@@ -29,14 +24,9 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.inputLabel}>{label}</Text>
-      <View
-        style={[
-          styles.inputWrapper,
-          error && styles.inputWrapperError,
-        ]}
-      >
+      <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
         <ThemedInputField style={styles.input} {...textInputProps} />
-        <InputBorder
+        <UniLinearGradient
           uniProps={(theme) => ({
             colors: error
               ? (["transparent", theme.accent.red, "transparent"] as const)
@@ -47,7 +37,11 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
           style={styles.inputBorder}
         />
         {isPassword && (
-          <TouchableOpacity onPress={onTogglePassword} style={styles.eyeIcon}>
+          <TouchableOpacity
+            onPress={onTogglePassword}
+            style={styles.eyeIcon}
+            haptic="selection"
+          >
             <EyeIcon
               name={showPassword ? "eye-outline" : "eye-off-outline"}
               size={20}

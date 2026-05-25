@@ -4,15 +4,10 @@ import { ClassUpdateModalProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const ClassModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
@@ -77,12 +72,13 @@ const ClassUpdateModal = ({
                     styles.modalTitlePrimary,
                     styles.modalTitleLarge,
                   ]}
-                >
+                  >
                   Update Class
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={() => setShowClassModal(false)}
+                haptic="selection"
                 style={[styles.closeButton, styles.closeButtonSubtle]}
               >
                 <SecondaryIcon name="close" size={20} />
@@ -106,7 +102,7 @@ const ClassUpdateModal = ({
                   value={className}
                   onChangeText={setClassName}
                   placeholder="e.g., Computer Science 101"
-                />
+                  />
               </View>
             </View>
 
@@ -114,6 +110,7 @@ const ClassUpdateModal = ({
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={() => setShowClassModal(false)}
+                haptic="selection"
               >
                 <Text
                   style={[
@@ -129,6 +126,7 @@ const ClassUpdateModal = ({
                 style={styles.modalButtonWrapper}
                 onPress={handleUpdateClass}
                 disabled={classUpdateLoading}
+                haptic="impact"
               >
                 <PrimaryGradient
                   start={{ x: 0, y: 0 }}

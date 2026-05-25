@@ -1,10 +1,11 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { RollSummaryModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -56,7 +57,11 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
                 </View>
                 <Text style={styles.modalTitle}>Present Students</Text>
               </View>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <TouchableOpacity
+                haptic="selection"
+                onPress={onClose}
+                style={styles.closeButton}
+              >
                 <CloseIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
@@ -91,7 +96,12 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
             </View>
 
             <View style={[styles.modalFooter, styles.modalFooterCompact]}>
-              <TouchableOpacity style={{ flex: 1 }} onPress={onCopy}>
+              {/* TODO: again copy impact and close selection haptic */}
+              <TouchableOpacity
+                haptic="impact"
+                style={{ flex: 1 }}
+                onPress={onCopy}
+              >
                 <CopyGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}

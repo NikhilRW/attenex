@@ -1,11 +1,11 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { showMessage } from "@shared/utils/toasts";
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
 import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Keyboard } from "react-native";
-import { showMessage } from "react-native-flash-message";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 export const useForgotPassword = () => {

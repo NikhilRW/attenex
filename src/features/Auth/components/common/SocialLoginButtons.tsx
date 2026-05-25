@@ -1,9 +1,10 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { SocialLoginButtonsProps } from "@auth/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useAuthStore } from "@shared/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 
@@ -20,13 +21,13 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   isGoogleLoading = false,
 }) => {
   const { user } = useAuthStore(useShallow((state) => ({ user: state.user })));
-
   return (
     <View style={styles.socialSection}>
       <TouchableOpacity
         style={[styles.socialButton, { borderColor: "rgba(0, 119, 181, 0.4)" }]}
         activeOpacity={0.8}
-        onPress={async () => await onGooglePress?.()}
+        onPress={onGooglePress}
+        haptic="impact"
         disabled={isGoogleLoading || !!user}
       >
         <LinearGradient
@@ -60,6 +61,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         ]}
         activeOpacity={0.8}
         onPress={onLinkedInPress}
+        haptic="impact"
       >
         <View style={styles.socialIconWrapper}>
           <SocialIcon name="logo-linkedin" size={24} />

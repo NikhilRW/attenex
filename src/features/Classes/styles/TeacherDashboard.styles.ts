@@ -335,14 +335,15 @@ export const styles = StyleSheet.create((theme, rt) => {
       height: 40,
       borderRadius: 40,
       backgroundColor: isDark
-        ? "rgba(255,255,255,0.1)"
-        : "rgba(255,255,255,0.8)",
+        ? "white"
+        : "rgba(255,255,255,1)",
       justifyContent: "center",
       alignItems: "center",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
+      zIndex:100
     },
     pullIndicatorGradient: {
       flexDirection: "row",

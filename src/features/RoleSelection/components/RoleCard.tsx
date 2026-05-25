@@ -1,7 +1,8 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@role-selection/styles/RoleSelection.styles";
 import { RoleCardProps } from "@role-selection/types/props";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { NitroImage } from "react-native-nitro-image";
 import Animated from "react-native-reanimated";
 
@@ -15,10 +16,11 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   onPress,
 }) => {
   return (
-    <Pressable
+    <TouchableOpacity
       style={[styles.modelWrapper, isSelected && styles.modelWrapperSelected]}
       onPress={onPress}
       disabled={isDisabled}
+      haptic="selection"
     >
       <Animated.View
         style={[styles.canvasContainer, { transform: [{ scale }] }]}
@@ -38,6 +40,6 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           <Text style={styles.checkmark}>✓</Text>
         </View>
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 };

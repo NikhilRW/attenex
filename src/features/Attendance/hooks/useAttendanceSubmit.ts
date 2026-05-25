@@ -1,4 +1,5 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { submitAttendance } from "@attendance/services/attendanceService";
@@ -10,7 +11,6 @@ import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
 import { validatePasscode } from "@attendance/utils/validationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
 
 /**
  * Custom hook to manage attendance submission
@@ -30,7 +30,7 @@ export const useAttendanceSubmit = (
 ): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");
   const rollNo = useAuthStore((state) => state.user?.rollNo);
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
 
   const handleSubmitMutateFn = async ({
     joinedLecture,

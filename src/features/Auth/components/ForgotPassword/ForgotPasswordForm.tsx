@@ -2,9 +2,10 @@ import { styles } from "@auth/styles/ForgotPassword.styles";
 import { ForgotPasswordFormProps } from "@auth/types/props";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import FuturisticButton from "../common/FuturisticButton";
 import FuturisticInput from "../common/FuturisticInput";
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   email,
@@ -13,6 +14,11 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   handleRequestReset,
 }) => {
   const router = useRouter();
+
+  const handleBackToSignIn = () => {
+    router.back();
+  };
+
   return (
     <View style={styles.formContainer}>
       <Text style={styles.description}>
@@ -37,11 +43,11 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       />
       <TouchableOpacity
         style={styles.backToSignIn}
-        onPress={() => router.back()}
+        onPress={handleBackToSignIn}
+        haptic="selection"
       >
         <Text style={styles.backToSignInText}>
-          Remember your password?{" "}
-          <Text style={styles.signInLink}>Sign In</Text>
+          Remember your password? <Text style={styles.signInLink}>Sign In</Text>
         </Text>
       </TouchableOpacity>
     </View>

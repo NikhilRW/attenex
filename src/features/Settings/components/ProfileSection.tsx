@@ -1,3 +1,4 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { styles } from "@settings/styles/Settings.styles";
 import { ProfileSectionProps } from "@settings/types/props";
@@ -7,7 +8,6 @@ import {
   ActivityIndicator,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { NitroImage } from "react-native-nitro-image";
@@ -92,6 +92,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 <TouchableOpacity
                   onPress={() => onNameUpdate(displayName)}
                   disabled={savingName}
+                  haptic="impact"
+                  // TODO: add the medium haptic impact later.
                 >
                   {savingName ? (
                     <SavingIndicator size="small" />

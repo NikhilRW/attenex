@@ -1,9 +1,10 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import { LectureEditModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -58,9 +59,11 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
                   Edit Lecture
                 </Text>
               </View>
+              {/* TODO: Why close button if there is Cancel Button Think */}
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
                 style={styles.modalCloseButton}
+                haptic="selection"
               >
                 <CloseIcon name="close" size={20} />
               </TouchableOpacity>
@@ -93,6 +96,7 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
               <TouchableOpacity
                 style={[styles.modalBtn, styles.modalBtnSecondary]}
                 onPress={() => setEditModalVisible(false)}
+                haptic="selection"
               >
                 <Text
                   style={[styles.modalBtnText, styles.modalBtnTextSecondary]}
@@ -100,10 +104,12 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
                   Cancel
                 </Text>
               </TouchableOpacity>
+              {/* TODO: check here also cancel selection and for update impact is good or not. */}
 
               <TouchableOpacity
                 style={styles.modalBtnWrapper}
                 onPress={handleUpdateLecture}
+                haptic="impact"
               >
                 <PrimaryButton
                   start={{ x: 0, y: 0 }}

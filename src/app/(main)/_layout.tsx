@@ -13,6 +13,7 @@ const MainLayout = () => {
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: "transparent" },
+        animation: "shift",
       }}
     />
   );

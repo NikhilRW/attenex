@@ -3,9 +3,10 @@ import { LectureOngoingProps } from "@attendance/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUnistyles } from "react-native-unistyles";
+import { TouchableOpacity } from "@shared/components/TouchableOpacity";
 
 const SuccessGradient = withUnistyles(LinearGradient, (theme) => ({
   colors: [theme.accent.green, "#4CAF50"] as const,
@@ -66,6 +67,7 @@ const LectureOngoing = ({
         <TouchableOpacity
           onPress={handleLeaveLecture}
           style={styles.leaveButtonWrapper}
+          haptic="impact"
         >
           <DangerGradient style={styles.leaveButton}>
             <PrimaryTextIcon name="exit-outline" size={20} />

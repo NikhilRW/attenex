@@ -1,10 +1,11 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { DurationSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -49,7 +50,11 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
     <>
       <View style={[styles.inputGroupLarge, styles.inputGroupDuration]}>
         <Text style={styles.label}>Duration</Text>
-        <TouchableOpacity onPress={onToggleDropdown} style={styles.dropdown}>
+        <TouchableOpacity
+          haptic="selection"
+          onPress={onToggleDropdown}
+          style={styles.dropdown}
+        >
           <Text style={styles.dropdownText}>{selectedDurationLabel}</Text>
           <AddCircleIcon name={"add-circle-sharp"} size={20} />
         </TouchableOpacity>
@@ -100,6 +105,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                 <TouchableOpacity
                   onPress={onToggleDropdown}
                   style={styles.modalCloseButton}
+                  haptic="selection"
                 >
                   <SecondaryIcon name="close" size={20} />
                 </TouchableOpacity>
@@ -110,6 +116,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                   <TouchableOpacity
                     key={option.label}
                     onPress={() => onSelectDuration(option.value)}
+                    haptic="selection"
                     style={[
                       styles.optionItem,
                       duration === option.value && styles.optionItemSelected,

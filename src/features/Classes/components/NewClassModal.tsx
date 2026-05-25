@@ -1,10 +1,11 @@
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { NewClassModalProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -64,6 +65,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
               <TouchableOpacity
                 onPress={onClose}
                 style={styles.modalCloseButton}
+                haptic="selection"
               >
                 <SecondaryIcon name="close" size={20} />
               </TouchableOpacity>
@@ -86,6 +88,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={onClose}
+                haptic="selection"
               >
                 <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
               </TouchableOpacity>
@@ -93,6 +96,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
               <TouchableOpacity
                 style={styles.modalButtonWrapper}
                 onPress={handleCreateClass}
+                haptic="impact"
               >
                 <PrimaryGradient
                   start={{ x: 0, y: 0 }}

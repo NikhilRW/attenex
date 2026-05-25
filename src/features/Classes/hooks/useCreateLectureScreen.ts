@@ -8,8 +8,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { useAlerts } from "react-native-paper-alerts";
 import { CreateLectureVariables } from "../types/params";
+import { selectionAsync } from "expo-haptics";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
@@ -25,7 +26,7 @@ export const useCreateLectureScreen = () => {
   const [showNewClassModal, setShowNewClassModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
 
-  const { alert } = useAlerts();
+  const { alert } = useHapticAlerts();
 
   const navigateToTeacherDashboard = () => {
     router.navigate("/classes");
@@ -167,7 +168,7 @@ export const useCreateLectureScreen = () => {
         );
         if (data) {
           alert("Error", "Failed to create lecture kindly try again", [
-            { text: "OK" },
+            { text: "OK", onPress: selectionAsync },
           ]);
         }
       }

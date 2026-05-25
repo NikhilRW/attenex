@@ -26,10 +26,16 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
               onPress={() => onThemeChange(m)}
               icon={
                 m === "light"
-                  ? "sunny"
+                  ? isActive
+                    ? "sunny"
+                    : "sunny-outline"
                   : m === "dark"
-                    ? "moon"
-                    : "settings-outline"
+                    ? isActive
+                      ? "moon"
+                      : "moon-outline"
+                    : isActive
+                      ? "settings"
+                      : "settings-outline"
               }
               label={m.charAt(0).toUpperCase() + m.slice(1)}
             />

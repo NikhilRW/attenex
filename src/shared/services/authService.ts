@@ -4,8 +4,8 @@ import { unsubscribeFromClassName } from "@shared/utils/fcm";
 import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { secureStore } from "@shared/utils/secureStore";
+import { showMessage } from "@shared/utils/toasts";
 import { router } from "expo-router";
-import { showMessage } from "react-native-flash-message";
 
 export const authService = {
   async login(user: any, token: string) {

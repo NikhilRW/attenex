@@ -430,7 +430,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderWidth: 0,
     },
     copyButtonText: {
-      color: theme.text.primary,
+      color: theme.static.white,
       fontSize: 16,
       fontWeight: "700",
     },
