@@ -4,7 +4,6 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUnistyles } from "react-native-unistyles";
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
@@ -31,14 +30,12 @@ const LectureEnded = ({
   passcode,
   setPasscode,
 }: LectureEndedProps) => {
-  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.screenContainer}>
       <View
         style={[
           styles.joinedContainer,
-          styles.joinedContainerWithInset(insets.bottom),
         ]}
       >
         <View style={styles.guardianIconOuter}>

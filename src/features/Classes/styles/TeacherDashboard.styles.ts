@@ -334,16 +334,14 @@ export const styles = StyleSheet.create((theme, rt) => {
       width: 40,
       height: 40,
       borderRadius: 40,
-      backgroundColor: isDark
-        ? "white"
-        : "rgba(255,255,255,1)",
+      backgroundColor: isDark ? "white" : "rgba(255,255,255,1)",
       justifyContent: "center",
       alignItems: "center",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      zIndex:100
+      zIndex: 100,
     },
     pullIndicatorGradient: {
       flexDirection: "row",

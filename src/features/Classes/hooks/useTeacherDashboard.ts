@@ -283,8 +283,8 @@ export const useTeacherDashboard = () => {
                   },
                 });
                 // Navigate to lecture ended screen
-                router.push({
-                  pathname: "/(main)/classes/lecture-ended",
+                router.navigate({
+                  pathname: "/(main)/lecture-ended",
                   params: {
                     lectureId: id,
                     lectureTitle: lectureTitle,
@@ -406,8 +406,8 @@ export const useTeacherDashboard = () => {
 
   const handleViewAttendance = useCallback(
     (lecture: LectureWithCount) => {
-      router.push({
-        pathname: "/(main)/classes/attendance",
+      router.navigate({
+        pathname: "/(main)/view-attendance",
         params: {
           lectureId: lecture.id,
           lectureTitle: lecture.title,
@@ -430,7 +430,7 @@ export const useTeacherDashboard = () => {
         staleTime: 60000,
       });
       setIsNavigating(true);
-      router.push("/(main)/classes/create-lecture");
+      router.push("/(main)/create-lecture");
       setTimeout(() => setIsNavigating(false), 1000);
     }
   }, [handleFetchTeacherClasses, isNavigating, queryClient, router]);
@@ -599,7 +599,7 @@ export const useTeacherDashboard = () => {
         "Delete Lecture",
         `Are you sure you want to delete "${lecture.title}"?`,
         [
-          { text: "Cancel", style: "cancel",onPress: selectionAsync  },
+          { text: "Cancel", style: "cancel", onPress: selectionAsync },
           {
             text: "Delete",
             style: "destructive",

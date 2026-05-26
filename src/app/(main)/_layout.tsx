@@ -1,22 +1,22 @@
-import { queryClient } from "@/shared/constants/tanstackConfig";
-import { setupMainOfflineMutations } from "@/shared/utils/tanstack";
-import CustomTabBar from "@shared/components/CustomTabBar";
-import { Tabs } from "expo-router";
-import React from "react";
+import { Stack } from "expo-router";
 
-setupMainOfflineMutations(queryClient);
-
-const MainLayout = () => {
+const Layout = () => {
   return (
-    <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        sceneStyle: { backgroundColor: "transparent" },
-        animation: "shift",
-      }}
-    />
+    <>
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: "transparent", paddingTop: 0 },
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="lecture-ongoing" options={{ headerShown: false }} />
+        <Stack.Screen name="create-lecture" options={{ headerShown: false }} />
+        <Stack.Screen name="lecture-ended" options={{ headerShown: false }} />
+        <Stack.Screen name="view-attendance" options={{ headerShown: false }} />
+      </Stack>
+    </>
   );
 };
 
-export default MainLayout;
+export default Layout;

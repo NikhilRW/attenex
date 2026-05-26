@@ -56,6 +56,13 @@ export const useCreateLectureScreen = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
+  const resetValues = useCallback(() => {
+    setLectureName("");
+    setSelectedClass("");
+    setDuration(0);
+    setCustomDuration("");
+  }, []);
+
   const { mutateAsync: handleCreateLecture, isPending: loading } = useMutation<
     CreateLectureAPIResponse | undefined,
     Error,
@@ -113,7 +120,7 @@ export const useCreateLectureScreen = () => {
       if (!onMutateResult?.tempLectureId) {
         return;
       }
-
+      resetValues();
       if (data?.success && data.data?.lecture) {
         const createdLecture = data.data.lecture;
         const lectureWithCount: LectureWithCount = {

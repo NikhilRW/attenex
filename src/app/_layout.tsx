@@ -136,7 +136,7 @@ export default function RootLayout() {
         />
 
         <ThemedSafeAreaView style={styles.safeArea}>
-          {user?.role !== "student" && <FuturisticBackground />}
+          {user?.role === "teacher" && <FuturisticBackground />}
           <ApolloGraphQLProvider>
             <>
               <ThemedPaperProvider>

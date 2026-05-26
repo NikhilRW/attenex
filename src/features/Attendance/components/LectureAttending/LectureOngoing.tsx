@@ -4,7 +4,6 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUnistyles } from "react-native-unistyles";
 import { TouchableOpacity } from "@shared/components/TouchableOpacity";
 
@@ -24,15 +23,9 @@ const LectureOngoing = ({
   handleLeaveLecture,
   joinedLecture,
 }: LectureOngoingProps) => {
-  const insets = useSafeAreaInsets();
   return (
     <View style={styles.screenContainer}>
-      <View
-        style={[
-          styles.joinedContainer,
-          styles.joinedContainerWithInset(insets.bottom),
-        ]}
-      >
+      <View style={[styles.joinedContainer]}>
         <View style={styles.guardianIconOuter}>
           <SuccessGradient style={styles.guardianIconInner}>
             <PrimaryTextIcon name="school" size={48} />

@@ -1,6 +1,5 @@
 import ClassUpdateModal from "@attendance/components/Modals/ClassUpdateModal";
 import LectureEnded from "@attendance/components/LectureAttending/LectureEnded";
-import LectureOngoing from "@attendance/components/LectureAttending/LectureOngoing";
 import LoadingScreen from "@attendance/components/MainScreen/LoadingScreen";
 import NoClassSelected from "@attendance/components/MainScreen/NoClassSelected";
 import NoLectureFound from "@attendance/components/MainScreen/NoLectureFound";
@@ -24,7 +23,7 @@ import {
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { markPerformance } from "@shared/utils/performance";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
@@ -96,7 +95,6 @@ const StudentDashboard = () => {
     status,
     loadingLectureId,
     handleJoin,
-    handleLeaveLecture,
     setJoinedLecture,
     setStatus,
     proceedWithJoin,
@@ -115,7 +113,7 @@ const StudentDashboard = () => {
   } = useAttendanceSubmit(proceedWithJoin);
 
   // Socket manager
-  const { lectureStatus, setLectureStatus } = useSocketManager(
+  const { lectureStatus } = useSocketManager(
     joinedLecture,
     refreshLectures,
     alert,
@@ -199,15 +197,6 @@ const StudentDashboard = () => {
     [pendingLecture, proceedWithJoin],
   );
 
-  // Leave lecture handler
-  const onLeaveLecture = useCallback(() => {
-    if (joinedLecture) {
-      socketService.leaveLecture(joinedLecture.id, user?.role || "student");
-    }
-    setLectureStatus("active");
-    refreshLectures();
-  }, [joinedLecture, refreshLectures, setLectureStatus, user?.role]);
-
   // Attendance submit success handler
   const onAttendanceSubmitSuccess = useCallback(() => {
     if (joinedLecture) {
@@ -218,6 +207,13 @@ const StudentDashboard = () => {
     refreshLectures();
   }, [joinedLecture, setJoinedLecture, setStatus, refreshLectures, user?.role]);
 
+  // If joined and lecture is still active - show ongoing status
+  useMemo(() => {
+    if (status === "joined" && lectureStatus === "active") {
+      router.navigate("/lecture-ongoing");
+    }
+  }, [lectureStatus, status]);
+
   // Show loading screen while fetching lecture details
   if (isFetchingLectureDetails) {
     return <LoadingScreen />;
@@ -225,15 +221,6 @@ const StudentDashboard = () => {
 
   if (user?.role !== "student") {
     return null;
-  }
-  // If joined and lecture is still active - show ongoing status
-  if (status === "joined" && lectureStatus === "active") {
-    return (
-      <LectureOngoing
-        joinedLecture={joinedLecture!}
-        handleLeaveLecture={() => handleLeaveLecture(onLeaveLecture)}
-      />
-    );
   }
 
   // If joined and lecture ended - show verify button

@@ -312,7 +312,7 @@ const getIconForRoute = (routeName: string, activated: boolean) => {
   } else if (routeName.includes("test")) {
     return (
       <TabMaterialCommunityIcons
-        name="test-tube"
+        name={activated ? "test-tube" : "test-tube-empty"}
         size={25}
         uniProps={(theme) => ({
           color: activated ? theme.primary.main : theme.text.secondary,

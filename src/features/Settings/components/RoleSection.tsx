@@ -27,7 +27,15 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
               mode={r}
               isActive={isActive}
               onPress={() => onRoleChange(r)}
-              icon={r === "teacher" ? "school" : "people"}
+              icon={
+                r === "teacher"
+                  ? isActive
+                    ? "school"
+                    : "school-outline"
+                  :isActive
+                    ? "people"
+                    : "people-outline"
+              }
               label={r.charAt(0).toUpperCase() + r.slice(1)}
             />
           );

@@ -250,9 +250,6 @@ const styles = StyleSheet.create((theme, rt) => {
       shadowOpacity: 0.15,
       shadowRadius: 12,
     },
-    joinedContainerWithInset: (bottomInset: number) => ({
-      marginBottom: 70 + bottomInset,
-    }),
     guardianIconOuter: {
       marginBottom: 32,
       shadowColor: theme.accent.green,
