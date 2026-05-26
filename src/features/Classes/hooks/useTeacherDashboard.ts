@@ -283,7 +283,7 @@ export const useTeacherDashboard = () => {
                   },
                 });
                 // Navigate to lecture ended screen
-                router.navigate({
+                router.push({
                   pathname: "/(main)/lecture-ended",
                   params: {
                     lectureId: id,
@@ -406,7 +406,7 @@ export const useTeacherDashboard = () => {
 
   const handleViewAttendance = useCallback(
     (lecture: LectureWithCount) => {
-      router.navigate({
+      router.push({
         pathname: "/(main)/view-attendance",
         params: {
           lectureId: lecture.id,
