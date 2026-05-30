@@ -109,7 +109,6 @@ export default (): ExpoConfig => ({
     "./plugins/androidManifestPlugin.js",
     "./plugins/androidMainApplicationPlugin.js",
     "react-native-edge-to-edge",
-    "expo-background-task",
     [
       "expo-build-properties",
       {

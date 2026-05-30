@@ -1,4 +1,3 @@
-import ApolloGraphQLProvider from "@/shared/provider/ApolloGraphQLProvider";
 import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
@@ -8,6 +7,7 @@ import { useThemeStore } from "@shared/hooks/useTheme";
 import { markPerformance } from "@shared/utils/performance";
 import {
   PerformanceMeasureView,
+  PerformanceProfiler,
   useResetFlow,
 } from "@shopify/react-native-performance";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -117,27 +117,32 @@ export default function RootLayout() {
     }
   }, [isConnected, resetFlow]);
 
+  const reportPreparedCallback = useCallback((report: any) => {
+    if (__DEV__) {
+      alert("Render Time : " + report.timeToBootJsMillis);
+    }
+  }, []);
+
   if (!loaded && !error) {
     return null;
   }
 
   return (
-    // <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
-    <PerformanceMeasureView
-      componentInstanceId={componentInstanceId}
-      interactive
-      screenName={ROOT_LAYOUT_SCREEN_NAME}
-    >
-      <SafeAreaProvider>
-        <StatusBar
-          style={statusBarStyle}
-          hideTransitionAnimation="fade"
-          translucent
-        />
+    <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
+      <PerformanceMeasureView
+        componentInstanceId={componentInstanceId}
+        interactive
+        screenName={ROOT_LAYOUT_SCREEN_NAME}
+      >
+        <SafeAreaProvider>
+          <StatusBar
+            style={statusBarStyle}
+            hideTransitionAnimation="fade"
+            translucent
+          />
 
-        <ThemedSafeAreaView style={styles.safeArea}>
-          {user?.role === "teacher" && <FuturisticBackground />}
-          <ApolloGraphQLProvider>
+          <ThemedSafeAreaView style={styles.safeArea}>
+            {user?.role === "teacher" && <FuturisticBackground />}
             <>
               <ThemedPaperProvider>
                 <AlertsProvider>
@@ -183,10 +188,9 @@ export default function RootLayout() {
                 style={{ marginBottom: bottom }}
               />
             </>
-          </ApolloGraphQLProvider>
-        </ThemedSafeAreaView>
-      </SafeAreaProvider>
-    </PerformanceMeasureView>
-    // </PerformanceProfiler>
+          </ThemedSafeAreaView>
+        </SafeAreaProvider>
+      </PerformanceMeasureView>
+    </PerformanceProfiler>
   );
 }
