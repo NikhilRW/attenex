@@ -2,17 +2,11 @@ import "tsconfig-paths/register";
 import admin, { ServiceAccount } from "firebase-admin";
 import "dotenv/config";
 import morgan from "morgan";
-
 import { userRoutes } from "@routes/userRoutes";
 import cors from "cors";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-admin.initializeApp({
-  credential: admin.credential.cert(
-    JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
-  ),
-});
 import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import testRoutes from "./routes/testRoutes";
@@ -20,46 +14,12 @@ import { logger } from "./utils/logger";
 import asyncHandler from "@utils/asyncHandler";
 import { userRouteLimiter } from "@utils/rateLimters";
 import { User } from "@middleware/auth";
-import { ApolloServer } from "@apollo/server";
-const typeDefs = `#graphql
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-  # This "Book" type defines the queryable fields for every book in our data source.
-  type Test {
-    name: String!
-  }
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
-  type Query {
-    tests: [Test]
-  }
-`;
 
-const tests = [
-  {
-    name: "Nikhil",
-  },
-  {
-    name: "Tushar",
-  },
-  {
-    name: "Siddhant",
-  },
-];
-
-// Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves books from the "books" array above.
-const resolvers = {
-  Query: {
-    tests: () => tests,
-  },
-};
-
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
-const server = new ApolloServer({ typeDefs, resolvers });
-
-// -r tsconfig-paths/register
+admin.initializeApp({
+  credential: admin.credential.cert(
+    JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
+  ),
+});
 
 // TODO: fix security vulnerabilties in npm pacakage.
 
@@ -202,14 +162,14 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/no-wrap", async (req, res) => {
+app.get("/no-wrap", async (_req, res) => {
   await Promise.reject(new Error("boom - no wrap"));
   res.json({ ok: true });
 });
 
 app.get(
   "/wrapped",
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     await Promise.reject(new Error("boom - wrapped"));
     res.json({ ok: true });
   }),

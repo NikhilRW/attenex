@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as v from "valibot";
 
 /**
  * Authentication Form Validation Schemas
@@ -15,15 +15,17 @@ import { z } from "zod";
  * - Valid email format
  * - Password minimum 6 characters
  */
-export const signInSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Please enter your email")
-    .email("This doesn't look like a valid email"),
-  password: z
-    .string()
-    .min(1, "Please enter your password")
-    .min(6, "Password is too short (minimum 6 characters)"),
+export const signInSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.minLength(1, "Please enter your email"),
+    v.email("This doesn't look like a valid email"),
+  ),
+  password: v.pipe(
+    v.string(),
+    v.minLength(1, "Please enter your password"),
+    v.minLength(6, "Password is too short (minimum 6 characters)"),
+  ),
 });
 
 /**
@@ -36,31 +38,42 @@ export const signInSchema = z.object({
  * - Strong password (minimum 8 characters with uppercase, lowercase, number)
  * - Password confirmation must match
  */
-export const signUpSchema = z
-  .object({
-    fullName: z
-      .string()
-      .min(1, "Please enter your full name")
-      .min(2, "Name should be at least 2 characters")
-      .max(100, "Name is too long (maximum 100 characters)"),
-    email: z
-      .string()
-      .min(1, "Please enter your email")
-      .email("This doesn't look like a valid email"),
-    password: z
-      .string()
-      .min(1, "Please create a password")
-      .min(8, "Password should be at least 8 characters")
-      .regex(
+export const signUpSchema = v.pipe(
+  v.object({
+    fullName: v.pipe(
+      v.string(),
+      v.minLength(1, "Please enter your full name"),
+      v.minLength(2, "Name should be at least 2 characters"),
+      v.maxLength(100, "Name is too long (maximum 100 characters)"),
+    ),
+    email: v.pipe(
+      v.string(),
+      v.minLength(1, "Please enter your email"),
+      v.email("This doesn't look like a valid email"),
+    ),
+    password: v.pipe(
+      v.string(),
+      v.minLength(1, "Please create a password"),
+      v.minLength(8, "Password should be at least 8 characters"),
+      v.regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password needs uppercase, lowercase, and a number"
+        "Password needs uppercase, lowercase, and a number",
       ),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"], // Error will be attached to confirmPassword field
-  });
+    ),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Please confirm your password"),
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [["password"], ["confirmPassword"]],
+      ({ password, confirmPassword }) => password === confirmPassword,
+      "Password don't match",
+    ),
+    ["confirmPassword"],
+  ),
+);
 
 /**
  * Reset Password Schema
@@ -70,27 +83,36 @@ export const signUpSchema = z
  * - Strong new password (minimum 8 characters with uppercase, lowercase, number)
  * - Password confirmation must match
  */
-export const resetPasswordSchema = z
-  .object({
-    newPassword: z
-      .string()
-      .min(1, "Please create a password")
-      .min(8, "Password should be at least 8 characters")
-      .regex(
+export const resetPasswordSchema = v.pipe(
+  v.object({
+    newPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Please create a password"),
+      v.minLength(8, "Password should be at least 8 characters"),
+      v.regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password needs uppercase, lowercase, and a number"
+        "Password needs uppercase, lowercase, and a number",
       ),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"], // Error will be attached to confirmPassword field
-  });
+    ),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Please confirm your password"),
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [["newPassword"], ["confirmPassword"]],
+      ({ confirmPassword, newPassword }) => newPassword === confirmPassword,
+      "Password don't match",
+    ),
+    ["confirmPassword"],
+  ),
+);
 
 /**
  * TypeScript Types derived from Zod Schemas
  * These provide type safety throughout the application
  */
-export type SignInFormData = z.infer<typeof signInSchema>;
-export type SignUpFormData = z.infer<typeof signUpSchema>;
-export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type SignInFormData = v.InferInput<typeof signInSchema>;
+export type SignUpFormData = v.InferInput<typeof signUpSchema>;
+export type ResetPasswordFormData = v.InferInput<typeof resetPasswordSchema>;

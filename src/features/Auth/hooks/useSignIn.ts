@@ -4,7 +4,7 @@ import { logger } from "@/shared/utils/logger";
 import { defaultFaliureCount } from "@/shared/utils/tanstack";
 import { handleEmailSignIn, handleGoogleSignIn } from "@auth/utils/common";
 import { SignInFormData, signInSchema } from "@auth/validation/authSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { showMessage } from "@shared/utils/toasts";
@@ -102,7 +102,7 @@ export const useSignIn = () => {
     handleSubmit,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
+    resolver: valibotResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",

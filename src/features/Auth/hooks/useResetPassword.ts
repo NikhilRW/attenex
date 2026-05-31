@@ -4,7 +4,7 @@ import {
   ResetPasswordFormData,
   resetPasswordSchema,
 } from "@auth/validation/authSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { mutationKeys } from "@shared/constants/mutationKeys";
 import http from "@shared/utils/http";
 import { showMessage } from "@shared/utils/toasts";
@@ -29,7 +29,7 @@ export const useResetPassword = () => {
     watch,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<ResetPasswordFormData>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: valibotResolver(resetPasswordSchema),
     defaultValues: {
       newPassword: "",
       confirmPassword: "",

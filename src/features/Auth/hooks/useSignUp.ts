@@ -1,7 +1,7 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { handleEmailSignUp, handleGoogleSignIn } from "@auth/utils/common";
 import { SignUpFormData, signUpSchema } from "@auth/validation/authSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -39,7 +39,7 @@ export const useSignUp = () => {
     handleSubmit,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<SignUpFormData>({
-    resolver: zodResolver(signUpSchema),
+    resolver: valibotResolver(signUpSchema),
     defaultValues: {
       fullName: "",
       email: "",
