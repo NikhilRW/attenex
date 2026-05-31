@@ -1,25 +1,19 @@
 import "tsconfig-paths/register";
-import admin, { ServiceAccount } from "firebase-admin";
 import "dotenv/config";
-import morgan from "morgan";
-import { userRoutes } from "@routes/userRoutes";
-import cors from "cors";
+import "@config/firebase_config";
 import express from "express";
+import morgan from "morgan";
+import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { logger } from "@utils/logger";
+import { userRoutes } from "@routes/userRoutes";
+import { userRouteLimiter } from "@utils/rateLimters";
+import asyncHandler from "@utils/asyncHandler";
+import { User } from "@middleware/auth";
 import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import testRoutes from "./routes/testRoutes";
-import { logger } from "./utils/logger";
-import asyncHandler from "@utils/asyncHandler";
-import { userRouteLimiter } from "@utils/rateLimters";
-import { User } from "@middleware/auth";
-
-admin.initializeApp({
-  credential: admin.credential.cert(
-    JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
-  ),
-});
 
 // TODO: fix security vulnerabilties in npm pacakage.
 
