@@ -1,28 +1,30 @@
-import { PASSCODE_LENGTH } from "@attendance/constants/studentDashboard.constants";
+import * as v from "valibot";
+import {
+  classNameSchema,
+  passcodeSchema,
+  rollNoSchema,
+} from "../schema/common";
 
 /**
  * Validate passcode format
  * @param passcode - The passcode to validate
  * @returns true if valid, false otherwise
  */
-export const validatePasscode = (passcode: string): boolean => {
-  return passcode.length === PASSCODE_LENGTH;
-};
+export const validatePasscode = (passcode: string): boolean =>
+  v.safeParse(passcodeSchema, passcode).success;
 
 /**
  * Validate class name
  * @param className - The class name to validate
  * @returns true if valid, false otherwise
  */
-export const validateClassName = (className: string): boolean => {
-  return className.trim().length > 0;
-};
+export const validateClassName = (className: string): boolean =>
+  v.safeParse(classNameSchema, className).success;
 
 /**
  * Validate roll number
  * @param rollNo - The roll number to validate
  * @returns true if valid, false otherwise
  */
-export const validateRollNo = (rollNo: string): boolean => {
-  return rollNo.trim().length > 0;
-};
+export const validateRollNo = (rollNo: string): boolean =>
+  v.safeParse(rollNoSchema, rollNo).success;

@@ -1,5 +1,10 @@
 import { storage } from "@shared/utils/mmkvStorage";
-import { Accuracy, requestBackgroundPermissionsAsync, startLocationUpdatesAsync, stopLocationUpdatesAsync, } from "expo-location";
+import {
+  Accuracy,
+  requestBackgroundPermissionsAsync,
+  startLocationUpdatesAsync,
+  stopLocationUpdatesAsync,
+} from "expo-location";
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import { sendPing } from "./attendanceService";
 
@@ -21,11 +26,19 @@ defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
         if (lectureId) {
           console.log("Sending background ping for lecture:", lectureId);
-          await sendPing(
-            lectureId,
-            location.coords.latitude,
-            location.coords.longitude,
-          );
+          const latitude = location.coords.latitude;
+          const longitude = location.coords.longitude;
+          if (
+            latitude &&
+            typeof latitude === "number" &&
+            longitude &&
+            typeof longitude === "number"
+          )
+            await sendPing(
+              lectureId,
+              location.coords.latitude,
+              location.coords.longitude,
+            );
         }
       } catch (err) {
         console.error("Error in background task:", err);
@@ -60,8 +73,7 @@ export const startBackgroundTracking = async (lectureId: string) => {
 
 export const stopBackgroundTracking = async () => {
   try {
-    const isRegistered =
-      await isTaskRegisteredAsync(LOCATION_TASK_NAME);
+    const isRegistered = await isTaskRegisteredAsync(LOCATION_TASK_NAME);
     if (isRegistered) {
       await stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       storage.remove("currentLectureId");

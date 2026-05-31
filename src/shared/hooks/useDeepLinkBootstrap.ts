@@ -2,6 +2,10 @@ import { handleEmailVerification } from "@auth/utils/common";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
+import {
+  parseResetQueryParams,
+  parseVerifyEmailQueryParams,
+} from "@shared/utils/parsers";
 
 export const useDeepLinkBootstrap = () => {
   const router = useRouter();
@@ -40,19 +44,20 @@ export const useDeepLinkBootstrap = () => {
 
       // Handle reset-password deep link
       if (parsed.path && parsed.path.includes("reset-password")) {
-        const token = parsed.queryParams?.token as string;
-        const email = parsed.queryParams?.email as string;
-
-        if (token && email) {
+        if (parseResetQueryParams(parsed.queryParams)) {
           router.navigate("/");
-          router.navigate(`/reset-password?token=${token}&email=${email}`);
+          router.navigate(
+            `/reset-password?token=${parsed.queryParams?.token}&email=${parsed.queryParams?.email}`,
+          );
         }
         return;
       }
 
       // Handle verify-email deep link
       if (parsed.path && parsed.path.includes("verify-email")) {
-        return await handleEmailVerification(parsed);
+        if (parseVerifyEmailQueryParams(parsed.queryParams)) {
+          return await handleEmailVerification(parsed);
+        }
       }
     };
 
