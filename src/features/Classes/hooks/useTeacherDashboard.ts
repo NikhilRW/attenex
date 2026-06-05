@@ -2,7 +2,7 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
-import { parseLectureId } from "@/shared/utils/parsers";
+import { parseEndedTrue, parseLectureId } from "@/shared/utils/parsers";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
@@ -192,7 +192,7 @@ export const useTeacherDashboard = () => {
     if (stressOptions.enabled) {
       return;
     }
-    if (ended === "true" && parseLectureId(lectureId)) {
+    if (parseEndedTrue(ended) && parseLectureId(lectureId)) {
       fetchActiveLectures();
       router.setParams({ ended: undefined, lectureId: undefined });
     }
