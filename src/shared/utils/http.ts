@@ -21,6 +21,8 @@ export type HttpError<T = any> = AxiosError<T>;
 // TODO: Test that it works with stream,formData,blob, etc. requests and responses acutally then Response would probably be compatible with AxiosResponse one.
 const axiosFetchEnv = {
   fetch: nitroFetch,
+  Request: null,
+  Response: null,
 } as unknown as NonNullable<AxiosRequestConfig["env"]>;
 
 const attachAuthHeader = async (config: InternalAxiosRequestConfig) => {

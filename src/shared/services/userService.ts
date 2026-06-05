@@ -20,7 +20,9 @@ export const userService = {
       }
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
-        await this.updateUserToken(null);
+        const token = await getDeviceToken();
+        
+        await this.updateUserToken(token);
       }
       if (role === "student") {
         // Ensure className is subscribed if role is changed to student
@@ -28,8 +30,7 @@ export const userService = {
         if (className) {
           await subscribeToClassName(className);
         }
-        const token = await getDeviceToken();
-        await this.updateUserToken(token);
+        await this.updateUserToken(null);
       }
       return response.data;
     } catch (error: any) {

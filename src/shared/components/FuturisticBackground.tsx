@@ -18,7 +18,11 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  useUnistyles,
+  withUnistyles,
+} from "react-native-unistyles";
 import { useAuthStore } from "../stores/authStore";
 
 const styles = StyleSheet.create((_, rt) => ({
@@ -29,6 +33,10 @@ const styles = StyleSheet.create((_, rt) => ({
     top: isStudent ? 0 : rt.insets.top,
     bottom: 0,
   }),
+}));
+
+const UniRect = withUnistyles(Rect, (theme) => ({
+  color: theme.background.primary,
 }));
 
 export const FuturisticBackground = () => {
@@ -110,13 +118,7 @@ export const FuturisticBackground = () => {
     <View pointerEvents="none" style={styles.container(isStudent)}>
       <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}
-        <Rect
-          x={0}
-          y={0}
-          width={width}
-          height={height}
-          color={colors.background.primary}
-        />
+        <UniRect x={0} y={0} width={width} height={height} />
 
         {/* Animated Glowing Orbs */}
         <Group opacity={isDark ? 0.6 : 0.35}>

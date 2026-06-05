@@ -1,4 +1,4 @@
-import db, { lectures, users } from "@config/database_setup";
+import db, { classes, lectures, users } from "@config/database_setup";
 import { message } from "@services/firebase";
 import { logger } from "@utils/logger";
 import { eq } from "drizzle-orm";
@@ -10,13 +10,19 @@ export const lectureClosure = async (lectureId: string) => {
         endedAt: lectures.endedAt,
         status: lectures.status,
         teacherId: lectures.teacherId,
+        classId: lectures.classId,
       })
       .from(lectures)
       .where(eq(lectures.id, lectureId))
       .limit(1)
   )[0];
 
-  logger.info("Lecture Ending JOB Started....");
+  const { className } = (
+    await db
+      .select({ className: classes.name })
+      .from(classes)
+      .where(eq(classes.id, lecture.classId))
+  )[0];
 
   if (lecture.status === "ended") return;
 
@@ -38,6 +44,15 @@ export const lectureClosure = async (lectureId: string) => {
         lectureId,
         ended: "true",
         endedAt: endedAt.toDateString(),
+      },
+    });
+  }
+
+  if (className) {
+    await message.send({
+      topic: className,
+      data: {
+        ended: "true",
       },
     });
   }

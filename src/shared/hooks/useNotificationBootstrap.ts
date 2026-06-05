@@ -12,68 +12,75 @@ import {
   AndroidImportance,
   AndroidNotificationPriority,
   AndroidNotificationVisibility,
-  getLastNotificationResponseAsync,
   NotificationContentInput,
   NotificationResponse,
   scheduleNotificationAsync,
   setNotificationChannelAsync,
   setNotificationHandler,
+  useLastNotificationResponse,
 } from "expo-notifications";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { queryKeys } from "../constants/queryKeys";
 import { queryClient } from "../constants/tanstackConfig";
-
-const ATTENEX_NOTIFICATION_IMAGE_URL =
-  "https://attenex.vercel.app/notification-attachment.png";
-const ATTENEX_ANDROID_CHANNEL_ID = "attenex";
+import {
+  parseBody,
+  parseLectureId,
+  parseTitle,
+  parseEndedTrue,
+} from "../utils/parsers";
+import { ATTENEX_NOTIFICATION_IMAGE_URL } from "../constants/uri";
+import { ATTENEX_ANDROID_CHANNEL_ID } from "../constants/notifications";
+import { useAuthStore } from "../stores/authStore";
 
 export const useNotificationBootstrap = () => {
   const router = useRouter();
+  const userRole = useAuthStore((state) => state.user?.role);
 
   // Track if we've already handled the killed-state notification to prevent infinite loop
   const {
     hasHandledKilledStateNotification,
     setHasHandledKilledStateNotification,
   } = useNotificationStore();
+  const getCurrentTheme = useCallback(() => UnistylesRuntime.getTheme(), []);
+  const lastNotificationResponse = useLastNotificationResponse();
+  const getNotificationAccentColor = useCallback(() => {
+    const currentTheme = getCurrentTheme();
 
-  useEffect(() => {
-    const cleanupTasks: (() => void)[] = [];
-    // Defer initialization using requestIdleCallback
-    const interactionHandle = requestIdleCallback(() => {
-        const getCurrentTheme = () => UnistylesRuntime.getTheme();
+    return UnistylesRuntime.themeName === "dark"
+      ? currentTheme.primary.light
+      : currentTheme.primary.main;
+  }, [getCurrentTheme]);
 
-        const getNotificationAccentColor = () => {
-          const currentTheme = getCurrentTheme();
+  const buildAttenexNotificationContent = useCallback(
+    (
+      remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+    ): NotificationContentInput => {
+      const title = remoteMessage.notification?.title ?? "Attenex";
+      const body = remoteMessage.notification?.body ?? "";
 
-          return UnistylesRuntime.themeName === "dark"
-            ? currentTheme.primary.light
-            : currentTheme.primary.main;
-        };
+      return {
+        title,
+        body,
+        data: remoteMessage.data,
+        sound: "notification.mp3",
+        color: getNotificationAccentColor(),
+        attachments: [
+          {
+            url: ATTENEX_NOTIFICATION_IMAGE_URL,
+            identifier: ATTENEX_NOTIFICATION_IMAGE_URL,
+            type: "image" as const,
+          },
+        ],
+      };
+    },
+    [getNotificationAccentColor],
+  );
 
-        const buildAttenexNotificationContent = (
-          remoteMessage: FirebaseMessagingTypes.RemoteMessage,
-        ): NotificationContentInput => {
-          const title = remoteMessage.notification?.title ?? "Attenex";
-          const body = remoteMessage.notification?.body ?? "";
-
-          return {
-            title,
-            body,
-            data: remoteMessage.data,
-            sound: "notification.mp3",
-            color: getNotificationAccentColor(),
-            attachments: [
-              {
-                url: ATTENEX_NOTIFICATION_IMAGE_URL,
-                identifier: ATTENEX_NOTIFICATION_IMAGE_URL,
-                type: "image" as const,
-              },
-            ],
-          };
-        };
-
+  const interactionHandle = useCallback(
+    (cleanupTasks: (() => void)[]) =>
+      requestIdleCallback(() => {
         // Android: create an Attenex notification channel (controls importance, vibration, accent light)
         // Safe to call repeatedly; Android will keep existing channel settings.
         setNotificationChannelAsync(ATTENEX_ANDROID_CHANNEL_ID, {
@@ -94,30 +101,22 @@ export const useNotificationBootstrap = () => {
           try {
             // Check Firebase initial notification (for data-only messages)
             const remoteMessage = await getInitialNotification(getMessaging());
+            const lectureId = remoteMessage?.data?.lectureId;
+            const ended = remoteMessage?.data?.ended;
             console.log(
               "Checking Firebase initial notification...",
               remoteMessage,
             );
-            if (remoteMessage?.data?.lectureId && !remoteMessage.data.ended) {
+            if (parseLectureId(lectureId) && !parseEndedTrue(ended)) {
               console.log(
                 "✅ Firebase notification caused app to open from quit state:",
                 JSON.stringify(remoteMessage),
               );
-              console.log(
-                "Navigating to lecture:",
-                remoteMessage.data.lectureId,
-              );
-              router.replace(
-                `/attendance?lectureId=${remoteMessage.data.lectureId}`,
-              );
+              console.log("Navigating to lecture:", lectureId);
+              router.replace(`/attendance?lectureId=${lectureId}`);
               return;
-            } else if (
-              remoteMessage?.data?.lectureId &&
-              remoteMessage.data.ended
-            ) {
-              router.replace(
-                `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`,
-              );
+            } else if (parseLectureId(lectureId) && parseEndedTrue(ended)) {
+              router.replace(`/classes?lectureId=${lectureId}&ended=true`);
               return;
             }
           } catch (error) {
@@ -149,13 +148,31 @@ export const useNotificationBootstrap = () => {
           async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             console.log("Message handled in the background!", remoteMessage);
             // Schedule the notification with a null trigger to show immediately
-            if (!remoteMessage.data?.ended) {
+            const remoteData = remoteMessage.data;
+            if (
+              !parseEndedTrue(remoteData?.ended) &&
+              parseTitle(remoteMessage?.notification?.title) &&
+              parseBody(remoteMessage?.notification?.body)
+            ) {
               await scheduleNotificationAsync({
                 content: {
                   ...buildAttenexNotificationContent(remoteMessage),
                 },
                 trigger: null,
               });
+            } else if (parseLectureId(remoteData?.lectureId)) {
+              if (userRole === "teacher") {
+                console.log("I am here teacher 1 ");
+                router.setParams({
+                  lectureId: remoteData?.lectureId as string,
+                  ended: remoteData?.ended as string,
+                });
+              } else {
+                console.log("I am here student 1");
+                router.replace(
+                  `/attendance?ended=${remoteData?.ended}`,
+                );
+              }
             }
           },
         );
@@ -166,7 +183,7 @@ export const useNotificationBootstrap = () => {
         ) => {
           const lectureId =
             response?.notification?.request?.content?.data?.lectureId;
-          if (lectureId) {
+          if (parseLectureId(lectureId)) {
             console.log(
               "✅ Navigating to lecture from notification:",
               lectureId,
@@ -186,14 +203,13 @@ export const useNotificationBootstrap = () => {
         const onNotificationOpenedAppListener = onNotificationOpenedApp(
           getMessaging(),
           (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+            const lectureId = remoteMessage?.data?.lectureId;
             console.log(
               "Notification caused app to open from background state:",
-              remoteMessage?.data?.lectureId,
+              lectureId,
             );
-            if (remoteMessage?.data?.lectureId) {
-              router.navigate(
-                `/attendance?lectureId=${remoteMessage.data.lectureId}`,
-              );
+            if (parseLectureId(lectureId)) {
+              router.navigate(`/attendance?lectureId=${lectureId}`);
             }
           },
         );
@@ -204,26 +220,30 @@ export const useNotificationBootstrap = () => {
 
         if (!hasHandledKilledStateNotification) {
           setHasHandledKilledStateNotification(true);
-          getLastNotificationResponseAsync().then((response) => {
-            if (response) {
-              console.log(
-                "📱 Found last notification response (app was killed):",
-                JSON.stringify(response),
-              );
-              const lectureId =
-                response?.notification?.request?.content?.data?.lectureId;
+          if (lastNotificationResponse) {
+            console.log(
+              "📱 Found last notification response (app was killed):",
+              JSON.stringify(lastNotificationResponse),
+            );
+            const lectureId =
+              lastNotificationResponse?.notification?.request?.content?.data
+                ?.lectureId;
+            const result = parseLectureId(lectureId);
 
-              if (lectureId) {
-                console.log(
-                  "✅ Navigating to lecture from notification:",
-                  lectureId,
-                );
-                router.replace(`/attendance?lectureId=${lectureId}`);
-              }
-            } else {
-              console.log("No last notification response found");
+            if (result) {
+              console.log(
+                "✅ Navigating to lecture from notification:",
+                lectureId,
+              );
+              requestIdleCallback(() => {
+                setTimeout(() => {
+                  router.replace(`/attendance?lectureId=${lectureId}`);
+                }, 500);
+              });
             }
-          });
+          } else {
+            console.log("No last notification response found");
+          }
         }
         const handlePushNotification = async (
           remoteMessage: FirebaseMessagingTypes.RemoteMessage,
@@ -231,15 +251,25 @@ export const useNotificationBootstrap = () => {
           queryClient.invalidateQueries({
             queryKey: queryKeys.lectures.student,
           });
-          if (!remoteMessage.data?.ended) {
+          if (!parseEndedTrue(remoteMessage?.data?.ended)) {
             await scheduleNotificationAsync({
               content: buildAttenexNotificationContent(remoteMessage),
               trigger: null,
             });
           } else {
-            router.replace(
-              `/classes?lectureId=${remoteMessage.data.lectureId}&ended=true`,
-            );
+            const lectureId = remoteMessage?.data?.lectureId;
+            if (parseLectureId(lectureId)) {
+              if (userRole === "teacher") {
+                router.setParams({
+                  lectureId: lectureId as string,
+                  ended: "true",
+                });
+                console.log("I am here teacher 2 ");
+              } else {
+                console.log("I am here student 2 ");
+                router.replace(`/attendance?ended=true`);
+              }
+            }
           }
         };
 
@@ -250,14 +280,29 @@ export const useNotificationBootstrap = () => {
           unsubscribe();
           onNotificationOpenedAppListener();
         });
-      });
+      }),
+    [
+      buildAttenexNotificationContent,
+      getCurrentTheme,
+      hasHandledKilledStateNotification,
+      lastNotificationResponse,
+      router,
+      setHasHandledKilledStateNotification,
+      userRole,
+    ],
+  );
 
+  useEffect(() => {
+    const cleanupTasks: (() => void)[] = [];
+    // Defer initialization using requestIdleCallback
+    const cleanInteractionHandle = interactionHandle(cleanupTasks);
     return () => {
-      cancelIdleCallback(interactionHandle);
+      cancelIdleCallback(cleanInteractionHandle);
       cleanupTasks.forEach((cleanup) => cleanup());
     };
   }, [
     hasHandledKilledStateNotification,
+    interactionHandle,
     router,
     setHasHandledKilledStateNotification,
   ]);

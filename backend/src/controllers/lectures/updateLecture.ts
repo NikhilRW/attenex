@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { LectureParams } from "../../types/params";
+import { destroyScheduledLectureEnd, scheduleLectureEnd } from "@utils/lecture";
 
 interface AuthRequest extends Request {
   user?: {
@@ -75,6 +76,8 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
 
     if (duration !== undefined && duration > 0) {
       updateData.duration = duration.toString();
+      await destroyScheduledLectureEnd(lectureId);
+      await scheduleLectureEnd(lectureId, duration);
     }
 
     // Check if there's anything to update

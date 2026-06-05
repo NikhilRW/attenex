@@ -11,13 +11,13 @@ export const getStartingScreenPath = (newUser: User | null = null) => {
     return "/(auth)/sign-in";
   }
   if (user?.role === "teacher") {
-    return "/(main)/classes";
+    return "/(main)/(tabs)/classes";
   }
   if (user?.role === "student") {
-    return "/(main)/attendance";
+    return "/(main)/(tabs)/attendance";
   }
   if (!user?.role) {
-    return "/(main)/role-selection";
+    return "/(main)/(tabs)/role-selection";
   }
   return "/(auth)/sign-in";
 };

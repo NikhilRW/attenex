@@ -8,8 +8,10 @@ import {
 import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.types";
 import { useAuthStore } from "@shared/stores/authStore";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Lecture } from "../types/common";
+import { router, useLocalSearchParams } from "expo-router";
+import { parseEndedTrue } from "@/shared/utils/parsers";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh
@@ -19,6 +21,7 @@ export const useLectureManagement = (
 ): UseLectureManagementReturn => {
   const { user } = useAuthStore();
   const userClassName = user?.className;
+  const { ended } = useLocalSearchParams();
 
   const fetchLectures = useCallback(async () => {
     try {
@@ -64,6 +67,13 @@ export const useLectureManagement = (
     gcTime: GarbageTime.SECONDS_30,
     enabled: shouldQueryBeEnabled,
   });
+
+  useEffect(() => {
+    if (parseEndedTrue(ended)) {
+      refreshLectures();
+      router.setParams({ ended: undefined });
+    }
+  }, [lectures, ended, refreshLectures]);
 
   return {
     lectures,

@@ -55,9 +55,9 @@ export const useRoleSelection = () => {
       if (success) {
         updateUser({ role: selectedRole });
         if (selectedRole === "teacher") {
-          router.replace("/(main)/classes");
+          router.replace("/(main)/(tabs)/classes");
         } else {
-          router.replace("/(main)/attendance");
+          router.replace("/(main)/(tabs)/attendance");
         }
         showMessage({
           message: "Role Updated",

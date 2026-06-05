@@ -61,6 +61,7 @@ export const useLectureDetailsParam = (
               // Still try to join with minimal data
               await onJoinLecture({ id: lectureId });
             }
+            router.setParams({ lectureId: undefined });
           } catch (error: any) {
             console.error(LOG_MESSAGES.DETAILS_ERROR, error);
             showErrorAlert(

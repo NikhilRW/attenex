@@ -63,10 +63,10 @@ export const useSettings = () => {
               return res.success ? [...res.data] : [];
             },
           });
-          router.replace("/(main)/classes");
+          router.replace("/(main)/(tabs)/classes");
         } else {
           // TODO: why not student fetching done.
-          router.replace("/(main)/attendance");
+          router.replace("/(main)/(tabs)/attendance");
         }
         alert("Role updated", `Your role is now set to ${newRole}.`);
       } else {
@@ -125,7 +125,7 @@ export const useSettings = () => {
     },
   });
 
-  // TODO: have all normal alert buttons have haptic feedback 
+  // TODO: have all normal alert buttons have haptic feedback
 
   const { mutateAsync: logoutUser } = useMutation({
     mutationKey: mutationKeys.auth.logout,

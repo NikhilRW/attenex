@@ -2,6 +2,7 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { parseLectureId } from "@/shared/utils/parsers";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import { LectureWithCount } from "@classes/types/common";
@@ -93,6 +94,7 @@ export const useTeacherDashboard = () => {
     size?: string;
   }>();
   const { ended, lectureId } = params;
+
   const { alert } = useHapticAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -190,11 +192,11 @@ export const useTeacherDashboard = () => {
     if (stressOptions.enabled) {
       return;
     }
-
-    if (ended === "true" && lectureId) {
+    if (ended === "true" && parseLectureId(lectureId)) {
       fetchActiveLectures();
+      router.setParams({ ended: undefined, lectureId: undefined });
     }
-  }, [ended, fetchActiveLectures, lectureId, stressOptions.enabled]);
+  }, [ended, fetchActiveLectures, lectureId, router, stressOptions.enabled]);
 
   useEffect(() => {
     if (stressOptions.enabled) {
