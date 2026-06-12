@@ -15,7 +15,7 @@ export interface ProfileSectionProps {
   onNameUpdate: (username: string) => Promise<{
     success: boolean;
     message: string;
-  }>;
+  } | null>;
   savingName: boolean;
   userPhotoUrl?: string | null;
   userEmail?: string | null;

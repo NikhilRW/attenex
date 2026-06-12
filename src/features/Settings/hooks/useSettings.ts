@@ -15,6 +15,7 @@ import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { parseUserName } from "@/shared/utils/parsers";
 import { UserSchema } from "@/shared/schemas/auth";
+import { showErrorAlert } from "@/features/Attendance/utils/alertUtils";
 
 // TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
@@ -91,7 +92,6 @@ export const useSettings = () => {
     }
     return await updateRole(role);
   }, [isConnected, role, updateRole]);
-
   const { isPending: savingName, mutateAsync: handleNameUpdate } = useMutation<
     { success: boolean; message: string },
     any,
@@ -192,6 +192,19 @@ export const useSettings = () => {
     await resetPassword();
   };
 
+  const handleNameUpdateWrapper = async (displayName: string) => {
+    if (parseUserName(displayName)) {
+      return await handleNameUpdate(displayName);
+    } else {
+      showErrorAlert(
+        "Invalid Name",
+        "Name must be at least 1 characters long.",
+        alert,
+      );
+      return null;
+    }
+  };
+
   return {
     displayName,
     setDisplayName,
@@ -201,7 +214,7 @@ export const useSettings = () => {
     savingName,
     user,
     handleRoleUpdate,
-    handleNameUpdate,
+    handleNameUpdate: handleNameUpdateWrapper,
     handleLogout,
     handleDeleteAccount,
     handleResetPassword,

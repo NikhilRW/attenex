@@ -3,7 +3,7 @@ import * as v from "valibot";
 // TODO: make the userSchema extremely strict.
 export const userSchema = v.object({
   id: v.pipe(v.string(), v.trim(), v.uuid()),
-  name: v.pipe(v.string(), v.trim()),
+  name: v.pipe(v.string(), v.trim(), v.minLength(1)),
   email: v.pipe(v.string(), v.trim(), v.email()),
   role: v.optional(
     v.nullable(v.picklist(["student", "teacher"], "Invalid role")),
