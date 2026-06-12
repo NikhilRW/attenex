@@ -1,7 +1,7 @@
-import { User } from "@backend/config/database_setup";
 import { useAuthStore } from "@shared/stores/authStore";
+import { UserSchema } from "../schemas/auth";
 
-export const getStartingScreenPath = (newUser: User | null = null) => {
+export const getStartingScreenPath = (newUser: UserSchema | null = null) => {
   let user = newUser;
   if (!user) {
     user = useAuthStore.getState().user;

@@ -4,13 +4,7 @@ import { styles } from "@settings/styles/Settings.styles";
 import { ProfileSectionProps } from "@settings/types/props";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { NitroImage } from "react-native-nitro-image";
+import { ActivityIndicator, Image, Text, TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -64,8 +58,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
         <ProfileHeaderGradient style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             {userPhotoUrl ? (
-              <NitroImage
-                image={{ url: userPhotoUrl }}
+              <Image
+                source={{ uri: userPhotoUrl }}
                 style={styles.avatarImage}
                 resizeMode="cover"
               />

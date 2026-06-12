@@ -7,10 +7,10 @@ import { useSettings } from "@settings/hooks/useSettings";
 import { styles } from "@settings/styles/Settings.styles";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { View } from "react-native";
-import { useShallow } from "zustand/shallow";
-import { useSlideAnimation } from "../hooks/useSlideAnimation";
 import Animated from "react-native-reanimated";
+import { useShallow } from "zustand/shallow";
 import SettingsHeader from "../components/SettingsHeader";
+import { useSlideAnimation } from "../hooks/useSlideAnimation";
 
 const SettingsScreen = () => {
   const { mode, setTheme } = useThemeStore(
@@ -39,7 +39,7 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {user?.role === "student" && <FuturisticBackground />}
+      <FuturisticBackground show={user?.role === "student"} />
       <SettingsHeader headerAnimatedStyle={headerAnimatedStyle} />
 
       <Animated.ScrollView

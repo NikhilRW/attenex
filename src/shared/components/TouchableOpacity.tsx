@@ -11,7 +11,8 @@ import {
 } from "@/shared/utils/haptics";
 
 type ImpactFeedbackStyleObject = typeof Haptics.ImpactFeedbackStyle;
-type ImpactFeedbackStyleEnum = ImpactFeedbackStyleObject[keyof ImpactFeedbackStyleObject]
+type ImpactFeedbackStyleEnum =
+  ImpactFeedbackStyleObject[keyof ImpactFeedbackStyleObject];
 
 export type MyTouchableOpacityProps = {
   haptic?: "selection" | "impact" | "notification";
@@ -48,6 +49,11 @@ export const TouchableOpacity = (props: MyTouchableOpacityProps) => {
     }
   }
   return (
-    <RNTouchableOpacity {...props} onPress={onPress} onPressOut={onPressOut} />
+    <RNTouchableOpacity
+      {...props}
+      activeOpacity={0.91}
+      onPress={onPress}
+      onPressOut={onPressOut}
+    />
   );
 };

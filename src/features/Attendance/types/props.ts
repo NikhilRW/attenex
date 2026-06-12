@@ -1,6 +1,6 @@
-import { User } from "@backend/config/database_setup";
 import { Dispatch, SetStateAction } from "react";
 import { Lecture } from "./common";
+import { UserSchema } from "@/shared/schemas/auth";
 
 /**
  * Props type definitions for Attendance components
@@ -23,7 +23,7 @@ export interface LectureOngoingProps {
 
 // MainScreen Components
 export interface ClassInfoProps {
-  user: User | null;
+  user: UserSchema | null;
   setShowClassModal: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -46,7 +46,7 @@ export interface OnGoingLectureProps {
 
 export interface StudentDashboardHeaderProps {
   setShowClassModal: Dispatch<SetStateAction<boolean>>;
-  user: User | null;
+  user: UserSchema | null;
 }
 
 // Modal Components

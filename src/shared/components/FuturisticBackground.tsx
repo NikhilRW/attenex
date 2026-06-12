@@ -10,45 +10,41 @@ import {
   vec,
 } from "@shopify/react-native-skia";
 import React, { useEffect } from "react";
-import { useWindowDimensions, View } from "react-native";
-import {
+import Animated, {
   Easing,
+  useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withDelay,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import {
-  StyleSheet,
-  useUnistyles,
-  withUnistyles,
-} from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuthStore } from "../stores/authStore";
 
 const styles = StyleSheet.create((_, rt) => ({
-  container: (isStudent: boolean) => ({
+  container: (isStudent: boolean, isAuthenticated: boolean) => ({
     position: "absolute",
     left: 0,
     right: 0,
-    top: isStudent ? 0 : rt.insets.top,
+    top: isAuthenticated && isStudent ? 0 : rt.insets.top,
     bottom: 0,
   }),
 }));
 
-const UniRect = withUnistyles(Rect, (theme) => ({
-  color: theme.background.primary,
-}));
-
-export const FuturisticBackground = () => {
+export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
   const {
     theme: colors,
-    rt: { themeName },
+    rt: {
+      themeName,
+      screen: { width, height },
+    },
   } = useUnistyles();
-  const isDark = themeName === "dark";
-  const user = useAuthStore((state) => state.user);
-  const isStudent = user?.role === "student";
 
-  const { width, height } = useWindowDimensions();
+  const isDark = themeName === "dark";
+  const userRole = useAuthStore((state) => state.user?.role);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isStudent = userRole === "student";
 
   const time1 = useSharedValue(0);
   const time2 = useSharedValue(0);
@@ -110,26 +106,38 @@ export const FuturisticBackground = () => {
     return vec(x, y);
   });
 
-  if (!isDark) {
-    return <></>;
-  }
+  const isVisible = isDark && show;
+
+  const opacityAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: withDelay(300, withTiming(isVisible ? 1 : 0, { duration: 0 })),
+  }));
 
   return (
-    <View pointerEvents="none" style={styles.container(isStudent)}>
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.container(isStudent,isAuthenticated), opacityAnimatedStyle]}
+    >
       <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}
-        <UniRect x={0} y={0} width={width} height={height} />
+        <Rect
+          color={colors.background.primary}
+          x={0}
+          y={0}
+          width={width}
+          height={height}
+          opacity={isVisible ? 1 : 0}
+        />
 
         {/* Animated Glowing Orbs */}
-        <Group opacity={isDark ? 0.6 : 0.35}>
+        <Group opacity={isVisible ? 0.6 : 0}>
           <Circle c={c1} r={180} color={colors.primary.main}>
-            <BlurMask blur={isDark ? 60 : 90} style="normal" />
+            <BlurMask blur={60} style="normal" />
           </Circle>
           <Circle c={c2} r={180} color={colors.accent.purple}>
-            <BlurMask blur={isDark ? 60 : 90} style="normal" />
+            <BlurMask blur={60} style="normal" />
           </Circle>
           <Circle c={c3} r={160} color={colors.accent.blue}>
-            <BlurMask blur={isDark ? 60 : 90} style="normal" />
+            <BlurMask blur={60} style="normal" />
           </Circle>
         </Group>
 
@@ -137,7 +145,7 @@ export const FuturisticBackground = () => {
         {/* We can simulate a grid or scanlines if needed, but let's keep it clean for now */}
 
         {/* Glassmorphism Overlay */}
-        <BackdropFilter filter={<Blur blur={isDark ? 30 : 50} />}>
+        <BackdropFilter filter={<Blur blur={30} />} opacity={isVisible ? 1 : 0}>
           <Rect
             x={0}
             y={0}
@@ -148,7 +156,13 @@ export const FuturisticBackground = () => {
         </BackdropFilter>
 
         {/* Subtle Gradient Overlay to unify */}
-        <Rect x={0} y={0} width={width} height={height + 600}>
+        <Rect
+          opacity={isVisible ? 1 : 0}
+          x={0}
+          y={0}
+          width={width}
+          height={height + 600}
+        >
           <LinearGradient
             start={vec(0, 0)}
             end={vec(width, height)}
@@ -156,6 +170,6 @@ export const FuturisticBackground = () => {
           />
         </Rect>
       </Canvas>
-    </View>
+    </Animated.View>
   );
 };

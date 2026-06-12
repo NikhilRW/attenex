@@ -1,28 +1,22 @@
-import { User as UserSchema } from "@backend/config/database_setup";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-export interface User extends UserSchema {
-  className: string;
-  synced?: boolean;
-}
+import { UserSchema } from "../schemas/auth";
 
 interface AuthState {
-  user: User | null;
+  user: UserSchema | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isNotSynced: boolean;
   setAuth: (
-    user: User | null,
+    user: UserSchema | null,
     token: string | null,
     isSignUp?: boolean,
   ) => void;
-
-  updateUser: (user: Partial<User>) => void;
+  updateUser: (user: Partial<UserSchema>) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setIsNotSynced: (isNotSynced: boolean) => void;
@@ -47,13 +41,13 @@ export const useAuthStore = create<AuthState>()(
       updateUser: (updatedFields) => {
         set((state) => ({
           user: state.user
-            ? ({ ...state.user, ...updatedFields } as User)
+            ? ({ ...state.user, ...updatedFields } as UserSchema)
             : null,
         }));
       },
       setIsNotSynced: (isNotSynced: boolean) => {
         set(() => ({
-          isNotSynced: isNotSynced,
+          isNotSynced,
         }));
       },
       logout: () => {

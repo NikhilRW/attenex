@@ -5,7 +5,6 @@ import { lectureService } from "@classes/services/lectureService";
 import type { UserRole } from "@settings/types/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
-import type { User } from "@shared/stores/authStore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useNetworkState } from "expo-network";
@@ -14,6 +13,8 @@ import { useCallback, useState } from "react";
 import { resetPassword } from "../utils/common";
 import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { parseUserName } from "@/shared/utils/parsers";
+import { UserSchema } from "@/shared/schemas/auth";
 
 // TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
@@ -29,7 +30,7 @@ export const useSettings = () => {
     { success: boolean; message: string },
     any,
     UserRole,
-    { user: Partial<User>; prevRole: UserRole }
+    { user: Partial<UserSchema>; prevRole: UserRole }
   >({
     mutationKey: mutationKeys.user.updateRole,
     onMutate: () => {
@@ -76,12 +77,10 @@ export const useSettings = () => {
       }
     },
     onError: (error, _, onMutateResult) => {
+      const prevRole = onMutateResult?.prevRole || "teacher";
       alert("Error", error.message || "Failed to update role");
-      setRole(
-        onMutateResult?.prevRole || onMutateResult?.user.role || "student",
-      );
-      updateUser({ role: onMutateResult?.user.role });
-      setRole(onMutateResult?.prevRole || "teacher");
+      updateUser({ role: prevRole });
+      setRole(prevRole);
     },
   });
 
@@ -102,7 +101,9 @@ export const useSettings = () => {
     mutationKey: mutationKeys.user.updateName, // Static key with displayName for deduplication
     onMutate() {
       const prevName = user?.name || "";
-      updateUser({ name: displayName });
+      if (parseUserName(displayName)) {
+        updateUser({ name: displayName });
+      }
       return { prevName };
     },
     async onSuccess(data, _, onMutateResult) {
@@ -110,13 +111,17 @@ export const useSettings = () => {
       if (data?.success) {
         alert("Success", "Your name has been updated");
       } else {
-        updateUser({ name: onMutateResult.prevName });
+        if (parseUserName(onMutateResult?.prevName)) {
+          updateUser({ name: onMutateResult.prevName });
+        }
         alert("Error", data?.message || "Failed to update name");
       }
     },
     onError: (error: any, _, onMutateResult) => {
       console.error("❌ Name update failed after retries:", error);
-      updateUser({ name: onMutateResult?.prevName });
+      if (parseUserName(onMutateResult?.prevName)) {
+        updateUser({ name: onMutateResult?.prevName });
+      }
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||

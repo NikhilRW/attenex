@@ -1,15 +1,15 @@
+import { parseRollNo } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
-import { logger } from "@shared/utils/logger";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert } from "@attendance/utils/alertUtils";
-import { validateRollNo } from "@attendance/utils/validationUtils";
+import { logger } from "@shared/utils/logger";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 /**
  * Custom hook to manage roll number handling
@@ -24,7 +24,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
   const handleRollNoSubmitMutateFn = async (
     onSubmit: (rollNo: string) => Promise<void>,
   ) => {
-    if (!validateRollNo(rollNo)) {
+    if (!parseRollNo(rollNo)) {
       return false;
     }
     setShowRollNoModal(false);
@@ -38,7 +38,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
     mutationKey: mutationKeys.user.submitRollNo,
     onMutate() {
       const contextRollNo = user?.rollNo;
-      updateUser({ rollNo: rollNo });
+      updateUser({ rollNo: rollNo.trim() });
       return contextRollNo;
     },
     onSuccess: () => {

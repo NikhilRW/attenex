@@ -112,7 +112,10 @@ export const useSignIn = () => {
   const onSignIn = async (data: SignInFormData) => {
     Keyboard.dismiss();
     await signInMutation.mutateAsync({
-      data,
+      data: {
+        email: data.email.trim(),
+        password: data.password.trim(),
+      },
       sendEmail: sendEmailMutation.mutateAsync,
     });
   };

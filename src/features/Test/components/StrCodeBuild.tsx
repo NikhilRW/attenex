@@ -1,11 +1,12 @@
 import { View } from "react-native";
 
 import React from "react";
-import codeStrToReactElement from "../utils/codeStrToElement";
-import { codeStr } from "../constants/common";
+// import codeStrToReactElement from "../utils/codeStrToElement";
+// import { codeStr } from "../constants/common";
 
 const StrCodeBuild = () => {
-  const element = codeStrToReactElement(codeStr);
+  // const element = codeStrToReactElement(codeStr);
+  const element = "No Element";
   return <View style={{flex:1}}>{ element }</View>;
 };
 

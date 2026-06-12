@@ -96,7 +96,7 @@ const OnGoingLecture = ({
         <TouchableOpacity
           onPress={handlePress}
           disabled={joining}
-          activeOpacity={0.8}
+          activeOpacity={0.9}
           haptic="impact"
         >
           <PrimaryGradient

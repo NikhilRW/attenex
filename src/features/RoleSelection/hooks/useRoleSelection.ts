@@ -19,7 +19,6 @@ export const useRoleSelection = () => {
   );
   const [, setHoveredRole] = useState<Role>(null);
   const { isConnected } = useNetworkState();
-
   const teacherScale = useSharedValue(1);
   const studentScale = useSharedValue(1);
 
@@ -51,7 +50,7 @@ export const useRoleSelection = () => {
       return { user: prevUser };
     },
     onSuccess({ success }) {
-      if (success) {
+      if (success && selectedRole !== null) {
         updateUser({ role: selectedRole });
         if (selectedRole === "teacher") {
           router.replace("/(main)/(tabs)/classes");
@@ -88,7 +87,9 @@ export const useRoleSelection = () => {
         duration: 3000,
         position: "bottom",
       });
-      updateUser(onMutateResult?.user!);
+      if (onMutateResult?.user) {
+        updateUser(onMutateResult.user);
+      }
       router.replace("/role-selection");
     },
   });

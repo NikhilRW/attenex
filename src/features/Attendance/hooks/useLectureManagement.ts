@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { Lecture } from "../types/common";
 import { router, useLocalSearchParams } from "expo-router";
-import { parseEndedTrue } from "@/shared/utils/parsers";
+import { parseClassName, parseEndedTrue } from "@/shared/utils/parsers";
 
 /**
  * Custom hook to manage lecture fetching and auto-refresh
@@ -53,11 +53,15 @@ export const useLectureManagement = (
   }, [user?.id, userClassName]);
 
   const shouldQueryBeEnabled =
-    joinedLecture === null && user?.role !== "teacher" && !!userClassName;
+    joinedLecture === null &&
+    user?.role !== "teacher" &&
+    parseClassName(userClassName);
 
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
-    queryKey: queryKeys.lectures.studentByClass(userClassName || ""),
+    queryKey: userClassName
+      ? queryKeys.lectures.studentByClass(userClassName)
+      : queryKeys.lectures.student,
     refetchInterval: () => {
       return joinedLecture !== null || user?.role === "teacher"
         ? 0

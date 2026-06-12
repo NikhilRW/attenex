@@ -1,10 +1,10 @@
+import { parseClassName } from "@shared/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { userService } from "@/shared/services/userService";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { UseClassManagementReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
-import { validateClassName } from "@attendance/utils/validationUtils";
 import { useAuthStore } from "@shared/stores/authStore";
 import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation } from "@tanstack/react-query";
@@ -18,13 +18,13 @@ export const useClassManagement = (
 ): UseClassManagementReturn => {
   const { user, updateUser } = useAuthStore();
   const defaultClassName =
-    (user as any)?.className || storage.getString("userClassName") || "";
+    user?.className || storage.getString("userClassName") || "";
   const [className, setClassName] = useState(defaultClassName);
   const [showClassModal, setShowClassModal] = useState(false);
   const { alert } = useHapticAlerts();
 
   const handleUpdateClassMutateFn = async () => {
-    if (!validateClassName(className)) {
+    if (!parseClassName(className)) {
       showErrorAlert(
         ALERT_MESSAGES.CLASS_REQUIRED.title,
         ALERT_MESSAGES.CLASS_REQUIRED.message,
@@ -61,7 +61,7 @@ export const useClassManagement = (
         }
       },
       onSettled(data, error, _, contextClassName) {
-        if (!data?.success || error) {
+        if ((!data?.success || error) && contextClassName) {
           updateUser({ className: contextClassName });
           setClassName(contextClassName);
           showErrorAlert(

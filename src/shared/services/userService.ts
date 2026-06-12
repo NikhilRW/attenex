@@ -13,15 +13,9 @@ export const userService = {
       const response = await http.post("/api/users/update-role", {
         role,
       });
-
-      // Update the user in the auth store with the new role
-      if (response.data.user) {
-        useAuthStore.getState().updateUser(response.data.user);
-      }
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
         const token = await getDeviceToken();
-        
         await this.updateUserToken(token);
       }
       if (role === "student") {
@@ -47,13 +41,11 @@ export const userService = {
         className,
       });
       unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
-      await subscribeToClassName(className);
       // Update the user in the auth store with the new class
-      if (response.data.data.user) {
-        useAuthStore.getState().updateUser(response.data.data.user);
+      if (response.data.success) {
+        useAuthStore.getState().updateUser({ className: className.trim() });
+        await subscribeToClassName(className.trim());
       }
-
-      await subscribeToClassName(className.trim());
       return response.data;
     } catch (error: any) {
       logger.info("authService:updateStudentClass - error", error);

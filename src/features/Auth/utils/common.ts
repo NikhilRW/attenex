@@ -1,4 +1,5 @@
 import { getStartingScreenPath } from "@/shared/utils/navigation";
+import { parseToken, parseUser } from "@/shared/utils/parsers";
 import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
 import { User } from "@backend/config/database_setup";
@@ -80,7 +81,11 @@ export const handleGoogleSignIn = async () => {
     // Stores user data and Google ID token in Zustand store
     // Use authService to persist token securely and set user state
 
-    if (newUser.data.success) {
+    if (
+      newUser.data.success &&
+      parseUser(newUser.data.user) &&
+      parseToken(newUser.data.token)
+    ) {
       await authService.login(newUser.data.user, newUser.data.token);
 
       if (newUser.data.user.className && newUser.data.user.role === "student") {
@@ -243,7 +248,22 @@ export const handleEmailSignIn = async ({
       return;
     }
 
-    await authService.login(user, token);
+    const userResults = parseUser(user);
+    const tokenResults = parseToken(token);
+    logger.info("Parsed user and token:", { userResults, tokenResults });
+
+    if (!userResults || !tokenResults) {
+      showMessage({
+        message: "Sign-in Failed",
+        description: "Something went wrong. Please try again.",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      return;
+    }
+
+    setTimeout(() => {});
 
     if (user.className && user.role === "student") {
       await subscribeToClassName(user.className!);
@@ -283,6 +303,7 @@ export const handleEmailSignIn = async ({
         router.replace(getStartingScreenPath());
       }
     });
+    await authService.login(user, token);
   } catch (err) {
     const e = err as any;
 

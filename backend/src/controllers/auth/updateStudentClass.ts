@@ -60,7 +60,7 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
     }
 
     // Update the student's class name (they will join any lecture with this class name)
-    const updatedUser = await db
+    await db
       .update(users)
       .set({
         className: className.trim(),
@@ -73,15 +73,6 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Class updated successfully",
-      data: {
-        user: {
-          id: updatedUser[0].id,
-          email: updatedUser[0].email,
-          name: updatedUser[0].name,
-          role: updatedUser[0].role,
-          className: className.trim(),
-        },
-      },
     });
   } catch (error: any) {
     logger.error("Error updating student class:", error);

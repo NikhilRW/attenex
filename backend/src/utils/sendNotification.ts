@@ -38,7 +38,7 @@ export const sendNotification = async (
       },
     },
     data: {
-      lectureId,
+      lectureId:"b61fa1b5-8d31-4d16-823e-0fb6f8f1cbd6",
     },
   });
 };

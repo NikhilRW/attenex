@@ -1,13 +1,15 @@
 import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
 import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
 import { useNotificationBootstrap } from "@shared/hooks/useNotificationBootstrap";
 import { useThemeStore } from "@shared/hooks/useTheme";
+import { clientPersister } from "@shared/utils/mmkvStorage";
 import { markPerformance } from "@shared/utils/performance";
 import {
-  PerformanceMeasureView,
-  PerformanceProfiler,
+  // PerformanceMeasureView,
+  // PerformanceProfiler,
   useResetFlow,
 } from "@shopify/react-native-performance";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -33,8 +35,6 @@ import {
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
-import { clientPersister } from "@shared/utils/mmkvStorage";
-import { useAuthStore } from "@/shared/stores/authStore";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 const QUERY_PERSIST_MAX_AGE_MS = StaleTime.DAYS_5;
@@ -77,7 +77,7 @@ const styles = StyleSheet.create((_, rt) => ({
 export default function RootLayout() {
   const { isConnected } = useNetworkState();
   const { bottom } = useSafeAreaInsets();
-  const { resetFlow, componentInstanceId } = useResetFlow();
+  const { resetFlow } = useResetFlow();
   const systemColorScheme = useColorScheme();
   const { mode } = useThemeStore(
     useShallow((state) => ({
@@ -109,6 +109,7 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const tanstackOnSuccess = useCallback(() => {
     if (isConnected) {
@@ -117,80 +118,79 @@ export default function RootLayout() {
     }
   }, [isConnected, resetFlow]);
 
-  const reportPreparedCallback = useCallback((report: any) => {
-    if (__DEV__) {
-      alert("Render Time : " + report.timeToBootJsMillis);
-    }
-  }, []);
+  // const reportPreparedCallback = useCallback((report: any) => {
+  //   if (__DEV__) {
+  //     alert("Render Time : " + report.timeToBootJsMillis);
+  //   }
+  // }, []);
 
   if (!loaded && !error) {
     return null;
   }
 
   return (
-    <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
-      <PerformanceMeasureView
-        componentInstanceId={componentInstanceId}
-        interactive
-        screenName={ROOT_LAYOUT_SCREEN_NAME}
-      >
-        <SafeAreaProvider>
-          <StatusBar
-            style={statusBarStyle}
-            hideTransitionAnimation="fade"
-            translucent
-          />
+    // <PerformanceProfiler onReportPrepared={reportPreparedCallback}>
+    //   <PerformanceMeasureView
+    //     componentInstanceId={componentInstanceId}
+    //     interactive
+    //     screenName={ROOT_LAYOUT_SCREEN_NAME}
+    //   >
+    <SafeAreaProvider>
+      <StatusBar
+        style={statusBarStyle}
+        hideTransitionAnimation="fade"
+        translucent
+      />
 
-          <ThemedSafeAreaView style={styles.safeArea}>
-            {user?.role === "teacher" && <FuturisticBackground />}
-            <>
-              <ThemedPaperProvider>
-                <AlertsProvider>
-                  <PersistQueryClientProvider
-                    client={queryClient}
-                    onSuccess={tanstackOnSuccess}
-                    persistOptions={{
-                      persister: clientPersister,
-                      maxAge: QUERY_PERSIST_MAX_AGE_MS,
-                      buster: QUERY_PERSIST_BUSTER,
-                      dehydrateOptions: {
-                        // Persist mutations that are queued/in-flight (paused = queued while offline)
-                        shouldDehydrateMutation: (mutation: any) => {
-                          return (
-                            mutation.state.status === "pending" ||
-                            mutation.state.status === "paused"
-                          );
-                        },
-                        // Persist successful, fresh query data so screens load instantly after app kill
-                        shouldDehydrateQuery: (query: any) => {
-                          const isFresh =
-                            Date.now() - query.state.dataUpdatedAt <
-                            StaleTime.HALF_DAY;
-                          return query.state.status === "success" && isFresh;
-                        },
-                      },
-                    }}
-                  >
-                    <Stack
-                      screenOptions={{
-                        headerShown: false,
-                        contentStyle: styles.stackContent,
-                      }}
-                    >
-                      <Stack.Screen name="(auth)" />
-                      <Stack.Screen name="(main)" />
-                    </Stack>
-                  </PersistQueryClientProvider>
-                </AlertsProvider>
-              </ThemedPaperProvider>
-              <FlashMessage
-                position="bottom"
-                style={{ marginBottom: bottom }}
-              />
-            </>
-          </ThemedSafeAreaView>
-        </SafeAreaProvider>
-      </PerformanceMeasureView>
-    </PerformanceProfiler>
+      <ThemedSafeAreaView style={styles.safeArea}>
+        <FuturisticBackground
+          show={!(isAuthenticated && user?.role === "student")}
+        />
+        <>
+          <ThemedPaperProvider>
+            <AlertsProvider>
+              <PersistQueryClientProvider
+                client={queryClient}
+                onSuccess={tanstackOnSuccess}
+                persistOptions={{
+                  persister: clientPersister,
+                  maxAge: QUERY_PERSIST_MAX_AGE_MS,
+                  buster: QUERY_PERSIST_BUSTER,
+                  dehydrateOptions: {
+                    // Persist mutations that are queued/in-flight (paused = queued while offline)
+                    shouldDehydrateMutation: (mutation: any) => {
+                      return (
+                        mutation.state.status === "pending" ||
+                        mutation.state.status === "paused"
+                      );
+                    },
+                    // Persist successful, fresh query data so screens load instantly after app kill
+                    shouldDehydrateQuery: (query: any) => {
+                      const isFresh =
+                        Date.now() - query.state.dataUpdatedAt <
+                        StaleTime.HALF_DAY;
+                      return query.state.status === "success" && isFresh;
+                    },
+                  },
+                }}
+              >
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: styles.stackContent,
+                  }}
+                >
+                  <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(main)" />
+                </Stack>
+              </PersistQueryClientProvider>
+            </AlertsProvider>
+          </ThemedPaperProvider>
+          <FlashMessage position="bottom" style={{ marginBottom: bottom }} />
+        </>
+      </ThemedSafeAreaView>
+    </SafeAreaProvider>
+    //   </PerformanceMeasureView>
+    // </PerformanceProfiler>
   );
 }

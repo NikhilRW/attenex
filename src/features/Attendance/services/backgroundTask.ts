@@ -7,6 +7,7 @@ import {
 } from "expo-location";
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import { sendPing } from "./attendanceService";
+import { parseLectureId } from "@/shared/utils/parsers";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
@@ -49,22 +50,23 @@ defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 export const startBackgroundTracking = async (lectureId: string) => {
   try {
-    storage.set("currentLectureId", lectureId);
-
-    const { status } = await requestBackgroundPermissionsAsync();
-    if (status === "granted") {
-      await startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Accuracy.Highest,
-        timeInterval: 3 * 60 * 1000, // Check every 3 minutes
-        distanceInterval: 1,
-        foregroundService: {
-          notificationTitle: "Attendance Active",
-          notificationBody: "Verifying your presence in class...",
-          notificationColor: "#4CAF50",
-        },
-        pausesUpdatesAutomatically: false,
-      });
-      console.log("Background tracking started");
+    if (parseLectureId(lectureId)) {
+      storage.set("currentLectureId", lectureId);
+      const { status } = await requestBackgroundPermissionsAsync();
+      if (status === "granted") {
+        await startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          accuracy: Accuracy.Highest,
+          timeInterval: 3 * 60 * 1000, // Check every 3 minutes
+          distanceInterval: 1,
+          foregroundService: {
+            notificationTitle: "Attendance Active",
+            notificationBody: "Verifying your presence in class...",
+            notificationColor: "#4CAF50",
+          },
+          pausesUpdatesAutomatically: false,
+        });
+        console.log("Background tracking started");
+      }
     }
   } catch (error) {
     console.error("Failed to start background tracking", error);

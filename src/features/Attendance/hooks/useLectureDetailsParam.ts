@@ -1,5 +1,6 @@
 import { lectureService } from "@/features/Classes/services/lectureService";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { parseLectureId } from "@/shared/utils/parsers";
 import {
   ALERT_MESSAGES,
   LOG_MESSAGES,
@@ -9,6 +10,7 @@ import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard
 import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { parseStudentLectureAPIResponseData } from "../utils/parsers";
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -25,20 +27,22 @@ export const useLectureDetailsParam = (
   const handledLectureId = useRef<string | null>(null);
 
   const fetchAndJoinLecture = useCallback(async () => {
-    if (lectureId) {
+    if (typeof lectureId === "string") {
       setIsFetchingLectureDetails(true);
       try {
         // First check if we already have the lecture in our list
         const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
+        console.log("Lecture To Join : "+lectureToJoin);
+        
         if (lectureToJoin) {
           await onJoinLecture(lectureToJoin);
         } else {
           try {
-            const res = (await lectureService.getStudentLectureDetails(
-              lectureId as string,
-            )) as any;
+            const res =
+              await lectureService.getStudentLectureDetails(lectureId);
 
-            if (res.success && res.data) {
+            if (res.success && parseStudentLectureAPIResponseData(res.data)) {
+              
               console.log(
                 LOG_MESSAGES.DETAILS_FETCHED,
                 "useLectureDetailsParams",
@@ -79,7 +83,7 @@ export const useLectureDetailsParam = (
   }, [alert, lectureId, lectures, onJoinLecture, router]);
 
   useEffect(() => {
-    if (lectureId && handledLectureId.current !== lectureId) {
+    if (parseLectureId(lectureId) && handledLectureId.current !== lectureId) {
       handledLectureId.current = lectureId as string;
       fetchAndJoinLecture();
     }

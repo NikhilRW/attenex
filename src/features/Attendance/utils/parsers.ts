@@ -1,6 +1,6 @@
 import * as v from "valibot";
+import { studentLectureAPIResponseSchema } from "../schema/apiResponse";
 import {
-  classNameSchema,
   passcodeSchema,
   rollNoSchema,
 } from "../schema/common";
@@ -10,21 +10,16 @@ import {
  * @param passcode - The passcode to validate
  * @returns true if valid, false otherwise
  */
-export const validatePasscode = (passcode: string): boolean =>
+export const parsePasscode = (passcode: string): boolean =>
   v.safeParse(passcodeSchema, passcode).success;
-
-/**
- * Validate class name
- * @param className - The class name to validate
- * @returns true if valid, false otherwise
- */
-export const validateClassName = (className: string): boolean =>
-  v.safeParse(classNameSchema, className).success;
 
 /**
  * Validate roll number
  * @param rollNo - The roll number to validate
  * @returns true if valid, false otherwise
  */
-export const validateRollNo = (rollNo: string): boolean =>
+export const parseRollNo = (rollNo: string): boolean =>
   v.safeParse(rollNoSchema, rollNo).success;
+
+export const parseStudentLectureAPIResponseData = (data: unknown) =>
+  v.safeParse(studentLectureAPIResponseSchema, data);

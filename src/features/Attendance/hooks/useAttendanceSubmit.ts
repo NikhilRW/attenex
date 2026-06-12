@@ -1,3 +1,4 @@
+import { parsePasscode } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
@@ -8,7 +9,6 @@ import { Lecture } from "@attendance/types/common";
 import { UseAttendanceSubmitReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
 import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
-import { validatePasscode } from "@attendance/utils/validationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -39,7 +39,7 @@ export const useAttendanceSubmit = (
     joinedLecture: Lecture;
     onSuccess: () => void;
   }) => {
-    if (!validatePasscode(passcode)) {
+    if (!parsePasscode(passcode)) {
       showErrorAlert(
         ALERT_MESSAGES.INVALID_PASSCODE.title,
         ALERT_MESSAGES.INVALID_PASSCODE.message,
