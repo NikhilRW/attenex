@@ -26,6 +26,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
   onPress,
   icon,
   label,
+  testID
 }) => {
   const scale = useSharedValue(1);
 
@@ -62,6 +63,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.optionCard(isActive), animatedContainerStyle]}
+      testID={testID}
     >
       <Animated.View
         style={[styles.optionIconContainer(isActive), animatedIconStyle]}

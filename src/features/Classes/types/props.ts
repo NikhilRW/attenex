@@ -1,4 +1,5 @@
 import { SkPath } from "@shopify/react-native-skia";
+import { RefObject } from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { AnimatedStyle, SharedValue } from "react-native-reanimated";
 import {
@@ -8,7 +9,6 @@ import {
   LectureWithCount,
 } from "./common";
 import { CreateLectureVariables } from "./params";
-import { RefObject } from "react";
 
 /**
  * AttendanceFilter component props
@@ -225,6 +225,7 @@ export interface RollSummaryModalProps {
 export interface StartLectureButtonProps {
   loading: boolean;
   onPress: () => void;
+  testID?: string; // Optional test ID for testing purposes
 }
 
 /**

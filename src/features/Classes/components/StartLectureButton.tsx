@@ -14,6 +14,7 @@ const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
 export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
   loading,
   onPress,
+  testID
 }) => {
   return (
     <TouchableOpacity
@@ -21,6 +22,7 @@ export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
       onPress={onPress}
       disabled={loading}
       haptic="impact"
+      testID={testID}
     >
       {loading ? (
         <PrimarySpinner />

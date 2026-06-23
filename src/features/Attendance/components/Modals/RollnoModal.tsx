@@ -76,6 +76,7 @@ const RollnoModal = ({
               placeholder="e.g., 2021001"
               keyboardType="default"
               autoCapitalize="characters"
+              testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.TEXT_INPUT"
             />
           </View>
 
@@ -101,6 +102,7 @@ const RollnoModal = ({
               style={styles.modalButtonWrapper}
               onPress={handleRollNoSubmit}
               haptic="impact"
+              testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.SUBMIT_BUTTON"
             >
               <PrimaryGradient
                 style={[styles.modalButton, styles.modalButtonPrimary]}

@@ -7,6 +7,7 @@ export interface ThemeOptionProps {
   onPress: () => void;
   icon: string;
   label: string;
+  testID?: string;
 }
 
 export interface ProfileSectionProps {

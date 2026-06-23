@@ -1,13 +1,13 @@
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
+import { triggerImpactHapticOn } from "@/shared/utils/haptics";
 import { FuturisticButtonProps } from "@auth/types/props";
-import { ActivityIndicator, Text,TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
 import { StyleSheet } from "react-native-unistyles";
-import { triggerImpactHapticOn } from "@/shared/utils/haptics";
-import UniLinearGradient from "@/shared/components/UniLinearGradient";
 
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
@@ -16,6 +16,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   gradient,
   disabled = false,
   loading = false,
+  testID,
 }) => {
   const buttonScale = useSharedValue(1);
 
@@ -42,6 +43,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   return (
     <Animated.View style={buttonAnimatedStyle}>
       <TouchableOpacity
+        testID={testID}
         onPressIn={handlePressIn}
         onPressOut={async () => await handlePressOut()}
         disabled={disabled || loading}

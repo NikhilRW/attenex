@@ -62,7 +62,7 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({
   return (
     <>
       <Animated.View style={[styles.header, headerAnimatedStyle]}>
-        <View>
+        <View testID="TEACHER_DASHBOARD_SCREEN.HEADER_SECTION.HEADER_TEXT_CONTAINER">
           <Text style={styles.headerTitle}>Teacher Dashboard</Text>
           <Text style={styles.headerSubtitle}>Overview & Management</Text>
         </View>

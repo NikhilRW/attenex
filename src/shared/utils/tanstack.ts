@@ -119,3 +119,11 @@ export const setupMainOfflineMutations = (queryClient: QueryClient) => {
     },
   });
 };
+
+export const isFreshQuery = (
+  dataUpdatedAt: number | undefined,
+  staleTimeMs: number,
+) => {
+  return dataUpdatedAt != null && Date.now() - dataUpdatedAt < staleTimeMs;
+};
+

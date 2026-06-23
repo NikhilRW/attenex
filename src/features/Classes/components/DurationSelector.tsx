@@ -53,6 +53,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
         <TouchableOpacity
           haptic="selection"
           onPress={onToggleDropdown}
+          testID="CREATE_LECTURE_SCREEN.DURATION_SELECTOR_BUTTON"
           style={styles.dropdown}
         >
           <Text style={styles.dropdownText}>{selectedDurationLabel}</Text>
@@ -70,6 +71,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
             value={customDuration}
             onChangeText={onChangeCustomDuration}
             keyboardType="numeric"
+            testID="CREATE_LECTURE_SCREEN.CUSTOM_DURATION_INPUT"
           />
         </View>
       )}
@@ -112,11 +114,12 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
               </View>
 
               <View style={styles.optionsWrapper}>
-                {options.map((option) => (
+                {options.map((option,index) => (
                   <TouchableOpacity
                     key={option.label}
                     onPress={() => onSelectDuration(option.value)}
                     haptic="selection"
+                    testID={`CREATE_LECTURE_SCREEN.DURATION_OPTION_${index + 1}`}
                     style={[
                       styles.optionItem,
                       duration === option.value && styles.optionItemSelected,

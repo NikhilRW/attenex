@@ -17,6 +17,7 @@ export const TopicInput: React.FC<TopicInputProps> = ({
       <Text style={styles.label}>Lecture Topic</Text>
       <TopicInputField
         style={styles.textInput}
+        testID="CREATE_LECTURE_SCREEN.LECTURE_TOPIC_INPUT" 
         placeholder="Enter lecture topic"
         value={value}
         onChangeText={onChangeText}

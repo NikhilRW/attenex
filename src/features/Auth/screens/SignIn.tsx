@@ -66,6 +66,7 @@ const SignIn = () => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   error={errors.email?.message}
+                  testID="SIGN_IN_SCREEN.EMAIL_FIELD"
                 />
               )}
             />
@@ -85,6 +86,7 @@ const SignIn = () => {
                   onTogglePassword={() => setShowPassword(!showPassword)}
                   secureTextEntry={!showPassword}
                   error={errors.password?.message}
+                  testID="SIGN_IN_SCREEN.PASSWORD_FIELD"
                 />
               )}
             />
@@ -100,6 +102,7 @@ const SignIn = () => {
               onPress={handleSubmit}
               disabled={isSubmitting || isAuthenticated}
               loading={isSubmitting}
+              testID="SIGN_IN_SCREEN.SIGN_IN_BUTTON"
             />
           </View>
 

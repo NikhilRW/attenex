@@ -6,7 +6,7 @@ import { ClassSelectorProps } from "@classes/types/props";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useMemo } from "react";
-import { Text, View } from "react-native";
+import { ListRenderItemInfo, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
@@ -45,7 +45,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
   onAddNewClass,
 }) => {
   const renderClassItem = useCallback(
-    ({ item: cls }: { item: ClassItem }) => (
+    ({ item: cls, index }: ListRenderItemInfo<ClassItem>) => (
       <TouchableOpacity
         onPress={() => onSelectClass(cls.name)}
         style={[
@@ -53,6 +53,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
           selectedClass === cls.name && styles.optionItemSelected,
         ]}
         haptic="selection"
+        testID={`CREATE_LECTURE_SCREEN.CLASS_SELECTOR_ITEM_${index + 1}`}
       >
         <Text
           style={[
@@ -98,6 +99,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
       <TouchableOpacity
         haptic="selection"
         onPress={onToggleDropdown}
+        testID={"CREATE_LECTURE_SCREEN.CLASS_SELECTOR.BUTTON"}
         style={styles.dropdown}
       >
         <Text

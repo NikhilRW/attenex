@@ -98,6 +98,7 @@ const OnGoingLecture = ({
           disabled={joining}
           activeOpacity={0.9}
           haptic="impact"
+          testID={`STUDENT_DASHBOARD.LECTURE_ITEM_${index + 1}_JOIN_BUTTON`}
         >
           <PrimaryGradient
             start={{ x: 0, y: 0 }}

@@ -36,6 +36,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
                     ? "people"
                     : "people-outline"
               }
+              testID={`SETTINGS_SCREEN.${r.toUpperCase()}_ROLE_OPTION_BUTTON`}
               label={r.charAt(0).toUpperCase() + r.slice(1)}
             />
           );
@@ -47,6 +48,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
             style={[styles.updateButton, styles.updateButtonPrimary]}
             onPress={async () => await onRoleUpdate()}
             disabled={savingRole}
+            testID="SETTINGS_SCREEN.CONFIRM_ROLE_CHANGE_BUTTON"
           >
             <Text style={styles.updateButtonText}>
               {savingRole ? "Updating..." : "Confirm Role Change"}

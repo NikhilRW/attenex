@@ -172,42 +172,55 @@
 //   },
 // }));
 
-import { View, Text } from "react-native";
-import React, { useEffect } from "react";
-import { Canvas, Path, Skia, usePathValue } from "@shopify/react-native-skia";
-import { useSharedValue, withTiming } from "react-native-reanimated";
-const path = Skia.Path.Make();
-const Test = () => {
-  const degree = useSharedValue(67);
-  const borderPath = usePathValue((path) => {
-    "worklet";
-    path.reset();
-    path.addArc({ x: 5, y: 5, width: 60, height: 60 }, 0, degree.value);
-    return path;
-  }, path);
-  useEffect(() => {
-    degree.value = withTiming(360, { duration: 2000 });
-  }, [degree]);
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Test</Text>
-      <Canvas
-        style={{
-          width: 200,
-          height: 200,
-        }}
-      >
-        <Path
-          path={borderPath}
-          color={"black"}
-          start={0}
-          end={1}
-          strokeWidth={10}
-          style={"stroke"}
-        />
-      </Canvas>
-    </View>
-  );
-};
+// import { View, Text } from "react-native";
+// import React, { useEffect } from "react";
+// import { Canvas, Path, Skia, usePathValue } from "@shopify/react-native-skia";
+// import { useSharedValue, withTiming } from "react-native-reanimated";
+// const path = Skia.Path.Make();
+// const Test = () => {
+//   const degree = useSharedValue(67);
+//   const borderPath = usePathValue((path) => {
+//     "worklet";
+//     path.reset();
+//     path.addArc({ x: 5, y: 5, width: 60, height: 60 }, 0, degree.value);
+//     return path;
+//   }, path);
+//   useEffect(() => {
+//     degree.value = withTiming(360, { duration: 2000 });
+//   }, [degree]);
+//   return (
+//     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+//       <Text>Test</Text>
+//       <Canvas
+//         style={{
+//           width: 200,
+//           height: 200,
+//         }}
+//       >
+//         <Path
+//           path={borderPath}
+//           color={"black"}
+//           start={0}
+//           end={1}
+//           strokeWidth={10}
+//           style={"stroke"}
+//         />
+//       </Canvas>
+//     </View>
+//   );
+// };
 
-export default Test;
+// export default Test;
+
+import { View, Text } from 'react-native'
+import React from 'react'
+
+const Test = () => {
+  return (
+    <View>
+      <Text>Test</Text>
+    </View>
+  )
+}
+
+export default Test

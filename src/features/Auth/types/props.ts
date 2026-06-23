@@ -36,6 +36,7 @@ export interface FuturisticButtonProps {
   gradient?: string[];
   disabled?: boolean;
   loading?: boolean;
+  testID: string;
 }
 
 /**

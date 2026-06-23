@@ -1,3 +1,4 @@
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { CreateLectureFormCardProps } from "@classes/types/props";
 import { LinearGradient } from "expo-linear-gradient";
@@ -8,7 +9,6 @@ import { ClassSelector } from "./ClassSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
 import { TopicInput } from "./TopicInput";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 const CreateLectureCardGradient = withUnistyles(
   LinearGradient,
@@ -72,6 +72,7 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
       <View>
         <StartLectureButton
           loading={loading}
+          testID="CREATE_LECTURE_SCREEN.START_LECTURE.BUTTON"
           onPress={() =>
             onCreateLecture({
               customDuration,
