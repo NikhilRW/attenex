@@ -13,12 +13,13 @@
     "test:coverage": "jest --coverage --watchAll=false",
     "test:update:snapshot": "jest --updateSnapshot",
     "format": "prettier --write .",
-    "e2e:debug":"detox test -c android.att.debug"
+    "e2e:debug": "detox test -c android.att.debug"
   },
   "dependencies": {
     "@expo-google-fonts/google-sans": "^0.4.0",
     "@expo-google-fonts/inter": "^0.4.2",
     "@hookform/resolvers": "^5.2.2",
+    "@legendapp/list": "^3.2.0",
     "@react-native-firebase/app": "^23.7.0",
     "@react-native-firebase/messaging": "^23.7.0",
     "@react-native-google-signin/google-signin": "^16.0.0",

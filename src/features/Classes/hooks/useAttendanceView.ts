@@ -2,6 +2,7 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
@@ -57,6 +58,7 @@ export const useAttendanceView = () => {
   const [manualRollNo, setManualRollNo] = useState("");
   const [manualAttendanceError, setManualAttendanceError] = useState("");
   const { isConnected } = useNetworkState();
+  const userRole = useAuthStore((state) => state.user?.role);
 
   const { alert } = useHapticAlerts();
 
@@ -88,7 +90,7 @@ export const useAttendanceView = () => {
 
   useEffect(() => {
     socketService.connect();
-    socketService.joinLecture(lectureId);
+    socketService.joinLecture(lectureId, userRole || "teacher");
 
     const handleStudentJoined = (data: any) => {
       if (data.lectureId === lectureId) {
@@ -119,26 +121,25 @@ export const useAttendanceView = () => {
 
       if (!socketService.isConnected()) {
         socketService.connect();
-        socketService.joinLecture(lectureId);
+        socketService.joinLecture(lectureId, userRole || "teacher");
       }
       refetchAttendance();
     });
 
     return () => {
-      socketService.leaveLecture(lectureId);
       socketService.offStudentJoined();
       socketService.offAttendanceSubmitted();
       socketService.offStudentLeaved();
       subscription.remove();
     };
-  }, [lectureId, refetchAttendance]);
+  }, [lectureId, refetchAttendance, userRole]);
 
   // Ensure connection when screen regains focus + initial data fetch with freshness check
   useFocusEffect(
     useCallback(() => {
       if (!socketService.isConnected()) {
         socketService.connect();
-        socketService.joinLecture(lectureId);
+        socketService.joinLecture(lectureId,userRole || "teacher");
       }
       // Only fetch if data is not already fresh (e.g. from prefetch on LectureCard press)
       const queryState = queryClient.getQueryState(
@@ -152,7 +153,7 @@ export const useAttendanceView = () => {
         refetchAttendance();
       }
       return () => {};
-    }, [lectureId, queryClient, refetchAttendance]),
+    }, [lectureId, queryClient, refetchAttendance, userRole]),
   );
 
   const filteredAttendance = useMemo(() => {
@@ -217,13 +218,22 @@ export const useAttendanceView = () => {
   }, [attendance]);
 
   const handleCopyRollNumbers = useCallback(async () => {
+    setShowRollSummary(false);
     if (attendanceSummary.presentRollNumbers) {
       await setStringAsync(attendanceSummary.presentRollNumbers);
-      alert("Copied!", "Roll numbers copied to clipboard");
+      showMessage({
+        message: "Copied to clipboard",
+        type: "success",
+        duration: 2000,
+      });
     } else {
-      alert("No Data", "No present students with roll numbers");
+      showMessage({
+        message: "No present students with roll numbers",
+        type: "danger",
+        duration: 2000,
+      });
     }
-  }, [alert, attendanceSummary.presentRollNumbers]);
+  }, [attendanceSummary.presentRollNumbers]);
 
   const handleManualRollNoChange = useCallback(
     (value: string) => {
@@ -299,9 +309,6 @@ export const useAttendanceView = () => {
     setManualRollNo: handleManualRollNoChange,
     manualAttendanceError,
     isSubmittingManual,
-    presentCount: attendanceSummary.presentCount,
-    incompleteCount: attendanceSummary.incompleteCount,
-    absentCount: attendanceSummary.absentCount,
     presentRollNumbers: attendanceSummary.presentRollNumbers,
     handleCopyRollNumbers,
     handleManualAttendance,

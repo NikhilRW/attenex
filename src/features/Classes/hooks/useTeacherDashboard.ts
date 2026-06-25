@@ -2,6 +2,7 @@ import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { parseEndedTrue, parseLectureId } from "@/shared/utils/parsers";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
@@ -93,7 +94,7 @@ export const useTeacherDashboard = () => {
     lectures?: string;
     size?: string;
   }>();
-  const { ended, lectureId } = params;
+  const { ended, lectureId, } = params;
 
   const { alert } = useHapticAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -121,9 +122,9 @@ export const useTeacherDashboard = () => {
   const stressOptions = useMemo(
     () =>
       getTeacherDashboardStressOptions({
-        stress: params.stress,
-        mock: params.mock,
-        count: params.count,
+        stress: params.stress || "enabled",
+        mock: params.mock || "enabled",
+        count: params.count || "10000",
         lectures: params.lectures,
         size: params.size,
       }),
@@ -132,11 +133,13 @@ export const useTeacherDashboard = () => {
 
   const mockLectures = useMemo<LectureWithCount[]>(
     () =>
-      stressOptions.enabled
-        ? generateMockLectures(stressOptions.lectureCount)
+      stressOptions.enabled || true
+        ? generateMockLectures(1000)
         : [],
-    [stressOptions.enabled, stressOptions.lectureCount],
+    [stressOptions.enabled],
   );
+  const { user } = useAuthStore.getState();
+  const userRole = user?.role || "teacher";
 
   const fetchActiveLecturesQueryFn = useCallback(async (): Promise<
     LectureWithCount[]
@@ -150,10 +153,10 @@ export const useTeacherDashboard = () => {
   >({
     queryKey: queryKeys.lectures.teacher,
     queryFn: fetchActiveLecturesQueryFn,
-    networkMode: "offlineFirst",
+    networkMode: "online",
     gcTime: Infinity,
     refetchInterval: StaleTime.MINUTES_2,
-    enabled: false,
+    enabled: true,
   });
 
   const effectiveLectures = useMemo<LectureWithCount[]>(
@@ -198,27 +201,73 @@ export const useTeacherDashboard = () => {
     }
   }, [ended, fetchActiveLectures, lectureId, router, stressOptions.enabled]);
 
+  const handleStudentJoined = useCallback(
+    ({
+      lectureId,
+    }: {
+      lectureId: string;
+      studentId: string;
+      studentName: string;
+    }) => {
+      console.log("TeacherDashboard :: student joined :: ", lectureId);
+      queryClient.setQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+        (old) => {
+          if (!old) return [];
+          return old.map((lecture) =>
+            lecture.id === lectureId
+              ? {
+                  ...lecture,
+                  studentCount: lecture.studentCount + 1,
+                  absentCount: Math.max(0, (lecture.absentCount || 0) - 1),
+                }
+              : lecture,
+          );
+        },
+      );
+    },
+    [queryClient],
+  );
+
+  const handleStudentLeaved = useCallback(
+    (lectureId: string) => {
+      console.log("student leaved the lecture: ", lectureId);
+
+      queryClient.setQueryData<LectureWithCount[]>(
+        queryKeys.lectures.teacher,
+        (old) => {
+          if (!old) return [];
+          return old.map((lecture) =>
+            lecture.id === lectureId
+              ? {
+                  ...lecture,
+                  studentCount: Math.max(0, lecture.studentCount - 1),
+                  absentCount: Math.min(
+                    lecture.absentCount || 0 + 1,
+                    lecture.totalClassStudents || 0,
+                  ),
+                }
+              : lecture,
+          );
+        },
+      );
+    },
+    [queryClient],
+  );
+
+  const lectureIds = (lectures || []).map((lecture) => lecture.id);
   useEffect(() => {
     if (stressOptions.enabled) {
       return;
     }
-
-    const lectureIds = (lectures || []).map((lecture) => lecture.id);
-
+    // TODO: test its true reactivity.
     try {
       socketService.connect();
-      lectureIds.forEach((id) => socketService.joinLecture(id));
-
-      const handleStudentJoined = () => {
-        fetchActiveLectures();
-      };
-
-      const handleAttendanceSubmitted = () => {
-        fetchActiveLectures();
-      };
-
+      lectureIds.forEach((id) =>
+        socketService.joinLecture(id, userRole || "teacher"),
+      );
       socketService.onStudentJoined(handleStudentJoined);
-      socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+      socketService.onStudentLeaved(handleStudentLeaved);
 
       const appStateSubscription = AppState.addEventListener(
         "change",
@@ -229,9 +278,11 @@ export const useTeacherDashboard = () => {
 
           if (!socketService.isConnected()) {
             socketService.connect();
-            lectureIds.forEach((id) => socketService.joinLecture(id));
+            lectureIds.forEach((id) =>
+              socketService.joinLecture(id, userRole || "teacher"),
+            );
             socketService.onStudentJoined(handleStudentJoined);
-            socketService.onAttendanceSubmitted(handleAttendanceSubmitted);
+            socketService.onStudentLeaved(handleStudentLeaved);
           }
 
           if (
@@ -246,18 +297,13 @@ export const useTeacherDashboard = () => {
       return () => {
         lectureIds.forEach((id) => socketService.leaveLecture(id));
         socketService.offStudentJoined();
-        socketService.offAttendanceSubmitted();
+        socketService.offStudentLeaved();
         appStateSubscription.remove();
       };
     } catch {
       return undefined;
     }
-  }, [
-    lectures,
-    fetchActiveLectures,
-    latestCreateLectureMutation,
-    stressOptions.enabled,
-  ]);
+  }, [fetchActiveLectures, handleStudentJoined, handleStudentLeaved, latestCreateLectureMutation, lectureIds, queryClient, stressOptions.enabled, userRole]);
 
   const handleEndLecture = useCallback(
     (id: string, lectureTitle: string) => {

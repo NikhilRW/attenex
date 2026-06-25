@@ -136,16 +136,18 @@ io.on("connection", (socket) => {
   logger.info(`Client connected: ${socket.id}`);
 
   // Join a lecture room (both students and teachers)
-  socket.on("joinLecture", (lectureId: string) => {
+  socket.on("joinLecture", (lectureId: string, role: User["role"]) => {
     socket.join(`lecture-${lectureId}`);
+    if (role === "student") {
+      io.to(`lecture-${lectureId}`).emit("studentJoined", lectureId);
+    }
     logger.info(`Socket ${socket.id} joined lecture-${lectureId}`);
   });
 
   // Leave a lecture room
   socket.on("leaveLecture", (lectureId: string, role: User["role"]) => {
-    logger.info("onStudentLeaved : " + lectureId);
     if (role === "student") {
-      socket.emit("studentLeavedLecture", lectureId);
+      io.to(`lecture-${lectureId}`).emit("studentLeavedLecture", lectureId);
     }
     socket.leave(`lecture-${lectureId}`);
     logger.info(`Socket ${socket.id} left lecture-${lectureId}`);

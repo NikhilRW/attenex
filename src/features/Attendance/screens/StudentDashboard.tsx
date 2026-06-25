@@ -208,11 +208,15 @@ const StudentDashboard = () => {
   }, [joinedLecture, setJoinedLecture, setStatus, refreshLectures, user?.role]);
 
   // If joined and lecture is still active - show ongoing status
-  useMemo(() => {
+  useEffect(() => {
     if (status === "joined" && lectureStatus === "active") {
-      router.navigate("/lecture-ongoing");
+      router.navigate(
+        joinedLecture?.id
+          ? `/lecture-ongoing?lectureId=${joinedLecture.id}`
+          : "/lecture-ongoing",
+      );
     }
-  }, [lectureStatus, status]);
+  }, [joinedLecture?.id, lectureStatus, status]);
 
   // Show loading screen while fetching lecture details
   if (isFetchingLectureDetails) {

@@ -54,9 +54,9 @@ class SocketService {
   /**
    * Join a lecture room to receive updates
    */
-  joinLecture(lectureId: string) {
+  joinLecture(lectureId: string, role: User["role"]) {
     if (this.socket) {
-      this.socket.emit("joinLecture", lectureId);
+      this.socket.emit("joinLecture", lectureId, role);
       // console.log(`Joined lecture room: lecture-${lectureId}`);
     }
   }
@@ -67,7 +67,6 @@ class SocketService {
   leaveLecture(lectureId: string, role?: User["role"]) {
     if (this.socket) {
       this.socket.emit("leaveLecture", lectureId, role);
-      // console.log(`Left lecture room: lecture-${lectureId}`);
     }
   }
 
@@ -153,11 +152,11 @@ class SocketService {
   }
 
   /**
-   * Remove student joined listener
+   * Remove student leaved listener
    */
   offStudentLeaved() {
     if (this.socket) {
-      this.socket.off("leaveLecture");
+      this.socket.off("studentLeavedLecture");
     }
   }
 

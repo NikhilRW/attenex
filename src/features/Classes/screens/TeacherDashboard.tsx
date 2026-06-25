@@ -26,6 +26,8 @@ import { withUnistyles } from "react-native-unistyles";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
+// TODO: learn legend list performance optimization
+
 const SearchIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));

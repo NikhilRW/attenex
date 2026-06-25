@@ -119,7 +119,7 @@ export default (): ExpoConfig => ({
           enablePngCrunchInReleaseBuilds: true,
           extraProguardRules: [
             // Keep your app classes
-            "-keep class com.myapp.** { *; }",
+            "-keep class com.attenex.attenex.** { *; }",
 
             // React Native essentials
             "-keep class com.facebook.react.** { *; }",

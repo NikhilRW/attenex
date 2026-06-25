@@ -54,7 +54,6 @@ describe("App", () => {
     const signInButton = element(by.id(signInButtonTestId));
     const emailField = element(by.id(emailFieldTestId));
     const passwordField = element(by.id(passwordFieldTestId));
-
     await emailField.typeText("nikhilwankhede0707@gmail.com");
     await passwordField.typeText("#Nikhil009");
 

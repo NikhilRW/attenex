@@ -32,9 +32,6 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
   visible,
   onClose,
   presentRollNumbers,
-  presentCount,
-  incompleteCount,
-  absentCount,
   onCopy,
 }) => {
   return (
@@ -71,27 +68,6 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
                 <Text style={styles.rollNumberText} selectable>
                   {presentRollNumbers || "No present students"}
                 </Text>
-              </View>
-
-              <View style={styles.modalStats}>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#4ADE80" }]}>
-                    {presentCount}
-                  </Text>
-                  <Text style={styles.statLabelSmall}>Present</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#FBBF24" }]}>
-                    {incompleteCount}
-                  </Text>
-                  <Text style={styles.statLabelSmall}>Incomplete</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#F87171" }]}>
-                    {absentCount}
-                  </Text>
-                  <Text style={styles.statLabelSmall}>Absent</Text>
-                </View>
               </View>
             </View>
 

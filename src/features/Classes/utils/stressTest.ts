@@ -1,6 +1,6 @@
 import { LectureWithCount } from "@classes/types/common";
 
-const STRESS_ENABLED_VALUES = new Set(["1", "true", "yes", "on"]);
+const STRESS_ENABLED_VALUES = new Set(["1", "true", "yes", "on", "enabled"]);
 const DEFAULT_LECTURE_COUNT = 2000;
 const MAX_LECTURE_COUNT = 20000;
 

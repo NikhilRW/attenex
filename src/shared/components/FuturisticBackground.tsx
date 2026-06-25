@@ -15,7 +15,6 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withDelay,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
@@ -109,13 +108,16 @@ export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
   const isVisible = isDark && show;
 
   const opacityAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: withDelay(300, withTiming(isVisible ? 1 : 0, { duration: 0 })),
+    opacity: withTiming(isVisible ? 1 : 0, { duration: 0 }),
   }));
 
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.container(isStudent,isAuthenticated), opacityAnimatedStyle]}
+      style={[
+        styles.container(isStudent, isAuthenticated),
+        opacityAnimatedStyle,
+      ]}
     >
       <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}

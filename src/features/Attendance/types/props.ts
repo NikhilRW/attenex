@@ -16,7 +16,7 @@ export interface LectureEndedProps {
 }
 
 export interface LectureOngoingProps {
-  handleLeaveLecture: () => Promise<void>;
+  handleLeaveLecture: () => void;
   joinedLecture: Lecture;
   joining?: boolean;
 }

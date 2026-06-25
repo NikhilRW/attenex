@@ -213,9 +213,6 @@ export interface RollSummaryModalProps {
   visible: boolean;
   onClose: () => void;
   presentRollNumbers: string;
-  presentCount: number;
-  incompleteCount: number;
-  absentCount: number;
   onCopy: () => void;
 }
 

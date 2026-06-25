@@ -35,6 +35,7 @@ import {
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 const QUERY_PERSIST_MAX_AGE_MS = StaleTime.DAYS_5;
@@ -174,15 +175,17 @@ export default function RootLayout() {
                   },
                 }}
               >
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: styles.stackContent,
-                  }}
-                >
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(main)" />
-                </Stack>
+                <GestureHandlerRootView>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: styles.stackContent,
+                    }}
+                  >
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(main)" />
+                  </Stack>
+                </GestureHandlerRootView>
               </PersistQueryClientProvider>
             </AlertsProvider>
           </ThemedPaperProvider>

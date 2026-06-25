@@ -4,7 +4,6 @@ import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants
 import { joinLecture } from "@attendance/services/attendanceService";
 import {
   startBackgroundTracking,
-  stopBackgroundTracking,
 } from "@attendance/services/backgroundTask";
 import { Lecture } from "@attendance/types/common";
 import {
@@ -12,7 +11,6 @@ import {
   UseAttendanceJoinReturn,
 } from "@attendance/types/studentDashboard.types";
 import {
-  showDestructiveAlert,
   showErrorAlert,
   showSuccessAlert,
 } from "@attendance/utils/alertUtils";
@@ -187,30 +185,11 @@ export const useAttendanceJoin = (
     retry: retryJoinUnlessLocationTooFar,
   });
 
-  const handleLeaveLecture = useCallback(
-    async (onLectureLeft: () => void) => {
-      showDestructiveAlert(
-        ALERT_MESSAGES.LEAVE_LECTURE.title,
-        ALERT_MESSAGES.LEAVE_LECTURE.message,
-        alert,
-        "Leave",
-        async () => {
-          await stopBackgroundTracking();
-          setJoinedLecture(null);
-          setStatus("idle");
-          onLectureLeft();
-        },
-      );
-    },
-    [alert],
-  );
-
   return {
     joinedLecture,
     status,
     loadingLectureId,
     handleJoin,
-    handleLeaveLecture,
     setJoinedLecture,
     setStatus,
     proceedWithJoin,

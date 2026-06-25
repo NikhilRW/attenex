@@ -51,6 +51,9 @@ export const useSettings = () => {
             queryKey: queryKeys.lectures.student,
           });
         } else {
+          await queryClient.cancelQueries({
+            queryKey: queryKeys.lectures.teacher,
+          });
           queryClient.removeQueries({
             queryKey: queryKeys.lectures.teacher,
           });

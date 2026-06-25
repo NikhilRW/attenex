@@ -1,4 +1,5 @@
 import { queryKeys } from "@/shared/constants/queryKeys";
+import { useAuthStore } from "@/shared/stores/authStore";
 import { lectureService } from "@classes/services/lectureService";
 import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
@@ -18,6 +19,7 @@ export const useLectureEnded = () => {
   const { lectureId, lectureTitle } = params as Record<string, string>;
   const { alert } = useAlerts();
   const [livePasscode, setLivePasscode] = useState<string | null>(null);
+  const userRole = useAuthStore((state) => state.user?.role);
   // const [, setLastUpdated] = useState<Date | null>(null);
 
   // Animation for passcode glow effect
@@ -57,7 +59,7 @@ export const useLectureEnded = () => {
   useEffect(() => {
     // Connect to socket and join lecture room
     socketService.connect();
-    socketService.joinLecture(lectureId as string);
+    socketService.joinLecture(lectureId as string, userRole || "teacher");
 
     // Listen for passcode refresh events
     socketService.onPasscodeRefresh((data) => {
@@ -73,7 +75,7 @@ export const useLectureEnded = () => {
       socketService.leaveLecture(lectureId as string);
       socketService.offPasscodeRefresh();
     };
-  }, [lectureId]);
+  }, [lectureId, userRole]);
 
   const handleDone = useCallback(() => {
     router.back();

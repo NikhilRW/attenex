@@ -46,9 +46,6 @@ const AttendanceViewScreen = () => {
     setManualRollNo,
     manualAttendanceError,
     isSubmittingManual,
-    presentCount,
-    incompleteCount,
-    absentCount,
     presentRollNumbers,
     handleCopyRollNumbers,
     handleManualAttendance,
@@ -111,9 +108,6 @@ const AttendanceViewScreen = () => {
         visible={showRollSummary}
         onClose={() => setShowRollSummary(false)}
         presentRollNumbers={presentRollNumbers}
-        presentCount={presentCount}
-        incompleteCount={incompleteCount}
-        absentCount={absentCount}
         onCopy={handleCopyRollNumbers}
       />
 

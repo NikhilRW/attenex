@@ -77,12 +77,12 @@ export const useSocketManager = (
     return () => {
       socketService.offLectureEnded();
     };
-  }, [joinedLecture]);
+  }, [alert, joinedLecture]);
 
   // Join/leave lecture room when joinedLecture changes
   useEffect(() => {
     if (joinedLecture) {
-      socketService.joinLecture(joinedLecture.id);
+      socketService.joinLecture(joinedLecture.id, user?.role || "student");
       console.log(`${LOG_MESSAGES.JOINED_ROOM} ${joinedLecture.id}`);
     }
 

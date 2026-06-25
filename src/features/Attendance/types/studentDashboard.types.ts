@@ -26,7 +26,6 @@ export interface UseAttendanceJoinReturn {
   joinedLecture: Lecture | null;
   status: JoinStatus;
   handleJoin: (lecture: Lecture) => Promise<void>;
-  handleLeaveLecture: (onLectureLeft: () => void) => Promise<void>;
   setJoinedLecture: Dispatch<SetStateAction<Lecture | null>>;
   setStatus: Dispatch<SetStateAction<JoinStatus>>;
   proceedWithJoin: (data: {
