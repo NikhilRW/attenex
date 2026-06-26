@@ -1,3 +1,5 @@
+import { spacing } from "./spacing";
+
 // Attenex Color Palette - Digital Trust Blue Theme
 export const staticColors = {
   white: "#FFFFFF",
@@ -69,6 +71,7 @@ export const darkTheme = {
     warning: "#F59E0B",
     info: "#3B82F6",
   },
+  spacing,
 } as const;
 
 export const lightTheme = {
@@ -136,6 +139,7 @@ export const lightTheme = {
     warning: "#D97706",
     info: "#2563EB",
   },
+  spacing,
 } as const;
 
 export { darkTheme as colors };

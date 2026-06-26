@@ -22,7 +22,7 @@ const styles = StyleSheet.create((theme, rt) => {
       paddingBottom: 70,
     },
     headerSection: {
-      marginBottom: 24,
+      marginBottom: theme.spacing.lg,
     },
     title: {
       fontSize: 32,
