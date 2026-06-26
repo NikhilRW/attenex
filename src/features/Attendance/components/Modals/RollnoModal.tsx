@@ -34,7 +34,10 @@ const RollnoModal = ({
   setRollNo,
   handleRollNoSubmit,
   setPendingLecture,
+  errorMessage,
 }: RollnoModalProps) => {
+  const hasError = Boolean(errorMessage);
+
   return (
     <UniModal
       visible={showRollNoModal}
@@ -69,15 +72,26 @@ const RollnoModal = ({
             <Text style={[styles.modalLabel, styles.modalLabelSecondary]}>
               Please enter your roll number to continue
             </Text>
-            <UniTextInput
-              style={[styles.modalInput, styles.modalInputField]}
-              value={rollNo}
-              onChangeText={setRollNo}
-              placeholder="e.g., 2021001"
-              keyboardType="default"
-              autoCapitalize="characters"
-              testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.TEXT_INPUT"
-            />
+            <View
+              style={[
+                styles.modalInput,
+                styles.modalInputField,
+                hasError && styles.inputContainerError,
+              ]}
+            >
+              <UniTextInput
+                style={styles.modalInputText}
+                value={rollNo}
+                onChangeText={setRollNo}
+                placeholder="e.g., 2021001"
+                keyboardType="default"
+                autoCapitalize="characters"
+                testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.TEXT_INPUT"
+              />
+            </View>
+            {hasError ? (
+              <Text style={styles.rollnoModalError}>{errorMessage}</Text>
+            ) : null}
           </View>
 
           <View style={styles.modalFooter}>

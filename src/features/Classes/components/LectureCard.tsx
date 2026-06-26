@@ -11,8 +11,8 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { LayoutChangeEvent, Text, View } from "react-native";
 import Animated, {
   Easing,
-  interpolate,
-  useAnimatedStyle,
+  // interpolate,
+  // useAnimatedStyle,
   useSharedValue,
   withDelay,
   withRepeat,
@@ -84,21 +84,21 @@ const LectureCard: React.FC<LectureCardProps> = ({
 
   const CardGradient = isPending ? PendingGradient : DefaultGradient;
 
-  const animatedLoadingState = useAnimatedStyle(() => {
-    const focusOpacity = interpolate(focusProgress.value, [0, 1], [0, 1]);
+  // const animatedLoadingState = useAnimatedStyle(() => {
+  //   const focusOpacity = interpolate(focusProgress.value, [0, 1], [0, 1]);
 
-    return {
-      opacity: opacity.value * focusOpacity,
-      transform: [
-        {
-          translateY: interpolate(focusProgress.value, [0, 1], [18, 0]),
-        },
-        {
-          scale: interpolate(focusProgress.value, [0, 1], [0.985, 1]),
-        },
-      ],
-    };
-  });
+  //   return {
+  //     opacity: opacity.value * focusOpacity,
+  //     transform: [
+  //       {
+  //         translateY: interpolate(focusProgress.value, [0, 1], [18, 0]),
+  //       },
+  //       {
+  //         scale: interpolate(focusProgress.value, [0, 1], [0.985, 1]),
+  //       },
+  //     ],
+  //   };
+  // });
 
   const formattedCreatedTime = useMemo(
     () =>
@@ -155,7 +155,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
     <Animated.View
       onLayout={handleLayout}
       key={lecture.id}
-      style={animatedLoadingState}
+      // style={animatedLoadingState}
     >
       <CardGradient
         style={[

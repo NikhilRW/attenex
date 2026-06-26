@@ -63,7 +63,8 @@ export interface RollnoModalProps {
   showRollNoModal: boolean;
   setShowRollNoModal: Dispatch<SetStateAction<boolean>>;
   rollNo: string;
-  setRollNo: Dispatch<SetStateAction<string>>;
+  setRollNo: (rollNo: string) => void;
   handleRollNoSubmit: () => void;
   setPendingLecture: Dispatch<SetStateAction<Lecture | null>>;
+  errorMessage: string;
 }

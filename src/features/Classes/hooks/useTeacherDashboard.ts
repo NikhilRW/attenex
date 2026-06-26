@@ -94,7 +94,7 @@ export const useTeacherDashboard = () => {
     lectures?: string;
     size?: string;
   }>();
-  const { ended, lectureId, } = params;
+  const { ended, lectureId } = params;
 
   const { alert } = useHapticAlerts();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -124,7 +124,7 @@ export const useTeacherDashboard = () => {
       getTeacherDashboardStressOptions({
         stress: params.stress || "enabled",
         mock: params.mock || "enabled",
-        count: params.count || "10000",
+        count: params.count || "1000",
         lectures: params.lectures,
         size: params.size,
       }),
@@ -132,10 +132,7 @@ export const useTeacherDashboard = () => {
   );
 
   const mockLectures = useMemo<LectureWithCount[]>(
-    () =>
-      stressOptions.enabled || true
-        ? generateMockLectures(1000)
-        : [],
+    () => (stressOptions.enabled || true ? generateMockLectures(1000) : []),
     [stressOptions.enabled],
   );
   const { user } = useAuthStore.getState();
@@ -303,7 +300,16 @@ export const useTeacherDashboard = () => {
     } catch {
       return undefined;
     }
-  }, [fetchActiveLectures, handleStudentJoined, handleStudentLeaved, latestCreateLectureMutation, lectureIds, queryClient, stressOptions.enabled, userRole]);
+  }, [
+    fetchActiveLectures,
+    handleStudentJoined,
+    handleStudentLeaved,
+    latestCreateLectureMutation,
+    lectureIds,
+    queryClient,
+    stressOptions.enabled,
+    userRole,
+  ]);
 
   const handleEndLecture = useCallback(
     (id: string, lectureTitle: string) => {
@@ -587,13 +593,14 @@ export const useTeacherDashboard = () => {
     [lectureRowHeightRef],
   );
 
+  
   const flatListPerformanceProps = useMemo(
     () => ({
       removeClippedSubviews: true,
       initialNumToRender: 8,
-      maxToRenderPerBatch: 8,
-      updateCellsBatchingPeriod: 40,
-      windowSize: 16,
+      maxToRenderPerBatch: 106,
+      updateCellsBatchingPeriod: 20,
+      windowSize: 106,
     }),
     [],
   );

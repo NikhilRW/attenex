@@ -25,9 +25,6 @@ import Animated, {
 import { withUnistyles } from "react-native-unistyles";
 import { useTeacherDashboard } from "../hooks/useTeacherDashboard";
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-
-// TODO: learn legend list performance optimization
-
 const SearchIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));
@@ -171,6 +168,7 @@ const TeacherDashboard = () => {
               onScroll={onScroll}
               scrollEventThrottle={16}
               {...flatListPerformanceProps}
+              // disableVirtualization
               itemLayoutAnimation={LinearTransition.springify()}
               extraData={searchQuery}
               ListHeaderComponent={

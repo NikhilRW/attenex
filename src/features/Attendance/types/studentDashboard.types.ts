@@ -66,11 +66,12 @@ export interface UseRollNoManagementReturn {
   rollNo: string;
   showRollNoModal: boolean;
   pendingLecture: Lecture | null;
-  setRollNo: Dispatch<SetStateAction<string>>;
+  setRollNo: (rollNo: string) => void;
   setShowRollNoModal: Dispatch<SetStateAction<boolean>>;
   setPendingLecture: Dispatch<SetStateAction<Lecture | null>>;
   handleRollNoSubmit: (fn: (rollNo: string) => Promise<void>) => void;
   requestRollNo: (lecture: Lecture) => void;
+  errorMessage: string;
 }
 
 export interface UseLectureDetailsParamReturn {

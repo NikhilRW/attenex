@@ -87,6 +87,7 @@ const StudentDashboard = () => {
     setPendingLecture,
     handleRollNoSubmit,
     requestRollNo,
+    errorMessage,
   } = useRollNoManagement();
 
   // Attendance join management
@@ -298,6 +299,7 @@ const StudentDashboard = () => {
         setRollNo={setRollNo}
         handleRollNoSubmit={() => handleRollNoSubmit(onRollNoSubmit)}
         setPendingLecture={setPendingLecture}
+        errorMessage={errorMessage}
       />
     </>
   );

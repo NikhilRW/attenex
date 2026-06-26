@@ -510,6 +510,16 @@ const styles = StyleSheet.create((theme, rt) => {
         : "rgba(0, 0, 0, 0.03)",
       borderColor: theme.surface.glassBorder,
     },
+    inputContainerError: {
+      borderColor: theme.status.error,
+    },
+    rollnoModalError: {
+      color: theme.status.error,
+      fontSize: 13,
+      fontWeight: "600",
+      lineHeight: 18,
+      marginTop: 8,
+    },
     modalFooter: {
       flexDirection: "row",
       gap: 12,

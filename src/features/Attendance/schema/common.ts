@@ -9,4 +9,6 @@ export const passcodeSchema = v.pipe(
   v.custom((value) => /^\d{4}$/.test(value as string)),
 );
 
-export const rollNoSchema = v.pipe(v.string(), v.trim(), v.minLength(1));
+// simple roll number regex with numbers alphabets(small and capital both) and hyphen
+
+export const rollNoSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.regex(/^[a-zA-Z0-9-]+$/));

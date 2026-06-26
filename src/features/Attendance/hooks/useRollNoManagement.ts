@@ -1,13 +1,9 @@
 import { parseRollNo } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
-import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";
-import { showErrorAlert } from "@attendance/utils/alertUtils";
-import { logger } from "@shared/utils/logger";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -15,16 +11,21 @@ import { useState } from "react";
  * Custom hook to manage roll number handling
  */
 export const useRollNoManagement = (): UseRollNoManagementReturn => {
-  const [rollNo, setRollNo] = useState("");
+  const [rollNo, setRollNoState] = useState("");
   const [showRollNoModal, setShowRollNoModal] = useState(false);
   const [pendingLecture, setPendingLecture] = useState<Lecture | null>(null);
-  const { alert } = useHapticAlerts();
+  const [errorMessage, setErrorMessage] = useState("");
   const { updateUser, user } = useAuthStore();
+
+  const setRollNo = (value: string) => {
+    setRollNoState(value);
+  };
 
   const handleRollNoSubmitMutateFn = async (
     onSubmit: (rollNo: string) => Promise<void>,
   ) => {
     if (!parseRollNo(rollNo)) {
+      setErrorMessage("Invalid roll number entered");
       return false;
     }
     setShowRollNoModal(false);
@@ -41,31 +42,22 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
       updateUser({ rollNo: rollNo.trim() });
       return contextRollNo;
     },
-    onSuccess: () => {
-      setPendingLecture(null);
-      setRollNo("");
-    },
-    onSettled: (data, error, _, contextRollNo) => {
-      if (data === false || error) {
-        showErrorAlert(
-          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.title,
-          ALERT_MESSAGES.ROLL_NO_NOT_UPDATED.message,
-          alert,
-        );
-        updateUser({ rollNo: contextRollNo });
+    onSuccess: (data) => {
+      if (data === true) {
+        setPendingLecture(null);
+        setRollNoState("");
+        setErrorMessage("");
       }
     },
-    onError: (error) => {
-      logger.error(error.message);
-      showErrorAlert(
-        "Roll no not updated successfully",
-        "Kindly try again",
-        alert,
-      );
+    onSettled: (_data, error, _, contextRollNo) => {
+      if (error) {
+        updateUser({ rollNo: contextRollNo });
+      }
     },
   });
 
   const requestRollNo = (lecture: Lecture) => {
+    setErrorMessage("");
     setPendingLecture(lecture);
     setShowRollNoModal(true);
   };
@@ -79,5 +71,6 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
     setPendingLecture,
     handleRollNoSubmit,
     requestRollNo,
+    errorMessage,
   };
 };
