@@ -122,8 +122,8 @@ export const useTeacherDashboard = () => {
   const stressOptions = useMemo(
     () =>
       getTeacherDashboardStressOptions({
-        stress: params.stress ,
-        mock: params.mock ,
+        stress: params.stress,
+        mock: params.mock,
         count: params.count,
         lectures: params.lectures,
         size: params.size,
@@ -199,24 +199,26 @@ export const useTeacherDashboard = () => {
   }, [ended, fetchActiveLectures, lectureId, router, stressOptions.enabled]);
 
   const handleStudentJoined = useCallback(
-    ({
-      lectureId,
-    }: {
+    (payload: {
       lectureId: string;
       studentId: string;
       studentName: string;
+      joinTime: string;
+      studentCount: number;
+      absentCount: number;
+      totalClassStudents: number;
     }) => {
-      console.log("TeacherDashboard :: student joined :: ", lectureId);
       queryClient.setQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
         (old) => {
           if (!old) return [];
           return old.map((lecture) =>
-            lecture.id === lectureId
+            lecture.id === payload.lectureId
               ? {
                   ...lecture,
-                  studentCount: lecture.studentCount + 1,
-                  absentCount: Math.max(0, (lecture.absentCount || 0) - 1),
+                  studentCount: payload.studentCount,
+                  absentCount: payload.absentCount,
+                  totalClassStudents: payload.totalClassStudents,
                 }
               : lecture,
           );
@@ -226,45 +228,29 @@ export const useTeacherDashboard = () => {
     [queryClient],
   );
 
-  const handleStudentLeaved = useCallback(
-    (lectureId: string) => {
-      console.log("student leaved the lecture: ", lectureId);
-
-      queryClient.setQueryData<LectureWithCount[]>(
-        queryKeys.lectures.teacher,
-        (old) => {
-          if (!old) return [];
-          return old.map((lecture) =>
-            lecture.id === lectureId
-              ? {
-                  ...lecture,
-                  studentCount: Math.max(0, lecture.studentCount - 1),
-                  absentCount: Math.min(
-                    lecture.absentCount || 0 + 1,
-                    lecture.totalClassStudents || 0,
-                  ),
-                }
-              : lecture,
-          );
-        },
-      );
-    },
-    [queryClient],
-  );
-
-  const lectureIds = (lectures || []).map((lecture) => lecture.id);
+  const joinedLecturesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (stressOptions.enabled) {
       return;
     }
-    // TODO: test its true reactivity.
+
+    const currentIds = new Set((lectures || []).map((l) => l.id));
+    const newIds = [...currentIds].filter(
+      (id) => !joinedLecturesRef.current.has(id),
+    );
+    const removedIds = [...joinedLecturesRef.current].filter(
+      (id) => !currentIds.has(id),
+    );
+
+    removedIds.forEach((id) => socketService.leaveLecture(id));
+    joinedLecturesRef.current = currentIds;
+
     try {
       socketService.connect();
-      lectureIds.forEach((id) =>
+      newIds.forEach((id) =>
         socketService.joinLecture(id, userRole || "teacher"),
       );
       socketService.onStudentJoined(handleStudentJoined);
-      socketService.onStudentLeaved(handleStudentLeaved);
 
       const appStateSubscription = AppState.addEventListener(
         "change",
@@ -275,11 +261,10 @@ export const useTeacherDashboard = () => {
 
           if (!socketService.isConnected()) {
             socketService.connect();
-            lectureIds.forEach((id) =>
+            [...joinedLecturesRef.current].forEach((id) =>
               socketService.joinLecture(id, userRole || "teacher"),
             );
             socketService.onStudentJoined(handleStudentJoined);
-            socketService.onStudentLeaved(handleStudentLeaved);
           }
 
           if (
@@ -292,9 +277,7 @@ export const useTeacherDashboard = () => {
       );
 
       return () => {
-        lectureIds.forEach((id) => socketService.leaveLecture(id));
         socketService.offStudentJoined();
-        socketService.offStudentLeaved();
         appStateSubscription.remove();
       };
     } catch {
@@ -303,9 +286,8 @@ export const useTeacherDashboard = () => {
   }, [
     fetchActiveLectures,
     handleStudentJoined,
-    handleStudentLeaved,
     latestCreateLectureMutation,
-    lectureIds,
+    lectures,
     queryClient,
     stressOptions.enabled,
     userRole,
@@ -593,7 +575,6 @@ export const useTeacherDashboard = () => {
     [lectureRowHeightRef],
   );
 
-  
   const flatListPerformanceProps = useMemo(
     () => ({
       removeClippedSubviews: true,

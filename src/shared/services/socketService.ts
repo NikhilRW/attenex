@@ -3,14 +3,17 @@ import { BASE_URI } from "@shared/constants/uri";
 import { io, Socket } from "socket.io-client";
 class SocketService {
   private socket: Socket | null = null;
+  private isConnecting = false;
 
   /**
    * Initialize socket connection
    */
   connect() {
-    if (this.socket?.connected) {
+    if (this.socket?.connected || this.isConnecting) {
       return;
     }
+
+    this.isConnecting = true;
 
     try {
       this.socket = io(BASE_URI, {
@@ -22,6 +25,7 @@ class SocketService {
       });
 
       this.socket.on("connect", () => {
+        this.isConnecting = false;
         console.log("Socket connected:", this.socket?.id);
       });
 
@@ -30,7 +34,7 @@ class SocketService {
       });
 
       this.socket.on("connect_error", () => {
-        // Suppress verbose socket errors in production
+        this.isConnecting = false;
         console.log("Socket connection error - Backend may be offline");
       });
     } catch (_) {
@@ -126,6 +130,10 @@ class SocketService {
       lectureId: string;
       studentId: string;
       studentName: string;
+      joinTime: string;
+      studentCount: number;
+      absentCount: number;
+      totalClassStudents: number;
     }) => void
   ) {
     if (this.socket) {

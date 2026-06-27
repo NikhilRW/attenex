@@ -136,11 +136,8 @@ io.on("connection", (socket) => {
   logger.info(`Client connected: ${socket.id}`);
 
   // Join a lecture room (both students and teachers)
-  socket.on("joinLecture", (lectureId: string, role: User["role"]) => {
+  socket.on("joinLecture", (lectureId: string) => {
     socket.join(`lecture-${lectureId}`);
-    if (role === "student") {
-      io.to(`lecture-${lectureId}`).emit("studentJoined", lectureId);
-    }
     logger.info(`Socket ${socket.id} joined lecture-${lectureId}`);
   });
 

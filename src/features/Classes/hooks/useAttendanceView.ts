@@ -98,13 +98,13 @@ export const useAttendanceView = () => {
       }
     };
 
-    const handleStudentLeaved = (data: any) => {
+    const handleAttendanceSubmitted = (data: any) => {
       if (data.lectureId === lectureId) {
         refetchAttendance();
       }
     };
 
-    const handleAttendanceSubmitted = (data: any) => {
+    const handleStudentLeaved = (data: any) => {
       if (data.lectureId === lectureId) {
         refetchAttendance();
       }

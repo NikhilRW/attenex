@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { attendance, db, lectures, users } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
+import { getLectureCounts } from "../../utils/lectureCounts";
 import { logger } from "../../utils/logger";
 
 interface AuthRequest extends Request {
@@ -36,9 +37,10 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       logger.info(`Updated roll number for user ${userId}: ${rollNo.trim()}`);
     }
 
-    // Get lecture details
+    // Get lecture details with class relation
     const lecture = await db.query.lectures.findFirst({
       where: eq(lectures.id, lectureId),
+      with: { class: true },
     });
 
     if (!lecture) {
@@ -123,7 +125,8 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       `Student ${userId} joined lecture ${lectureId} successfully. Initial checkScore: 1`
     );
 
-    // Emit socket event to notify teacher about new student join
+    // Query actual counts and emit with absolute values (not deltas) for drift-proof reactivity
+    const counts = await getLectureCounts(lectureId, lecture.class?.name);
     const io = (req as any).app.get("io");
     if (io) {
       io.to(`lecture-${lectureId}`).emit("studentJoined", {
@@ -131,6 +134,7 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
         studentId: userId,
         studentName: updatedUser?.name || "Unknown",
         joinTime: newAttendance[0].joinTime,
+        ...counts,
       });
       logger.info(
         `Socket event emitted: studentJoined for lecture-${lectureId}`
