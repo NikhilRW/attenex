@@ -168,7 +168,6 @@ const TeacherDashboard = () => {
               onScroll={onScroll}
               scrollEventThrottle={16}
               {...flatListPerformanceProps}
-              // disableVirtualization
               itemLayoutAnimation={LinearTransition.springify()}
               extraData={searchQuery}
               ListHeaderComponent={

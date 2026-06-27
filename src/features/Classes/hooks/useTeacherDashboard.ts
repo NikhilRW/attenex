@@ -122,9 +122,9 @@ export const useTeacherDashboard = () => {
   const stressOptions = useMemo(
     () =>
       getTeacherDashboardStressOptions({
-        stress: params.stress || "enabled",
-        mock: params.mock || "enabled",
-        count: params.count || "1000",
+        stress: params.stress ,
+        mock: params.mock ,
+        count: params.count,
         lectures: params.lectures,
         size: params.size,
       }),
