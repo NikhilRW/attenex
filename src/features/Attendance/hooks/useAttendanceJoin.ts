@@ -142,19 +142,7 @@ export const useAttendanceJoin = (
       }
       return true;
     },
-    onSettled(data) {
-      if (data === false) {
-        setJoinedLecture(null);
-        setStatus("idle");
-        showErrorAlert(
-          ALERT_MESSAGES.JOIN_FAILED.title,
-          ALERT_MESSAGES.JOIN_FAILED.message,
-          alert,
-        );
-      }
-    },
     onError: (error) => {
-      console.log(error);
       setJoinedLecture(null);
       setStatus("idle");
       const errorMessage =

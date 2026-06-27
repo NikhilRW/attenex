@@ -75,7 +75,7 @@ export const useSocketManager = (
     socketService.onLectureEnded(handleLectureEnded);
 
     return () => {
-      socketService.offLectureEnded();
+      socketService.offLectureEnded(handleLectureEnded);
     };
   }, [alert, joinedLecture]);
 

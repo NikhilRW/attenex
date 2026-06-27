@@ -52,7 +52,7 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
     if (lecture.status !== "active") {
       return res
         .status(400)
-        .json({ success: false, message: "Lecture is not active" });
+        .json({ success: false, message: "Lecture has been ended ask teacher to give manual attendance if it is authentic" });
     }
 
     // Check distance

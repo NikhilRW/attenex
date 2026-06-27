@@ -111,7 +111,7 @@ const StudentDashboard = () => {
     loading: submitLoading,
     setPasscode,
     handleSubmit,
-  } = useAttendanceSubmit(proceedWithJoin);
+  } = useAttendanceSubmit();
 
   // Socket manager
   const { lectureStatus } = useSocketManager(

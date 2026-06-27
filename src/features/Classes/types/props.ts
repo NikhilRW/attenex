@@ -126,6 +126,7 @@ export interface LectureCardProps {
   handleEditLecture: (lecture: LectureWithCount) => void;
   handleEndLecture: (lectureId: string, lectureTitle: string) => void;
   handleDeleteLecture: (lecture: LectureWithCount) => void;
+  handleViewPasscode?: (lecture: LectureWithCount) => void;
   isLectureCreating: boolean;
   lectureRowHeightRef: RefObject<number>;
 }

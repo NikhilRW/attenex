@@ -453,6 +453,19 @@ export const useTeacherDashboard = () => {
     [router],
   );
 
+  const handleViewPasscode = useCallback(
+    (lecture: LectureWithCount) => {
+      router.push({
+        pathname: "/(main)/lecture-ended",
+        params: {
+          lectureId: lecture.id,
+          lectureTitle: lecture.title,
+        },
+      });
+    },
+    [router],
+  );
+
   const handleFetchTeacherClasses = useCallback(async () => {
     const response = await lectureService.getTeacherClasses();
     return response.data;
@@ -666,6 +679,7 @@ export const useTeacherDashboard = () => {
     setSearchQuery,
     filteredLectures,
     handleViewAttendance,
+    handleViewPasscode,
     handleEditLecture,
     handleEndLecture,
     editModalVisible,

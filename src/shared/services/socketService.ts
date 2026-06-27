@@ -92,9 +92,13 @@ class SocketService {
   /**
    * Remove lecture ended listener
    */
-  offLectureEnded() {
+  offLectureEnded(callback?: (...args: any[]) => void) {
     if (this.socket) {
-      this.socket.off("lectureEnded");
+      if (callback) {
+        this.socket.off("lectureEnded", callback);
+      } else {
+        this.socket.off("lectureEnded");
+      }
     }
   }
 

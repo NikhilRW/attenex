@@ -46,7 +46,7 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({
         success: false,
         message:
-          "Invalid passcode. Please enter the correct code from your teacher.",
+          "Invalid passcode. Please re confirm the correct code from your teacher.",
       });
     }
 

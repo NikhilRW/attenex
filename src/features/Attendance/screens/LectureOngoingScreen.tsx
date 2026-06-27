@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import LectureOngoing from "../components/LectureAttending/LectureOngoing";
 import { socketService } from "@/shared/services/socketService";
-import { useSocketManager } from "../hooks/useSocketManager";
 import { useLectureManagement } from "../hooks/useLectureManagement";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
@@ -16,11 +15,22 @@ const LectureOngoingScreen = () => {
   const { alert } = useHapticAlerts();
   const { joinedLecture } = useLectureOngoingScreen();
   const { refreshLectures } = useLectureManagement(joinedLecture || null);
-  const { setLectureStatus } = useSocketManager(
-    joinedLecture ?? null,
-    refreshLectures,
-    alert,
-  );
+
+  // Listen for lecture ended event and go back to dashboard
+  useEffect(() => {
+    const handleLectureEnded = (data: { lectureId: string }) => {
+      if (joinedLecture && data.lectureId === joinedLecture.id) {
+        // Pop back to existing StudentDashboard which will show LectureEnded
+        router.back();
+      }
+    };
+
+    socketService.onLectureEnded(handleLectureEnded);
+
+    return () => {
+      socketService.offLectureEnded(handleLectureEnded);
+    };
+  }, [joinedLecture]);
 
   const handleLeaveLecture = useCallback(async () => {
     showDestructiveAlert(
@@ -33,12 +43,11 @@ const LectureOngoingScreen = () => {
         if (joinedLecture) {
           socketService.leaveLecture(joinedLecture.id, user?.role || "student");
         }
-        setLectureStatus("active");
         refreshLectures();
         router.navigate("/attendance");
       },
     );
-  }, [alert, joinedLecture, refreshLectures, setLectureStatus, user?.role]);
+  }, [alert, joinedLecture, refreshLectures, user?.role]);
 
   return (
     <LectureOngoing

@@ -56,6 +56,7 @@ const TeacherDashboard = () => {
     handleEndLecture,
     handleUpdateLecture,
     handleViewAttendance,
+    handleViewPasscode,
     lectures,
     navigateToCreate,
     onScroll,
@@ -131,6 +132,7 @@ const TeacherDashboard = () => {
         lecture={lecture}
         index={index}
         handleViewAttendance={handleViewAttendance}
+        handleViewPasscode={handleViewPasscode}
         handleEditLecture={handleEditLecture}
         handleEndLecture={handleEndLecture}
         handleDeleteLecture={handleDeleteLecture}
@@ -143,6 +145,7 @@ const TeacherDashboard = () => {
       handleEditLecture,
       handleEndLecture,
       handleViewAttendance,
+      handleViewPasscode,
       lectureRowHeightRef,
     ],
   );

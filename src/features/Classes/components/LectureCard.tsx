@@ -49,6 +49,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   handleEditLecture,
   handleEndLecture,
   handleDeleteLecture,
+  handleViewPasscode,
   lectureRowHeightRef,
 }) => {
   const queryClient = useQueryClient();
@@ -150,6 +151,10 @@ const LectureCard: React.FC<LectureCardProps> = ({
   const handleDeletePress = useCallback(() => {
     handleDeleteLecture(lecture);
   }, [handleDeleteLecture, lecture]);
+
+  const handlePasscodePress = useCallback(() => {
+    handleViewPasscode?.(lecture);
+  }, [handleViewPasscode, lecture]);
 
   return (
     <Animated.View
@@ -255,13 +260,22 @@ const LectureCard: React.FC<LectureCardProps> = ({
               </>
             )}
             {lecture.status === "ended" && (
-              <TouchableOpacity
-                style={[styles.iconBtn, styles.iconBtnDanger]}
-                onPress={handleDeletePress}
-                haptic="impact"
-              >
-                <Ionicons name="trash-outline" size={20} color="#EF4444" />
-              </TouchableOpacity>
+              <>
+                <TouchableOpacity
+                  style={[styles.iconBtn, styles.iconBtnNeutral]}
+                  onPress={handlePasscodePress}
+                  haptic="impact"
+                >
+                  <Ionicons name="key-outline" size={20} color="#3B82F6" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.iconBtn, styles.iconBtnDanger]}
+                  onPress={handleDeletePress}
+                  haptic="impact"
+                >
+                  <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                </TouchableOpacity>
+              </>
             )}
           </View>
         </View>

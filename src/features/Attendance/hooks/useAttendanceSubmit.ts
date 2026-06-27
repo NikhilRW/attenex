@@ -1,35 +1,21 @@
 import { parsePasscode } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
-import { useAuthStore } from "@/shared/stores/authStore";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { submitAttendance } from "@attendance/services/attendanceService";
 import { stopBackgroundTracking } from "@attendance/services/backgroundTask";
-import { Lecture } from "@attendance/types/common";
 import { UseAttendanceSubmitReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
 import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { Lecture } from "../types/common";
 
 /**
  * Custom hook to manage attendance submission
  */
-export const useAttendanceSubmit = (
-  proceedWithJoin: (data: {
-    lecture: Lecture;
-    studentRollNo: string;
-  }) => Promise<
-    | false
-    | {
-        res: any;
-        lecture: Lecture;
-      }
-    | undefined
-  >,
-): UseAttendanceSubmitReturn => {
+export const useAttendanceSubmit = (): UseAttendanceSubmitReturn => {
   const [passcode, setPasscode] = useState("");
-  const rollNo = useAuthStore((state) => state.user?.rollNo);
   const { alert } = useHapticAlerts();
 
   const handleSubmitMutateFn = async ({
@@ -80,16 +66,6 @@ export const useAttendanceSubmit = (
         setPasscode("");
         await stopBackgroundTracking();
         onSuccess();
-      }
-    },
-    onSettled(data, error, { joinedLecture }) {
-      if (!data || error) {
-        if (rollNo) {
-          proceedWithJoin({
-            lecture: joinedLecture,
-            studentRollNo: rollNo!,
-          });
-        }
       }
     },
     onError(error) {
