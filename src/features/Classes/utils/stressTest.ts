@@ -61,7 +61,7 @@ export const generateMockLectures = (count: number): LectureWithCount[] => {
 
     return {
       id: `stress-lecture-${index + 1}`,
-      title: `Stress Lecture ${index + 1}`,
+      subject: `Stress Lecture ${index + 1}`,
       courseName: `Class-${(index % 40) + 1}`,
       createdAt,
       studentCount,

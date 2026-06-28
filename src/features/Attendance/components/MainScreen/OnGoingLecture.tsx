@@ -71,7 +71,7 @@ const OnGoingLecture = ({
             </View>
             <View style={styles.lectureInfo}>
               <Text style={styles.lectureCardTitle} numberOfLines={1}>
-                {lecture.title}
+                {lecture.subject}
               </Text>
               <View style={styles.lectureMetaRow}>
                 <SecondaryIcon

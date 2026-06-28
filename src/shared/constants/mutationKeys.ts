@@ -27,6 +27,11 @@ export const mutationKeys = {
     join: ["lectures", "join"] as const,
   },
 
+  // Subject mutations
+  subjects: {
+    create: ["subjects", "create"] as const,
+  },
+
   // Attendance mutations
   attendance: {
     submit: ["attendance", "submit"] as const,

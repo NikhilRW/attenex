@@ -6,9 +6,9 @@ import React from "react";
 import { Text, View } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 import { ClassSelector } from "./ClassSelector";
+import { SubjectSelector } from "./SubjectSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
-import { TopicInput } from "./TopicInput";
 
 const CreateLectureCardGradient = withUnistyles(
   LinearGradient,
@@ -27,8 +27,13 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
   onToggleClassDropdown,
   onSelectClass,
   onAddNewClass,
-  lectureName,
-  onLectureNameChange,
+  selectedSubject,
+  selectedSubjectId,
+  existingSubjects,
+  showSubjectDropdown,
+  onToggleSubjectDropdown,
+  onSelectSubject,
+  onAddNewSubject,
   duration,
   customDuration,
   showDurationDropdown,
@@ -53,7 +58,14 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
         onAddNewClass={onAddNewClass}
       />
 
-      <TopicInput value={lectureName} onChangeText={onLectureNameChange} />
+      <SubjectSelector
+        selectedSubject={selectedSubject}
+        existingSubjects={existingSubjects}
+        showDropdown={showSubjectDropdown}
+        onToggleDropdown={onToggleSubjectDropdown}
+        onSelectSubject={onSelectSubject}
+        onAddNewSubject={onAddNewSubject}
+      />
 
       <View style={styles.sectionDivider} />
 
@@ -77,7 +89,8 @@ export const CreateLectureFormCard: React.FC<CreateLectureFormCardProps> = ({
             onCreateLecture({
               customDuration,
               duration,
-              lectureName,
+              selectedSubject,
+              selectedSubjectId,
               selectedClass,
               alert,
             })

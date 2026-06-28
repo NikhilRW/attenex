@@ -30,6 +30,7 @@ export const queryKeys = {
     detail: (id: string) => ["lectures", "detail", id] as const,
     studentDetail: (id: string) => ["lectures", "student-detail", id] as const,
     passcode: (id: string) => ["lectures", "passcode", id] as const,
+    subjects: ["lectures", "subjects"] as const,
     joinWithNotification: ["lectures", "join-notification"] as const,
   },
 

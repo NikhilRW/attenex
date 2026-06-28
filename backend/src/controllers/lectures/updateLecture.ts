@@ -18,7 +18,7 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const userRole = req.user?.role;
     const { lectureId } = req.params as unknown as LectureParams;
-    const { title, duration } = req.body;
+    const { duration } = req.body;
 
     // Verify user is authenticated
     if (!userId) {
@@ -67,12 +67,8 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Build update object - only title and duration allowed for active lectures
+    // Build update object - only duration allowed for active lectures
     const updateData: any = {};
-
-    if (title !== undefined && title.trim().length > 0) {
-      updateData.title = title.trim();
-    }
 
     if (duration !== undefined && duration > 0) {
       updateData.duration = duration.toString();
@@ -85,7 +81,7 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({
         success: false,
         message:
-          "No valid fields to update. Only title and duration can be updated.",
+          "No valid fields to update. Only duration can be updated.",
       });
     }
 
@@ -104,7 +100,7 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
       data: {
         lecture: {
           id: updatedLecture[0].id,
-          title: updatedLecture[0].title,
+          subjectId: updatedLecture[0].subjectId,
           duration: updatedLecture[0].duration,
           status: updatedLecture[0].status,
         },

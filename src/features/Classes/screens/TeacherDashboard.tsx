@@ -50,7 +50,6 @@ const TeacherDashboard = () => {
   const {
     editDuration,
     editModalVisible,
-    editTitle,
     filteredLectures,
     handleEditLecture,
     handleEndLecture,
@@ -65,7 +64,6 @@ const TeacherDashboard = () => {
     searchQuery,
     setEditDuration,
     setEditModalVisible,
-    setEditTitle,
     setSearchQuery,
     totalActive,
     totalStudents,
@@ -242,8 +240,6 @@ const TeacherDashboard = () => {
       <LectureEditModal
         editModalVisible={editModalVisible}
         setEditModalVisible={setEditModalVisible}
-        editTitle={editTitle}
-        setEditTitle={setEditTitle}
         editDuration={editDuration}
         setEditDuration={setEditDuration}
         handleUpdateLecture={handleUpdateLecture}

@@ -50,8 +50,8 @@ export const useLectureDetailsParam = (
               );
               const lectureData = {
                 id: res.data.id,
-                title: res.data.title,
-                className: res.data.classname,
+                subject: res.data.subject,
+                className: res.data.className,
                 startedAt: res.data.startedAt,
               };
               await onJoinLecture(lectureData);

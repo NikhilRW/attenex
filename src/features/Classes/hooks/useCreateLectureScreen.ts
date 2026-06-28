@@ -1,7 +1,7 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services/lectureService";
-import { ClassItem, LectureWithCount } from "@classes/types/common";
+import { ClassItem, LectureWithCount, SubjectItem } from "@classes/types/common";
 import { CreateLectureAPIResponse } from "@classes/types/api";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -15,16 +15,21 @@ import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 export const useCreateLectureScreen = () => {
   const router = useRouter();
   const { height } = useWindowDimensions();
-  const [lectureName, setLectureName] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [duration, setDuration] = useState(60);
   const [customDuration, setCustomDuration] = useState("");
 
   // Dropdown states
   const [showClassDropdown, setShowClassDropdown] = useState(false);
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
   const [showDurationDropdown, setShowDurationDropdown] = useState(false);
   const [showNewClassModal, setShowNewClassModal] = useState(false);
+  const [showNewSubjectModal, setShowNewSubjectModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  const [newSubjectName, setNewSubjectName] = useState("");
+  const [subjectError, setSubjectError] = useState("");
 
   const { alert } = useHapticAlerts();
 
@@ -56,8 +61,33 @@ export const useCreateLectureScreen = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
+  const fetchTeacherSubjects: () => Promise<SubjectItem[] | null> =
+    useCallback(async () => {
+      try {
+        const res = await lectureService.getSubjects();
+        let currentSubjects: SubjectItem[] = [];
+        if (res.success) {
+          currentSubjects = [...res.data];
+        }
+        return currentSubjects;
+      } catch (error) {
+        console.log("Error fetching subjects", error);
+        throw error;
+      }
+    }, []);
+
+  const { data: existingSubjects } = useQuery({
+    queryFn: fetchTeacherSubjects,
+    queryKey: queryKeys.lectures.subjects,
+    networkMode: "offlineFirst",
+    enabled: true,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
   const resetValues = useCallback(() => {
-    setLectureName("");
+    setSelectedSubject("");
+    setSelectedSubjectId("");
     setSelectedClass("");
     setDuration(0);
     setCustomDuration("");
@@ -78,10 +108,10 @@ export const useCreateLectureScreen = () => {
         queryKeys.lectures.teacher,
       );
 
-      const optimisticTitle = variables.lectureName.trim();
+      const optimisticSubject = variables.selectedSubject.trim();
       const optimisticClass = variables.selectedClass.trim();
 
-      if (!optimisticTitle || !optimisticClass) {
+      if (!optimisticSubject || !optimisticClass) {
         return { previousLectures };
       }
 
@@ -92,7 +122,8 @@ export const useCreateLectureScreen = () => {
           : String(variables.duration);
       const newLecture: LectureWithCount = {
         id: tempLectureId,
-        title: optimisticTitle,
+        subject: optimisticSubject,
+        subjectId: variables.selectedSubjectId,
         courseName: optimisticClass,
         createdAt: new Date().toISOString(),
         studentCount: 0,
@@ -102,7 +133,6 @@ export const useCreateLectureScreen = () => {
         duration: optimisticDuration,
       };
 
-      // Optimistically update to the new value
       context.client.setQueryData<LectureWithCount[]>(
         queryKeys.lectures.teacher,
         (old) => {
@@ -125,7 +155,8 @@ export const useCreateLectureScreen = () => {
         const createdLecture = data.data.lecture;
         const lectureWithCount: LectureWithCount = {
           id: createdLecture.id,
-          title: createdLecture.title,
+          subject: createdLecture.subject,
+          subjectId: createdLecture.subjectId,
           courseName: createdLecture.className,
           createdAt:
             createdLecture.createdAt instanceof Date
@@ -195,10 +226,22 @@ export const useCreateLectureScreen = () => {
     setShowNewClassModal(true);
   };
 
+  const handleAddNewSubject = () => {
+    setShowSubjectDropdown(false);
+    setShowNewSubjectModal(true);
+  };
+
   const afterClassNameAdded = useCallback(() => {
     setNewClassName("");
     setShowNewClassModal(false);
     setShowClassDropdown(true);
+  }, []);
+ // TODO: why this is added ?
+  const afterSubjectNameAdded = useCallback((name: string, id: string) => {
+    setNewSubjectName("");
+    setShowNewSubjectModal(false);
+    setSelectedSubject(name);
+    setSelectedSubjectId(id);
   }, []);
 
   const { mutateAsync: handleCreateNewClass } = useMutation<
@@ -207,7 +250,7 @@ export const useCreateLectureScreen = () => {
     string,
     { previousClasses: ClassItem[] } | null
   >({
-    mutationKey: mutationKeys.classes.create,
+    mutationKey: mutationKeys.subjects.create,
     onMutate: async (params, context) => {
       if (!params.trim()) {
         alert("Error", "Please enter a class name");
@@ -271,10 +314,109 @@ export const useCreateLectureScreen = () => {
     },
   });
 
+  const { mutateAsync: handleCreateNewSubject } = useMutation<
+    { success: boolean; message: string; data?: { id: string } },
+    Error,
+    string,
+    { previousSubjects: SubjectItem[] } | null
+  >({
+    mutationKey: mutationKeys.subjects.create,
+    mutationFn: async (name: string) => {
+      return lectureService.createSubject(name);
+    },
+    onMutate: async (params, context) => {
+      const name = params.trim();
+      await context.client.cancelQueries({
+        queryKey: queryKeys.lectures.subjects,
+      });
+      const previousSubjects = context.client.getQueryData<SubjectItem[]>(
+        queryKeys.lectures.subjects,
+      );
+      context.client.setQueryData<SubjectItem[]>(
+        queryKeys.lectures.subjects,
+        (old) => {
+          const result: SubjectItem[] = [];
+          if (old) {
+            result.push(...old.filter((s) => s.name !== name));
+          }
+          result.push({
+            id: "temp" + new Date().getTime(),
+            name,
+          });
+          return result;
+        },
+      );
+      return {
+        previousSubjects: previousSubjects!,
+      };
+    },
+    onSuccess: async (res, variables, onMutateResult, context) => {
+      if (res.success) {
+        await context.client.invalidateQueries({
+          queryKey: queryKeys.lectures.subjects,
+        });
+        // Select the newly created subject
+        setSelectedSubject(variables.trim());
+        setSelectedSubjectId(res.data?.id || "");
+        setShowNewSubjectModal(false);
+        setNewSubjectName("");
+      } else if (onMutateResult?.previousSubjects) {
+        context.client.setQueryData<SubjectItem[]>(
+          queryKeys.lectures.subjects,
+          onMutateResult.previousSubjects,
+        );
+        alert("Subject not added successfully");
+      }
+    },
+    onError(error, _, onMutateResult, context) {
+      if (onMutateResult?.previousSubjects) {
+        context.client.setQueryData<SubjectItem[]>(
+          queryKeys.lectures.subjects,
+          onMutateResult.previousSubjects,
+        );
+      }
+
+      if ((error as any).response?.status === 409) {
+        setSubjectError("Subject already exists");
+      } else {
+        setSubjectError(error.message || "Failed to add subject");
+      }
+    },
+  });
+
+  const handleCloseNewSubjectModal = useCallback(() => {
+    setShowNewSubjectModal(false);
+    setSubjectError("");
+    setNewSubjectName("");
+  }, []);
+
+  const handleSubjectNameChange = useCallback((name: string) => {
+    setNewSubjectName(name);
+    setSubjectError("");
+  }, []);
+
+  const handleCreateNewSubjectWithCallback = useCallback(
+    async (name: string) => {
+      if (!name.trim()) {
+        setSubjectError("Please enter a subject name");
+        return;
+      }
+      await handleCreateNewSubject(name);
+    },
+    [handleCreateNewSubject],
+  );
+
   const handleGoBack = () => router.back();
 
   const handleToggleClassDropdown = () => {
     setShowClassDropdown(!showClassDropdown);
+    setShowSubjectDropdown(false);
+    setShowDurationDropdown(false);
+  };
+
+  const handleToggleSubjectDropdown = () => {
+    setShowSubjectDropdown(!showSubjectDropdown);
+    setShowClassDropdown(false);
     setShowDurationDropdown(false);
   };
 
@@ -283,9 +425,17 @@ export const useCreateLectureScreen = () => {
     setShowClassDropdown(false);
   };
 
+  const handleSelectSubject = (name: string) => {
+    setSelectedSubject(name);
+    const subject = existingSubjects?.find((s) => s.name === name);
+    setSelectedSubjectId(subject?.id || "");
+    setShowSubjectDropdown(false);
+  };
+
   const handleToggleDurationDropdown = () => {
     setShowDurationDropdown(!showDurationDropdown);
     setShowClassDropdown(false);
+    setShowSubjectDropdown(false);
   };
 
   const handleSelectDuration = (val: number) => {
@@ -302,30 +452,41 @@ export const useCreateLectureScreen = () => {
 
   return {
     // State
-    lectureName,
-    setLectureName,
+    selectedSubject,
+    selectedSubjectId,
     selectedClass,
     duration,
     customDuration,
     setCustomDuration,
     loading,
     existingClasses,
+    existingSubjects,
     showClassDropdown,
+    showSubjectDropdown,
     showDurationDropdown,
     showNewClassModal,
+    showNewSubjectModal,
     newClassName,
     setNewClassName,
+    newSubjectName,
+    handleSubjectNameChange,
+    subjectError,
     minHeightScrollView,
 
     // Handlers
     handleCreateLecture,
     handleAddNewClass,
+    handleAddNewSubject,
     handleCreateNewClass,
+    handleCreateNewSubject: handleCreateNewSubjectWithCallback,
     handleGoBack,
     handleToggleClassDropdown,
+    handleToggleSubjectDropdown,
     handleSelectClass,
+    handleSelectSubject,
     handleToggleDurationDropdown,
     handleSelectDuration,
     handleCloseNewClassModal,
+    handleCloseNewSubjectModal,
   };
 };

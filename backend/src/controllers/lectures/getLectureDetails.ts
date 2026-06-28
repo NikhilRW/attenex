@@ -26,6 +26,7 @@ export const getLectureDetails = async (req: AuthRequest, res: Response) => {
       where: eq(lectures.id, lectureId),
       with: {
         class: true,
+        subject: true,
       },
     });
 

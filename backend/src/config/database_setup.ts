@@ -152,6 +152,31 @@ export const classes = pgTable(
 );
 
 /**
+ * Subjects Table - Academic subjects that teachers teach
+ *
+ * Teachers create subjects (e.g., "Mathematics", "Physics") and assign them
+ * to lectures. This enables subject-based analytics and reporting.
+ * Each subject is unique per teacher.
+ */
+export const subjects = pgTable(
+  "subjects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    teacherId: uuid("teacher_id")
+      .references(() => users.id)
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    uniqueNameTeacher: uniqueIndex("subjects_name_teacher_idx").on(
+      table.name,
+      table.teacherId,
+    ),
+  }),
+);
+
+/**
  * Lectures Table - Individual class sessions
  *
  * Each lecture represents a single attendance session within a class.
@@ -167,7 +192,7 @@ export const lectures = pgTable(
     classId: uuid("class_id")
       .references(() => classes.id)
       .notNull(), // Class this lecture belongs to (references class id)
-    title: text("title").notNull(), // Lecture title/topic
+    subjectId: uuid("subject_id").references(() => subjects.id), // FK to subjects table
     passcode: varchar("passcode", { length: 4 }), // 4-digit passcode that refreshes every 10 seconds
     passcodeUpdatedAt: timestamp("passcode_updated_at", { withTimezone: true }), // Last time passcode was refreshed
     duration: numeric("duration").default("60").notNull(), // Duration in minutes
@@ -329,6 +354,14 @@ export const classesRelations = relations(classes, ({ one, many }) => ({
   lectures: many(lectures), // Class has many lectures
 }));
 
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  teacher: one(users, {
+    fields: [subjects.teacherId],
+    references: [users.id],
+  }),
+  lectures: many(lectures),
+}));
+
 export const lecturesRelations = relations(lectures, ({ one, many }) => ({
   teacher: one(users, {
     fields: [lectures.teacherId],
@@ -338,6 +371,10 @@ export const lecturesRelations = relations(lectures, ({ one, many }) => ({
     fields: [lectures.classId],
     references: [classes.id],
   }), // Lecture belongs to one class
+  subject: one(subjects, {
+    fields: [lectures.subjectId],
+    references: [subjects.id],
+  }), // Lecture has one subject
   attendanceRecords: many(attendance), // Lecture has many attendance records
   attendanceAttempts: many(attendanceAttempts), // Lecture has many attempt records
 }));
@@ -389,6 +426,7 @@ export const db = drizzle(pool, {
   schema: {
     users,
     classes,
+    subjects,
     lectures,
     attendance,
     attendanceAttempts,
@@ -396,6 +434,7 @@ export const db = drizzle(pool, {
     geofenceLogs,
     usersRelations,
     classesRelations,
+    subjectsRelations,
     lecturesRelations,
     attendanceRelations,
     attendanceAttemptsRelations,
@@ -433,6 +472,9 @@ export type NewUser = typeof users.$inferInsert; // For creating new users
 
 export type Class = typeof classes.$inferSelect;
 export type NewClass = typeof classes.$inferInsert;
+
+export type Subject = typeof subjects.$inferSelect;
+export type NewSubject = typeof subjects.$inferInsert;
 
 export type Lecture = typeof lectures.$inferSelect;
 export type NewLecture = typeof lectures.$inferInsert;

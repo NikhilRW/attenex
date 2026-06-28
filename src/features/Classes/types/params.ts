@@ -1,5 +1,6 @@
 export type CreateLectureVariables = {
-  lectureName: string;
+  selectedSubject: string;
+  selectedSubjectId: string;
   selectedClass: string;
   customDuration: string;
   duration: number;

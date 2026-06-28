@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { Request, Response } from "express";
-import { classes, db, lectures, users } from "../../config/database_setup";
+import {  Response } from "express";
+import { classes, db, lectures, subjects, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { AuthRequest } from "@middleware/auth";
 import { LectureParams } from "../../types/params";
@@ -74,7 +74,8 @@ export const getStudentLecture = async (req: AuthRequest, res: Response) => {
   const activeLectures = await db
     .select({
       id: lectures.id,
-      title: lectures.title,
+      subject: subjects.name,
+      subjectId: lectures.subjectId,
       className: classes.name,
       duration: lectures.duration,
       status: lectures.status,
@@ -85,6 +86,7 @@ export const getStudentLecture = async (req: AuthRequest, res: Response) => {
     })
     .from(lectures)
     .leftJoin(classes, eq(lectures.classId, classes.id))
+    .leftJoin(subjects, eq(lectures.subjectId, subjects.id))
     .where(
       and(
         eq(classes.name, studentClassName),

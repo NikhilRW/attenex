@@ -4,7 +4,7 @@ const API_URL = `/api/lectures`;
 
 export const lectureService = {
   createLecture: async (
-    lectureName: string,
+    subjectId: string,
     className: string,
     duration: number,
     latitude: number,
@@ -12,7 +12,7 @@ export const lectureService = {
   ) => {
     try {
       const response = await http.post(`${API_URL}/create`, {
-        lectureName,
+        subjectId,
         className,
         duration,
         latitude,
@@ -88,7 +88,7 @@ export const lectureService = {
   updateLecture: async (
     lectureId: string,
     updateData: {
-      title?: string;
+      subjectId?: string | null;
       duration?: number;
       latitude?: number;
       longitude?: number;
@@ -129,6 +129,22 @@ export const lectureService = {
           studentRollNo,
         },
       );
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error.message;
+    }
+  },
+  getSubjects: async () => {
+    try {
+      const response = await http.get(`${API_URL}/subjects`);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error.message;
+    }
+  },
+  createSubject: async (name: string) => {
+    try {
+      const response = await http.post(`${API_URL}/subjects`, { name });
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;

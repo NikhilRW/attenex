@@ -59,7 +59,7 @@ export const generateMockStudentLectures = (count: number): Lecture[] => {
 
     return {
       id: `stress-student-lecture-${index + 1}`,
-      title: `Stress Lecture ${index + 1}`,
+      subject: `Stress Lecture ${index + 1}`,
       className: `Class ${(index % 40) + 1}`,
       duration: String(30 + (index % 6) * 10),
       status: active ? "active" : "ended",

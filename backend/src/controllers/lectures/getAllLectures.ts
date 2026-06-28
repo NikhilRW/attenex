@@ -5,6 +5,7 @@ import {
   classes,
   db,
   lectures,
+  subjects,
   users,
 } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
@@ -38,11 +39,12 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Fetch all lectures for this teacher with class information, sorted by most recent first
+    // Fetch all lectures for this teacher with class and subject information, sorted by most recent first
     const allLectures = await db
       .select({
         id: lectures.id,
-        title: lectures.title,
+        subject: subjects.name,
+        subjectId: lectures.subjectId,
         className: classes.name,
         duration: lectures.duration,
         status: lectures.status,
@@ -54,6 +56,7 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
       })
       .from(lectures)
       .leftJoin(classes, eq(lectures.classId, classes.id))
+      .leftJoin(subjects, eq(lectures.subjectId, subjects.id))
       .where(eq(lectures.teacherId, userId))
       .orderBy(desc(lectures.createdAt));
 

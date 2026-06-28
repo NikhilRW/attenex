@@ -1,6 +1,7 @@
 import { CreateLectureFormCard } from "@classes/components/CreateLectureFormCard";
 import { CreateLectureHeader } from "@classes/components/CreateLectureHeader";
 import { NewClassModal } from "@classes/components/NewClassModal";
+import { NewSubjectModal } from "@classes/components/NewSubjectModal";
 import { DURATION_OPTIONS } from "@classes/constants/common";
 import { useCreateLectureScreen } from "@classes/hooks/useCreateLectureScreen";
 import { styles } from "@classes/styles/CreateLecture.styles";
@@ -10,29 +11,40 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 
 const CreateLectureScreen = () => {
   const {
-    lectureName,
-    setLectureName,
+    selectedSubject,
+    selectedSubjectId,
     selectedClass,
     duration,
     customDuration,
     setCustomDuration,
     loading,
     existingClasses,
+    existingSubjects,
     showClassDropdown,
+    showSubjectDropdown,
     showDurationDropdown,
     showNewClassModal,
+    showNewSubjectModal,
     newClassName,
     setNewClassName,
+    newSubjectName,
+    handleSubjectNameChange,
+    subjectError,
     minHeightScrollView,
     handleCreateLecture,
     handleAddNewClass,
+    handleAddNewSubject,
     handleCreateNewClass,
+    handleCreateNewSubject,
     handleGoBack,
     handleToggleClassDropdown,
+    handleToggleSubjectDropdown,
     handleSelectClass,
+    handleSelectSubject,
     handleToggleDurationDropdown,
     handleSelectDuration,
     handleCloseNewClassModal,
+    handleCloseNewSubjectModal,
   } = useCreateLectureScreen();
 
   return (
@@ -60,8 +72,13 @@ const CreateLectureScreen = () => {
               onToggleClassDropdown={handleToggleClassDropdown}
               onSelectClass={handleSelectClass}
               onAddNewClass={handleAddNewClass}
-              lectureName={lectureName}
-              onLectureNameChange={setLectureName}
+              selectedSubject={selectedSubject}
+              selectedSubjectId={selectedSubjectId}
+              existingSubjects={existingSubjects || []}
+              showSubjectDropdown={showSubjectDropdown}
+              onToggleSubjectDropdown={handleToggleSubjectDropdown}
+              onSelectSubject={handleSelectSubject}
+              onAddNewSubject={handleAddNewSubject}
               duration={duration}
               customDuration={customDuration}
               showDurationDropdown={showDurationDropdown}
@@ -82,6 +99,15 @@ const CreateLectureScreen = () => {
         newClassName={newClassName}
         setNewClassName={setNewClassName}
         onCreateClass={handleCreateNewClass}
+      />
+
+      <NewSubjectModal
+        visible={showNewSubjectModal}
+        onClose={handleCloseNewSubjectModal}
+        newSubjectName={newSubjectName}
+        setNewSubjectName={handleSubjectNameChange}
+        onCreateSubject={handleCreateNewSubject}
+        errorMessage={subjectError}
       />
     </View>
   );

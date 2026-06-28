@@ -46,10 +46,10 @@ const LectureEnded = ({
 
         <Text style={styles.guardianTitle}>Lecture Ended</Text>
         <Text style={styles.guardianSubtitle}>
-          {joinedLecture?.title ? (
+          {joinedLecture?.subject ? (
             <>
               <Text style={styles.lectureTitleHighlight}>
-                {joinedLecture.title}
+                {joinedLecture.subject} Lecture
               </Text>{" "}
               has finished!
               {"\n"}

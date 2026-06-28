@@ -34,11 +34,11 @@ const LectureOngoing = ({
 
         <Text style={styles.guardianTitle}>Lecture Ongoing</Text>
         <Text style={styles.guardianSubtitle}>
-          {joinedLecture?.title ? (
+          {joinedLecture?.subject ? (
             <>
               Attending:{" "}
               <Text style={styles.leaveLectureTitleHighlight}>
-                {joinedLecture.title}
+                {joinedLecture.subject} Lecture
               </Text>
               {"\n"}
             </>

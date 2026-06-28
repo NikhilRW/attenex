@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { classes, db, lectures, users } from "../../config/database_setup";
+import { classes, db, lectures, subjects, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 
 interface AuthRequest extends Request {
@@ -78,14 +78,14 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Get all class IDs with this name
-    const classIds = matchingClasses.map((c) => c.id);
+
 
     // Fetch all active lectures for classes with matching name
     const activeLectures = await db
       .select({
         id: lectures.id,
-        title: lectures.title,
+        subject: subjects.name,
+        subjectId: lectures.subjectId,
         className: classes.name,
         duration: lectures.duration,
         status: lectures.status,
@@ -96,6 +96,7 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       })
       .from(lectures)
       .leftJoin(classes, eq(lectures.classId, classes.id))
+      .leftJoin(subjects, eq(lectures.subjectId, subjects.id))
       .where(
         and(eq(classes.name, studentClassName), eq(lectures.status, "active"))
       )
@@ -105,7 +106,7 @@ export const getStudentLectures = async (req: AuthRequest, res: Response) => {
       `Fetched ${activeLectures.length} active lectures for student: ${userId} in class: ${studentClassName}`,
       activeLectures.map((l) => ({
         id: l.id,
-        title: l.title,
+        subject: l.subject,
         className: l.className,
       }))
     );

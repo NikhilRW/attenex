@@ -11,6 +11,8 @@ import { getLectureDetails } from "../controllers/lectures/getLectureDetails";
 import { getPasscode } from "../controllers/lectures/getPasscode";
 import { getStudentLectures } from "../controllers/lectures/getStudentLectures";
 import { getTeacherClasses } from "../controllers/lectures/getTeacherClasses";
+import { getTeacherSubjects } from "../controllers/lectures/getTeacherSubjects";
+import { addTeacherSubject } from "../controllers/lectures/addTeacherSubject";
 import { updateLecture } from "../controllers/lectures/updateLecture";
 import { authenticate } from "../middleware/auth";
 import { getStudentLecture } from "@controllers/lectures/getStudentLecture";
@@ -32,6 +34,8 @@ router.get(
 router.get("/classes/all", authenticate, getAllClasses);
 router.get("/classes", authenticate, getTeacherClasses);
 router.post("/classes", authenticate, addTeacherClass);
+router.get("/subjects", authenticate, getTeacherSubjects);
+router.post("/subjects", authenticate, addTeacherSubject);
 router.get("/:lectureId/details", authenticate, getLectureDetails);
 router.get("/:lectureId/passcode", authenticate, getPasscode);
 router.put("/:lectureId/end", authenticate, endLecture);

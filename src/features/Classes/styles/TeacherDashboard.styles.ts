@@ -408,7 +408,6 @@ export const styles = StyleSheet.create((theme, rt) => {
       paddingTop: 10,
     },
     inputGroup: {
-      marginBottom: 20,
     },
     label: {
       fontSize: 14,

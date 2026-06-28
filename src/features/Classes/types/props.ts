@@ -7,6 +7,7 @@ import {
   ClassItem,
   FilterType,
   LectureWithCount,
+  SubjectItem,
 } from "./common";
 import { CreateLectureVariables } from "./params";
 
@@ -68,9 +69,14 @@ export interface CreateLectureFormCardProps {
   onSelectClass: (className: string) => void;
   onAddNewClass: () => void;
 
-  // Topic input
-  lectureName: string;
-  onLectureNameChange: (value: string) => void;
+  // Subject selection
+  selectedSubject: string;
+  selectedSubjectId: string;
+  existingSubjects: SubjectItem[];
+  showSubjectDropdown: boolean;
+  onToggleSubjectDropdown: () => void;
+  onSelectSubject: (subjectName: string) => void;
+  onAddNewSubject: () => void;
 
   // Duration selection
   duration: number;
@@ -137,8 +143,6 @@ export interface LectureCardProps {
 export interface LectureEditModalProps {
   editModalVisible: boolean;
   setEditModalVisible: (visible: boolean) => void;
-  editTitle: string;
-  setEditTitle: (title: string) => void;
   editDuration: string;
   setEditDuration: (duration: string) => void;
   handleUpdateLecture: () => void;

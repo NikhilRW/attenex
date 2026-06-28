@@ -1,11 +1,12 @@
 export interface LectureWithCount {
   id: string;
-  title: string;
+  subject: string;
   courseName: string;
   createdAt: string;
   studentCount: number;
   absentCount?: number;
   totalClassStudents?: number;
+  subjectId?: string | null;
   status: "active" | "ended";
   duration: string;
 }
@@ -26,6 +27,11 @@ export interface AttendanceRecord {
 export type FilterType = "all" | "present" | "absent" | "incomplete";
 
 export interface ClassItem {
+  id: string;
+  name: string;
+}
+
+export interface SubjectItem {
   id: string;
   name: string;
 }

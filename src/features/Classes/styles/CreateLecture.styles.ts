@@ -277,6 +277,10 @@ export const styles = StyleSheet.create((theme, rt) => {
       height: 56,
       marginBottom: 8,
     },
+    modalInputRowError: {
+      borderColor: theme.status.error,
+      marginBottom: 4,
+    },
     modalInput: {
       padding: 16,
       borderRadius: 16,
@@ -295,6 +299,14 @@ export const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.primary,
       fontSize: 16,
       fontWeight: "500",
+    },
+    modalErrorText: {
+      color: theme.status.error,
+      fontSize: 13,
+      fontWeight: "600",
+      lineHeight: 18,
+      marginBottom: 8,
+      marginLeft: 4,
     },
     modalButtons: {
       flexDirection: "row",

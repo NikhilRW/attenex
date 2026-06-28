@@ -62,7 +62,6 @@ type LectureMutationResponse = {
 
 type UpdateLectureVariables = {
   lectureId: string;
-  title: string;
   duration: number;
 };
 
@@ -103,7 +102,6 @@ export const useTeacherDashboard = () => {
     null,
   );
   const { isConnected } = useNetworkState();
-  const [editTitle, setEditTitle] = useState("");
   const [editDuration, setEditDuration] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -344,7 +342,6 @@ export const useTeacherDashboard = () => {
         return;
       }
       setEditingLecture(lecture);
-      setEditTitle(lecture.title);
       setEditDuration(lecture.duration);
       setEditModalVisible(true);
     },
@@ -377,7 +374,6 @@ export const useTeacherDashboard = () => {
 
       const optimisticUpdatedLecture: LectureWithCount = {
         ...lectureToUpdate,
-        title: editTitle,
         duration: editDuration,
       };
 
@@ -423,10 +419,6 @@ export const useTeacherDashboard = () => {
 
   const handleUpdateLecture = useCallback(async () => {
     if (!editingLecture) return;
-    if (!editTitle.trim()) {
-      alert("Error", "Title cannot be empty");
-      return;
-    }
     const durationNum = parseInt(editDuration);
     if (isNaN(durationNum) || durationNum <= 0) {
       alert("Error", "Duration must be a positive number");
@@ -436,9 +428,8 @@ export const useTeacherDashboard = () => {
     return updateLecture({
       lectureId: editingLecture.id,
       duration: durationNum,
-      title: editTitle.trim(),
     });
-  }, [alert, editDuration, editTitle, editingLecture, updateLecture]);
+  }, [alert, editDuration, editingLecture, updateLecture]);
 
   const handleViewAttendance = useCallback(
     (lecture: LectureWithCount) => {
@@ -446,7 +437,7 @@ export const useTeacherDashboard = () => {
         pathname: "/(main)/view-attendance",
         params: {
           lectureId: lecture.id,
-          lectureTitle: lecture.title,
+          lectureTitle: lecture.subject,
         },
       });
     },
@@ -459,7 +450,7 @@ export const useTeacherDashboard = () => {
         pathname: "/(main)/lecture-ended",
         params: {
           lectureId: lecture.id,
-          lectureTitle: lecture.title,
+          lectureTitle: lecture.subject,
         },
       });
     },
@@ -493,7 +484,7 @@ export const useTeacherDashboard = () => {
 
     return effectiveLectures.filter((l: LectureWithCount) => {
       return (
-        l.title.toLowerCase().includes(normalizedSearchQuery) ||
+        l.subject.toLowerCase().includes(normalizedSearchQuery) ||
         l.courseName.toLowerCase().includes(normalizedSearchQuery)
       );
     });
@@ -646,7 +637,7 @@ export const useTeacherDashboard = () => {
 
       alert(
         "Delete Lecture",
-        `Are you sure you want to delete "${lecture.title}"?`,
+        `Are you sure you want to delete "${lecture.subject}"?`,
         [
           { text: "Cancel", style: "cancel", onPress: selectionAsync },
           {
@@ -684,8 +675,6 @@ export const useTeacherDashboard = () => {
     handleEndLecture,
     editModalVisible,
     setEditModalVisible,
-    editTitle,
-    setEditTitle,
     editDuration,
     setEditDuration,
     handleUpdateLecture,

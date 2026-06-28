@@ -37,13 +37,14 @@ export const createNewClassMutateFn = async (className: string) => {
 };
 
 export const createLectureMutateFn = async ({
-  lectureName,
+  selectedSubject,
+  selectedSubjectId,
   selectedClass,
   customDuration,
   duration,
   alert,
 }: CreateLectureVariables) => {
-  if (!lectureName || !selectedClass) {
+  if (!selectedSubject || !selectedClass) {
     alert("Missing Information", "Please fill in all fields.");
     return;
   }
@@ -64,7 +65,7 @@ export const createLectureMutateFn = async ({
   });
 
   const res = await lectureService.createLecture(
-    lectureName,
+    selectedSubjectId,
     selectedClass,
     finalDuration,
     location.coords.latitude,
@@ -85,15 +86,12 @@ export const deleteLectureMutateFn = async ({
 
 export const updateLectureMutateFn = async ({
   lectureId,
-  title,
   duration,
 }: {
   lectureId: string;
-  title: string;
   duration: number;
 }) => {
   const res = await lectureService.updateLecture(lectureId, {
-    title,
     duration,
   });
   return res;

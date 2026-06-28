@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { classes, db, lectures } from "../../config/database_setup";
+import { classes, db, lectures, subjects } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 
 interface AuthRequest extends Request {
@@ -32,11 +32,12 @@ export const getActiveLectures = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Fetch all active lectures for this teacher with class information
+    // Fetch all active lectures for this teacher with class and subject information
     const activeLectures = await db
       .select({
         id: lectures.id,
-        title: lectures.title,
+        subject: subjects.name,
+        subjectId: lectures.subjectId,
         className: classes.name,
         duration: lectures.duration,
         status: lectures.status,
@@ -47,6 +48,7 @@ export const getActiveLectures = async (req: AuthRequest, res: Response) => {
       })
       .from(lectures)
       .leftJoin(classes, eq(lectures.classId, classes.id))
+      .leftJoin(subjects, eq(lectures.subjectId, subjects.id))
       .where(and(eq(lectures.teacherId, userId), eq(lectures.status, "active")))
       .orderBy(lectures.createdAt);
 

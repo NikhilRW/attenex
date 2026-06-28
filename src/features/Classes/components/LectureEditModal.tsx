@@ -30,8 +30,6 @@ const ModalInput = withUnistyles(TextInput, (theme) => ({
 export const LectureEditModal: React.FC<LectureEditModalProps> = ({
   editModalVisible,
   setEditModalVisible,
-  editTitle,
-  setEditTitle,
   editDuration,
   setEditDuration,
   handleUpdateLecture,
@@ -56,10 +54,9 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderLeft}>
                 <Text style={[styles.modalTitle, styles.modalTitleLarge]}>
-                  Edit Lecture
+                  Edit Duration
                 </Text>
               </View>
-              {/* TODO: Why close button if there is Cancel Button Think */}
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
                 style={styles.modalCloseButton}
@@ -70,26 +67,14 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
             </View>
 
             <View style={styles.modalBody}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Title</Text>
-                <ModalInput
-                  style={styles.modalInput}
-                  value={editTitle}
-                  onChangeText={setEditTitle}
-                  placeholder="Lecture Title"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Duration (min)</Text>
-                <ModalInput
-                  style={styles.modalInput}
-                  value={editDuration}
-                  onChangeText={setEditDuration}
-                  keyboardType="number-pad"
-                  placeholder="60"
-                />
-              </View>
+              <Text style={styles.label}>Duration (min)</Text>
+              <ModalInput
+                style={styles.modalInput}
+                value={editDuration}
+                onChangeText={setEditDuration}
+                keyboardType="number-pad"
+                placeholder="60"
+              />
             </View>
 
             <View style={styles.modalActions}>
@@ -104,7 +89,6 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
                   Cancel
                 </Text>
               </TouchableOpacity>
-              {/* TODO: check here also cancel selection and for update impact is good or not. */}
 
               <TouchableOpacity
                 style={styles.modalBtnWrapper}

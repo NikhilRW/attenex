@@ -4,7 +4,8 @@ export interface CreateLectureAPIResponse {
   data: {
     lecture: {
       id: string;
-      title: string;
+      subject: string;
+      subjectId?: string | null;
       className: string;
       duration: string;
       status: string;

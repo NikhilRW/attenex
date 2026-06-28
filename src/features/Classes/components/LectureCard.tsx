@@ -145,8 +145,8 @@ const LectureCard: React.FC<LectureCardProps> = ({
   }, [handleEditLecture, lecture]);
 
   const handleEndPress = useCallback(() => {
-    handleEndLecture(lecture.id, lecture.title);
-  }, [handleEndLecture, lecture.id, lecture.title]);
+    handleEndLecture(lecture.id, lecture.subject);
+  }, [handleEndLecture, lecture.id, lecture.subject]);
 
   const handleDeletePress = useCallback(() => {
     handleDeleteLecture(lecture);
@@ -174,7 +174,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
       >
         <View style={styles.cardHeader}>
           <View style={styles.cardTitleContainer}>
-            <Text style={styles.cardTitle}>{lecture.title}</Text>
+            <Text style={styles.cardTitle}>{lecture.subject}</Text>
             <Text style={styles.cardSubtitle}>{lecture.courseName}</Text>
           </View>
           {isPending ? (

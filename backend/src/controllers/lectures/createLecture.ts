@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { classes, db, lectures } from "../../config/database_setup";
+import { classes, db, lectures, subjects } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { generatePasscode } from "../../utils/passcode";
 import { sendNotification } from "@utils/sendNotification";
@@ -35,28 +35,44 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const { className, lectureName, latitude, longitude, duration } = req.body;
+    const { className, subjectId, latitude, longitude, duration } = req.body;
 
+    // Look up subject to get the name
+    let subjectName = "";
+    if (subjectId) {
+      const subject = await db
+        .select()
+        .from(subjects)
+        .where(eq(subjects.id, subjectId))
+        .limit(1);
+      if (subject.length > 0) {
+        subjectName = subject[0].name;
+      }
+    }
+
+    logger.info(
+      `Creating lecture for teacher: ${userId}, class: ${className}, subject: ${subjectName}, location: (${latitude}, ${longitude}), duration: ${duration}`,
+    )
     // Validate input
-    if (!className || !lectureName || !latitude || !longitude || !duration) {
+    if (!className || !subjectName || !latitude || !longitude || !duration) {
       return res.status(400).json({
         success: false,
         message:
-          "Class name, lecture name, location, and duration are required",
+          "Class name, subject, location, and duration are required",
       });
     }
 
-    if (typeof className !== "string" || typeof lectureName !== "string") {
+    if (typeof className !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Class name and lecture name must be strings",
+        message: "Class name must be a string",
       });
     }
 
-    if (className.trim().length === 0 || lectureName.trim().length === 0) {
+    if (className.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Class name and lecture name cannot be empty",
+        message: "Class name cannot be empty",
       });
     }
 
@@ -101,7 +117,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       .values({
         teacherId: userId,
         classId: classId,
-        title: lectureName,
+        subjectId: subjectId || null,
         teacherLatitude: latitude.toString(),
         teacherLongitude: longitude.toString(),
         duration: duration.toString(),
@@ -114,7 +130,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     const newLecture = newLectures[0];
 
     logger.info(`Lecture created: ${newLecture.id} by teacher: ${userId}`);
-    await sendNotification(className, lectureName, newLecture.id, duration);
+    await sendNotification(className, subjectName, newLecture.id, duration);
     await scheduleLectureEnd(newLecture.id, parseInt(duration, 10));
 
     return res.status(201).json({
@@ -123,7 +139,8 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       data: {
         lecture: {
           id: newLecture.id,
-          title: newLecture.title,
+          subject: subjectName,
+          subjectId: newLecture.subjectId,
           className: className,
           duration: newLecture.duration,
           status: newLecture.status,

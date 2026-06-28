@@ -5,7 +5,7 @@ import {
 
 export type Lecture = {
   id: string;
-  title: string;
+  subject: string;
   className: string;
   duration: string;
   status: "active" | "ended";
