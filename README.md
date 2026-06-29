@@ -1,16 +1,14 @@
 <div align="center">
-	<img src="./assets/images/logo-transparent.png" alt="Attenex Logo" width="130" />
-
-	# Attenex
-
-	**Real-time Attendance Management and Class Platform**
-
-	[![Showcase Website](https://img.shields.io/badge/Website-Showcase-blue?style=for-the-badge&logo=vercel)](https://attenex.vercel.app)
-	[![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactnative.dev)
-	[![Expo](https://img.shields.io/badge/Expo-SDK%2054-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev)
-
-	**[🌐 View Showcase Website](https://attenex.vercel.app)**
+	<img src="./apps/expo/assets/images/logo-transparent.png" alt="Attenex Logo" width="130" />
 </div>
+
+# Attenex
+
+**Real-time Attendance Management and Class Platform**
+
+[![Showcase Website](https://img.shields.io/badge/Website-Showcase-blue?style=for-the-badge&logo=vercel)](https://attenex.vercel.app)
+[![React Native](https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactnative.dev)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2055-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev)
 
 ---
 

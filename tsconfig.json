@@ -1,29 +1,6 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@assets/*": ["./assets/*"],
-      "@backend/*": ["./backend/src/*"],
-      "@/features/*": ["./src/features/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@/app/*": ["./app/*"],
-      "@auth/*": ["./src/features/Auth/*"],
-      "@classes/*": ["./src/features/Classes/*"],
-      "@attendance/*": ["./src/features/Attendance/*"],
-      "@settings/*": ["./src/features/Settings/*"],
-      "@role-selection/*": ["./src/features/RoleSelection/*"],
-      "@test/*": ["./src/features/Test/*"]
-    },
-    "types": ["@types/jest"]
+    "moduleDetection": "force"
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "nativewind-env.d.ts",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
-  "exclude": ["backend/**"]
+  "include": []
 }

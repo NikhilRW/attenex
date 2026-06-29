@@ -2,66 +2,7 @@
 
 # dependencies
 node_modules/
-
-# Expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
-
-# Native
-.kotlin/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-
-personal/
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-app-example
-
-# generated native folders
-/ios
-/android
-
-*.env
-
-backend/.env
-assets/models/*.glb
-assets/models/*.gltf
-assets/models/*.bin
-
 .agents/
 .github/skills
-backend/personal/ 
-# backend/
-
-rnsec-report.html
-rnsec-report.json
-
-UNISTYLES_MIGRATION_CHECKLIST.md
-IMPROVEMENTS.md
-
 skills-lock.json
-
-# src/features/Test/
+.vscode/
