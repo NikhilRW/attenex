@@ -5,4 +5,4 @@ node_modules/
 .agents/
 .github/skills
 skills-lock.json
-.vscode/
+.vscode
