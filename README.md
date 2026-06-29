@@ -31,11 +31,11 @@ ence, and re-fetching via TanStack Query |
 ## 📸 Product Preview
 
 <div align="center">
-	<img src="./assets/images/showcase_1.png" alt="Attenex preview 1" width="220" />
+	<img src="./apps/expo/assets/images/showcase_1.png" alt="Attenex preview 1" width="220" />
 	&nbsp;&nbsp;
-	<img src="./assets/images/showcase_2.png" alt="Attenex preview 2" width="220" />
+	<img src="./apps/expo/assets/images/showcase_2.png" alt="Attenex preview 2" width="220" />
 	&nbsp;&nbsp;
-	<img src="./assets/images/showcase_3.png" alt="Attenex preview 3" width="220" />
+	<img src="./apps/expo/assets/images/showcase_3.png" alt="Attenex preview 3" width="220" />
 </div>
 
 ---
