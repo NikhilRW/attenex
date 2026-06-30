@@ -1,40 +1,36 @@
-import { UserSchema } from "@/shared/schemas/auth";
+import * as v from "valibot";
+import { linkedInAuthSuccessResponseSchema } from "@attenex/api-contracts";
 import http from "@shared/utils/http";
 
-/**
- * Service for handling LinkedIn OAuth related operations.
- * Centralizes the network call for exchanging code for tokens and user data.
- */
 export const linkedinAuthService = {
-  /**
-   * Exchange authorization code with backend for user session (JWT token + user)
-   */
   async exchangeCodeForUser(
     code: string,
-    redirectUri: string
-  ): Promise<{ user: UserSchema; token: string } | null> {
+    redirectUri: string,
+  ): Promise<{ user: v.InferOutput<typeof linkedInAuthSuccessResponseSchema>["user"]; token: string } | null> {
     try {
       const response = await http.post(`/api/users/signin?authType=linkedin`, {
         code,
         redirectUri,
       });
 
-      const { user, token } = response.data;
+      const parsed = v.safeParse(linkedInAuthSuccessResponseSchema, response.data);
+      if (!parsed.success) {
+        console.error("linkedinAuthService: invalid response shape", parsed.issues);
+        return null;
+      }
 
-      return { user, token };
+      return { user: parsed.output.user, token: parsed.output.token };
     } catch (err: any) {
-      // Log for debugging but let the caller handle user-facing errors
       console.error(
         "linkedinAuthService: exchangeCodeForUser failed",
-        err.response?.data || err.message
+        err.response?.data || err.message,
       );
 
-      // Re-throw with parsed error for better error messages upstream
-      if (err.response?.data?.error) {
-        throw new Error(err.response.data.error);
+      if (err.response?.data?.message) {
+        throw new Error(err.response.data.message);
       } else if (err.message?.includes("Network Error")) {
         throw new Error(
-          "Unable to connect. Please check your internet connection."
+          "Unable to connect. Please check your internet connection.",
         );
       }
 

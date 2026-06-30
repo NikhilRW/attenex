@@ -1,8 +1,11 @@
-import { UserSchema } from "@/shared/schemas/auth";
 import { getStartingScreenPath } from "@/shared/utils/navigation";
-import { parseToken, parseUser } from "@/shared/utils/parsers";
-import { RegisterGoogleUserResponse } from "@auth/types/request";
 import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
+import * as v from "valibot";
+import {
+  emailSignInSuccessResponseSchema,
+  emailSignUpSuccessResponseSchema,
+  googleAuthSuccessResponseSchema,
+} from "@attenex/api-contracts";
 import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { queryClient } from "@shared/constants/tanstackConfig";
@@ -65,9 +68,8 @@ export const handleGoogleSignIn = async () => {
     }
 
     // Step 2: Send user data to backend for account creation/verification
-    // Backend will create user if they don't exist, or return existing user data
-    const newUser = await http.post<RegisterGoogleUserResponse>(
-      `/api/users/signin?authType=google`, // Google user registration endpoint (http uses BASE_URI)
+    const newUser = await http.post(
+      `/api/users/signin?authType=google`,
       {
         name: response.data.user.name,
         email: response.data.user.email,
@@ -77,43 +79,8 @@ export const handleGoogleSignIn = async () => {
       },
     );
 
-    // Step 3: Update local authentication state
-    // Stores user data and Google ID token in Zustand store
-    // Use authService to persist token securely and set user state
-
-    if (
-      newUser.data.success &&
-      parseUser(newUser.data.user) &&
-      parseToken(newUser.data.token)
-    ) {
-      await authService.login(newUser.data.user, newUser.data.token);
-
-      if (newUser.data.user.className && newUser.data.user.role === "student") {
-        await subscribeToClassName(newUser.data.user.className);
-      }
-
-      // Step 4: Show success feedback to user and navigate to main flow
-      showMessage({
-        message: "Sign-in Successful!",
-        description: `Welcome, ${newUser.data.user?.name}`,
-        type: "success",
-        duration: 2500,
-        position: "bottom",
-      });
-
-      // Step 5: Log successful authentication for monitoring
-      logger.info(
-        `Google sign-in successful for user: ${newUser.data.user?.email}`,
-        "common.ts :: handleGoogleSignIn()",
-      );
-
-      // Navigate to the main stack (replace to avoid back navigation to auth)
-      useAuthStore.subscribe((newState, prevState) => {
-        if (newState.user && prevState.user === null) {
-          router.replace(getStartingScreenPath());
-        }
-      });
-    } else {
+    const parsedResponse = v.safeParse(googleAuthSuccessResponseSchema, newUser.data);
+    if (!parsedResponse.success) {
       showMessage({
         message: "Sign-in Failed",
         description: "Unable to sign in with Google. Please try again.",
@@ -123,6 +90,36 @@ export const handleGoogleSignIn = async () => {
       });
       return;
     }
+
+    const { user, token } = parsedResponse.output;
+
+    // Step 3: Update local authentication state
+    await authService.login(user, token);
+
+    if (user.className && user.role === "student") {
+      await subscribeToClassName(user.className);
+    }
+
+    // Step 4: Show success feedback to user and navigate to main flow
+    showMessage({
+      message: "Sign-in Successful!",
+      description: `Welcome, ${user?.name}`,
+      type: "success",
+      duration: 2500,
+      position: "bottom",
+    });
+
+    // Step 5: Log successful authentication for monitoring
+    logger.info(
+      `Google sign-in successful for user: ${user?.email}`,
+      "common.ts :: handleGoogleSignIn()",
+    );
+
+    useAuthStore.subscribe((newState, prevState) => {
+      if (newState.user && prevState.user === null) {
+        router.replace(getStartingScreenPath());
+      }
+    });
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;
@@ -130,8 +127,8 @@ export const handleGoogleSignIn = async () => {
     // Extract user-friendly error message
     let errorMessage = "Something went wrong. Please try again.";
 
-    if (e.response?.data?.error) {
-      errorMessage = e.response.data.error;
+    if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
     } else if (e.message?.includes("Network Error")) {
       errorMessage =
         "Unable to connect. Please check your internet connection.";
@@ -151,7 +148,6 @@ export const handleGoogleSignIn = async () => {
       position: "bottom",
     });
 
-    // Log full error for debugging
     logger.error(JSON.stringify(e), "common.ts :: handleGoogleSignIn()");
   }
 };
@@ -213,16 +209,27 @@ export const handleEmailSignIn = async ({
   sendEmail: (email: string) => Promise<HttpResponse<any>>;
 }) => {
   try {
-    const {
-      data: { token, user },
-      status,
-    } = await http.post<{
-      user: UserSchema;
-      token: string;
-    }>("/api/users/signin?authType=email", {
-      email: data.email!,
-      password: data.password!,
-    });
+    const { data: responseData, status } = await http.post(
+      "/api/users/signin?authType=email",
+      {
+        email: data.email!,
+        password: data.password!,
+      },
+    );
+
+    const parsedResponse = v.safeParse(emailSignInSuccessResponseSchema, responseData);
+    if (!parsedResponse.success) {
+      showMessage({
+        message: "Sign-in Failed",
+        description: "Invalid email or password. Please try again.",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      return;
+    }
+
+    const { token, user } = parsedResponse.output;
 
     if (user.isVerified === false) {
       showMessage({
@@ -247,23 +254,6 @@ export const handleEmailSignIn = async ({
       });
       return;
     }
-
-    const userResults = parseUser(user);
-    const tokenResults = parseToken(token);
-    logger.info("Parsed user and token:", { userResults, tokenResults });
-
-    if (!userResults || !tokenResults) {
-      showMessage({
-        message: "Sign-in Failed",
-        description: "Something went wrong. Please try again.",
-        type: "danger",
-        duration: 3000,
-        position: "bottom",
-      });
-      return;
-    }
-
-    setTimeout(() => {});
 
     if (user.className && user.role === "student") {
       await subscribeToClassName(user.className!);
@@ -314,15 +304,15 @@ export const handleEmailSignIn = async ({
       errorMessage = "Invalid email or password. Please try again.";
     } else if (e.response?.status === 400) {
       errorMessage =
-        e.response?.data?.error || "Please check your email and password.";
+        e.response?.data?.message || "Please check your email and password.";
     } else if (
       e.message?.includes("Network Error") ||
       e.message?.includes("connect")
     ) {
       errorMessage =
         "Unable to connect. Please check your internet connection.";
-    } else if (e.response?.data?.error) {
-      errorMessage = e.response.data.error;
+    } else if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
     } else if (e.response.status === 429) {
       errorMessage = e.response.data;
     }
@@ -343,14 +333,26 @@ export const handleEmailSignIn = async ({
 
 export const handleEmailSignUp = async (data: SignUpFormData) => {
   try {
-    const { status } = await http.post<{
-      user: UserSchema;
-      token: string;
-    }>("/api/users/signup?authType=email", {
-      name: data.fullName!,
-      email: data.email!,
-      password: data.password!,
-    });
+    const { data: responseData, status } = await http.post(
+      "/api/users/signup?authType=email",
+      {
+        name: data.fullName!,
+        email: data.email!,
+        password: data.password!,
+      },
+    );
+
+    const parsedResponse = v.safeParse(emailSignUpSuccessResponseSchema, responseData);
+    if (!parsedResponse.success) {
+      showMessage({
+        message: "Sign-up Failed",
+        description: "Unable to create account. Please try again.",
+        type: "danger",
+        duration: 3000,
+        position: "bottom",
+      });
+      return;
+    }
 
     if (status !== 201) {
       showMessage({
@@ -363,7 +365,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       return;
     }
 
-    useAuthStore.setState({ isAuthenticated: false }); // Require email verification
+    useAuthStore.setState({ isAuthenticated: false });
 
     showMessage({
       message: "Account Created!",
@@ -385,7 +387,7 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
         "This email is already registered. Please sign in instead.";
     } else if (e.response?.status === 400) {
       errorMessage =
-        e.response?.data?.error ||
+        e.response?.data?.message ||
         "Please check your information and try again.";
     } else if (
       e.message?.includes("Network Error") ||
@@ -393,8 +395,8 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     ) {
       errorMessage =
         "Unable to connect. Please check your internet connection.";
-    } else if (e.response?.data?.error) {
-      errorMessage = e.response.data.error;
+    } else if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
     }
 
     showMessage({

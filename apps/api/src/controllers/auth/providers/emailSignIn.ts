@@ -3,18 +3,21 @@ import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import * as v from "valibot";
+import { emailSignInRequestSchema } from "@attenex/api-contracts";
 
 export const emailSignIn = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-
-    // Validate required fields
-    if (!email || !password) {
+    const parsed = v.safeParse(emailSignInRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
       });
     }
+
+    const { email, password } = parsed.output;
+
     // Find user by email
     const existingUsers = await db
       .select()

@@ -4,46 +4,25 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db, users } from "../../../config/database_setup";
 import { logger } from "../../../utils/logger";
+import * as v from "valibot";
+import { linkedInAuthRequestSchema } from "@attenex/api-contracts";
 import "dotenv/config";
 
-// JWT configuration - should be a strong, random secret in production
 const JWT_SECRET = process.env.JWT_SECRET || "xxxx-xxxx-xxxx";
-
-// LinkedIn OAuth credentials - loaded from environment variables
 const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || "";
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET || "";
 
-/**
- * POST /api/auth/linkedin
- *
- * Main endpoint for LinkedIn OAuth authentication.
- * This endpoint handles the complete OAuth flow server-side for security.
- *
- * Request Body:
- * - code: Authorization code from LinkedIn redirect
- * - redirectUri: The redirect URI used in the OAuth request
- *
- * Response:
- * - success: boolean
- * - user: User object with id, email, name, role, className
- * - token: JWT token for session authentication
- *
- * Security Notes:
- * - Client secret is never sent to frontend
- * - Authorization code is single-use and expires quickly
- * - All LinkedIn API calls happen server-side
- */
 export const linkedInAuth = async (req: Request, res: Response) => {
   try {
-    // Extract authorization code and redirect URI from request
-    const { code, redirectUri } = req.body;
-
-    // Validate required parameters
-    if (!code || !redirectUri) {
+    const parsed = v.safeParse(linkedInAuthRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
-        error: "Missing required fields: code and redirectUri",
+        success: false,
+        message: "Missing required fields: code and redirectUri",
       });
     }
+
+    const { code, redirectUri } = parsed.output;
 
     logger.info("LinkedIn OAuth: Starting token exchange process");
 
@@ -212,19 +191,18 @@ export const linkedInAuth = async (req: Request, res: Response) => {
   } catch (error: any) {
     logger.error("LinkedIn OAuth error: " + error);
 
-    // Handle different types of errors appropriately
     if (error.response?.data) {
-      // LinkedIn API error (invalid code, expired token, etc.)
       return res.status(400).json({
-        error:
+        success: false,
+        message:
           error.response.data.error_description ||
           "LinkedIn authentication failed",
       });
     }
 
-    // Generic server error
     res.status(500).json({
-      error: "Internal server error during LinkedIn authentication",
+      success: false,
+      message: "Internal server error during LinkedIn authentication",
     });
   }
 };

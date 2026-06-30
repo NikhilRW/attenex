@@ -4,18 +4,21 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@utils/email";
 import { logger } from "@utils/logger";
+import * as v from "valibot";
+import { emailSignUpRequestSchema } from "@attenex/api-contracts";
 
 export const emailSignUp = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
-    // Validate required fields
-
-    if (!name || !email || !password) {
+    const parsed = v.safeParse(emailSignUpRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Name, email, and password are required",
       });
     }
+
+    const { name, email, password } = parsed.output;
+
     // Check if user already exists
     const existingUsers = await db
       .select()

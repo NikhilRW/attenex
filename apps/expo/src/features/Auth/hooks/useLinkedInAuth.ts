@@ -1,5 +1,4 @@
 import { mutationKeys } from "@/shared/constants/mutationKeys";
-import { parseToken, parseUser } from "@/shared/utils/parsers";
 import { linkedinAuthService } from "@auth/services/linkedinAuthService";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
@@ -70,45 +69,30 @@ export const useLinkedInAuth = () => {
     onSuccess: async (data) => {
       const { user, token } = data;
 
-      if (parseUser(user) && parseToken(token)) {
-        // Store user data and JWT token using the auth hook
-        await authService.login(user, token);
+      await authService.login(user, token);
 
-        if (user.className && user.role === "student") {
-          // Runnning In The Background
-          subscribeToClassName(user.className);
-        }
-
-        // Show success feedback to user
-        showMessage({
-          message: "Sign-in Successful!",
-          description: `Welcome, ${user.name}`,
-          type: "success",
-          duration: 2500,
-          position: "bottom",
-        });
-
-        logger.info(
-          `LinkedIn sign-in successful for user: ${user.email}`,
-          "LinkedInAuth",
-        );
-
-        // Navigate to role selection screen (next step in user onboarding)
-        useAuthStore.subscribe((newState, prevState) => {
-          if (newState.user && prevState.user === null) {
-            router.replace(getStartingScreenPath());
-          }
-        });
-      } else {
-        // Show success feedback to user
-        showMessage({
-          message: "Sign-in Failed",
-          description: `Something went wrong try again}`,
-          type: "danger",
-          duration: 2500,
-          position: "bottom",
-        });
+      if (user.className && user.role === "student") {
+        subscribeToClassName(user.className);
       }
+
+      showMessage({
+        message: "Sign-in Successful!",
+        description: `Welcome, ${user.name}`,
+        type: "success",
+        duration: 2500,
+        position: "bottom",
+      });
+
+      logger.info(
+        `LinkedIn sign-in successful for user: ${user.email}`,
+        "LinkedInAuth",
+      );
+
+      useAuthStore.subscribe((newState, prevState) => {
+        if (newState.user && prevState.user === null) {
+          router.replace(getStartingScreenPath());
+        }
+      });
     },
     onError: (error) => {
       const err = error as any;
@@ -116,8 +100,8 @@ export const useLinkedInAuth = () => {
       // Extract user-friendly error message
       let errorMessage = "Unable to sign in. Please try again.";
 
-      if (err.response?.data?.error) {
-        errorMessage = err.response.data.error;
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
       } else if (
         err.message?.includes("Network Error") ||
         err.message?.includes("connect")

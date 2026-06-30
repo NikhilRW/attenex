@@ -28,7 +28,6 @@ const axiosFetchEnv = {
 const attachAuthHeader = async (config: InternalAxiosRequestConfig) => {
   const state = useAuthStore.getState();
   let token = state.token;
-  console.log("token : ",token);
 
   if (!token) {
     token = await secureStore.getItem("jwt");

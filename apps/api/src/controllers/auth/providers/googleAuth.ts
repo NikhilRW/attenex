@@ -2,18 +2,20 @@ import { users, db } from "@config/database_setup";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import * as v from "valibot";
+import { googleAuthRequestSchema } from "@attenex/api-contracts";
 
 export const googleAuth = async (req: Request, res: Response) => {
   try {
-    const { name, email, oauth_id, oauth_provider, photo_url } = req.body;
-
-    // Validate required fields
-    if (!name || !email || !oauth_id || !oauth_provider) {
+    const parsed = v.safeParse(googleAuthRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Name, email, oauth_id, and oauth_provider are required",
       });
     }
+
+    const { name, email, oauth_id, oauth_provider, photo_url } = parsed.output;
 
     // Check if user already exists
     const existingUser = await db

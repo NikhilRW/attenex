@@ -8,7 +8,9 @@
     "typecheck": "bun run --filter='./apps/*' typecheck && bun run --filter='./packages/*' typecheck",
     "test": "bun run --filter='./apps/*' test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
+    "android": "bun run --filter='./apps/expo' android",
+    "dev": "bun run --filter='./apps/api' dev"
   },
   "devDependencies": {
     "prettier": "^3.7.4"
