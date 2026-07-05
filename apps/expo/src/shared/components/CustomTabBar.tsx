@@ -1,4 +1,4 @@
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import React from "react";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { routeNameToNavButtonTestId } from "../utils/ui";

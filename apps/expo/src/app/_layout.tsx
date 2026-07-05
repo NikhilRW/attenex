@@ -140,7 +140,6 @@ export default function RootLayout() {
       <StatusBar
         style={statusBarStyle}
         hideTransitionAnimation="fade"
-        translucent
       />
 
       <ThemedSafeAreaView style={styles.safeArea}>

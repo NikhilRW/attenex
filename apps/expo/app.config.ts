@@ -66,11 +66,11 @@ export default (): ExpoConfig => ({
   },
   plugins: [
     "expo-router",
+    "expo-status-bar",
     [
       "expo-location",
       {
-        locationAlwaysAndWhenInUsePermission:
-          "Allow $(PRODUCT_NAME) to use your location.",
+        locationAlwaysAndWhenInUsePermission: "Allow $(PRODUCT_NAME) to use your location.",
       },
     ],
     [
@@ -117,6 +117,7 @@ export default (): ExpoConfig => ({
           enableProguardInReleaseBuilds: true,
           enableShrinkResourcesInReleaseBuilds: true,
           enablePngCrunchInReleaseBuilds: true,
+          usePrecompiledHeaders: true,
           extraProguardRules: [
             // Keep your app classes
             "-keep class com.attenex.attenex.** { *; }",

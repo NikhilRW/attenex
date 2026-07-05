@@ -7,8 +7,8 @@ import { isFreshQuery } from "../utils/tanstack";
 import { lectureService } from "@/features/Classes/services/lectureService";
 import { StaleTime } from "../constants/tanstackConfig";
 import { queryKeys } from "../constants/queryKeys";
-import { BottomTabNavigationEventMap } from "node_modules/@react-navigation/bottom-tabs/lib/typescript/src/types";
-import { NavigationHelpers, ParamListBase } from "@react-navigation/native";
+import { NavigationHelpers, ParamListBase } from "expo-router/react-navigation";
+import { BottomTabNavigationEventMap } from "expo-router/js-tabs";
 
 export const useCustomTabBar = ({
   index,

@@ -16,7 +16,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   gradient,
   disabled = false,
   loading = false,
-  testID,
+  testID = "futuristic-button",
 }) => {
   const buttonScale = useSharedValue(1);
 
