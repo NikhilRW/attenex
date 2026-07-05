@@ -5,6 +5,7 @@ import db, {
   classes,
   geofenceLogs,
   lectures,
+  subjects,
   users,
 } from "@config/database_setup";
 import { AuthRequest } from "@middleware/auth";
@@ -15,7 +16,6 @@ export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
   const userId = req.user.id;
 
   try {
-    // Step 1: Get all lectures created by this teacher to delete their child records
     const teacherLectures = await db
       .select({ id: lectures.id })
       .from(lectures)
@@ -23,7 +23,6 @@ export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
 
     const lectureIds = teacherLectures.map((l) => l.id);
 
-    // Step 2: Delete all records where user is a student
     await Promise.all([
       db.delete(attendancePings).where(eq(attendancePings.studentId, userId)),
       db.delete(geofenceLogs).where(eq(geofenceLogs.studentId, userId)),
@@ -33,7 +32,6 @@ export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
       db.delete(attendance).where(eq(attendance.studentId, userId)),
     ]);
 
-    // Step 3: Delete all records for lectures created by this teacher (from ANY student)
     if (lectureIds.length > 0) {
       await Promise.all([
         db
@@ -49,13 +47,10 @@ export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
       ]);
     }
 
-    // Step 4: Delete lectures created by this teacher
     await db.delete(lectures).where(eq(lectures.teacherId, userId));
-
-    // Step 5: Delete classes created by this teacher
+    await db.delete(subjects).where(eq(subjects.teacherId, userId));
     await db.delete(classes).where(eq(classes.teacherId, userId));
 
-    // Step 4: Finally delete the user
     const deletedUser = await db
       .delete(users)
       .where(eq(users.id, userId))
@@ -66,18 +61,17 @@ export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
         success: true,
         message: "User account deleted successfully",
       });
-    } else {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
     }
+
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
   } catch (error) {
     console.error("Error deleting user account:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to delete user account",
-      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

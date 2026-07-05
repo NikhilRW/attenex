@@ -6,3 +6,4 @@ node_modules/
 .github/skills
 skills-lock.json
 .vscode
+/personal

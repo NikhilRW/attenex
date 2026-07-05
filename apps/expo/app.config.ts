@@ -11,7 +11,7 @@ export default (): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.attenex.attenex",
-    googleServicesFile: "./personal/google-services.json",
+    googleServicesFile: "./personal/secrets/google-services.json",
   },
   android: {
     config: {
@@ -19,7 +19,7 @@ export default (): ExpoConfig => ({
         apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY,
       },
     },
-    googleServicesFile: "./personal/google-services.json",
+    googleServicesFile: "./personal/secrets/google-services.json",
     permissions: [
       "ACCESS_COARSE_LOCATION",
       "ACCESS_FINE_LOCATION",

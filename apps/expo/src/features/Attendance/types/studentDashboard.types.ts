@@ -1,5 +1,5 @@
-import { UserSchema } from "@/shared/schemas/auth";
 import { Lecture } from "@attendance/types/common";
+import type { SuccessResponse } from "@attenex/api-contracts";
 import { Dispatch, SetStateAction } from "react";
 
 /**
@@ -57,9 +57,7 @@ export interface UseClassManagementReturn {
   classUpdateLoading: boolean;
   setClassName: Dispatch<SetStateAction<string>>;
   setShowClassModal: Dispatch<SetStateAction<boolean>>;
-  handleUpdateClass: () => Promise<
-    { success: boolean; user: Partial<UserSchema> } | undefined
-  >;
+  handleUpdateClass: () => Promise<SuccessResponse | undefined>;
 }
 
 export interface UseRollNoManagementReturn {

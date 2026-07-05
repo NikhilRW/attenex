@@ -2,6 +2,8 @@ import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import { classes, db, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
+import * as v from "valibot";
+import { updateStudentClassRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -15,9 +17,7 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
-    const { className } = req.body;
 
-    // Verify user is authenticated
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -25,7 +25,6 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Verify user is a student
     if (userRole !== "student") {
       return res.status(403).json({
         success: false,
@@ -33,42 +32,36 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Validate input
-    if (
-      !className ||
-      typeof className !== "string" ||
-      className.trim().length === 0
-    ) {
+    const parsed = v.safeParse(updateStudentClassRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Valid class name is required",
       });
     }
 
-    // Find classes with matching name (can be multiple teachers with same class name)
+    const { className } = parsed.output;
+
     const classRecords = await db
       .select()
       .from(classes)
-      .where(eq(classes.name, className.trim()));
+      .where(eq(classes.name, className));
 
     if (classRecords.length > 0) {
       logger.info(
-        `Found ${classRecords.length} class(es) with name: ${className.trim()}`
+        `Found ${classRecords.length} class(es) with name: ${className}`
       );
     } else {
-      logger.info(`No existing class found with name: ${className.trim()}`);
+      logger.info(`No existing class found with name: ${className}`);
     }
 
-    // Update the student's class name (they will join any lecture with this class name)
     await db
       .update(users)
-      .set({
-        className: className.trim(),
-      })
+      .set({ className })
       .where(eq(users.id, userId))
       .returning();
 
-    logger.info(`Updated student ${userId} class to: ${className.trim()}`);
+    logger.info(`Updated student ${userId} class to: ${className}`);
 
     return res.status(200).json({
       success: true,
@@ -79,7 +72,6 @@ export const updateStudentClass = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

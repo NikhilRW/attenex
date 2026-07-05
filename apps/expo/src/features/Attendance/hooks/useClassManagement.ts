@@ -10,9 +10,6 @@ import { storage } from "@shared/utils/mmkvStorage";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-/**
- * Custom hook to manage class updates
- */
 export const useClassManagement = (
   onClassUpdated: () => void,
 ): UseClassManagementReturn => {

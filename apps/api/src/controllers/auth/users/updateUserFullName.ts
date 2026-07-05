@@ -2,40 +2,50 @@ import db, { users } from "@config/database_setup";
 import { AuthRequest } from "@middleware/auth";
 import { eq } from "drizzle-orm";
 import { Response } from "express";
+import * as v from "valibot";
+import { updateUserFullNameRequestSchema } from "@attenex/api-contracts";
 
 export const updateUserFullName = async (req: AuthRequest, res: Response) => {
-  const { fullName } = req.body;
-  const userId = req?.user?.id;
+  try {
+    const userId = req.user?.id;
 
-  if (!fullName) {
-    return res
-      .json({
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        message: "Fullname not provided",
-      })
-      .status(401);
-  }
+        message: "Unauthorized",
+      });
+    }
 
-  const dbResponse = await db
-    .update(users)
-    .set({
-      name: fullName,
-    })
-    .where(eq(users.id, userId));
+    const parsed = v.safeParse(updateUserFullNameRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Fullname is required",
+      });
+    }
 
-  if (dbResponse.rowCount > 0) {
-    return res
-      .json({
+    const { fullName } = parsed.output;
+
+    const dbResponse = await db
+      .update(users)
+      .set({ name: fullName })
+      .where(eq(users.id, userId));
+
+    if (dbResponse.rowCount > 0) {
+      return res.status(200).json({
         success: true,
         message: "Fullname is updated",
-      })
-      .status(200);
-  }
+      });
+    }
 
-  return res
-    .json({
+    return res.status(500).json({
       success: false,
       message: "Fullname not updated due to some error kindly try again.",
-    })
-    .status(500);
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update fullname",
+    });
+  }
 };

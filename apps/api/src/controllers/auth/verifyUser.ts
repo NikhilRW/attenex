@@ -3,16 +3,20 @@ import { logger } from "@utils/logger";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import * as v from "valibot";
+import { verifyUserRequestSchema } from "@attenex/api-contracts";
 
 export const verifyUser = async (req: Request, res: Response) => {
   try {
-    const { email, token } = req.body;
-    if (!email || !token) {
+    const parsed = v.safeParse(verifyUserRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Email and token are required",
       });
     }
+
+    const { email, token } = parsed.output;
 
     const [user] = await db
       .select()
@@ -28,7 +32,6 @@ export const verifyUser = async (req: Request, res: Response) => {
     }
 
     if (user.isVerified) {
-        // e70e47ab-fb9e-4e65-9d1a-a4f1d16d44aa
       return res.status(400).json({
         success: false,
         message: "User is already verified",
@@ -57,7 +60,7 @@ export const verifyUser = async (req: Request, res: Response) => {
 
     await db
       .update(users)
-      .set({ isVerified: true,  })
+      .set({ isVerified: true })
       .where(eq(users.email, email));
     return res.status(200).json({
       success: true,

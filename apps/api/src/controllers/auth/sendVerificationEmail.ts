@@ -2,43 +2,58 @@ import { db, users } from "@config/database_setup";
 import { sendVerificationEmail } from "@utils/email";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
+import * as v from "valibot";
+import { sendVerificationEmailRequestSchema } from "@attenex/api-contracts";
 
 export const sendVerificationEmailController = async (
   req: Request,
   res: Response
 ) => {
-  const { email } = req.body;
+  try {
+    const parsed = v.safeParse(sendVerificationEmailRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
 
-  const user = (await db.select().from(users).where(eq(users.email, email)))[0];
+    const { email } = parsed.output;
 
-  if (!user) {
-    return res
-      .json({
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
         message: "User does not exist",
-        success: false,
-      })
-      .status(400);
-  }
+      });
+    }
 
-  if (user.isVerified) {
-    return res
-      .json({
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
         message: "User is already verified kindly sign up",
-        success: false,
-      })
-      .status(400);
-  }
+      });
+    }
 
-  await sendVerificationEmail({
-    email: user.email,
-    id: user.id,
-    name: user.name,
-  });
+    await sendVerificationEmail({
+      email: user.email,
+      id: user.id,
+      name: user.name,
+    });
 
-  return res
-    .json({
+    return res.status(200).json({
       success: true,
-      message: "Email has been sended",
-    })
-    .status(200);
+      message: "Email has been sent",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send verification email",
+    });
+  }
 };

@@ -1,6 +1,8 @@
 import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { showMessage } from "@shared/utils/toasts";
+import * as v from "valibot";
+import { sendVerificationEmailSuccessResponseSchema } from "@attenex/api-contracts";
 import { router } from "expo-router";
 
 export const sendVerificationEmailRequest = async (email: string) => {
@@ -13,7 +15,11 @@ export const handleVerificationEmailResponse = async (
   response: HttpResponse<any>,
 ) => {
   try {
-    if (response.data.success) {
+    const parsed = v.safeParse(
+      sendVerificationEmailSuccessResponseSchema,
+      response.data,
+    );
+    if (parsed.success) {
       showMessage({
         message: "Verification Email Sent",
         description:

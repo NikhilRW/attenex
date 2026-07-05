@@ -37,20 +37,19 @@ export const useCreateLectureScreen = () => {
     router.navigate("/classes");
   };
 
-  const fetchTeacherClasses: () => Promise<ClassItem[] | null> =
-    useCallback(async () => {
-      try {
-        const res = await lectureService.getTeacherClasses();
-        let currentClasses: ClassItem[] = [];
-        if (res.success) {
-          currentClasses = [...res.data];
-        }
-        return currentClasses;
-      } catch (error) {
-        console.log("Error fetching classes", error);
-        throw error;
+  const fetchTeacherClasses: () => Promise<ClassItem[] | null> = useCallback(async () => {
+    try {
+      const res = await lectureService.getTeacherClasses();
+      let currentClasses: ClassItem[] = [];
+      if (res.success) {
+        currentClasses = [...res.data];
       }
-    }, []);
+      return currentClasses;
+    } catch (error) {
+      console.log("Error fetching classes", error);
+      throw error;
+    }
+  }, []);
 
   const { data: existingClasses } = useQuery({
     queryFn: fetchTeacherClasses,
@@ -61,20 +60,19 @@ export const useCreateLectureScreen = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const fetchTeacherSubjects: () => Promise<SubjectItem[] | null> =
-    useCallback(async () => {
-      try {
-        const res = await lectureService.getSubjects();
-        let currentSubjects: SubjectItem[] = [];
-        if (res.success) {
-          currentSubjects = [...res.data];
-        }
-        return currentSubjects;
-      } catch (error) {
-        console.log("Error fetching subjects", error);
-        throw error;
+  const fetchTeacherSubjects: () => Promise<SubjectItem[] | null> = useCallback(async () => {
+    try {
+      const res = await lectureService.getSubjects();
+      let currentSubjects: SubjectItem[] = [];
+      if (res.success) {
+        currentSubjects = [...res.data];
       }
-    }, []);
+      return currentSubjects;
+    } catch (error) {
+      console.log("Error fetching subjects", error);
+      throw error;
+    }
+  }, []);
 
   const { data: existingSubjects } = useQuery({
     queryFn: fetchTeacherSubjects,
@@ -117,9 +115,7 @@ export const useCreateLectureScreen = () => {
 
       const tempLectureId = "temp-" + new Date().getTime();
       const optimisticDuration =
-        variables.duration === -1
-          ? variables.customDuration.trim()
-          : String(variables.duration);
+        variables.duration === -1 ? variables.customDuration.trim() : String(variables.duration);
       const newLecture: LectureWithCount = {
         id: tempLectureId,
         subject: optimisticSubject,
@@ -133,16 +129,13 @@ export const useCreateLectureScreen = () => {
         duration: optimisticDuration,
       };
 
-      context.client.setQueryData<LectureWithCount[]>(
-        queryKeys.lectures.teacher,
-        (old) => {
-          if (old) {
-            return [newLecture, ...old];
-          } else {
-            return [newLecture];
-          }
-        },
-      );
+      context.client.setQueryData<LectureWithCount[]>(queryKeys.lectures.teacher, (old) => {
+        if (old) {
+          return [newLecture, ...old];
+        } else {
+          return [newLecture];
+        }
+      });
       navigateToTeacherDashboard();
       return { previousLectures, tempLectureId };
     },
@@ -169,41 +162,33 @@ export const useCreateLectureScreen = () => {
           duration: createdLecture.duration,
         };
 
-        context.client.setQueryData<LectureWithCount[]>(
-          queryKeys.lectures.teacher,
-          (old) => {
-            if (!old) {
-              return [lectureWithCount];
+        context.client.setQueryData<LectureWithCount[]>(queryKeys.lectures.teacher, (old) => {
+          if (!old) {
+            return [lectureWithCount];
+          }
+
+          let replacedTempLecture = false;
+          const lecturesWithoutDuplicate = old.filter(
+            (lecture) => lecture.id !== lectureWithCount.id,
+          );
+          const nextLectures = lecturesWithoutDuplicate.map((lecture) => {
+            if (lecture.id !== onMutateResult.tempLectureId) {
+              return lecture;
             }
 
-            let replacedTempLecture = false;
-            const lecturesWithoutDuplicate = old.filter(
-              (lecture) => lecture.id !== lectureWithCount.id,
-            );
-            const nextLectures = lecturesWithoutDuplicate.map((lecture) => {
-              if (lecture.id !== onMutateResult.tempLectureId) {
-                return lecture;
-              }
+            replacedTempLecture = true;
+            return lectureWithCount;
+          });
 
-              replacedTempLecture = true;
-              return lectureWithCount;
-            });
-
-            return replacedTempLecture
-              ? nextLectures
-              : [lectureWithCount, ...nextLectures];
-          },
-        );
+          return replacedTempLecture ? nextLectures : [lectureWithCount, ...nextLectures];
+        });
         alert("Success", "Lecture created successfully!", [{ text: "OK" }]);
         await context.client.invalidateQueries({
           queryKey: queryKeys.lectures.teacher,
           refetchType: "none",
         });
       } else {
-        context.client.setQueryData(
-          queryKeys.lectures.teacher,
-          onMutateResult.previousLectures,
-        );
+        context.client.setQueryData(queryKeys.lectures.teacher, onMutateResult.previousLectures);
         if (data) {
           alert("Error", "Failed to create lecture kindly try again", [
             { text: "OK", onPress: selectionAsync },
@@ -213,10 +198,7 @@ export const useCreateLectureScreen = () => {
     },
     onError(error, _, onMutateResult, context) {
       alert("Error", error.message || "Failed to create lecture");
-      context.client.setQueryData(
-        queryKeys.lectures.teacher,
-        onMutateResult?.previousLectures,
-      );
+      context.client.setQueryData(queryKeys.lectures.teacher, onMutateResult?.previousLectures);
     },
     mutationKey: mutationKeys.lectures.create,
   });
@@ -232,17 +214,11 @@ export const useCreateLectureScreen = () => {
   };
 
   const afterClassNameAdded = useCallback(() => {
+    setSelectedClass(newClassName);
     setNewClassName("");
     setShowNewClassModal(false);
     setShowClassDropdown(true);
-  }, []);
- // TODO: why this is added ?
-  const afterSubjectNameAdded = useCallback((name: string, id: string) => {
-    setNewSubjectName("");
-    setShowNewSubjectModal(false);
-    setSelectedSubject(name);
-    setSelectedSubjectId(id);
-  }, []);
+  }, [newClassName]);
 
   const { mutateAsync: handleCreateNewClass } = useMutation<
     { success: boolean; message: string },
@@ -250,7 +226,7 @@ export const useCreateLectureScreen = () => {
     string,
     { previousClasses: ClassItem[] } | null
   >({
-    mutationKey: mutationKeys.subjects.create,
+    mutationKey: mutationKeys.classes.create,
     onMutate: async (params, context) => {
       if (!params.trim()) {
         alert("Error", "Please enter a class name");
@@ -260,32 +236,25 @@ export const useCreateLectureScreen = () => {
       await context.client.cancelQueries({
         queryKey: queryKeys.classes.teacher,
       });
-      const previousClasses = context.client.getQueryData<ClassItem[]>(
-        queryKeys.classes.teacher,
-      );
-      context.client.setQueryData<ClassItem[]>(
-        queryKeys.classes.teacher,
-        (old) => {
-          const newClassNames: ClassItem[] = [];
-          if (old) {
-            newClassNames.push(
-              ...old.filter((classEle) => classEle.name !== newClassNameParam),
-            );
-          }
-          newClassNames.push({
-            id: "temp" + new Date().getTime(),
-            name: newClassNameParam,
-          });
-          return newClassNames;
-        },
-      );
-      afterClassNameAdded();
+      const previousClasses = context.client.getQueryData<ClassItem[]>(queryKeys.classes.teacher);
+      context.client.setQueryData<ClassItem[]>(queryKeys.classes.teacher, (old) => {
+        const newClassNames: ClassItem[] = [];
+        if (old) {
+          newClassNames.push(...old.filter((classEle) => classEle.name !== newClassNameParam));
+        }
+        newClassNames.push({
+          id: "temp" + new Date().getTime(),
+          name: newClassNameParam,
+        });
+        return newClassNames;
+      });
       return {
         previousClasses: previousClasses!,
       };
     },
     onSuccess: async (res, _, onMutateResult, context) => {
       if (res.success) {
+        afterClassNameAdded();
         await context.client.invalidateQueries({
           queryKey: queryKeys.classes.teacher,
         });
@@ -332,20 +301,17 @@ export const useCreateLectureScreen = () => {
       const previousSubjects = context.client.getQueryData<SubjectItem[]>(
         queryKeys.lectures.subjects,
       );
-      context.client.setQueryData<SubjectItem[]>(
-        queryKeys.lectures.subjects,
-        (old) => {
-          const result: SubjectItem[] = [];
-          if (old) {
-            result.push(...old.filter((s) => s.name !== name));
-          }
-          result.push({
-            id: "temp" + new Date().getTime(),
-            name,
-          });
-          return result;
-        },
-      );
+      context.client.setQueryData<SubjectItem[]>(queryKeys.lectures.subjects, (old) => {
+        const result: SubjectItem[] = [];
+        if (old) {
+          result.push(...old.filter((s) => s.name !== name));
+        }
+        result.push({
+          id: "temp" + new Date().getTime(),
+          name,
+        });
+        return result;
+      });
       return {
         previousSubjects: previousSubjects!,
       };
@@ -445,10 +411,7 @@ export const useCreateLectureScreen = () => {
 
   const handleCloseNewClassModal = () => setShowNewClassModal(false);
 
-  const minHeightScrollView = useMemo(
-    () => getMinHeightForScrollView(height),
-    [height],
-  );
+  const minHeightScrollView = useMemo(() => getMinHeightForScrollView(height), [height]);
 
   return {
     // State

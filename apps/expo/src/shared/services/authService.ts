@@ -5,6 +5,8 @@ import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { secureStore } from "@shared/utils/secureStore";
 import { showMessage } from "@shared/utils/toasts";
+import * as v from "valibot";
+import { deleteUserAccountSuccessResponseSchema } from "@attenex/api-contracts";
 import { router } from "expo-router";
 
 export const authService = {
@@ -41,7 +43,11 @@ export const authService = {
   async deleteUserAccount() {
     try {
       const response = await http.delete("/api/users/delete-account");
-      if (response.data.success) {
+      const parsed = v.safeParse(
+        deleteUserAccountSuccessResponseSchema,
+        response.data,
+      );
+      if (parsed.success) {
         await secureStore.removeItem("jwt");
         await secureStore.removeItem("is-signup");
         if (GoogleSignin.hasPreviousSignIn()) {

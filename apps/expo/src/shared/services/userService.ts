@@ -6,6 +6,13 @@ import {
 } from "@shared/utils/fcm";
 import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
+import * as v from "valibot";
+import {
+  updateUserRoleSuccessResponseSchema,
+  updateStudentClassSuccessResponseSchema,
+  updateUserDeviceTokenSuccessResponseSchema,
+  updateUserFullNameSuccessResponseSchema,
+} from "@attenex/api-contracts";
 
 export const userService = {
   async updateUserRole(role: "teacher" | "student") {
@@ -13,24 +20,33 @@ export const userService = {
       const response = await http.post("/api/users/update-role", {
         role,
       });
+
+      const parsed = v.safeParse(
+        updateUserRoleSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Failed to update user role");
+      }
+
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
         const token = await getDeviceToken();
         await this.updateUserToken(token);
       }
       if (role === "student") {
-        // Ensure className is subscribed if role is changed to student
         const className = useAuthStore.getState().user?.className;
         if (className) {
           await subscribeToClassName(className);
         }
         await this.updateUserToken(null);
       }
-      return response.data;
+
+      return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateUserRole - error", error);
       throw new Error(
-        error.response?.data?.error || "Failed to update user role",
+        error.response?.data?.message || "Failed to update user role",
       );
     }
   },
@@ -40,13 +56,20 @@ export const userService = {
       const response = await http.post("/api/users/update-class", {
         className,
       });
-      unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
-      // Update the user in the auth store with the new class
-      if (response.data.success) {
-        useAuthStore.getState().updateUser({ className: className.trim() });
-        await subscribeToClassName(className.trim());
+
+      const parsed = v.safeParse(
+        updateStudentClassSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Failed to update student class");
       }
-      return response.data;
+
+      unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
+      useAuthStore.getState().updateUser({ className: className.trim() });
+      await subscribeToClassName(className.trim());
+
+      return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateStudentClass - error", error);
       throw new Error(
@@ -59,18 +82,36 @@ export const userService = {
       const response = await http.post("/api/users/update-device-token", {
         token,
       });
-      return response.data;
+
+      const parsed = v.safeParse(
+        updateUserDeviceTokenSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Failed to update device token");
+      }
+
+      return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateUserToken - error", error);
       throw new Error(
-        error.response?.data?.message || "Failed to update student class",
+        error.response?.data?.message || "Failed to update device token",
       );
     }
   },
   async updateUserFullName(fullName: string) {
     try {
       const response = await http.patch("/api/users/full-name", { fullName });
-      return response.data;
+
+      const parsed = v.safeParse(
+        updateUserFullNameSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Failed to update user full name");
+      }
+
+      return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateUserFullName - error", error.message);
       throw new Error(error.message || "Failed to update user full name");

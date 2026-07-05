@@ -5,6 +5,7 @@ import {
   emailSignInSuccessResponseSchema,
   emailSignUpSuccessResponseSchema,
   googleAuthSuccessResponseSchema,
+  verifyUserSuccessResponseSchema,
 } from "@attenex/api-contracts";
 import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
@@ -415,14 +416,15 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
 export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
   try {
     const token = deepLink.queryParams!.token;
-    const response = await http.post<{ success: boolean; message: string }>(
+    const response = await http.post(
       "/api/users/verify-user",
       {
         token: decodeURIComponent(token as string),
         email: decodeURIComponent(deepLink.queryParams!.email as string),
       },
     );
-    if (response.data.success) {
+    const parsed = v.safeParse(verifyUserSuccessResponseSchema, response.data);
+    if (parsed.success) {
       router.replace("/(auth)/sign-in?verified=true");
       useAuthStore.setState({ isAuthenticated: false });
     } else {
@@ -437,8 +439,8 @@ export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
   } catch (err) {
     const e = err as any;
     let errorMessage = "Email verification failed. Please try again.";
-    if (e.response?.data?.error) {
-      errorMessage = e.response.data.error;
+    if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
     }
     showMessage({
       message: "Verification Failed",

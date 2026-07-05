@@ -8,6 +8,11 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { mutationKeys } from "@shared/constants/mutationKeys";
 import http from "@shared/utils/http";
 import { showMessage } from "@shared/utils/toasts";
+import * as v from "valibot";
+import {
+  verifyResetTokenSuccessResponseSchema,
+  resetPasswordSuccessResponseSchema,
+} from "@attenex/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -57,10 +62,19 @@ export const useResetPassword = () => {
         token,
       });
 
-      return { isValid: true, userName: response.data.userName || "" };
+      const parsed = v.safeParse(
+        verifyResetTokenSuccessResponseSchema,
+        response.data,
+      );
+
+      if (parsed.success) {
+        return { isValid: true, userName: parsed.output.userName };
+      }
+
+      return { isValid: false, userName: "" };
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.error ||
+        error.response?.data?.message ||
         "This reset link is invalid or has expired";
 
       showMessage({
@@ -86,11 +100,20 @@ export const useResetPassword = () => {
   const resetPasswordMutation = useMutation({
     mutationKey: mutationKeys.auth.resetPassword,
     mutationFn: async (data: ResetPasswordFormData) => {
-      await http.post("/api/users/reset-password", {
+      const response = await http.post("/api/users/reset-password", {
         email: email,
         token: token,
         newPassword: data.newPassword,
       });
+
+      const parsed = v.safeParse(
+        resetPasswordSuccessResponseSchema,
+        response.data,
+      );
+
+      if (!parsed.success) {
+        throw new Error("Invalid response from server");
+      }
     },
     onSuccess: () => {
       showMessage({
@@ -105,7 +128,7 @@ export const useResetPassword = () => {
     },
     onError: (error: any) => {
       const errorMessage =
-        error.response?.data?.error ||
+        error.response?.data?.message ||
         "Unable to reset password. Please try again.";
 
       showMessage({

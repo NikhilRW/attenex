@@ -29,7 +29,7 @@ export const roleUpdateMutateFn = async (role: UserRole) => {
 
 export const createNewClassMutateFn = async (className: string) => {
   if (!className.trim()) {
-    return;
+    throw new Error("Class name cannot be empty.");
   }
   impactAsync(ImpactFeedbackStyle.Medium);
   const res = await lectureService.addTeacherClass(className.trim());

@@ -2,46 +2,41 @@ import { db, users } from "@config/database_setup";
 import { AuthRequest } from "@middleware/auth";
 import { eq } from "drizzle-orm";
 import { Response } from "express";
+import * as v from "valibot";
+import { updateUserRoleRequestSchema } from "@attenex/api-contracts";
 
-/**
- * Update User Role Controller
- *
- * Updates the user's role to either "teacher" or "student" after authentication.
- * This is typically called after initial signup when the user selects their role.
- *
- * Route: POST /api/users/update-role
- * Auth: Required (JWT)
- * Body: { role: "teacher" | "student" }
- */
 export const updateUserRole = async (req: AuthRequest, res: Response) => {
   try {
-    const { role } = req.body;
     const userId = req.user?.id;
 
-    // Validate user is authenticated
     if (!userId) {
-      return res.status(401).json({ error: "User not authenticated" });
-    }
-
-    // Validate role
-    if (!role || !["teacher", "student"].includes(role)) {
-      return res.status(400).json({
-        error: "Invalid role. Must be either 'teacher' or 'student'",
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
       });
     }
 
-    // Update user role in database
+    const parsed = v.safeParse(updateUserRoleRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role. Must be either 'teacher' or 'student'",
+      });
+    }
+
+    const { role } = parsed.output;
+
     const updatedUsers = await db
       .update(users)
-      .set({
-        role: role as "teacher" | "student",
-        updatedAt: new Date(),
-      })
+      .set({ role, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
 
     if (!updatedUsers.length) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     return res.status(200).json({
@@ -52,7 +47,7 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
     console.error("Error updating user role:", error);
     return res.status(500).json({
       success: false,
-      error: "Failed to update user role. Please try again.",
+      message: "Failed to update user role. Please try again.",
     });
   }
 };

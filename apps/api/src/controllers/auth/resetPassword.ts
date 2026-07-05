@@ -5,51 +5,49 @@ import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import axios from "axios";
+import * as v from "valibot";
+import {
+  forgotPasswordRequestSchema,
+  verifyResetTokenRequestSchema,
+  resetPasswordRequestSchema,
+} from "@attenex/api-contracts";
 import { EMAIL_SERVER_ENDPOINT } from "../../constants/endpoints";
 
-/**
- * Request Password Reset
- *
- * Sends a password reset email with a secure token link.
- * The token expires after 1 hour for security.
- */
 export const requestPasswordReset = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-
-    if (!email) {
+    const parsed = v.safeParse(forgotPasswordRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
-        error: "Email is required",
+        success: false,
+        message: "Valid email is required",
       });
     }
 
-    // Find user by email
+    const { email } = parsed.output;
+
     const [user] = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
 
-    // Always return success to prevent email enumeration attacks
     if (!user) {
       return res.status(200).json({
         message: "If that email exists, a reset link has been sent",
       });
     }
 
-    // Only allow password reset for email/password users (not OAuth users)
     if (user.oauthProvider) {
       return res.status(400).json({
-        error: `This account uses ${user.oauthProvider} sign-in. Please use ${user.oauthProvider} to access your account.`,
+        success: false,
+        message: `This account uses ${user.oauthProvider} sign-in. Please use ${user.oauthProvider} to access your account.`,
       });
     }
 
-    // Generate secure reset token
     const resetToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = await bcrypt.hash(resetToken, 10);
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    // Save hashed token to database
     await db
       .update(users)
       .set({
@@ -59,7 +57,6 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
       })
       .where(eq(users.id, user.id));
 
-    // Create reset link (deep link for mobile app)
     const resetLink = `https://attenex.vercel.app/auth/reset-password?token=${encodeURIComponent(
       resetToken,
     )}&email=${encodeURIComponent(email)}`;
@@ -108,8 +105,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
       user.name || "there"
     },\n\nWe received a request to reset your password for your Attenex account.\n\nClick this link to reset your password (expires in 1 hour):\n${resetLink}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nThe Attenex Team`;
 
-    // Send reset email
-    const response = await axios.post(EMAIL_SERVER_ENDPOINT, {
+    await axios.post(EMAIL_SERVER_ENDPOINT, {
       to: email,
       subject: "Reset Your Password - Attenex",
       text,
@@ -122,26 +118,23 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Password reset request error:", error);
     return res.status(500).json({
-      error: "Unable to process password reset request. Please try again.",
+      success: false,
+      message: "Unable to process password reset request. Please try again.",
     });
   }
 };
 
-/**
- * Verify Reset Token
- *
- * Validates that a reset token is valid and not expired.
- * Used by frontend to check token before showing reset form.
- */
 export const verifyResetToken = async (req: Request, res: Response) => {
   try {
-    const { email, token } = req.body;
-
-    if (!email || !token) {
+    const parsed = v.safeParse(verifyResetTokenRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
-        error: "Email and token are required",
+        success: false,
+        message: "Email and token are required",
       });
     }
+
+    const { email, token } = parsed.output;
 
     const [user] = await db
       .select()
@@ -151,23 +144,24 @@ export const verifyResetToken = async (req: Request, res: Response) => {
 
     if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
       return res.status(400).json({
-        error: "Invalid or expired reset link",
+        success: false,
+        message: "Invalid or expired reset link",
       });
     }
 
-    // Check if token is expired
     if (new Date() > new Date(user.resetTokenExpiresAt)) {
       return res.status(400).json({
-        error: "Reset link has expired. Please request a new one.",
+        success: false,
+        message: "Reset link has expired. Please request a new one.",
       });
     }
 
-    // Verify token
     const isValid = await bcrypt.compare(token, user.resetToken);
 
     if (!isValid) {
       return res.status(400).json({
-        error: "Invalid or expired reset link",
+        success: false,
+        message: "Invalid or expired reset link",
       });
     }
 
@@ -178,34 +172,24 @@ export const verifyResetToken = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Token verification error:", error);
     return res.status(500).json({
-      error: "Unable to verify reset token",
+      success: false,
+      message: "Unable to verify reset token",
     });
   }
 };
 
-/**
- * Reset Password with Token
- *
- * Updates user password after validating reset token.
- * Clears the reset token after successful password update.
- */
 export const resetPassword = async (req: Request, res: Response) => {
   try {
-    const { email, token, newPassword } = req.body;
-
-    if (!email || !token || !newPassword) {
+    const parsed = v.safeParse(resetPasswordRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
-        error: "Email, token, and new password are required",
+        success: false,
+        message: "Email, token, and new password are required",
       });
     }
 
-    // Validate password strength
-    if (newPassword.length < 8) {
-      return res.status(400).json({
-        error: "Password must be at least 8 characters long",
-      });
-    }
-
+    const { email, token, newPassword } = parsed.output;
+// TODO: try to make the response message more generic info not detailed to avoid giving hints to potential attackers about the validity of the email or token.
     const [user] = await db
       .select()
       .from(users)
@@ -214,33 +198,29 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
       return res.status(400).json({
-        error: "Invalid or expired reset link",
+        success: false,
+        message: "Invalid or expired reset link",
       });
     }
-    console.log("i am here 1");
 
-    // Check if token is expired
     if (new Date() > new Date(user.resetTokenExpiresAt)) {
       return res.status(400).json({
-        error: "Reset link has expired. Please request a new one.",
+        success: false,
+        message: "Reset link has expired. Please request a new one.",
       });
     }
-    console.log("i am here 2");
 
-    // Verify token
     const isValid = await bcrypt.compare(token, user.resetToken);
 
     if (!isValid) {
       return res.status(400).json({
-        error: "Invalid or expired reset link",
+        success: false,
+        message: "Invalid or expired reset link",
       });
     }
-    console.log("i am here 3");
 
-    // Hash new password
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
-    // Update password and clear reset token
     await db
       .update(users)
       .set({
@@ -258,7 +238,8 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Password reset error:", error);
     return res.status(500).json({
-      error: "Unable to reset password. Please try again.",
+      success: false,
+      message: "Unable to reset password. Please try again.",
     });
   }
 };
