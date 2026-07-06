@@ -66,7 +66,7 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
           .select({ count: sql<number>`count(*)` })
           .from(attendance)
           .where(eq(attendance.lectureId, lecture.id));
-        const presentCount = studentCountRes[0]?.count || 0;
+        const presentCount = Number(studentCountRes[0]?.count || 0);
 
         let totalClassStudents = 0;
         if (lecture.className) {
@@ -79,7 +79,7 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
                 eq(users.role, "student"),
               ),
             );
-          totalClassStudents = totalStudentsRes[0]?.count || 0;
+          totalClassStudents = Number(totalStudentsRes[0]?.count || 0);
         }
 
         const absentCount = totalClassStudents - presentCount;
@@ -106,7 +106,6 @@ export const getAllLectures = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

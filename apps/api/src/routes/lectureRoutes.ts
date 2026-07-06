@@ -7,7 +7,6 @@ import { fetchLectureAttendance } from "../controllers/lectures/fetchLectureAtte
 import { getActiveLectures } from "../controllers/lectures/getActiveLectures";
 import { getAllClasses } from "../controllers/lectures/getAllClasses";
 import { getAllLectures } from "../controllers/lectures/getAllLectures";
-import { getLectureDetails } from "../controllers/lectures/getLectureDetails";
 import { getPasscode } from "../controllers/lectures/getPasscode";
 import { getStudentLectures } from "../controllers/lectures/getStudentLectures";
 import { getTeacherClasses } from "../controllers/lectures/getTeacherClasses";
@@ -36,7 +35,6 @@ router.get("/classes", authenticate, getTeacherClasses);
 router.post("/classes", authenticate, addTeacherClass);
 router.get("/subjects", authenticate, getTeacherSubjects);
 router.post("/subjects", authenticate, addTeacherSubject);
-router.get("/:lectureId/details", authenticate, getLectureDetails);
 router.get("/:lectureId/passcode", authenticate, getPasscode);
 router.put("/:lectureId/end", authenticate, endLecture);
 router.put("/:lectureId/update", authenticate, updateLecture);

@@ -48,3 +48,14 @@ export type { DeleteLectureSuccessResponse } from "./apiResponses/lectures/delet
 export { deleteLectureSuccessResponseSchema } from "./apiResponses/lectures/deleteLecture";
 export type { AddManualAttendanceSuccessResponse } from "./apiResponses/lectures/addManualAttendance";
 export { addManualAttendanceSuccessResponseSchema } from "./apiResponses/lectures/addManualAttendance";
+export type { EndLectureSuccessResponse } from "./apiResponses/lectures/endLecture";
+export { endLectureSuccessResponseSchema } from "./apiResponses/lectures/endLecture";
+export type { FetchLectureAttendanceSuccessResponse } from "./apiResponses/lectures/fetchLectureAttendance";
+export { fetchLectureAttendanceSuccessResponseSchema } from "./apiResponses/lectures/fetchLectureAttendance";
+export type { GetActiveLecturesSuccessResponse } from "./apiResponses/lectures/getActiveLectures";
+export { getActiveLecturesSuccessResponseSchema } from "./apiResponses/lectures/getActiveLectures";
+export type { GetAllClassesSuccessResponse } from "./apiResponses/lectures/getAllClasses";
+export { getAllClassesSuccessResponseSchema } from "./apiResponses/lectures/getAllClasses";
+export type { GetAllLecturesSuccessResponse } from "./apiResponses/lectures/getAllLectures";
+export { getAllLecturesSuccessResponseSchema } from "./apiResponses/lectures/getAllLectures";
+

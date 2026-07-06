@@ -1,3 +1,5 @@
+import { DeleteLectureSuccessResponse, GetAllLecturesSuccessResponse } from "@attenex/api-contracts";
+
 export interface LectureWithCount {
   id: string;
   subject: string;
@@ -20,7 +22,7 @@ export interface AttendanceRecord {
   status: "present" | "absent" | "incomplete";
   joinTime: string | null;
   submitTime: string | null;
-  checkScore: number;
+  checkScore: string;
   method: "manual" | "auto" | "oauth";
 }
 
@@ -35,5 +37,15 @@ export interface SubjectItem {
   id: string;
   name: string;
 }
+export type LectureApiItem = GetAllLecturesSuccessResponse["data"][number];
 
+export type LectureMutationResponse = DeleteLectureSuccessResponse;
 
+export type UpdateLectureVariables = {
+  lectureId: string;
+  duration: number;
+};
+
+export type LectureRollbackContext = {
+  previousLectures?: LectureWithCount[];
+} | null;

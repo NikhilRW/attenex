@@ -119,7 +119,6 @@ export const endLecture = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

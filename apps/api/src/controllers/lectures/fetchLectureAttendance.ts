@@ -136,7 +136,7 @@ export const fetchLectureAttendance = async (
           joinTime: null,
           submitTime: null,
           status: "absent" as const,
-          checkScore: 0,
+          checkScore: "0",
           method: "auto" as const,
           locationSnapshot: null,
         };
@@ -163,7 +163,6 @@ export const fetchLectureAttendance = async (
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

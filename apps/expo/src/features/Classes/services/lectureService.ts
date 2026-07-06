@@ -6,6 +6,9 @@ import {
   addTeacherSubjectSuccessResponseSchema,
   deleteLectureSuccessResponseSchema,
   addManualAttendanceSuccessResponseSchema,
+  endLectureSuccessResponseSchema,
+  getAllLecturesSuccessResponseSchema,
+  fetchLectureAttendanceSuccessResponseSchema,
 } from "@attenex/api-contracts";
 
 const API_URL = `/api/lectures`;
@@ -41,7 +44,11 @@ export const lectureService = {
   endLecture: async (lectureId: string) => {
     try {
       const response = await http.put(`${API_URL}/${lectureId}/end`, {});
-      return response.data;
+      const parsed = v.safeParse(endLectureSuccessResponseSchema, response.data);
+      if (!parsed.success) {
+        throw new Error("Invalid end lecture response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
@@ -50,20 +57,16 @@ export const lectureService = {
   getAllLectures: async () => {
     try {
       const response = await http.get(`${API_URL}/all`);
-      return response.data;
+      const parsed = v.safeParse(getAllLecturesSuccessResponseSchema, response.data);
+      if (!parsed.success) {
+        throw new Error("Invalid get all lectures response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
   },
 
-  getActiveLectures: async () => {
-    try {
-      const response = await http.get(`${API_URL}/active`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data || error.message;
-    }
-  },
   getTeacherClasses: async () => {
     try {
       const response = await http.get(`${API_URL}/classes`);
@@ -92,14 +95,6 @@ export const lectureService = {
   getStudentLectureDetails: async (lectureId: string) => {
     try {
       const response = await http.get(`${API_URL}/student/${lectureId}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data || error.message;
-    }
-  },
-  getTeacherLectureDetails: async (lectureId: string) => {
-    try {
-      const response = await http.get(`${API_URL}/${lectureId}/details`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
@@ -143,7 +138,11 @@ export const lectureService = {
   fetchLectureAttendance: async (lectureId: string) => {
     try {
       const response = await http.get(`${API_URL}/${lectureId}/attendance`);
-      return response.data;
+      const parsed = v.safeParse(fetchLectureAttendanceSuccessResponseSchema, response.data);
+      if (!parsed.success) {
+        throw new Error("Invalid fetch lecture attendance response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
@@ -204,14 +203,6 @@ export const lectureService = {
   getPasscode: async (lectureId: string) => {
     try {
       const response = await http.get(`${API_URL}/${lectureId}/passcode`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data || error.message;
-    }
-  },
-  getAllClasses: async () => {
-    try {
-      const response = await http.get(`${API_URL}/classes/all`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error.message;
