@@ -5,6 +5,8 @@ import { logger } from "../../utils/logger";
 import { generatePasscode } from "../../utils/passcode";
 import { sendNotification } from "@utils/sendNotification";
 import { scheduleLectureEnd } from "@utils/lecture";
+import * as v from "valibot";
+import { createLectureRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -19,7 +21,6 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const userRole = req.user?.role;
 
-    // Verify user is authenticated
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -27,7 +28,6 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Verify user is a teacher
     if (userRole !== "teacher") {
       return res.status(403).json({
         success: false,
@@ -35,9 +35,17 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const { className, subjectId, latitude, longitude, duration } = req.body;
+    const parsed = v.safeParse(createLectureRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Class name, subject, location, and duration are required",
+      });
+    }
 
-    // Look up subject to get the name
+    const { className, subjectId, latitude, longitude, duration } = parsed.output;
+
     let subjectName = "";
     if (subjectId) {
       const subject = await db
@@ -50,11 +58,7 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    logger.info(
-      `Creating lecture for teacher: ${userId}, class: ${className}, subject: ${subjectName}, location: (${latitude}, ${longitude}), duration: ${duration}`,
-    )
-    // Validate input
-    if (!className || !subjectName || !latitude || !longitude || !duration) {
+    if (!subjectName) {
       return res.status(400).json({
         success: false,
         message:
@@ -62,21 +66,10 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (typeof className !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Class name must be a string",
-      });
-    }
+    logger.info(
+      `Creating lecture for teacher: ${userId}, class: ${className}, subject: ${subjectName}, location: (${latitude}, ${longitude}), duration: ${duration}`,
+    );
 
-    if (className.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Class name cannot be empty",
-      });
-    }
-
-    // Check if class already exists for this teacher
     const existingClass = await db
       .select()
       .from(classes)
@@ -87,14 +80,12 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     let classNameStr: string;
 
     if (existingClass.length > 0) {
-      // Use existing class
       classId = existingClass[0].id;
       classNameStr = existingClass[0].name;
       logger.info(
         `Using existing class: ${classNameStr} (ID: ${classId}) for teacher: ${userId}`,
       );
     } else {
-      // Create new class with composite key (name, teacherId)
       const newClass = await db
         .insert(classes)
         .values({
@@ -110,7 +101,6 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
       );
     }
 
-    // Create the lecture
     const initialPasscode = generatePasscode();
     const newLectures = await db
       .insert(lectures)
@@ -130,8 +120,8 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     const newLecture = newLectures[0];
 
     logger.info(`Lecture created: ${newLecture.id} by teacher: ${userId}`);
-    await sendNotification(className, subjectName, newLecture.id, duration);
-    await scheduleLectureEnd(newLecture.id, parseInt(duration, 10));
+    await sendNotification(className, subjectName, newLecture.id, duration.toString());
+    await scheduleLectureEnd(newLecture.id, parseInt(duration.toString(), 10));
 
     return res.status(201).json({
       success: true,
@@ -153,7 +143,6 @@ export const createLecture = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

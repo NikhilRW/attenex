@@ -32,3 +32,19 @@ export { updateStudentClassSuccessResponseSchema } from "./apiResponses/auth/upd
 export { updateUserDeviceTokenSuccessResponseSchema } from "./apiResponses/auth/updateUserDeviceToken";
 export { updateUserRoleSuccessResponseSchema } from "./apiResponses/auth/updateUserRole";
 export { updateUserFullNameSuccessResponseSchema } from "./apiResponses/auth/users/updateUserFullName";
+
+// apiRequests - lectures
+export { addTeacherClassRequestSchema } from "./apiRequests/lectures/addTeacherClass";
+export { addTeacherSubjectRequestSchema } from "./apiRequests/lectures/addTeacherSubject";
+export { createLectureRequestSchema } from "./apiRequests/lectures/createLecture";
+export { addManualAttendanceRequestSchema } from "./apiRequests/lectures/addManualAttendance";
+
+// apiResponses - lectures
+export { addTeacherClassSuccessResponseSchema } from "./apiResponses/lectures/addTeacherClass";
+export type { AddTeacherSubjectSuccessResponse } from "./apiResponses/lectures/addTeacherSubject";
+export { addTeacherSubjectSuccessResponseSchema } from "./apiResponses/lectures/addTeacherSubject";
+export { createLectureResponseSchema } from "./apiResponses/lectures/createLecture";
+export type { DeleteLectureSuccessResponse } from "./apiResponses/lectures/deleteLecture";
+export { deleteLectureSuccessResponseSchema } from "./apiResponses/lectures/deleteLecture";
+export type { AddManualAttendanceSuccessResponse } from "./apiResponses/lectures/addManualAttendance";
+export { addManualAttendanceSuccessResponseSchema } from "./apiResponses/lectures/addManualAttendance";

@@ -25,7 +25,6 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
     const userRole = req.user?.role;
     const { lectureId } = req.params as unknown as LectureParams;
 
-    // Verify user is authenticated
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -33,7 +32,6 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Verify user is a teacher
     if (userRole !== "teacher") {
       return res.status(403).json({
         success: false,
@@ -48,7 +46,6 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Check if lecture exists and belongs to the teacher
     const existingLecture = await db
       .select()
       .from(lectures)
@@ -62,7 +59,6 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Only allow deleting ended lectures
     if (existingLecture[0].status !== "ended") {
       return res.status(400).json({
         success: false,
@@ -71,27 +67,16 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Delete all related records first (cascade delete)
-    // This ensures referential integrity is maintained
     logger.info(`Deleting all related records for lecture: ${lectureId}`);
 
-    // Delete attendance pings
     await db
       .delete(attendancePings)
       .where(eq(attendancePings.lectureId, lectureId));
-
-    // Delete geofence logs
     await db.delete(geofenceLogs).where(eq(geofenceLogs.lectureId, lectureId));
-
-    // Delete attendance attempts
     await db
       .delete(attendanceAttempts)
       .where(eq(attendanceAttempts.lectureId, lectureId));
-
-    // Delete attendance records
     await db.delete(attendance).where(eq(attendance.lectureId, lectureId));
-
-    // Finally, delete the lecture itself
     await db.delete(lectures).where(eq(lectures.id, lectureId));
 
     logger.info(
@@ -110,7 +95,6 @@ export const deleteLecture = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

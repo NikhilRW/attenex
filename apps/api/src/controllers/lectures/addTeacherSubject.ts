@@ -3,23 +3,27 @@ import { AuthRequest } from "@middleware/auth";
 import { logger } from "@utils/logger";
 import { and, eq } from "drizzle-orm";
 import { Response } from "express";
+import * as v from "valibot";
+import { addTeacherSubjectRequestSchema } from "@attenex/api-contracts";
 
 export const addTeacherSubject = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const name = req.body.name;
 
-    if (!name || !name.trim()) {
+    const parsed = v.safeParse(addTeacherSubjectRequestSchema, req.body);
+    if (!parsed.success) {
       return res.status(400).json({
         success: false,
         message: "Subject name is required",
       });
     }
 
+    const { name } = parsed.output;
+
     const existingSubject = await db
       .select()
       .from(subjects)
-      .where(and(eq(subjects.name, name.trim()), eq(subjects.teacherId, userId)))
+      .where(and(eq(subjects.name, name), eq(subjects.teacherId, userId)))
       .limit(1);
 
     if (existingSubject[0]) {
@@ -32,7 +36,7 @@ export const addTeacherSubject = async (req: AuthRequest, res: Response) => {
     const [newSubject] = await db
       .insert(subjects)
       .values({
-        name: name.trim(),
+        name,
         teacherId: userId,
       })
       .returning({ id: subjects.id });

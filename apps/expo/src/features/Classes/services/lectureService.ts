@@ -1,4 +1,12 @@
 import http from "@shared/utils/http";
+import * as v from "valibot";
+import {
+  createLectureResponseSchema,
+  addTeacherClassSuccessResponseSchema,
+  addTeacherSubjectSuccessResponseSchema,
+  deleteLectureSuccessResponseSchema,
+  addManualAttendanceSuccessResponseSchema,
+} from "@attenex/api-contracts";
 
 const API_URL = `/api/lectures`;
 
@@ -19,7 +27,12 @@ export const lectureService = {
         longitude,
       });
 
-      return response.data;
+      const parsed = v.safeParse(createLectureResponseSchema, response.data);
+      if (!parsed.success) {
+        throw new Error("Invalid create lecture response");
+      }
+
+      return parsed.output;
     } catch (error: any) {
       console.log(error);
       throw error.response?.data || error.message;
@@ -64,7 +77,14 @@ export const lectureService = {
       const response = await http.post(`${API_URL}/classes`, {
         className: newClassName,
       });
-      return response.data;
+      const parsed = v.safeParse(
+        addTeacherClassSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Invalid add class response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
@@ -107,7 +127,14 @@ export const lectureService = {
   deleteLecture: async (lectureId: string) => {
     try {
       const response = await http.delete(`${API_URL}/${lectureId}`);
-      return response.data;
+      const parsed = v.safeParse(
+        deleteLectureSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Invalid delete lecture response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
@@ -129,7 +156,14 @@ export const lectureService = {
           studentRollNo,
         },
       );
-      return response.data;
+      const parsed = v.safeParse(
+        addManualAttendanceSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Invalid manual attendance response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }
@@ -145,7 +179,14 @@ export const lectureService = {
   createSubject: async (name: string) => {
     try {
       const response = await http.post(`${API_URL}/subjects`, { name });
-      return response.data;
+      const parsed = v.safeParse(
+        addTeacherSubjectSuccessResponseSchema,
+        response.data,
+      );
+      if (!parsed.success) {
+        throw new Error("Invalid create subject response");
+      }
+      return parsed.output;
     } catch (error: any) {
       throw error.response?.data || error.message;
     }

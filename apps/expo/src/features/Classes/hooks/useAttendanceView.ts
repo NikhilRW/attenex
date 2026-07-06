@@ -1,3 +1,4 @@
+import type { AddManualAttendanceSuccessResponse } from "@attenex/api-contracts";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
@@ -256,7 +257,7 @@ export const useAttendanceView = () => {
 
   const manualAttendance = async () => {
     const trimmedRollNo = manualRollNo.trim();
-
+    // TODO: make the empty roll number more fast to appear.
     if (!trimmedRollNo) {
       throw new Error("Please enter student roll number.");
     }
@@ -269,7 +270,11 @@ export const useAttendanceView = () => {
   };
 
   const { mutate: handleManualAttendance, isPending: isSubmittingManual } =
-    useMutation({
+    useMutation<
+      AddManualAttendanceSuccessResponse,
+      Error,
+      void
+    >({
       mutationKey: mutationKeys.attendance.manual,
       mutationFn: manualAttendance,
       onSuccess: async (data) => {

@@ -9,6 +9,8 @@ import {
 } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { LectureParams } from "../../types/params";
+import * as v from "valibot";
+import { addManualAttendanceRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -23,9 +25,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const userRole = req.user?.role;
     const { lectureId } = req.params as unknown as LectureParams;
-    const { studentRollNo } = req.body;
 
-    // Verify user is authenticated
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -33,7 +33,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Verify user is a teacher
     if (userRole !== "teacher") {
       return res.status(403).json({
         success: false,
@@ -41,14 +40,23 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (!lectureId || !studentRollNo) {
+    if (!lectureId) {
       return res.status(400).json({
         success: false,
         message: "Lecture ID and student roll number are required",
       });
     }
 
-    // Check if lecture exists and belongs to the teacher, and get the class info
+    const parsed = v.safeParse(addManualAttendanceRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Lecture ID and student roll number are required",
+      });
+    }
+
+    const { studentRollNo } = parsed.output;
+
     const existingLecture = await db
       .select({
         lecture: lectures,
@@ -68,7 +76,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
 
     const lectureClass = existingLecture[0].class.name;
 
-    // Find the student by roll number and class
     const student = await db
       .select()
       .from(users)
@@ -90,7 +97,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
 
     const studentId = student[0].id;
 
-    // Check if attendance already exists
     const existingAttendance = await db
       .select()
       .from(attendance)
@@ -103,7 +109,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       .limit(1);
 
     if (existingAttendance.length > 0) {
-      // Update existing attendance to present
       const updatedAttendance = await db
         .update(attendance)
         .set({
@@ -139,7 +144,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Create new manual attendance record
     const newAttendance = await db
       .insert(attendance)
       .values({
@@ -149,7 +153,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
         submitTime: new Date(),
         status: "present",
         method: "manual",
-        checkScore: "100", // Full score for manual attendance
+        checkScore: "100",
       })
       .returning();
 
@@ -176,7 +180,6 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

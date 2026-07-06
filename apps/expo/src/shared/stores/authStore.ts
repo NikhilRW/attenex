@@ -11,11 +11,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   isNotSynced: boolean;
-  setAuth: (
-    user: UserSchema | null,
-    token: string | null,
-    isSignUp?: boolean,
-  ) => void;
+  setAuth: (user: UserSchema | null, token: string | null, isSignUp?: boolean) => void;
   updateUser: (user: Partial<UserSchema>) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
@@ -31,6 +27,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: true,
       setAuth: (user, token) => {
+        if (__DEV__) {
+          console.log(token);
+        }
         set({
           user,
           token,
@@ -40,9 +39,7 @@ export const useAuthStore = create<AuthState>()(
       },
       updateUser: (updatedFields) => {
         set((state) => ({
-          user: state.user
-            ? ({ ...state.user, ...updatedFields } as UserSchema)
-            : null,
+          user: state.user ? ({ ...state.user, ...updatedFields } as UserSchema) : null,
         }));
       },
       setIsNotSynced: (isNotSynced: boolean) => {

@@ -1,3 +1,4 @@
+import type { DeleteLectureSuccessResponse } from "@attenex/api-contracts";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
@@ -55,10 +56,7 @@ type LectureApiItem = Omit<
   totalClassStudents?: number | string | null;
 };
 
-type LectureMutationResponse = {
-  success: boolean;
-  message?: string;
-};
+type LectureMutationResponse = DeleteLectureSuccessResponse;
 
 type UpdateLectureVariables = {
   lectureId: string;

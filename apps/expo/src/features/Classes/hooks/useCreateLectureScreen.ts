@@ -1,3 +1,4 @@
+import type { AddTeacherSubjectSuccessResponse } from "@attenex/api-contracts";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { lectureService } from "@classes/services/lectureService";
@@ -217,7 +218,7 @@ export const useCreateLectureScreen = () => {
     setSelectedClass(newClassName);
     setNewClassName("");
     setShowNewClassModal(false);
-    setShowClassDropdown(true);
+    setShowClassDropdown(false);
   }, [newClassName]);
 
   const { mutateAsync: handleCreateNewClass } = useMutation<
@@ -267,13 +268,15 @@ export const useCreateLectureScreen = () => {
       }
     },
     onError(error, _, onMutateResult, context) {
+      // TODO: inline the error there in the input box.
+      setShowNewClassModal(false);
+      setShowClassDropdown(false);
       if (onMutateResult?.previousClasses) {
         context.client.setQueryData<ClassItem[]>(
           queryKeys.classes.teacher,
           onMutateResult.previousClasses,
         );
       }
-
       if ((error as any).response?.status === 409) {
         alert("Info", "Class name added already exists");
       } else {
@@ -284,7 +287,7 @@ export const useCreateLectureScreen = () => {
   });
 
   const { mutateAsync: handleCreateNewSubject } = useMutation<
-    { success: boolean; message: string; data?: { id: string } },
+    AddTeacherSubjectSuccessResponse,
     Error,
     string,
     { previousSubjects: SubjectItem[] } | null
