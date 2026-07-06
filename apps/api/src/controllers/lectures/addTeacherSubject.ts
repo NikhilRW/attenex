@@ -44,7 +44,7 @@ export const addTeacherSubject = async (req: AuthRequest, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Subject added successfully",
-      data: { id: newSubject?.id },
+      data: { id: newSubject!.id },
     });
   } catch (error: any) {
     logger.error("Add teacher subject error", error);

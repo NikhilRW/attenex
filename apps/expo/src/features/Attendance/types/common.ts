@@ -5,12 +5,12 @@ import {
 
 export type Lecture = {
   id: string;
-  subject: string;
-  className: string;
+  subject: string | null;
+  className: string | null;
   duration: string;
   status: "active" | "ended";
-  createdAt: Date;
-  startedAt: Date;
+  createdAt: string | null;
+  startedAt: string | null;
   teacherLatitude: string;
   teacherLongitude: string;
 };

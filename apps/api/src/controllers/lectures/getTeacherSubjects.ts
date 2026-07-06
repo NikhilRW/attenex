@@ -12,7 +12,11 @@ export const getTeacherSubjects = async (req: AuthRequest, res: Response) => {
     }
 
     const teacherSubjects = await db
-      .select()
+      .select({
+        id: subjects.id,
+        name: subjects.name,
+        createdAt: subjects.createdAt,
+      })
       .from(subjects)
       .where(eq(subjects.teacherId, userId))
       .orderBy(subjects.name);

@@ -1,9 +1,9 @@
 import * as v from "valibot";
-import { studentLectureAPIResponseSchema } from "../schema/apiResponse";
 import {
   passcodeSchema,
   rollNoSchema,
 } from "../schema/common";
+import { getStudentLectureSuccessResponseSchema } from "@attenex/api-contracts";
 
 /**
  * Validate passcode format
@@ -22,4 +22,4 @@ export const parseRollNo = (rollNo: string): boolean =>
   v.safeParse(rollNoSchema, rollNo).success;
 
 export const parseStudentLectureAPIResponseData = (data: unknown) =>
-  v.safeParse(studentLectureAPIResponseSchema, data);
+  v.safeParse(getStudentLectureSuccessResponseSchema, data);

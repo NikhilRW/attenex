@@ -50,7 +50,7 @@ export const useLectureManagement = (
       console.log(LOG_MESSAGES.FETCH_ERROR, error);
       return [];
     }
-  }, [user?.id, userClassName]);
+  }, [user]);
 
   const shouldQueryBeEnabled =
     joinedLecture === null &&
@@ -80,7 +80,7 @@ export const useLectureManagement = (
   }, [lectures, ended, refreshLectures]);
 
   return {
-    lectures,
+    lectures: lectures ?? [],
     refreshLectures,
   };
 };

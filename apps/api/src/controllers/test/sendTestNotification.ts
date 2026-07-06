@@ -7,7 +7,7 @@ export const sendTestNotification = async (req: Request, res: Response) => {
     await sendNotification(
       "D7C",
       "FSWD LEC 6",
-      "580f5378-eb8d-40e8-8a05-6393fef89d93",
+      "aae0264a-1423-4897-a433-f26887d1ef6e",
       "60",
     );
     return res.status(200).json({

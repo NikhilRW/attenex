@@ -4,6 +4,8 @@ import { db, lectures } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { LectureParams } from "../../types/params";
 import { destroyScheduledLectureEnd, scheduleLectureEnd } from "@utils/lecture";
+import * as v from "valibot";
+import { updateLectureRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -18,7 +20,16 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const userRole = req.user?.role;
     const { lectureId } = req.params as unknown as LectureParams;
-    const { duration } = req.body;
+
+    const parsed = v.safeParse(updateLectureRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Duration is required and must be a positive number",
+      });
+    }
+
+    const { duration } = parsed.output;
 
     // Verify user is authenticated
     if (!userId) {
@@ -111,7 +122,6 @@ export const updateLecture = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

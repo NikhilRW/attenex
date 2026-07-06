@@ -10,7 +10,7 @@ export const createLectureResponseSchema = v.object({
       subjectId: v.nullable(v.string()),
       className: v.string(),
       duration: v.string(),
-      status: v.string(),
+      status: v.literal("active"),
       createdAt: v.nullable(v.string()),
     }),
   }),

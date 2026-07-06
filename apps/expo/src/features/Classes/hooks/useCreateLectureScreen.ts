@@ -66,7 +66,7 @@ export const useCreateLectureScreen = () => {
       const res = await lectureService.getSubjects();
       let currentSubjects: SubjectItem[] = [];
       if (res.success) {
-        currentSubjects = [...res.data];
+        currentSubjects = res.data;
       }
       return currentSubjects;
     } catch (error) {
@@ -308,7 +308,7 @@ export const useCreateLectureScreen = () => {
         const result: SubjectItem[] = [];
         if (old) {
           result.push(...old.filter((s) => s.name !== name));
-        }
+        }// TODO: make the use of the createdAt for ordering the subjects
         result.push({
           id: "temp" + new Date().getTime(),
           name,

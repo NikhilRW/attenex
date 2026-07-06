@@ -5,9 +5,10 @@ export const attendanceRecordSchema = v.object({
   studentId: v.string(),
   studentName: v.string(),
   studentEmail: v.string(),
-  status: v.string(),
-  method: v.string(),
+  status: v.picklist(["present", "absent", "incomplete"]),
+  method: v.picklist(["manual", "auto", "oauth"]),
 });
+
 
 export const absentStudentSchema = v.object({
   id: v.string(),

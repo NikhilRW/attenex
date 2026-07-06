@@ -90,7 +90,7 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
           updatedAt: passcodeUpdatedAt.toISOString(),
         });
         logger.info(
-          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`,
+          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`,`new passcode: ${passcode}, updatedAt: ${passcodeUpdatedAt.toISOString()}`
         );
       }
     }
@@ -107,7 +107,6 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

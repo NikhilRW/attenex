@@ -63,8 +63,8 @@ export const generateMockStudentLectures = (count: number): Lecture[] => {
       className: `Class ${(index % 40) + 1}`,
       duration: String(30 + (index % 6) * 10),
       status: active ? "active" : "ended",
-      createdAt,
-      startedAt,
+      createdAt: createdAt.toISOString(),
+      startedAt: startedAt.toISOString(),
       teacherLatitude: "12.9716",
       teacherLongitude: "77.5946",
     };

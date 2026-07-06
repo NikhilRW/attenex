@@ -175,6 +175,14 @@ app.get("/", (_, res) => {
     .json({ status: "healthy", message: "Attenex backend is running" });
 });
 
+// remove cache
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+
+app.disable("etag");
+
 /**
  * Server Startup
  *

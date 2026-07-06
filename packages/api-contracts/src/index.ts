@@ -38,6 +38,7 @@ export { addTeacherClassRequestSchema } from "./apiRequests/lectures/addTeacherC
 export { addTeacherSubjectRequestSchema } from "./apiRequests/lectures/addTeacherSubject";
 export { createLectureRequestSchema } from "./apiRequests/lectures/createLecture";
 export { addManualAttendanceRequestSchema } from "./apiRequests/lectures/addManualAttendance";
+export { updateLectureRequestSchema } from "./apiRequests/lectures/updateLecture";
 
 // apiResponses - lectures
 export { addTeacherClassSuccessResponseSchema } from "./apiResponses/lectures/addTeacherClass";
@@ -58,4 +59,16 @@ export type { GetAllClassesSuccessResponse } from "./apiResponses/lectures/getAl
 export { getAllClassesSuccessResponseSchema } from "./apiResponses/lectures/getAllClasses";
 export type { GetAllLecturesSuccessResponse } from "./apiResponses/lectures/getAllLectures";
 export { getAllLecturesSuccessResponseSchema } from "./apiResponses/lectures/getAllLectures";
+export type { GetPasscodeSuccessResponse } from "./apiResponses/lectures/getPasscode";
+export { getPasscodeSuccessResponseSchema } from "./apiResponses/lectures/getPasscode";
+export type { GetStudentLectureSuccessResponse } from "./apiResponses/lectures/getStudentLecture";
+export { getStudentLectureSuccessResponseSchema } from "./apiResponses/lectures/getStudentLecture";
+export type { GetStudentLecturesSuccessResponse } from "./apiResponses/lectures/getStudentLectures";
+export { getStudentLecturesSuccessResponseSchema } from "./apiResponses/lectures/getStudentLectures";
+export type { GetTeacherClassesSuccessResponse } from "./apiResponses/lectures/getTeacherClasses";
+export { getTeacherClassesSuccessResponseSchema } from "./apiResponses/lectures/getTeacherClasses";
+export type { GetTeacherSubjectsSuccessResponse } from "./apiResponses/lectures/getTeacherSubjects";
+export { getTeacherSubjectsSuccessResponseSchema } from "./apiResponses/lectures/getTeacherSubjects";
+export type { UpdateLectureSuccessResponse } from "./apiResponses/lectures/updateLecture";
+export { updateLectureSuccessResponseSchema } from "./apiResponses/lectures/updateLecture";
 

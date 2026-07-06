@@ -10,7 +10,7 @@ import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard
 import { showErrorAlert } from "@attendance/utils/alertUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { parseStudentLectureAPIResponseData } from "../utils/parsers";
+
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -40,8 +40,7 @@ export const useLectureDetailsParam = (
           try {
             const res =
               await lectureService.getStudentLectureDetails(lectureId);
-
-            if (res.success && parseStudentLectureAPIResponseData(res.data)) {
+            if (res.success && res.data && !Array.isArray(res.data)) {
               
               console.log(
                 LOG_MESSAGES.DETAILS_FETCHED,

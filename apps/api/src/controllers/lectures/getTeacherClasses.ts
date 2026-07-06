@@ -12,7 +12,7 @@ export const getTeacherClasses = async (req: AuthRequest, res: Response) => {
     }
 
     const teacherClasses = await db
-      .select()
+      .select({ id: classes.id, name: classes.name })
       .from(classes)
       .where(eq(classes.teacherId, userId))
       .orderBy(classes.name);
@@ -23,8 +23,6 @@ export const getTeacherClasses = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     logger.error("Get teacher classes error", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
