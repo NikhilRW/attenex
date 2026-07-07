@@ -26,19 +26,18 @@ export const sendNotification = async (
         body: `Duration ${duration} Minutes`,
         title: `${lectureTitle} has started`,
         priority: "max",
-        channelId:"attenex"
-        // defaultLightSettings: true,
-        // lightSettings: {
-        //   color: "#00AA00",
-        //   lightOnDurationMillis: 1000,
-        //   lightOffDurationMillis: 500,
-        // },
-        // imageUrl: "https://attenex.vercel.app/icon.png",
-        // imageUrl: "https://attenex.vercel.app/notification-attachment.png",
+        channelId:"attenex",
+        defaultLightSettings: true,
+        lightSettings: {
+          color: "#00AA00",
+          lightOnDurationMillis: 1000,
+          lightOffDurationMillis: 500,
+        },
+        imageUrl: "https://attenex.vercel.app/icon.png",
       },
     },
     data: {
-      lectureId:"b61fa1b5-8d31-4d16-823e-0fb6f8f1cbd6",
+      lectureId,
     },
   });
 };

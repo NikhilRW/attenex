@@ -22,9 +22,9 @@ export const parseTitle = (data: unknown) =>
 export const parseBody = (data: unknown) =>
   v.safeParse(bodySchema, data).success;
 
-export const parseLectureId = (data: unknown) =>
+export const parseLectureId = (data: unknown): data is string =>
   v.safeParse(lectureIdSchema, data).success;
-export const parseEndedTrue = (data: unknown) =>
+export const parseEndedTrue = (data: unknown): data is "true" =>
   v.safeParse(endedTrueSchema, data).success;
 
 export const parseToken = (data: unknown) =>

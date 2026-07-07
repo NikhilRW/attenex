@@ -22,27 +22,20 @@ import {
 import { useRouter } from "expo-router";
 import { useCallback, useEffect } from "react";
 import { UnistylesRuntime } from "react-native-unistyles";
+import { ATTENEX_ANDROID_CHANNEL_ID } from "../constants/notifications";
 import { queryKeys } from "../constants/queryKeys";
 import { queryClient } from "../constants/tanstackConfig";
-import {
-  parseBody,
-  parseLectureId,
-  parseTitle,
-  parseEndedTrue,
-} from "../utils/parsers";
 import { ATTENEX_NOTIFICATION_IMAGE_URL } from "../constants/uri";
-import { ATTENEX_ANDROID_CHANNEL_ID } from "../constants/notifications";
 import { useAuthStore } from "../stores/authStore";
+import { parseBody, parseEndedTrue, parseLectureId, parseTitle } from "../utils/parsers";
 
 export const useNotificationBootstrap = () => {
   const router = useRouter();
   const userRole = useAuthStore((state) => state.user?.role);
 
   // Track if we've already handled the killed-state notification to prevent infinite loop
-  const {
-    hasHandledKilledStateNotification,
-    setHasHandledKilledStateNotification,
-  } = useNotificationStore();
+  const { hasHandledKilledStateNotification, setHasHandledKilledStateNotification } =
+    useNotificationStore();
   const getCurrentTheme = useCallback(() => UnistylesRuntime.getTheme(), []);
   const lastNotificationResponse = useLastNotificationResponse();
   const getNotificationAccentColor = useCallback(() => {
@@ -54,9 +47,7 @@ export const useNotificationBootstrap = () => {
   }, [getCurrentTheme]);
 
   const buildAttenexNotificationContent = useCallback(
-    (
-      remoteMessage: FirebaseMessagingTypes.RemoteMessage,
-    ): NotificationContentInput => {
+    (remoteMessage: FirebaseMessagingTypes.RemoteMessage): NotificationContentInput => {
       const title = remoteMessage.notification?.title ?? "Attenex";
       const body = remoteMessage.notification?.body ?? "";
 
@@ -103,27 +94,21 @@ export const useNotificationBootstrap = () => {
             const remoteMessage = await getInitialNotification(getMessaging());
             const lectureId = remoteMessage?.data?.lectureId;
             const ended = remoteMessage?.data?.ended;
-            console.log(
-              "Checking Firebase initial notification...",
-              remoteMessage,
-            );
+            console.log("Checking Firebase initial notification...", remoteMessage);
             if (parseLectureId(lectureId) && !parseEndedTrue(ended)) {
               console.log(
                 "✅ Firebase notification caused app to open from quit state:",
                 JSON.stringify(remoteMessage),
               );
               console.log("Navigating to lecture:", lectureId);
-              router.replace(`/attendance?lectureId=${lectureId}`);
+              router.replace({ pathname: "/attendance", params: { lectureId } });
               return;
             } else if (parseLectureId(lectureId) && parseEndedTrue(ended)) {
-              router.replace(`/classes?lectureId=${lectureId}&ended=true`);
-              return;
+              router.replace({ pathname: "/classes", params: { lectureId, ended: "true" } });
+              return;              
             }
           } catch (error) {
-            console.error(
-              "Error getting Firebase initial notification:",
-              error,
-            );
+            console.error("Error getting Firebase initial notification:", error);
           }
         };
 
@@ -162,39 +147,30 @@ export const useNotificationBootstrap = () => {
               });
             } else if (parseLectureId(remoteData?.lectureId)) {
               if (userRole === "teacher") {
-                console.log("I am here teacher 1 ");
                 router.setParams({
-                  lectureId: remoteData?.lectureId as string,
-                  ended: remoteData?.ended as string,
+                  lectureId: remoteData?.lectureId,
+                  ended:  remoteData?.ended as string,
                 });
-              } else {
+              } else  {
                 console.log("I am here student 1");
-                router.replace(
-                  `/attendance?ended=${remoteData?.ended}`,
-                );
+                router.replace({ pathname: "/attendance", params: { ended: remoteData?.ended as string } });
               }
             }
           },
         );
 
         // Handle user clicking on a notification and open the screen
-        const handleNotificationClick = async (
-          response: NotificationResponse,
-        ) => {
-          const lectureId =
-            response?.notification?.request?.content?.data?.lectureId;
+        const handleNotificationClick = async (response: NotificationResponse) => {
+          const lectureId = response?.notification?.request?.content?.data?.lectureId;
           if (parseLectureId(lectureId)) {
-            console.log(
-              "✅ Navigating to lecture from notification:",
-              lectureId,
-            );
-            if (
-              response?.actionIdentifier ===
-              "expo.modules.notifications.actions.DEFAULT"
-            ) {
-              router.replace(`/attendance?lectureId=${lectureId}`);
+            console.log("✅ Navigating to lecture from notification:", lectureId);
+            if (response?.actionIdentifier === "expo.modules.notifications.actions.DEFAULT") {
+              router.replace({ pathname: "/attendance", params: { lectureId: lectureId } });
             } else {
-              router.navigate(`/attendance?lectureId=${lectureId}`);
+              router.navigate({
+                pathname: "/attendance",
+                params: { lectureId: lectureId},
+              });
             }
           }
         };
@@ -204,12 +180,9 @@ export const useNotificationBootstrap = () => {
           getMessaging(),
           (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             const lectureId = remoteMessage?.data?.lectureId;
-            console.log(
-              "Notification caused app to open from background state:",
-              lectureId,
-            );
+            console.log("Notification caused app to open from background state:", lectureId);
             if (parseLectureId(lectureId)) {
-              router.navigate(`/attendance?lectureId=${lectureId}`);
+              router.navigate({ pathname: "/attendance", params: { lectureId } });
             }
           },
         );
@@ -226,18 +199,12 @@ export const useNotificationBootstrap = () => {
               JSON.stringify(lastNotificationResponse),
             );
             const lectureId =
-              lastNotificationResponse?.notification?.request?.content?.data
-                ?.lectureId;
-            const result = parseLectureId(lectureId);
-
-            if (result) {
-              console.log(
-                "✅ Navigating to lecture from notification:",
-                lectureId,
-              );
+              lastNotificationResponse?.notification?.request?.content?.data?.lectureId;
+            if (parseLectureId(lectureId)) {
+              console.log("✅ Navigating to lecture from notification:", lectureId);
               requestIdleCallback(() => {
                 setTimeout(() => {
-                  router.replace(`/attendance?lectureId=${lectureId}`);
+                  router.replace({ pathname: "/attendance", params: { lectureId } });
                 }, 500);
               });
             }
@@ -261,13 +228,13 @@ export const useNotificationBootstrap = () => {
             if (parseLectureId(lectureId)) {
               if (userRole === "teacher") {
                 router.setParams({
-                  lectureId: lectureId as string,
+                  lectureId,
                   ended: "true",
                 });
                 console.log("I am here teacher 2 ");
               } else {
                 console.log("I am here student 2 ");
-                router.replace(`/attendance?ended=true`);
+                router.replace({ pathname: "/attendance", params: { ended: "true" } });
               }
             }
           }

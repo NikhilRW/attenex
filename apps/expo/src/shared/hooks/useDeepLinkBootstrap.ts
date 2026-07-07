@@ -46,9 +46,10 @@ export const useDeepLinkBootstrap = () => {
       if (parsed.path && parsed.path.includes("reset-password")) {
         if (parseResetQueryParams(parsed.queryParams)) {
           router.navigate("/");
-          router.navigate(
-            `/reset-password?token=${parsed.queryParams?.token}&email=${parsed.queryParams?.email}`,
-          );
+          router.navigate({
+            pathname: '/reset-password',
+            params: { token: parsed.queryParams?.token, email: parsed.queryParams?.email },
+          });
         }
         return;
       }
