@@ -4,6 +4,8 @@ import { attendance, db, lectures, users } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { getLectureCounts } from "../../utils/lectureCounts";
 import { logger } from "../../utils/logger";
+import * as v from "valibot";
+import { joinLectureRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -19,13 +21,12 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
     if (!userId)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const { lectureId, latitude, longitude, rollNo } = req.body;
-
-    if (!lectureId || !latitude || !longitude) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing parameters" });
+    const parsed = v.safeParse(joinLectureRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: "Missing or invalid parameters" });
     }
+
+    const { lectureId, latitude, longitude, rollNo } = parsed.output;
 
     // If rollNo is provided, update the user's roll number
     if (rollNo && rollNo.trim()) {
@@ -57,15 +58,15 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
 
     // Check distance
     const distance = calculateDistance(
-      parseFloat(latitude),
-      parseFloat(longitude),
+      latitude,
+      longitude,
       parseFloat(lecture.teacherLatitude!),
       parseFloat(lecture.teacherLongitude!)
     );
 
     // Log coordinates for debugging
     logger.info(
-      `Distance check: Student(${latitude}, ${longitude}) vs Teacher(${lecture.teacherLatitude}, ${lecture.teacherLongitude}) = ${Math.round(distance)}m`
+      `Distance check: Student(${latitude}, ${longitude}) vs Teacher(${lecture.teacherLatitude}, ${lecture.teacherLongitude}) = ${Math.round(distance)}m`,
     );
 
     const radius = parseFloat(lecture.geofenceRadius || "5000");

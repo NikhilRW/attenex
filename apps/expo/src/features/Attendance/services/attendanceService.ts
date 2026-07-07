@@ -1,4 +1,10 @@
 import http from "@shared/utils/http";
+import * as v from "valibot";
+import {
+  joinLectureSuccessResponseSchema,
+  pingLectureSuccessResponseSchema,
+  submitAttendanceSuccessResponseSchema,
+} from "@attenex/api-contracts";
 
 const API_URL = `/api/attendance`;
 
@@ -15,7 +21,11 @@ export const joinLecture = async (
       longitude,
       rollNo,
     });
-    return response.data;
+    const parsed = v.safeParse(joinLectureSuccessResponseSchema, response.data);
+    if (!parsed.success) {
+      throw new Error("Invalid join lecture response");
+    }
+    return parsed.output;
   } catch (error: any) {
     throw error.response?.data || error.message;
   }
@@ -34,7 +44,11 @@ export const submitAttendance = async (
       latitude,
       longitude,
     });
-    return response.data;
+    const parsed = v.safeParse(submitAttendanceSuccessResponseSchema, response.data);
+    if (!parsed.success) {
+      throw new Error("Invalid submit attendance response");
+    }
+    return parsed.output;
   } catch (error: any) {
     throw error.response?.data || error.message;
   }
@@ -46,12 +60,15 @@ export const sendPing = async (
   longitude: number,
 ) => {
   try {
-    // Silent ping, no error throwing usually
-    await http.post(`${API_URL}/ping`, {
+    const response = await http.post(`${API_URL}/ping`, {
       lectureId,
       latitude,
       longitude,
     });
+    const parsed = v.safeParse(pingLectureSuccessResponseSchema, response.data);
+    if (!parsed.success) {
+      console.log("Invalid ping response", parsed.issues);
+    }
   } catch (error) {
     console.log("Ping failed", error);
   }

@@ -8,6 +8,8 @@ import {
 } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
+import * as v from "valibot";
+import { pingLectureRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -23,13 +25,12 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
     if (!userId)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const { lectureId, latitude, longitude } = req.body;
-
-    if (!lectureId || !latitude || !longitude) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing parameters" });
+    const parsed = v.safeParse(pingLectureRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: "Missing or invalid parameters" });
     }
+
+    const { lectureId, latitude, longitude } = parsed.output;
 
     // Get lecture details for geofence check
     const lecture = await db.query.lectures.findFirst({
@@ -44,8 +45,8 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
 
     // Calculate distance
     const distance = calculateDistance(
-      parseFloat(latitude),
-      parseFloat(longitude),
+      latitude,
+      longitude,
       parseFloat(lecture.teacherLatitude!),
       parseFloat(lecture.teacherLongitude!)
     );

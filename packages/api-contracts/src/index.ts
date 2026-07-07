@@ -72,3 +72,13 @@ export { getTeacherSubjectsSuccessResponseSchema } from "./apiResponses/lectures
 export type { UpdateLectureSuccessResponse } from "./apiResponses/lectures/updateLecture";
 export { updateLectureSuccessResponseSchema } from "./apiResponses/lectures/updateLecture";
 
+// apiRequests - attendance
+export { joinLectureRequestSchema } from "./apiRequests/attendance/joinLecture";
+export { pingLectureRequestSchema } from "./apiRequests/attendance/pingLecture";
+export { submitAttendanceRequestSchema } from "./apiRequests/attendance/submitAttendance";
+
+// apiResponses - attendance
+export { joinLectureSuccessResponseSchema } from "./apiResponses/attendance/joinLecture";
+export { pingLectureSuccessResponseSchema } from "./apiResponses/attendance/pingLecture";
+export { submitAttendanceSuccessResponseSchema } from "./apiResponses/attendance/submitAttendance";
+

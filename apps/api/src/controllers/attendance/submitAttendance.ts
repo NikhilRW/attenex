@@ -8,6 +8,8 @@ import {
 } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
+import * as v from "valibot";
+import { submitAttendanceRequestSchema } from "@attenex/api-contracts";
 
 interface AuthRequest extends Request {
   user?: {
@@ -23,13 +25,12 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
     if (!userId)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const { lectureId, latitude, longitude, passcode } = req.body;
-
-    if (!lectureId || !latitude || !longitude || !passcode) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing parameters" });
+    const parsed = v.safeParse(submitAttendanceRequestSchema, req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: "Missing or invalid parameters" });
     }
+
+    const { lectureId, latitude, longitude, passcode } = parsed.output;
 
     // Get lecture
     const lecture = await db.query.lectures.findFirst({
@@ -52,8 +53,8 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
 
     // Verify Location
     const distance = calculateDistance(
-      parseFloat(latitude),
-      parseFloat(longitude),
+      latitude,
+      longitude,
       parseFloat(lecture.teacherLatitude!),
       parseFloat(lecture.teacherLongitude!)
     );
