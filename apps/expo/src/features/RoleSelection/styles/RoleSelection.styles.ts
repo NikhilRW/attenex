@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create((theme) => ({
+export const styles = StyleSheet.create((theme,rt) => ({
   container: {
     flex: 1,
   },
@@ -45,7 +45,7 @@ export const styles = StyleSheet.create((theme) => ({
   },
   modelWrapper: {
     flex: 1,
-    height: "75%",
+    height: rt.screen.height * 0.45,
     borderRadius: 24,
     borderWidth: 2,
     overflow: "hidden",
@@ -114,7 +114,7 @@ export const styles = StyleSheet.create((theme) => ({
   },
   confirmButton: (bottomInset: number) => ({
     marginHorizontal: 24,
-    marginBottom: 70 + bottomInset * 2,
+    marginBottom: bottomInset + 16,
     borderRadius: 16,
     overflow: "hidden",
     shadowColor: theme.primary.main,

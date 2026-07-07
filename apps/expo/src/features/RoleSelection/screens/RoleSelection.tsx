@@ -24,38 +24,38 @@ const RoleSelection = () => {
   return (
     <View style={styles.container}>
       <RoleSelectionHeader />
+      <View style={{flex: 1, justifyContent: "space-between"}}>
+        <View style={styles.modelsContainer}>
+          <RoleCard
+            role="teacher"
+            imageSource={TEACHER_IMG}
+            title="Teacher"
+            description="Manage classes & attendance"
+            isSelected={selectedRole === "teacher"}
+            isDisabled={isUpdating}
+            scale={teacherScale}
+            onPress={handleTeacherPress}
+          />
 
-      <View style={styles.modelsContainer}>
-        <RoleCard
-          role="teacher"
-          imageSource={TEACHER_IMG}
-          title="Teacher"
-          description="Manage classes & attendance"
-          isSelected={selectedRole === "teacher"}
-          isDisabled={isUpdating}
-          scale={teacherScale}
-          onPress={handleTeacherPress}
-        />
-
-        <RoleCard
-          role="student"
-          imageSource={STUDENT_IMG}
-          title="Student"
-          description="Mark your attendance"
-          isSelected={selectedRole === "student"}
-          isDisabled={isUpdating}
-          scale={studentScale}
-          onPress={handleStudentPress}
+          <RoleCard
+            role="student"
+            imageSource={STUDENT_IMG}
+            title="Student"
+            description="Mark your attendance"
+            isSelected={selectedRole === "student"}
+            isDisabled={isUpdating}
+            scale={studentScale}
+            onPress={handleStudentPress}
+          />
+        </View>
+        <ConfirmButton
+          selectedRole={selectedRole}
+          isUpdating={isUpdating}
+          userRole={user?.role}
+          bottomInset={insets.bottom}
+          onConfirm={handleRoleUpdate}
         />
       </View>
-
-      <ConfirmButton
-        selectedRole={selectedRole}
-        isUpdating={isUpdating}
-        userRole={user?.role}
-        bottomInset={insets.bottom}
-        onConfirm={handleRoleUpdate}
-      />
     </View>
   );
 };
