@@ -14,7 +14,6 @@ export const styles = StyleSheet.create((theme,rt) => ({
   header: {
     paddingTop: 30,
     paddingHorizontal: 24,
-    marginBottom: 20,
   },
   headerContent: {
     flexDirection: "row",

@@ -26,10 +26,11 @@ const CreateLectureScreen = () => {
     showNewClassModal,
     showNewSubjectModal,
     newClassName,
-    setNewClassName,
+    handleClassNameChange,
     newSubjectName,
     handleSubjectNameChange,
     subjectError,
+    classError,
     minHeightScrollView,
     handleCreateLecture,
     handleAddNewClass,
@@ -97,8 +98,9 @@ const CreateLectureScreen = () => {
         visible={showNewClassModal}
         onClose={handleCloseNewClassModal}
         newClassName={newClassName}
-        setNewClassName={setNewClassName}
+        setNewClassName={handleClassNameChange}
         onCreateClass={handleCreateNewClass}
+        errorMessage={classError}
       />
 
       <NewSubjectModal

@@ -34,7 +34,10 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
   newClassName,
   setNewClassName,
   onCreateClass,
+  errorMessage,
 }) => {
+  const hasError = Boolean(errorMessage);
+
   const handleCreateClass = async () => {
     await onCreateClass(newClassName);
   };
@@ -74,7 +77,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
             <View style={styles.modalBody}>
               <Text style={styles.modalLabel}>Class Name</Text>
 
-              <View style={styles.modalInputRow}>
+              <View style={[styles.modalInputRow, hasError && styles.modalInputRowError]}>
                 <NewClassInput
                   style={styles.modalInputText}
                   placeholder="e.g., Computer Science 101"
@@ -82,6 +85,9 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                   onChangeText={setNewClassName}
                 />
               </View>
+              {hasError && (
+                <Text style={styles.modalErrorText}>{errorMessage}</Text>
+              )}
             </View>
 
             <View style={styles.modalFooter}>

@@ -31,6 +31,7 @@ export const useCreateLectureScreen = () => {
   const [newClassName, setNewClassName] = useState("");
   const [newSubjectName, setNewSubjectName] = useState("");
   const [subjectError, setSubjectError] = useState("");
+  const [classError, setClassError] = useState("");
 
   const { alert } = useHapticAlerts();
 
@@ -230,7 +231,7 @@ export const useCreateLectureScreen = () => {
     mutationKey: mutationKeys.classes.create,
     onMutate: async (params, context) => {
       if (!params.trim()) {
-        alert("Error", "Please enter a class name");
+        setClassError("Please enter a class name");
         return null;
       }
       const newClassNameParam = params.trim();
@@ -264,13 +265,10 @@ export const useCreateLectureScreen = () => {
           queryKeys.classes.teacher,
           onMutateResult.previousClasses,
         );
-        alert("Class not Added sucessfully");
+        setClassError("Class not added successfully");
       }
     },
     onError(error, _, onMutateResult, context) {
-      // TODO: inline the error there in the input box.
-      setShowNewClassModal(false);
-      setShowClassDropdown(false);
       if (onMutateResult?.previousClasses) {
         context.client.setQueryData<ClassItem[]>(
           queryKeys.classes.teacher,
@@ -278,9 +276,9 @@ export const useCreateLectureScreen = () => {
         );
       }
       if ((error as any).response?.status === 409) {
-        alert("Info", "Class name added already exists");
+        setClassError("Class name already exists");
       } else {
-        alert("Error", error.message || "Failed to add class");
+        setClassError(error.message || "Failed to add class");
       }
       console.log("Error saving class", error);
     },
@@ -351,6 +349,12 @@ export const useCreateLectureScreen = () => {
         setSubjectError(error.message || "Failed to add subject");
       }
     },
+    retry(failureCount, error) {
+      if(error.message.includes("already exists")) {
+        return false; // Don't retry if the subject already exists
+      }
+      return failureCount < 3; 
+    },
   });
 
   const handleCloseNewSubjectModal = useCallback(() => {
@@ -362,6 +366,11 @@ export const useCreateLectureScreen = () => {
   const handleSubjectNameChange = useCallback((name: string) => {
     setNewSubjectName(name);
     setSubjectError("");
+  }, []);
+
+  const handleClassNameChange = useCallback((name: string) => {
+    setNewClassName(name);
+    setClassError("");
   }, []);
 
   const handleCreateNewSubjectWithCallback = useCallback(
@@ -412,7 +421,11 @@ export const useCreateLectureScreen = () => {
     setShowDurationDropdown(false);
   };
 
-  const handleCloseNewClassModal = () => setShowNewClassModal(false);
+  const handleCloseNewClassModal = () => {
+    setShowNewClassModal(false);
+    setClassError("");
+    setNewClassName("");
+  };
 
   const minHeightScrollView = useMemo(() => getMinHeightForScrollView(height), [height]);
 
@@ -433,10 +446,11 @@ export const useCreateLectureScreen = () => {
     showNewClassModal,
     showNewSubjectModal,
     newClassName,
-    setNewClassName,
+    handleClassNameChange,
     newSubjectName,
     handleSubjectNameChange,
     subjectError,
+    classError,
     minHeightScrollView,
 
     // Handlers
