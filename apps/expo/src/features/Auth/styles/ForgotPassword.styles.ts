@@ -9,8 +9,8 @@ export const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 30,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.custom(30),
   },
   backButton: {
     width: 44,
@@ -18,22 +18,22 @@ export const styles = StyleSheet.create((theme) => ({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: theme.spacing.custom(20),
     backgroundColor: theme.surface.glass,
   },
   formContainer: {
-    gap: 24,
+    gap: theme.spacing.lg,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
     color: theme.text.secondary,
   },
   backToSignIn: {
     alignItems: "center",
-    marginTop: 8,
+    marginTop: theme.spacing.sm,
   },
   backToSignInText: {
     fontSize: 14,
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create((theme) => ({
     color: theme.primary.main,
   },
   successContainer: {
-    gap: 24,
+    gap: theme.spacing.lg,
     alignItems: "center",
   },
   iconContainer: {
@@ -53,7 +53,7 @@ export const styles = StyleSheet.create((theme) => ({
     borderRadius: 60,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 20,
+    marginVertical: theme.spacing.custom(20),
     backgroundColor: theme.primary.glow,
   },
   successTitle: {
@@ -76,20 +76,20 @@ export const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
     lineHeight: 22,
     textAlign: "center",
-    marginTop: -8,
+    marginTop: -theme.spacing.sm,
     color: theme.text.muted,
   },
   helpContainer: {
     alignItems: "center",
-    gap: 8,
-    marginTop: 16,
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
   },
   helpText: {
     fontSize: 14,
     color: theme.text.secondary,
   },
   resendButton: {
-    padding: 8,
+    padding: theme.spacing.sm,
   },
   resendText: {
     fontSize: 14,

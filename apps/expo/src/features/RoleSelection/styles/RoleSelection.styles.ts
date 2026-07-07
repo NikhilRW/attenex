@@ -12,8 +12,8 @@ export const styles = StyleSheet.create((theme,rt) => ({
     bottom: 0,
   },
   header: {
-    paddingTop: 30,
-    paddingHorizontal: 24,
+    paddingTop: theme.spacing.custom(30),
+    paddingHorizontal: theme.spacing.lg,
   },
   headerContent: {
     flexDirection: "row",
@@ -21,14 +21,14 @@ export const styles = StyleSheet.create((theme,rt) => ({
     alignItems: "flex-start",
   },
   themeToggle: {
-    padding: 8,
+    padding: theme.spacing.sm,
     borderRadius: 20,
     backgroundColor: theme.surface.glass,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
     color: theme.text.primary,
   },
   subtitle: {
@@ -38,8 +38,8 @@ export const styles = StyleSheet.create((theme,rt) => ({
   modelsContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: 16,
-    gap: 16,
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.md,
     alignItems: "center",
   },
   modelWrapper: {
@@ -72,7 +72,7 @@ export const styles = StyleSheet.create((theme,rt) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
+    padding: theme.spacing.custom(20),
     backdropFilter: "blur(10px)",
     zIndex: 2,
     height: 110,
@@ -82,7 +82,7 @@ export const styles = StyleSheet.create((theme,rt) => ({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
     color: theme.text.primary,
   },
   roleDescription: {
@@ -112,7 +112,7 @@ export const styles = StyleSheet.create((theme,rt) => ({
     fontWeight: "bold",
   },
   confirmButton: (bottomInset: number) => ({
-    marginHorizontal: 24,
+    marginHorizontal: theme.spacing.lg,
     marginBottom: bottomInset + 16,
     borderRadius: 16,
     overflow: "hidden",
@@ -127,8 +127,8 @@ export const styles = StyleSheet.create((theme,rt) => ({
     elevation: 0,
   },
   confirmGradient: {
-    paddingVertical: 18,
-    paddingHorizontal: 32,
+    paddingVertical: theme.spacing.custom(18),
+    paddingHorizontal: theme.spacing.xl,
     alignItems: "center",
   },
   confirmButtonText: {

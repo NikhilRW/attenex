@@ -9,7 +9,7 @@ export const styles = StyleSheet.create((theme) => ({
   rememberMe: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: theme.spacing.sm,
   },
   checkbox: {
     width: 20,

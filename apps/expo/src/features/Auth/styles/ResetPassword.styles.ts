@@ -9,15 +9,15 @@ export const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 40,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.custom(80),
+    paddingBottom: theme.spacing["2xl"],
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 16,
+    gap: theme.spacing.md,
   },
   loadingText: {
     fontSize: 16,
@@ -27,8 +27,8 @@ export const styles = StyleSheet.create((theme) => ({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 24,
-    gap: 24,
+    paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.lg,
   },
   iconContainer: {
     width: 120,
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create((theme) => ({
     borderRadius: 60,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 20,
+    marginVertical: theme.spacing.custom(20),
   },
   errorIconContainer: {
     backgroundColor: `${theme.status.error}20`,
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create((theme) => ({
     color: theme.text.secondary,
   },
   formContainer: {
-    gap: 24,
+    gap: theme.spacing.lg,
   },
   greeting: {
     fontSize: 34,
@@ -66,24 +66,24 @@ export const styles = StyleSheet.create((theme) => ({
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
     color: theme.text.secondary,
   },
   requirementsContainer: {
     borderRadius: 12,
-    padding: 16,
-    gap: 12,
+    padding: theme.spacing.md,
+    gap: theme.spacing.custom(12),
   },
   requirementsTitle: {
     fontSize: 14,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
     color: theme.primary.main,
   },
   requirementItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: theme.spacing.custom(10),
   },
   requirementText: {
     fontSize: 14,

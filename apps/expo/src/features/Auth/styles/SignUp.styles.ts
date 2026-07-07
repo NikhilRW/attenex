@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
-export const styles = StyleSheet.create(() => ({
+export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -9,11 +9,11 @@ export const styles = StyleSheet.create(() => ({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 70,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.custom(60),
+    paddingBottom: theme.spacing.custom(70),
   },
   formContainer: {
-    gap: 24,
+    gap: theme.spacing.lg,
   },
 }));

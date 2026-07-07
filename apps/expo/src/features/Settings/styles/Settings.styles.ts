@@ -6,12 +6,12 @@ export const styles = StyleSheet.create((theme) => {
       flex: 1,
     },
     header: {
-      paddingTop: 30,
-      paddingBottom: 20,
-      paddingHorizontal: 24,
+      paddingTop: theme.spacing.custom(30),
+      paddingBottom: theme.spacing.custom(20),
+      paddingHorizontal: theme.spacing.lg,
     },
     headerContent: {
-      gap: 4,
+      gap: theme.spacing.xs,
     },
     title: {
       fontSize: 32,
@@ -26,20 +26,20 @@ export const styles = StyleSheet.create((theme) => {
       color: theme.text.secondary,
     },
     content: {
-      padding: 20,
-      gap: 24,
+      padding: theme.spacing.custom(20),
+      gap: theme.spacing.lg,
     },
     bottomSpacer: {
       height: 50,
     },
     section: {
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     sectionTitle: {
       fontSize: 12,
       fontWeight: "700",
       letterSpacing: 1,
-      marginLeft: 4,
+      marginLeft: theme.spacing.xs,
       color: theme.text.muted,
     },
     sectionTitleDanger: {
@@ -59,10 +59,10 @@ export const styles = StyleSheet.create((theme) => {
       borderColor: "rgba(239, 68, 68, 0.2)",
     },
     profileHeader: {
-      padding: 20,
+      padding: theme.spacing.custom(20),
       flexDirection: "row",
       alignItems: "center",
-      gap: 16,
+      gap: theme.spacing.md,
     },
     avatarContainer: {
       position: "relative",
@@ -97,12 +97,12 @@ export const styles = StyleSheet.create((theme) => {
     },
     profileInfo: {
       flex: 1,
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     label: {
       fontSize: 12,
       fontWeight: "600",
-      marginLeft: 4,
+      marginLeft: theme.spacing.xs,
     },
     labelSecondary: {
       color: theme.text.secondary,
@@ -112,7 +112,7 @@ export const styles = StyleSheet.create((theme) => {
       alignItems: "center",
       borderWidth: 1,
       borderRadius: 16,
-      paddingHorizontal: 12,
+      paddingHorizontal: theme.spacing.custom(12),
       height: 44,
       backgroundColor: theme.surface.glass,
       borderColor: theme.surface.glassBorder,
@@ -126,18 +126,18 @@ export const styles = StyleSheet.create((theme) => {
     },
     statsRow: {
       flexDirection: "row",
-      paddingVertical: 16,
+      paddingVertical: theme.spacing.md,
       borderTopWidth: 1,
       borderTopColor: theme.surface.glassBorder,
     },
     statsRowCentered: {
       justifyContent: "center",
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     statItem: {
       flex: 1,
       alignItems: "center",
-      gap: 4,
+      gap: theme.spacing.xs,
     },
     statValue: {
       fontSize: 16,
@@ -156,15 +156,15 @@ export const styles = StyleSheet.create((theme) => {
     },
     roleContainer: {
       flexDirection: "row",
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     optionCard: (isActive: boolean) => ({
       flex: 1,
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 20,
       borderWidth: 1,
       alignItems: "center",
-      gap: 12,
+      gap: theme.spacing.custom(12),
       position: "relative",
       backgroundColor: isActive
         ? "rgba(0, 212, 255, 0.15)"
@@ -173,11 +173,11 @@ export const styles = StyleSheet.create((theme) => {
     }),
     roleCard: {
       flex: 1,
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 20,
       borderWidth: 1,
       alignItems: "center",
-      gap: 12,
+      gap: theme.spacing.custom(12),
       position: "relative",
     },
     optionIconContainer: (isActive: boolean) => ({
@@ -199,11 +199,11 @@ export const styles = StyleSheet.create((theme) => {
       right: 12,
     },
     updateButton: {
-      paddingVertical: 16,
+      paddingVertical: theme.spacing.md,
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 8,
+      marginTop: theme.spacing.sm,
     },
     updateButtonPrimary: {
       backgroundColor: theme.primary.main,
@@ -217,12 +217,12 @@ export const styles = StyleSheet.create((theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      padding: 16,
+      padding: theme.spacing.md,
     },
     rowLeft: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     iconBox: {
       width: 36,
@@ -245,7 +245,7 @@ export const styles = StyleSheet.create((theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      padding: 16,
+      padding: theme.spacing.md,
     },
     dangerLabel: {
       fontSize: 15,
@@ -254,12 +254,12 @@ export const styles = StyleSheet.create((theme) => {
     },
     dangerSub: {
       fontSize: 12,
-      marginTop: 2,
+      marginTop: theme.spacing.xxs,
       color: theme.text.muted,
     },
     divider: {
       height: 1,
-      marginLeft: 64,
+      marginLeft: theme.spacing['5xl'],
       backgroundColor: theme.surface.glassBorder,
     },
     emailText: {

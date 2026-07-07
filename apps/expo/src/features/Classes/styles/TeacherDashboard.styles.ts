@@ -6,7 +6,7 @@ export const styles = StyleSheet.create((theme, rt) => {
   return {
     container: {
       flex: 1,
-      paddingTop: 15,
+      paddingTop: theme.spacing.custom(15),
     },
     screenFill: {
       flex: 1,
@@ -19,15 +19,15 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     scrollContent: {
       flexGrow: 1,
-      padding: 20,
-      paddingTop: 20,
-      paddingBottom: 100,
+      padding: theme.spacing.custom(20),
+      paddingTop: theme.spacing.custom(20),
+      paddingBottom: theme.spacing.custom(100),
     },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 24,
+      marginBottom: theme.spacing.lg,
     },
     headerTitle: {
       fontSize: 32,
@@ -37,7 +37,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     headerSubtitle: {
       fontSize: 16,
-      marginTop: 4,
+      marginTop: theme.spacing.xs,
       color: theme.text.secondary,
     },
     addButton: {
@@ -54,22 +54,22 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: theme.primary.main,
     },
     statsScroll: {
-      marginBottom: 24,
-      marginHorizontal: -20,
+      marginBottom: theme.spacing.lg,
+      marginHorizontal: theme.spacing.custom(-20),
       flex: 1,
     },
     statsContent: {
-      paddingHorizontal: 20,
-      gap: 12,
+      paddingHorizontal: theme.spacing.custom(20),
+      gap: theme.spacing.custom(12),
     },
     statsCard: {
       flexDirection: "row",
       alignItems: "center",
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 20,
       borderWidth: 1,
       minWidth: 160,
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     statsCardBlue: {
       borderColor: "rgba(59, 130, 246, 0.3)",
@@ -109,11 +109,11 @@ export const styles = StyleSheet.create((theme, rt) => {
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
-      padding: 12,
+      padding: theme.spacing.custom(12),
       borderRadius: 16,
       borderWidth: 1,
-      marginBottom: 24,
-      gap: 10,
+      marginBottom: theme.spacing.lg,
+      gap: theme.spacing.custom(10),
       backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
       borderColor: theme.surface.glassBorder,
     },
@@ -123,19 +123,19 @@ export const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.primary,
     },
     listContainer: {
-      gap: 16,
+      gap: theme.spacing.md,
     },
     sectionTitle: {
       fontSize: 18,
       fontWeight: "600",
-      marginBottom: 8,
+      marginBottom: theme.spacing.sm,
       color: theme.text.primary,
     },
     lectureCard: {
       borderRadius: 24,
       borderWidth: 1,
-      padding: 20,
-      marginBottom: 16,
+      padding: theme.spacing.custom(20),
+      marginBottom: theme.spacing.md,
     },
     lectureCardBorderDefault: {
       borderColor: theme.surface.glassBorder,
@@ -150,16 +150,16 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
     },
     cardTitleContainer: {
       flex: 1,
-      marginRight: 12,
+      marginRight: theme.spacing.custom(12),
     },
     cardTitle: {
       fontSize: 18,
       fontWeight: "bold",
-      marginBottom: 4,
+      marginBottom: theme.spacing.xs,
       color: theme.text.primary,
     },
     cardSubtitle: {
@@ -171,12 +171,12 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: "rgba(34, 197, 94, 0.15)",
-      paddingHorizontal: 10,
-      paddingVertical: 4,
+      paddingHorizontal: theme.spacing.custom(10),
+      paddingVertical: theme.spacing.xs,
       borderRadius: 12,
       borderWidth: 1,
       borderColor: "rgba(34, 197, 94, 0.3)",
-      gap: 6,
+      gap: theme.spacing.custom(6),
     },
     pulsingDot: {
       width: 6,
@@ -190,8 +190,8 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "bold",
     },
     statusBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
+      paddingHorizontal: theme.spacing.custom(10),
+      paddingVertical: theme.spacing.xs,
       borderRadius: 12,
       borderWidth: 1,
       flexDirection: "row",
@@ -215,17 +215,17 @@ export const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.muted,
     },
     metaIconSpacing: {
-      marginRight: 4,
+      marginRight: theme.spacing.xs,
     },
     cardStats: {
       flexDirection: "row",
-      gap: 16,
-      marginBottom: 16,
+      gap: theme.spacing.md,
+      marginBottom: theme.spacing.md,
     },
     statItem: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: theme.spacing.custom(6),
     },
     statText: {
       fontSize: 13,
@@ -234,11 +234,11 @@ export const styles = StyleSheet.create((theme, rt) => {
     classInfoBanner: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
-      padding: 10,
+      gap: theme.spacing.sm,
+      padding: theme.spacing.custom(10),
       borderRadius: 12,
       borderWidth: 1,
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
     },
     classInfoText: {
       fontSize: 12,
@@ -247,7 +247,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     divider: {
       height: 1,
       width: "100%",
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
       backgroundColor: theme.surface.glassBorder,
     },
     cardActions: {
@@ -258,10 +258,10 @@ export const styles = StyleSheet.create((theme, rt) => {
     actionBtn: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 16,
-      paddingVertical: 10,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.custom(10),
       borderRadius: 12,
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     actionBtnPrimary: {
       backgroundColor: isDark
@@ -275,7 +275,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     iconActions: {
       flexDirection: "row",
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     iconBtn: {
       width: 40,
@@ -293,8 +293,8 @@ export const styles = StyleSheet.create((theme, rt) => {
     emptyState: {
       alignItems: "center",
       justifyContent: "center",
-      padding: 40,
-      marginTop: 20,
+      padding: theme.spacing["2xl"],
+      marginTop: theme.spacing.custom(20),
     },
     emptyIcon: {
       opacity: 0.5,
@@ -302,12 +302,12 @@ export const styles = StyleSheet.create((theme, rt) => {
     emptyText: {
       fontSize: 16,
       fontWeight: "600",
-      marginTop: 16,
+      marginTop: theme.spacing.md,
       color: theme.text.muted,
     },
     emptySubText: {
       fontSize: 14,
-      marginTop: 8,
+      marginTop: theme.spacing.sm,
       opacity: 0.7,
       color: theme.text.muted,
     },
@@ -346,10 +346,10 @@ export const styles = StyleSheet.create((theme, rt) => {
     pullIndicatorGradient: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 20,
-      paddingVertical: 10,
+      paddingHorizontal: theme.spacing.custom(20),
+      paddingVertical: theme.spacing.custom(10),
       borderRadius: 24,
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     pullText: {
       color: theme.text.primary,
@@ -363,23 +363,23 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 18,
-      marginBottom: 10,
+      paddingHorizontal: theme.spacing.custom(18),
+      marginBottom: theme.spacing.custom(10),
     },
     modalHeaderLeft: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      gap: theme.spacing.custom(10),
     },
     modalOverlay: {
       flex: 1,
       justifyContent: "center",
-      padding: 20,
+      padding: theme.spacing.custom(20),
     },
     modalContent: {
       borderRadius: 24,
-      paddingHorizontal: 8,
-      paddingVertical: 22,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.custom(22),
       borderWidth: 1,
     },
     modalSurface: {
@@ -387,7 +387,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     modalTitle: {
       fontSize: 24,
-      marginLeft: 9,
+      marginLeft: theme.spacing.custom(9),
       fontWeight: "bold",
       color: theme.text.primary,
     },
@@ -404,15 +404,15 @@ export const styles = StyleSheet.create((theme, rt) => {
       justifyContent: "center",
     },
     modalBody: {
-      paddingHorizontal: 24,
-      paddingTop: 10,
+      paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.custom(10),
     },
     inputGroup: {
     },
     label: {
       fontSize: 14,
       fontWeight: "600",
-      marginBottom: 8,
+      marginBottom: theme.spacing.sm,
       color: theme.text.secondary,
     },
     modalInput: {
@@ -423,21 +423,21 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing.md,
       color: theme.text.primary,
       fontSize: 16,
       fontWeight: "500",
     },
     modalActions: {
       flexDirection: "row",
-      gap: 12,
-      marginTop: 12,
-      padding: 20,
-      paddingTop: 10,
+      gap: theme.spacing.custom(12),
+      marginTop: theme.spacing.custom(12),
+      padding: theme.spacing.custom(20),
+      paddingTop: theme.spacing.custom(10),
     },
     modalBtn: {
       flex: 1,
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",

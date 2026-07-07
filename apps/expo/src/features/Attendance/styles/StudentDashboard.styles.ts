@@ -17,9 +17,9 @@ const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
     },
     scrollContent: {
-      padding: 20,
-      paddingTop: 30,
-      paddingBottom: 70,
+      padding: theme.spacing.custom(20),
+      paddingTop: theme.spacing.custom(30),
+      paddingBottom: theme.spacing.custom(70),
     },
     headerSection: {
       marginBottom: theme.spacing.lg,
@@ -27,15 +27,15 @@ const styles = StyleSheet.create((theme, rt) => {
     title: {
       fontSize: 32,
       fontWeight: "800",
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
       letterSpacing: -0.5,
       color: theme.text.primary,
     },
     classInfoCard: {
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 16,
       borderWidth: 1,
-      marginBottom: 8,
+      marginBottom: theme.spacing.sm,
       borderColor: theme.surface.glassBorder,
     },
     classInfoHeader: {
@@ -49,13 +49,13 @@ const styles = StyleSheet.create((theme, rt) => {
       flex: 1,
     },
     classInfoIcon: {
-      marginRight: 12,
+      marginRight: theme.spacing.custom(12),
     },
     classInfoLabel: {
       fontWeight: "600",
       textTransform: "uppercase",
       letterSpacing: 0.5,
-      marginBottom: 4,
+      marginBottom: theme.spacing.xs,
       color: theme.text.secondary,
     },
     classInfoValue: {
@@ -76,19 +76,19 @@ const styles = StyleSheet.create((theme, rt) => {
     subtitle: {
       fontSize: 18,
       fontWeight: "600",
-      marginBottom: 24,
+      marginBottom: theme.spacing.lg,
       opacity: 0.8,
       color: theme.text.secondary,
     },
     emptyContainer: {
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 60,
+      paddingVertical: theme.spacing.custom(60),
       opacity: 0.7,
     },
     emptyText: {
       fontSize: 16,
-      marginTop: 16,
+      marginTop: theme.spacing.md,
       textAlign: "center",
       color: theme.text.muted,
     },
@@ -96,17 +96,17 @@ const styles = StyleSheet.create((theme, rt) => {
       fontSize: 16,
       textAlign: "center",
       color: theme.text.secondary,
-      marginTop: 16,
+      marginTop: theme.spacing.md,
     },
     refreshButton: {
-      marginTop: 16,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
+      marginTop: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
     },
     refreshButtonFilled: {
       backgroundColor: theme.primary.main,
       borderRadius: 12,
-      marginTop: 20,
+      marginTop: theme.spacing.custom(20),
     },
     refreshText: {
       fontSize: 16,
@@ -117,10 +117,10 @@ const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.primary,
     },
     lectureCard: {
-      padding: 20,
+      padding: theme.spacing.custom(20),
       borderRadius: 24,
       borderWidth: 1,
-      marginBottom: 20,
+      marginBottom: theme.spacing.custom(20),
       borderColor: theme.surface.glassBorder,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 8 },
@@ -131,12 +131,12 @@ const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
     },
     headerLeftContent: {
       flexDirection: "row",
       flex: 1,
-      marginRight: 12,
+      marginRight: theme.spacing.custom(12),
     },
     iconContainer: {
       width: 44,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create((theme, rt) => {
       borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
-      marginRight: 12,
+      marginRight: theme.spacing.custom(12),
       backgroundColor: isDark ? "rgba(255 255 255 / 0.12)" : "rgba(0,0,0,0.04)",
     },
     lectureInfo: {
@@ -156,12 +156,12 @@ const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
     },
     lectureMetaIcon: {
-      marginRight: 4,
+      marginRight: theme.spacing.xs,
     },
     lectureCardTitle: {
       fontSize: 18,
       fontWeight: "700",
-      marginBottom: 4,
+      marginBottom: theme.spacing.xs,
       letterSpacing: -0.3,
       lineHeight: 24,
       color: theme.text.primary,
@@ -175,8 +175,8 @@ const styles = StyleSheet.create((theme, rt) => {
     liveBadge: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      paddingHorizontal: theme.spacing.custom(10),
+      paddingVertical: theme.spacing.custom(6),
       borderRadius: 12,
       backgroundColor: isDark
         ? "rgba(76, 175, 80, 0.2)"
@@ -188,7 +188,7 @@ const styles = StyleSheet.create((theme, rt) => {
       width: 6,
       height: 6,
       borderRadius: 3,
-      marginRight: 6,
+      marginRight: theme.spacing.custom(6),
       backgroundColor: theme.accent.green,
     },
     liveBadgeText: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create((theme, rt) => {
     divider: {
       height: 1,
       width: "100%",
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
       opacity: 0.5,
       backgroundColor: theme.surface.glassBorder,
     },
@@ -208,7 +208,7 @@ const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 16,
+      paddingVertical: theme.spacing.md,
       borderRadius: 16,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
@@ -220,27 +220,27 @@ const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.primary,
       fontSize: 16,
       fontWeight: "700",
-      marginRight: 8,
+      marginRight: theme.spacing.sm,
     },
     joinIconContainer: {
       backgroundColor: theme.surface.glass,
       borderRadius: 12,
-      padding: 4,
-      marginLeft: 8,
+      padding: theme.spacing.xs,
+      marginLeft: theme.spacing.sm,
     },
     joinButtonIcon: {
-      marginLeft: 4,
+      marginLeft: theme.spacing.xs,
     },
     joinButtonLoader: {
-      marginLeft: 8,
+      marginLeft: theme.spacing.sm,
     },
     // Joined State Styles
     joinedContainer: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      padding: 24,
-      margin: 20,
+      padding: theme.spacing.lg,
+      margin: theme.spacing.custom(20),
       borderRadius: 24,
       backgroundColor: theme.surface.cardBg,
       borderColor: theme.surface.glassBorder,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create((theme, rt) => {
       shadowRadius: 12,
     },
     guardianIconOuter: {
-      marginBottom: 32,
+      marginBottom: theme.spacing.xl,
       shadowColor: theme.accent.green,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.4,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create((theme, rt) => {
     guardianTitle: {
       fontSize: 28,
       fontWeight: "800",
-      marginBottom: 12,
+      marginBottom: theme.spacing.custom(12),
       textAlign: "center",
       letterSpacing: -0.5,
       color: theme.text.primary,
@@ -278,14 +278,14 @@ const styles = StyleSheet.create((theme, rt) => {
     guardianSubtitle: {
       fontSize: 16,
       textAlign: "center",
-      marginBottom: 48,
+      marginBottom: theme.spacing['3xl'],
       lineHeight: 24,
       opacity: 0.8,
       color: theme.text.secondary,
     },
     passcodeCard: {
       width: "100%",
-      padding: 24,
+      padding: theme.spacing.lg,
       borderRadius: 24,
       borderWidth: 1,
       borderColor: theme.surface.glassBorder,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create((theme, rt) => {
     passcodeLabel: {
       fontSize: 14,
       fontWeight: "600",
-      marginBottom: 12,
+      marginBottom: theme.spacing.custom(12),
       textTransform: "uppercase",
       letterSpacing: 1,
       opacity: 0.7,
@@ -314,11 +314,11 @@ const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.5)",
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing.md,
       fontSize: 20,
       fontWeight: "600",
       textAlign: "center",
-      marginBottom: 20,
+      marginBottom: theme.spacing.custom(20),
       color: theme.text.primary,
     },
     lectureTitleHighlight: {
@@ -344,17 +344,17 @@ const styles = StyleSheet.create((theme, rt) => {
     ongoingInfo: {
       width: "100%",
       alignItems: "center",
-      marginBottom: 32,
-      gap: 16,
+      marginBottom: theme.spacing.xl,
+      gap: theme.spacing.md,
     },
     trackingBadge: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 20,
-      paddingVertical: 12,
+      paddingHorizontal: theme.spacing.custom(20),
+      paddingVertical: theme.spacing.custom(12),
       borderRadius: 20,
       backgroundColor: "rgba(76, 175, 80, 0.15)",
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     pulseDot: {
       width: 8,
@@ -375,15 +375,15 @@ const styles = StyleSheet.create((theme, rt) => {
     },
     leaveButtonWrapper: {
       width: "100%",
-      marginTop: 16,
+      marginTop: theme.spacing.md,
     },
     leaveButton: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 16,
+      paddingVertical: theme.spacing.md,
       borderRadius: 16,
-      gap: 8,
+      gap: theme.spacing.sm,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.2,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create((theme, rt) => {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      padding: 20,
+      padding: theme.spacing.custom(20),
     },
     modalContent: {
       width: "100%",
@@ -426,14 +426,14 @@ const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: 20,
+      padding: theme.spacing.custom(20),
       borderBottomWidth: 1,
       borderBottomColor: theme.surface.glassBorder,
     },
     modalHeaderContent: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      gap: theme.spacing.custom(10),
     },
     modalHeaderIconContainer: {
       width: 40,
@@ -464,26 +464,26 @@ const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
     },
     modalBody: {
-      padding: 20,
+      padding: theme.spacing.custom(20),
     },
     modalBodyCompact: {
-      paddingTop: 10,
+      paddingTop: theme.spacing.custom(10),
     },
     modalLabel: {
       fontSize: 14,
       fontWeight: "600",
-      marginBottom: 8,
+      marginBottom: theme.spacing.sm,
     },
     modalLabelSecondary: {
       color: theme.text.secondary,
     },
     modalLabelSpaced: {
-      marginBottom: 12,
+      marginBottom: theme.spacing.custom(12),
     },
     modalInput: {
       borderWidth: 1,
       borderRadius: 12,
-      padding: 14,
+      padding: theme.spacing.custom(14),
       fontSize: 16,
     },
     modalInputText: {
@@ -500,7 +500,7 @@ const styles = StyleSheet.create((theme, rt) => {
       borderRadius: 16,
       borderWidth: 1,
       borderColor: theme.border.modal,
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing.md,
       height: 56,
     },
     modalInputField: {
@@ -518,22 +518,22 @@ const styles = StyleSheet.create((theme, rt) => {
       fontSize: 13,
       fontWeight: "600",
       lineHeight: 18,
-      marginTop: 8,
+      marginTop: theme.spacing.sm,
     },
     modalFooter: {
       flexDirection: "row",
-      gap: 12,
-      padding: 20,
+      gap: theme.spacing.custom(12),
+      padding: theme.spacing.custom(20),
       borderTopWidth: 1,
       borderTopColor: theme.surface.glassBorder,
     },
     modalFooterCompact: {
       borderTopWidth: 0,
-      paddingTop: 10,
+      paddingTop: theme.spacing.custom(10),
     },
     modalButton: {
       flex: 1,
-      padding: 14,
+      padding: theme.spacing.custom(14),
       borderRadius: 12,
       alignItems: "center",
     },
@@ -567,10 +567,10 @@ const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "700",
     },
     trackingIndicator: {
-      marginTop: 24,
+      marginTop: theme.spacing.lg,
       flexDirection: "row",
       alignItems: "center",
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     trackingText: {
       fontSize: 14,
@@ -580,7 +580,7 @@ const styles = StyleSheet.create((theme, rt) => {
       justifyContent: "center",
       alignItems: "center",
       flex: 1,
-      paddingHorizontal: 12,
+      paddingHorizontal: theme.spacing.custom(12),
       marginBottom: rt.insets.bottom,
     },
   };

@@ -9,9 +9,9 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: theme.background.primary,
     },
     header: {
-      paddingTop: 20,
-      paddingBottom: 20,
-      paddingHorizontal: 20,
+      paddingTop: theme.spacing.custom(20),
+      paddingBottom: theme.spacing.custom(20),
+      paddingHorizontal: theme.spacing.custom(20),
       borderBottomWidth: 1,
       borderBottomLeftRadius: 24,
       borderBottomRightRadius: 24,
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 20,
+      marginBottom: theme.spacing.custom(20),
     },
     headerButton: {
       width: 40,
@@ -58,7 +58,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     headerSubtitle: {
       fontSize: 14,
-      marginTop: 2,
+      marginTop: theme.spacing.xxs,
       opacity: 0.7,
       color: theme.text.secondary,
     },
@@ -70,14 +70,14 @@ export const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
       height: 46,
       borderRadius: 16,
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing.md,
       borderWidth: 1,
       backgroundColor: isDark ? theme.surface.glass : "rgba(0, 0, 0, 0.05)",
       borderColor: theme.surface.glassBorder,
     },
     searchInput: {
       flex: 1,
-      marginLeft: 10,
+      marginLeft: theme.spacing.custom(10),
       fontSize: 15,
       height: "100%",
       color: theme.text.primary,
@@ -86,25 +86,25 @@ export const styles = StyleSheet.create((theme, rt) => {
       flex: 1,
     },
     scrollContent: {
-      padding: 20,
-      gap: 10,
+      padding: theme.spacing.custom(20),
+      gap: theme.spacing.custom(10),
     },
     spacerBottom: {
       height: 40,
     },
     statsContainer: {
       flexDirection: "row",
-      gap: 12,
-      marginBottom: 24,
+      gap: theme.spacing.custom(12),
+      marginBottom: theme.spacing.lg,
     },
     statCard: {
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      padding: 16,
+      padding: theme.spacing.md,
       borderRadius: 20,
       borderWidth: 1,
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     statIconContainer: {
       width: 40,
@@ -119,7 +119,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "600",
       textTransform: "uppercase",
       letterSpacing: 0.5,
-      marginBottom: 2,
+      marginBottom: theme.spacing.xxs,
     },
     statNumber: {
       fontSize: 24,
@@ -127,12 +127,12 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     filterContainer: {
       flexDirection: "row",
-      gap: 10,
-      marginBottom: 20,
+      gap: theme.spacing.custom(10),
+      marginBottom: theme.spacing.custom(20),
     },
     filterButton: {
       flex: 1,
-      paddingVertical: 12,
+      paddingVertical: theme.spacing.custom(12),
       borderRadius: 14,
       alignItems: "center",
       justifyContent: "center",
@@ -166,14 +166,14 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "500",
     },
     loadingContainer: {
-      padding: 40,
+      padding: theme.spacing["2xl"],
       alignItems: "center",
     },
     listContainer: {
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     emptyState: {
-      padding: 40,
+      padding: theme.spacing["2xl"],
       borderRadius: 24,
       borderWidth: 1,
       alignItems: "center",
@@ -183,7 +183,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderColor: theme.surface.glassBorder,
     },
     emptyStateIcon: {
-      marginBottom: 16,
+      marginBottom: theme.spacing.md,
       opacity: 0.5,
     },
     emptyStateText: {
@@ -195,7 +195,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderRadius: 20,
       borderWidth: 1,
       borderLeftWidth: 4,
-      padding: 16,
+      padding: theme.spacing.md,
       overflow: "hidden",
       backgroundColor: isDark
         ? theme.surface.cardBg
@@ -221,7 +221,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      marginRight: 16,
+      marginRight: theme.spacing.md,
     },
     avatarText: {
       fontSize: 18,
@@ -242,8 +242,8 @@ export const styles = StyleSheet.create((theme, rt) => {
     nameRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
-      marginBottom: 4,
+      gap: theme.spacing.custom(6),
+      marginBottom: theme.spacing.xs,
     },
     studentName: {
       fontSize: 16,
@@ -252,7 +252,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     rollNo: {
       fontSize: 13,
-      marginBottom: 6,
+      marginBottom: theme.spacing.custom(6),
       color: theme.text.secondary,
     },
     metaRow: {
@@ -262,7 +262,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     metaItem: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 4,
+      gap: theme.spacing.xs,
     },
     metaText: {
       fontSize: 11,
@@ -274,17 +274,17 @@ export const styles = StyleSheet.create((theme, rt) => {
       height: 3,
       borderRadius: 1.5,
       backgroundColor: theme.text.muted,
-      marginHorizontal: 8,
+      marginHorizontal: theme.spacing.sm,
     },
     statusContainer: {
       alignItems: "flex-end",
       justifyContent: "center",
-      marginLeft: 8,
+      marginLeft: theme.spacing.sm,
     },
     rollBadge: {
       alignItems: "center",
-      paddingHorizontal: 12,
-      paddingVertical: 8,
+      paddingHorizontal: theme.spacing.custom(12),
+      paddingVertical: theme.spacing.sm,
       borderRadius: 10,
       backgroundColor: "rgba(74, 222, 128, 0.1)",
     },
@@ -295,8 +295,8 @@ export const styles = StyleSheet.create((theme, rt) => {
       color: "#4ADE80",
     },
     absentBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      paddingHorizontal: theme.spacing.custom(10),
+      paddingVertical: theme.spacing.custom(6),
       borderRadius: 8,
     },
     absentBadgeIncomplete: {
@@ -319,7 +319,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      padding: 20,
+      padding: theme.spacing.custom(20),
     },
     modalAnimatedWrapper: {
       width: "100%",
@@ -333,8 +333,8 @@ export const styles = StyleSheet.create((theme, rt) => {
       width: "100%",
       maxWidth: 500,
       borderRadius: 24,
-      paddingHorizontal: 14,
-      paddingVertical: 24,
+      paddingHorizontal: theme.spacing.custom(14),
+      paddingVertical: theme.spacing.lg,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
@@ -348,13 +348,13 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 20,
-      paddingHorizontal: 10,
+      marginBottom: theme.spacing.custom(20),
+      paddingHorizontal: theme.spacing.custom(10),
     },
     modalHeaderLeft: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      gap: theme.spacing.custom(10),
     },
     modalHeaderIcon: {
       width: 40,
@@ -378,16 +378,16 @@ export const styles = StyleSheet.create((theme, rt) => {
       backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
     },
     modalBody: {
-      paddingHorizontal: 24,
+      paddingHorizontal: theme.spacing.lg,
     },
     modalBodyTop: {
-      paddingTop: 10,
+      paddingTop: theme.spacing.custom(10),
     },
     rollNumberBox: {
       borderRadius: 16,
       borderWidth: 1,
-      padding: 20,
-      marginBottom: 20,
+      padding: theme.spacing.custom(20),
+      marginBottom: theme.spacing.custom(20),
       minHeight: 80,
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
@@ -403,8 +403,8 @@ export const styles = StyleSheet.create((theme, rt) => {
     modalStats: {
       flexDirection: "row",
       justifyContent: "space-around",
-      marginBottom: 20,
-      paddingVertical: 16,
+      marginBottom: theme.spacing.custom(20),
+      paddingVertical: theme.spacing.md,
     },
     statItem: {
       alignItems: "center",
@@ -412,7 +412,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     statValue: {
       fontSize: 28,
       fontWeight: "800",
-      marginBottom: 4,
+      marginBottom: theme.spacing.xs,
     },
     statLabelSmall: {
       fontSize: 12,
@@ -424,9 +424,9 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 14,
+      paddingVertical: theme.spacing.custom(14),
       borderRadius: 12,
-      gap: 8,
+      gap: theme.spacing.sm,
       borderWidth: 0,
     },
     copyButtonText: {
@@ -453,7 +453,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     modalDescription: {
       fontSize: 14,
       lineHeight: 20,
-      marginBottom: 20,
+      marginBottom: theme.spacing.custom(20),
     },
     modalLabel: {
       fontSize: 14,
@@ -461,16 +461,16 @@ export const styles = StyleSheet.create((theme, rt) => {
       color: theme.text.secondary,
     },
     modalLabelDescription: {
-      marginBottom: 12,
+      marginBottom: theme.spacing.custom(12),
     },
     inputContainer: {
       flexDirection: "row",
       alignItems: "center",
       height: 56,
       borderRadius: 16,
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing.md,
       borderWidth: 1,
-      marginBottom: 24,
+      marginBottom: theme.spacing.lg,
       backgroundColor: isDark
         ? "rgba(0, 0, 0, 0.3)"
         : "rgba(255, 255, 255, 0.8)",
@@ -478,10 +478,10 @@ export const styles = StyleSheet.create((theme, rt) => {
     },
     inputContainerError: {
       borderColor: theme.status.error,
-      marginBottom: 8,
+      marginBottom: theme.spacing.sm,
     },
     inputIcon: {
-      marginRight: 12,
+      marginRight: theme.spacing.custom(12),
     },
     input: {
       flex: 1,
@@ -495,20 +495,20 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontSize: 13,
       fontWeight: "600",
       lineHeight: 18,
-      marginBottom: 24,
+      marginBottom: theme.spacing.lg,
     },
     modalActions: {
       flexDirection: "row",
-      gap: 12,
+      gap: theme.spacing.custom(12),
     },
     modalFooter: {
       flexDirection: "row",
-      gap: 12,
-      padding: 20,
+      gap: theme.spacing.custom(12),
+      padding: theme.spacing.custom(20),
     },
     modalFooterCompact: {
       borderTopWidth: 0,
-      paddingTop: 10,
+      paddingTop: theme.spacing.custom(10),
     },
     actionButton: {
       flex: 1,
@@ -517,7 +517,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
-      gap: 8,
+      gap: theme.spacing.sm,
     },
     cancelButton: {
       borderWidth: 1,
@@ -548,7 +548,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontWeight: "700",
     },
     submitButtonIcon: {
-      marginLeft: 8,
+      marginLeft: theme.spacing.sm,
     },
   };
 });
