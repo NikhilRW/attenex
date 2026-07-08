@@ -105,7 +105,7 @@ export const useNotificationBootstrap = () => {
               return;
             } else if (parseLectureId(lectureId) && parseEndedTrue(ended)) {
               router.replace({ pathname: "/classes", params: { lectureId, ended: "true" } });
-              return;              
+              return;
             }
           } catch (error) {
             console.error("Error getting Firebase initial notification:", error);
@@ -143,17 +143,22 @@ export const useNotificationBootstrap = () => {
                 content: {
                   ...buildAttenexNotificationContent(remoteMessage),
                 },
-                trigger: null,
+                trigger: {
+                  channelId: ATTENEX_ANDROID_CHANNEL_ID,
+                },
               });
             } else if (parseLectureId(remoteData?.lectureId)) {
               if (userRole === "teacher") {
                 router.setParams({
                   lectureId: remoteData?.lectureId,
-                  ended:  remoteData?.ended as string,
+                  ended: remoteData?.ended as string,
                 });
-              } else  {
+              } else {
                 console.log("I am here student 1");
-                router.replace({ pathname: "/attendance", params: { ended: remoteData?.ended as string } });
+                router.replace({
+                  pathname: "/attendance",
+                  params: { ended: remoteData?.ended as string },
+                });
               }
             }
           },
@@ -169,7 +174,7 @@ export const useNotificationBootstrap = () => {
             } else {
               router.navigate({
                 pathname: "/attendance",
-                params: { lectureId: lectureId},
+                params: { lectureId: lectureId },
               });
             }
           }
@@ -221,7 +226,9 @@ export const useNotificationBootstrap = () => {
           if (!parseEndedTrue(remoteMessage?.data?.ended)) {
             await scheduleNotificationAsync({
               content: buildAttenexNotificationContent(remoteMessage),
-              trigger: null,
+              trigger: {
+                channelId: ATTENEX_ANDROID_CHANNEL_ID,
+              },
             });
           } else {
             const lectureId = remoteMessage?.data?.lectureId;
