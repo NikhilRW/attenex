@@ -8,6 +8,7 @@ import {
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import { sendPing } from "./attendanceService";
 import { parseLectureId } from "@/shared/utils/parsers";
+import { IS_TESTING } from "../constants/common";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
@@ -56,7 +57,7 @@ export const startBackgroundTracking = async (lectureId: string) => {
       if (status === "granted") {
         await startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           accuracy: Accuracy.Highest,
-          timeInterval: 3 * 60 * 1000, // Check every 3 minutes
+          timeInterval: __DEV__ && IS_TESTING? 10 * 1000 : 3 * 60 * 1000, // Check every 3 minutes (10s in dev for testing)
           distanceInterval: 1,
           foregroundService: {
             notificationTitle: "Attendance Active",

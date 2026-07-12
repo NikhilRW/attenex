@@ -69,11 +69,13 @@ const LectureEnded = ({
             onChangeText={setPasscode}
             keyboardType="numeric"
             maxLength={4}
+            testID="LECTURE_ENDED.PASSCODE_INPUT"
           />
           <TouchableOpacity
             onPress={handleSubmit}
             disabled={loading}
             haptic="impact"
+            testID="LECTURE_ENDED.VERIFY_BUTTON"
           >
             <PrimaryGradient style={styles.submitButton}>
               {loading ? (

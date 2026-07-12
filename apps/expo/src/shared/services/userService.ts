@@ -28,7 +28,6 @@ export const userService = {
       if (!parsed.success) {
         throw new Error("Failed to update user role");
       }
-
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
         const token = await getDeviceToken();
@@ -36,6 +35,7 @@ export const userService = {
       }
       if (role === "student") {
         const className = useAuthStore.getState().user?.className;
+        // TODO:fix this
         if (className) {
           await subscribeToClassName(className);
         }

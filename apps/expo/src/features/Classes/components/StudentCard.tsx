@@ -128,19 +128,19 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         {/* Roll Number/Status */}
         <View style={styles.statusContainer}>
           {record.status === "present" ? (
-            <View style={styles.rollBadge}>
+            <View style={styles.rollBadge} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
               <Text style={styles.rollText}>
                 {record.studentRollNo || "N/A"}
               </Text>
             </View>
           ) : record.status === "incomplete" ? (
-            <View style={[styles.absentBadge, styles.absentBadgeIncomplete]}>
+            <View style={[styles.absentBadge, styles.absentBadgeIncomplete]} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
               <Text style={[styles.absentText, styles.absentTextIncomplete]}>
                 INC
               </Text>
             </View>
           ) : (
-            <View style={[styles.absentBadge, styles.absentBadgeAbsent]}>
+            <View style={[styles.absentBadge, styles.absentBadgeAbsent]} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
               <Text style={[styles.absentText, styles.absentTextAbsent]}>
                 ABS
               </Text>

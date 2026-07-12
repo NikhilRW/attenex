@@ -47,7 +47,7 @@ export const PasscodeCard: React.FC<PasscodeCardProps> = ({
           <LoadingIndicator size="large" />
         ) : passcode ? (
           <>
-            <View style={styles.passcodeDigits}>
+            <View style={styles.passcodeDigits} testID="TEACHER.ENDED_LECTURE.PASSCODE_DIGITS">
               {passcode.split("").map((digit) => (
                 <View
                   key={`passcode-${digit}`}

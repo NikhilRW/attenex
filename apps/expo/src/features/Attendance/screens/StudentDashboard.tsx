@@ -29,7 +29,6 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
-
 const DEFAULT_LECTURE_ROW_HEIGHT = 220;
 
 const StudentDashboard = () => {

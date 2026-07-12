@@ -93,9 +93,9 @@ const getErrorMessage = (error: AxiosError) => {
 const http = create({
   baseURL: BASE_URI,
   adapter: "fetch",
-  env: {
-    ...axiosFetchEnv,
-  },
+  // env: {
+  //   ...axiosFetchEnv,
+  // },
 });
 
 http.interceptors.request.use(async (config) => {

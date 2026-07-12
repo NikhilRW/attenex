@@ -30,7 +30,7 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ success: false, message: "Missing or invalid parameters" });
     }
 
-    const { lectureId, latitude, longitude } = parsed.output;
+    const { lectureId, latitude, longitude, _testTimestamp } = parsed.output;
 
     // Get lecture details for geofence check
     const lecture = await db.query.lectures.findFirst({
@@ -55,13 +55,17 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
     const isValid = distance <= radius;
 
     // Log the ping
+    const pingTimestamp =
+      process.env.NODE_ENV === "development" && _testTimestamp
+        ? new Date(_testTimestamp)
+        : new Date();
     await db.insert(attendancePings).values({
       lectureId,
       studentId: userId,
       latitude: latitude.toString(),
       longitude: longitude.toString(),
       isValid: isValid,
-      timestamp: new Date(),
+      timestamp: pingTimestamp,
     });
 
     // If ping is valid, increment the checkScore in attendance table

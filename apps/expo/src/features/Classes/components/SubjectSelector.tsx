@@ -107,6 +107,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
       <TouchableOpacity
         haptic="selection"
         onPress={onToggleDropdown}
+        testID="CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR.BUTTON"
         style={styles.dropdown}
       >
         <Text

@@ -19,7 +19,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { useColorScheme,LogBox } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
@@ -40,6 +40,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 const QUERY_PERSIST_MAX_AGE_MS = StaleTime.DAYS_5;
 const QUERY_PERSIST_BUSTER = `attenex-${Constants.expoConfig?.version ?? "1"}`;
+
 // Configure Reanimated logger to suppress warnings
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -49,6 +50,8 @@ configureReanimatedLogger({
 SplashScreen.preventAutoHideAsync();
 
 const ThemedSafeAreaView = withUnistyles(SafeAreaView);
+
+LogBox.ignoreAllLogs(true); // Ignore all log notifications
 
 const ThemedPaperProvider = withUnistyles(PaperProvider, (theme, rt) => {
   const paperTheme = rt.themeName === "dark" ? MD3DarkTheme : MD3LightTheme;

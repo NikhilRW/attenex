@@ -30,8 +30,8 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ success: false, message: "Missing or invalid parameters" });
     }
 
-    const { lectureId, latitude, longitude, passcode } = parsed.output;
-
+    const { lectureId, latitude, longitude, passcode, _testElapsedMinutes } = parsed.output;
+    // TODO: remove it
     // Get lecture
     const lecture = await db.query.lectures.findFirst({
       where: eq(lectures.id, lectureId),
@@ -98,7 +98,14 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
     const startTime = new Date(lecture.startedAt || lecture.createdAt!);
     const endTime = new Date(); // Current time as the end of participation
     const durationMs = endTime.getTime() - startTime.getTime();
-    const durationMinutes = durationMs / (1000 * 60);
+    let durationMinutes = durationMs / (1000 * 60);
+    if (
+      process.env.NODE_ENV === "development" &&
+      typeof _testElapsedMinutes === "number" &&
+      _testElapsedMinutes > 0
+    ) {
+      durationMinutes = _testElapsedMinutes;
+    }
 
     let finalStatus: "present" | "absent" | "incomplete" = "incomplete";
     let message = "Attendance Incomplete";

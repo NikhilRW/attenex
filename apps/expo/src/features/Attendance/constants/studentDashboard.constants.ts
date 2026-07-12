@@ -32,6 +32,14 @@ export const ALERT_MESSAGES = {
     title: "Success",
     message: "Attendance Marked Present!",
   },
+  ATTENDANCE_INCOMPLETE: {
+    title: "Incomplete",
+    message: "Your attendance could not be fully confirmed.",
+  },
+  ATTENDANCE_ABSENT: {
+    title: "Absent",
+    message: "You have been marked absent.",
+  },
   SUBMISSION_FAILED: {
     title: "Submission Failed",
     message: "Could not mark attendance",

@@ -5,7 +5,8 @@ const headerTextContainerTestId =
   "TEACHER_DASHBOARD_SCREEN.HEADER_SECTION.HEADER_TEXT_CONTAINER";
 const classSelectorTestId = "CREATE_LECTURE_SCREEN.CLASS_SELECTOR.BUTTON";
 const classSelectorItemTestIdPrefix = "CREATE_LECTURE_SCREEN.CLASS_SELECTOR_ITEM_";
-const lectureTopicInputTestId = "CREATE_LECTURE_SCREEN.LECTURE_TOPIC_INPUT";
+const subjectSelectorTestId = "CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR.BUTTON";
+const subjectSelectorItemTestIdPrefix = "CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR_ITEM_";
 const customDurationInputTestId = "CREATE_LECTURE_SCREEN.CUSTOM_DURATION_INPUT";
 const durationSelectorButtonTestId =
   "CREATE_LECTURE_SCREEN.DURATION_SELECTOR_BUTTON";
@@ -82,10 +83,12 @@ describe("App", () => {
     await waitFor(classSelectorItem).toBeVisible().withTimeout(5000);
     await classSelectorItem.tap();
 
-    const lectureTopicInput = element(by.id(lectureTopicInputTestId));
-    await waitFor(lectureTopicInput).toBeVisible().withTimeout(5000);
-    await lectureTopicInput.typeText("Test Lecture");
-    await lectureTopicInput.tapReturnKey();
+    // Select first subject
+    const subjectSelector = element(by.id('CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR.BUTTON'));
+    await subjectSelector.tap();
+    const subjectItem = element(by.id('CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR_ITEM_1'));
+    await waitFor(subjectItem).toBeVisible().withTimeout(5000);
+    await subjectItem.tap();
 
     const durationSelectorButton = element(by.id(durationSelectorButtonTestId));
     await waitFor(durationSelectorButton).toBeVisible().withTimeout(5000);

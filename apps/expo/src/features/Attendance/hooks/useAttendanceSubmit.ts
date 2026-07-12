@@ -56,12 +56,34 @@ export const useAttendanceSubmit = (): UseAttendanceSubmitReturn => {
         return;
       }
       const { res, onSuccess } = data;
+      // TODO: make this message less techinal.
       if (res.success) {
-        showSuccessAlert(
-          ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
-          ALERT_MESSAGES.ATTENDANCE_SUCCESS.message,
-          alert,
-        );
+        const status = res.data?.status;
+        if (status === "present") {
+          showSuccessAlert(
+            ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
+            ALERT_MESSAGES.ATTENDANCE_SUCCESS.message,
+            alert,
+          );
+        } else if (status === "incomplete") {
+          showErrorAlert(
+            ALERT_MESSAGES.ATTENDANCE_INCOMPLETE.title,
+            res.message || ALERT_MESSAGES.ATTENDANCE_INCOMPLETE.message,
+            alert,
+          );
+        } else if (status === "absent") {
+          showErrorAlert(
+            ALERT_MESSAGES.ATTENDANCE_ABSENT.title,
+            res.message || ALERT_MESSAGES.ATTENDANCE_ABSENT.message,
+            alert,
+          );
+        } else {
+          showSuccessAlert(
+            ALERT_MESSAGES.ATTENDANCE_SUCCESS.title,
+            ALERT_MESSAGES.ATTENDANCE_SUCCESS.message,
+            alert,
+          );
+        }
 
         setPasscode("");
         await stopBackgroundTracking();
