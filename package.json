@@ -23,14 +23,6 @@
     "prettier": "^3.7.4"
   },
   "lint-staged": {
-    "apps/expo/src/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "apps/api/src/**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ],
     "*.{json,md}": [
       "prettier --write"
     ]
