@@ -30,11 +30,13 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({
 
   useFocusEffect(
     useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withTiming(1, {
-        duration: HEADER_FOCUS_ANIMATION_DURATION_MS,
-        easing: Easing.out(Easing.cubic),
-      });
+      focusProgress.set(0);
+      focusProgress.set(
+        withTiming(1, {
+          duration: HEADER_FOCUS_ANIMATION_DURATION_MS,
+          easing: Easing.out(Easing.cubic),
+        }),
+      );
     }, [focusProgress]),
   );
 

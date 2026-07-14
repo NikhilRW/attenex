@@ -78,11 +78,13 @@ const TeacherDashboard = () => {
 
   useFocusEffect(
     useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withTiming(1, {
-        duration: DASHBOARD_CONTENT_FOCUS_ANIMATION_DURATION_MS,
-        easing: Easing.out(Easing.cubic),
-      });
+      focusProgress.set(0);
+      focusProgress.set(
+        withTiming(1, {
+          duration: DASHBOARD_CONTENT_FOCUS_ANIMATION_DURATION_MS,
+          easing: Easing.out(Easing.cubic),
+        }),
+      );
     }, [focusProgress]),
   );
 

@@ -59,28 +59,32 @@ const LectureCard: React.FC<LectureCardProps> = ({
 
   useFocusEffect(
     useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withDelay(
-        Math.min(index * 45, 180),
-        withTiming(1, {
-          duration: 320,
-          easing: Easing.out(Easing.cubic),
-        }),
+      focusProgress.set(0);
+      focusProgress.set(
+        withDelay(
+          Math.min(index * 45, 180),
+          withTiming(1, {
+            duration: 320,
+            easing: Easing.out(Easing.cubic),
+          }),
+        ),
       );
     }, [focusProgress, index]),
   );
 
   useEffect(() => {
     if (isPending) {
-      opacity.value = withRepeat(
-        withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-        -1,
-        true,
+      opacity.set(
+        withRepeat(
+          withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+          -1,
+          true,
+        ),
       );
       return;
     }
 
-    opacity.value = withTiming(1, { duration: 150 });
+    opacity.set(withTiming(1, { duration: 150 }));
   }, [isPending, opacity]);
 
   const CardGradient = isPending ? PendingGradient : DefaultGradient;

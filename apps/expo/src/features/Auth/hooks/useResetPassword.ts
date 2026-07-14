@@ -1,9 +1,6 @@
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
-import {
-  ResetPasswordFormData,
-  resetPasswordSchema,
-} from "@auth/validation/authSchemas";
+import { ResetPasswordFormData, resetPasswordSchema } from "@auth/validation/authSchemas";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { mutationKeys } from "@shared/constants/mutationKeys";
 import http from "@shared/utils/http";
@@ -16,7 +13,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { Keyboard } from "react-native";
 
 export const useResetPassword = () => {
@@ -31,7 +28,6 @@ export const useResetPassword = () => {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<ResetPasswordFormData>({
     resolver: valibotResolver(resetPasswordSchema),
@@ -41,8 +37,9 @@ export const useResetPassword = () => {
     },
   });
 
-  const newPassword = watch("newPassword");
-  const confirmPassword = watch("confirmPassword");
+  const { confirmPassword, newPassword } = useWatch({
+    control: control,
+  });
 
   const verifyToken = async () => {
     if (!token || !email) {
@@ -62,10 +59,7 @@ export const useResetPassword = () => {
         token,
       });
 
-      const parsed = v.safeParse(
-        verifyResetTokenSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(verifyResetTokenSuccessResponseSchema, response.data);
 
       if (parsed.success) {
         return { isValid: true, userName: parsed.output.userName };
@@ -74,8 +68,7 @@ export const useResetPassword = () => {
       return { isValid: false, userName: "" };
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message ||
-        "This reset link is invalid or has expired";
+        error.response?.data?.message || "This reset link is invalid or has expired";
 
       showMessage({
         message: "Invalid Link",
@@ -106,10 +99,7 @@ export const useResetPassword = () => {
         newPassword: data.newPassword,
       });
 
-      const parsed = v.safeParse(
-        resetPasswordSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(resetPasswordSuccessResponseSchema, response.data);
 
       if (!parsed.success) {
         throw new Error("Invalid response from server");
@@ -128,8 +118,7 @@ export const useResetPassword = () => {
     },
     onError: (error: any) => {
       const errorMessage =
-        error.response?.data?.message ||
-        "Unable to reset password. Please try again.";
+        error.response?.data?.message || "Unable to reset password. Please try again.";
 
       showMessage({
         message: "Reset Failed",

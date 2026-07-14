@@ -11,20 +11,20 @@ import {
 
 const DEFAULT_DURATION_MS = 320;
 
-export const useStudentDashboardFocusAnimation = (
-  duration = DEFAULT_DURATION_MS,
-) => {
+export const useStudentDashboardFocusAnimation = (duration = DEFAULT_DURATION_MS) => {
   const focusProgress = useSharedValue(1);
 
-  useFocusEffect(
-    useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withTiming(1, {
+  const onFocus = useCallback(() => {
+    focusProgress.set(0);
+    focusProgress.set(
+      withTiming(1, {
         duration,
         easing: Easing.out(Easing.cubic),
-      });
-    }, [duration, focusProgress]),
-  );
+      }),
+    );
+  }, [duration, focusProgress]);
+
+  useFocusEffect(onFocus)
 
   return focusProgress;
 };
@@ -77,13 +77,15 @@ export const useStudentDashboardLectureAnimation = (index: number) => {
 
   useFocusEffect(
     useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withDelay(
-        Math.min(index * 45, 180),
-        withTiming(1, {
-          duration: DEFAULT_DURATION_MS,
-          easing: Easing.out(Easing.cubic),
-        }),
+      focusProgress.set(0);
+      focusProgress.set(
+        withDelay(
+          Math.min(index * 45, 180),
+          withTiming(1, {
+            duration: DEFAULT_DURATION_MS,
+            easing: Easing.out(Easing.cubic),
+          }),
+        ),
       );
     }, [focusProgress, index]),
   );

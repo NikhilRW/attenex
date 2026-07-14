@@ -29,18 +29,18 @@ const TabBarButton = ({
   const iconScale = useSharedValue(1);
 
   useDerivedValue(() => {
-    opacity.value = withTiming(isActivated ? 1 : 0.6, { duration: 300 });
-    // backgroundOpacity.value = withSpring(isActivated ? 1 : 0);
-    iconScale.value = withSpring(isActivated ? 1.1 : 1);
+    opacity.set(withTiming(isActivated ? 1 : 0.6, { duration: 300 }));
+    // backgroundOpacity.set(withSpring(isActivated ? 1 : 0));
+    iconScale.set(withSpring(isActivated ? 1.1 : 1));
   }, [isActivated]);
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.9, {});
+    scale.set(withSpring(0.9, {}));
     onPrefetch?.(name);
   }, [name, onPrefetch, scale]);
 
   const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, {});
+    scale.set(withSpring(1, {}));
   }, [scale]);
 
   const handlePress = useCallback(() => {

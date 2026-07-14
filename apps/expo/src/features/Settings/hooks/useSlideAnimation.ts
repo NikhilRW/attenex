@@ -13,11 +13,13 @@ export const useSlideAnimation = () => {
   const focusProgress = useSharedValue(1);
   useFocusEffect(
     useCallback(() => {
-      focusProgress.value = 0;
-      focusProgress.value = withTiming(1, {
-        duration: SETTINGS_FOCUS_ANIMATION_DURATION_MS,
-        easing: Easing.out(Easing.cubic),
-      });
+      focusProgress.set(0);
+      focusProgress.set(
+        withTiming(1, {
+          duration: SETTINGS_FOCUS_ANIMATION_DURATION_MS,
+          easing: Easing.out(Easing.cubic),
+        }),
+      );
     }, [focusProgress]),
   );
 

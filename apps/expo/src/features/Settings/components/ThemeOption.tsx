@@ -50,11 +50,11 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
   });
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.95);
+    scale.set(withSpring(0.95));
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1);
+    scale.set(withSpring(1));
   };
 
   return (

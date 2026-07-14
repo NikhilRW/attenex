@@ -50,30 +50,32 @@ export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
   const time3 = useSharedValue(0);
 
   useEffect(() => {
-    // Initialize animation cycles after first render to avoid writing shared
-    // values during the React render phase.
-    time1.value = withRepeat(
-      withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-      -1,
-      false,
+    time1.set(
+      withRepeat(
+        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
+        -1,
+        false,
+      ),
     );
-    time2.value = withRepeat(
-      withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-      -1,
-      false,
+    time2.set(
+      withRepeat(
+        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
+        -1,
+        false,
+      ),
     );
-    time3.value = withRepeat(
-      withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-      -1,
-      false,
+    time3.set(
+      withRepeat(
+        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
+        -1,
+        false,
+      ),
     );
 
     return () => {
-      // Optional cleanup: stop animations by writing a stable value on unmount
-      // so that we don't leave long-running animations.
-      time1.value = 0;
-      time2.value = 0;
-      time3.value = 0;
+      time1.set(0);
+      time2.set(0);
+      time3.set(0);
     };
   }, [time1, time2, time3]);
 

@@ -22,14 +22,16 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
 
   const handlePressIn = () => {
     if (loading) return;
-    buttonScale.value = withSpring(0.95, {}, () => {
-      buttonScale.value = withSpring(1);
-    });
+    buttonScale.set(
+      withSpring(0.95, {}, () => {
+        buttonScale.set(withSpring(1));
+      }),
+    );
   };
 
   const handlePressOut = async () => {
     if (loading) return;
-    buttonScale.value = withSpring(1);
+    buttonScale.set(withSpring(1));
     // TODO: think about the parameter.
     triggerImpactHapticOn()("" as any);
     await onPress();

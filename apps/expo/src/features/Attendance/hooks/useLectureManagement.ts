@@ -50,6 +50,7 @@ export const useLectureManagement = (
       console.log(LOG_MESSAGES.FETCH_ERROR, error);
       return [];
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const shouldQueryBeEnabled =

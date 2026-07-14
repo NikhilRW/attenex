@@ -25,15 +25,15 @@ export const useRoleSelection = () => {
   const handleTeacherPress = useCallback(() => {
     setHoveredRole("teacher");
     setSelectedRole("teacher");
-    teacherScale.value = withSpring(1.05, { duration: 1000 });
-    studentScale.value = withSpring(1, { duration: 1000 });
+    teacherScale.set(withSpring(1.05, { duration: 1000 }));
+    studentScale.set(withSpring(1, { duration: 1000 }));
   }, [teacherScale, studentScale]);
 
   const handleStudentPress = useCallback(() => {
     setHoveredRole("student");
     setSelectedRole("student");
-    teacherScale.value = withSpring(1, { duration: 1000 });
-    studentScale.value = withSpring(1.05, { duration: 1000 });
+    teacherScale.set(withSpring(1, { duration: 1000 }));
+    studentScale.set(withSpring(1.05, { duration: 1000 }));
   }, [teacherScale, studentScale]);
 
   const updateRoleMutateFn = useCallback(async () => {
