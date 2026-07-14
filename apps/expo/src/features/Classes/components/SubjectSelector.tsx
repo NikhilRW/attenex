@@ -1,13 +1,16 @@
+import React, { useCallback, useMemo } from "react";
+import { ListRenderItemInfo, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { SubjectItem } from "@classes/types/common";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo } from "react";
-import { ListRenderItemInfo, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
+
 // TODO: cleanup file to do only ONE THING.
 const AddCircleIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.secondary,
@@ -56,10 +59,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
       <TouchableOpacity
         onPress={() => onSelectSubject(item.name)}
-        style={[
-          styles.optionItem,
-          selectedSubject === item.name && styles.optionItemSelected,
-        ]}
+        style={[styles.optionItem, selectedSubject === item.name && styles.optionItemSelected]}
         haptic="selection"
         testID={`CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR_ITEM_${index + 1}`}
       >
@@ -71,9 +71,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         >
           {item.name}
         </Text>
-        {selectedSubject === item.name && (
-          <PrimaryIcon name="checkmark-circle" size={20} />
-        )}
+        {selectedSubject === item.name ? <PrimaryIcon name="checkmark-circle" size={20} /> : null}
       </TouchableOpacity>
     ),
     [onSelectSubject, selectedSubject],
@@ -110,12 +108,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         testID="CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR.BUTTON"
         style={styles.dropdown}
       >
-        <Text
-          style={[
-            styles.dropdownText,
-            !selectedSubject && styles.dropdownTextMuted,
-          ]}
-        >
+        <Text style={[styles.dropdownText, !selectedSubject && styles.dropdownTextMuted]}>
           {selectedSubject || "Select a subject"}
         </Text>
         <AddCircleIcon name="add-circle-sharp" size={20} />
@@ -128,23 +121,14 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         onRequestClose={onToggleDropdown}
       >
         <View style={styles.modalContainer}>
-          <AnimatedView
-            entering={FadeInUp.springify()}
-            style={styles.modalAnimatedWrapper}
-          >
+          <AnimatedView entering={FadeInUp.springify()} style={styles.modalAnimatedWrapper}>
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[
-                styles.modalContent,
-                styles.modalSurface,
-                styles.modalSurfaceFlat,
-              ]}
+              style={[styles.modalContent, styles.modalSurface, styles.modalSurfaceFlat]}
             >
               <View style={styles.modalHeaderRow}>
-                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
-                  Select Subject
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>Select Subject</Text>
                 <TouchableOpacity
                   haptic="selection"
                   onPress={onToggleDropdown}
@@ -160,11 +144,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                 getItemLayout={getItemLayout}
                 ListEmptyComponent={
                   <View style={styles.selectionEmptyState}>
-                    <MutedIcon
-                      name="book-outline"
-                      size={48}
-                      style={styles.selectionEmptyIcon}
-                    />
+                    <MutedIcon name="book-outline" size={48} style={styles.selectionEmptyIcon} />
                     <Text style={styles.selectionEmptyText}>
                       No subjects found.{"\n"}Add one below!
                     </Text>

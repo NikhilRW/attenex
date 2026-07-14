@@ -1,4 +1,5 @@
 import { useAuthStore } from "@shared/stores/authStore";
+
 import { UserSchema } from "../schemas/auth";
 
 export const getStartingScreenPath = (newUser: UserSchema | null = null) => {

@@ -1,12 +1,15 @@
-import { getStartingScreenPath } from "@/shared/utils/navigation";
-import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
+import * as Linking from "expo-linking";
+import { router } from "expo-router";
 import * as v from "valibot";
+
+import { getStartingScreenPath } from "@/shared/utils/navigation";
 import {
   emailSignInSuccessResponseSchema,
   emailSignUpSuccessResponseSchema,
   googleAuthSuccessResponseSchema,
   verifyUserSuccessResponseSchema,
 } from "@attenex/api-contracts";
+import { SignInFormData, SignUpFormData } from "@auth/validation/authSchemas";
 import { lectureService } from "@classes/services/lectureService";
 import { queryKeys } from "@shared/constants/queryKeys";
 import { queryClient } from "@shared/constants/tanstackConfig";
@@ -17,8 +20,6 @@ import { googleAuth } from "@shared/utils/google-auth";
 import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { showMessage } from "@shared/utils/toasts";
-import * as Linking from "expo-linking";
-import { router } from "expo-router";
 
 /**
  * Authentication Utility Functions
@@ -69,16 +70,13 @@ export const handleGoogleSignIn = async () => {
     }
 
     // Step 2: Send user data to backend for account creation/verification
-    const newUser = await http.post(
-      `/api/users/signin?authType=google`,
-      {
-        name: response.data.user.name,
-        email: response.data.user.email,
-        photo_url: response.data.user.photo,
-        oauth_id: response.data.user.id,
-        oauth_provider: "google",
-      },
-    );
+    const newUser = await http.post(`/api/users/signin?authType=google`, {
+      name: response.data.user.name,
+      email: response.data.user.email,
+      photo_url: response.data.user.photo,
+      oauth_id: response.data.user.id,
+      oauth_provider: "google",
+    });
 
     const parsedResponse = v.safeParse(googleAuthSuccessResponseSchema, newUser.data);
     if (!parsedResponse.success) {
@@ -131,13 +129,8 @@ export const handleGoogleSignIn = async () => {
     if (e.response?.data?.message) {
       errorMessage = e.response.data.message;
     } else if (e.message?.includes("Network Error")) {
-      errorMessage =
-        "Unable to connect. Please check your internet connection.";
-    } else if (
-      e.message &&
-      !e.message.includes("Object") &&
-      !e.message.includes("undefined")
-    ) {
+      errorMessage = "Unable to connect. Please check your internet connection.";
+    } else if (e.message && !e.message.includes("Object") && !e.message.includes("undefined")) {
       errorMessage = e.message;
     }
 
@@ -210,13 +203,10 @@ export const handleEmailSignIn = async ({
   sendEmail: (email: string) => Promise<HttpResponse<any>>;
 }) => {
   try {
-    const { data: responseData, status } = await http.post(
-      "/api/users/signin?authType=email",
-      {
-        email: data.email!,
-        password: data.password!,
-      },
-    );
+    const { data: responseData, status } = await http.post("/api/users/signin?authType=email", {
+      email: data.email!,
+      password: data.password!,
+    });
 
     const parsedResponse = v.safeParse(emailSignInSuccessResponseSchema, responseData);
     if (!parsedResponse.success) {
@@ -304,14 +294,9 @@ export const handleEmailSignIn = async ({
     if (e.response!.status === 401) {
       errorMessage = "Invalid email or password. Please try again.";
     } else if (e.response?.status === 400) {
-      errorMessage =
-        e.response?.data?.message || "Please check your email and password.";
-    } else if (
-      e.message?.includes("Network Error") ||
-      e.message?.includes("connect")
-    ) {
-      errorMessage =
-        "Unable to connect. Please check your internet connection.";
+      errorMessage = e.response?.data?.message || "Please check your email and password.";
+    } else if (e.message?.includes("Network Error") || e.message?.includes("connect")) {
+      errorMessage = "Unable to connect. Please check your internet connection.";
     } else if (e.response?.data?.message) {
       errorMessage = e.response.data.message;
     } else if (e.response.status === 429) {
@@ -325,23 +310,17 @@ export const handleEmailSignIn = async ({
       duration: 3000,
       position: "bottom",
     });
-    logger.error(
-      JSON.stringify(e.response?.data || e.message),
-      "common.ts :: handleEmailSignIn()",
-    );
+    logger.error(JSON.stringify(e.response?.data || e.message), "common.ts :: handleEmailSignIn()");
   }
 };
 
 export const handleEmailSignUp = async (data: SignUpFormData) => {
   try {
-    const { data: responseData, status } = await http.post(
-      "/api/users/signup?authType=email",
-      {
-        name: data.fullName!,
-        email: data.email!,
-        password: data.password!,
-      },
-    );
+    const { data: responseData, status } = await http.post("/api/users/signup?authType=email", {
+      name: data.fullName!,
+      email: data.email!,
+      password: data.password!,
+    });
 
     const parsedResponse = v.safeParse(emailSignUpSuccessResponseSchema, responseData);
     if (!parsedResponse.success) {
@@ -384,18 +363,11 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
     let errorMessage = "Unable to create account. Please try again.";
 
     if (e.response?.status === 409) {
-      errorMessage =
-        "This email is already registered. Please sign in instead.";
+      errorMessage = "This email is already registered. Please sign in instead.";
     } else if (e.response?.status === 400) {
-      errorMessage =
-        e.response?.data?.message ||
-        "Please check your information and try again.";
-    } else if (
-      e.message?.includes("Network Error") ||
-      e.message?.includes("connect")
-    ) {
-      errorMessage =
-        "Unable to connect. Please check your internet connection.";
+      errorMessage = e.response?.data?.message || "Please check your information and try again.";
+    } else if (e.message?.includes("Network Error") || e.message?.includes("connect")) {
+      errorMessage = "Unable to connect. Please check your internet connection.";
     } else if (e.response?.data?.message) {
       errorMessage = e.response.data.message;
     }
@@ -407,22 +379,16 @@ export const handleEmailSignUp = async (data: SignUpFormData) => {
       duration: 3000,
       position: "bottom",
     });
-    logger.error(
-      JSON.stringify(e.response?.data || e.message),
-      "common.ts :: emailSignUp()",
-    );
+    logger.error(JSON.stringify(e.response?.data || e.message), "common.ts :: emailSignUp()");
   }
 };
 export const handleEmailVerification = async (deepLink: Linking.ParsedURL) => {
   try {
     const token = deepLink.queryParams!.token;
-    const response = await http.post(
-      "/api/users/verify-user",
-      {
-        token: decodeURIComponent(token as string),
-        email: decodeURIComponent(deepLink.queryParams!.email as string),
-      },
-    );
+    const response = await http.post("/api/users/verify-user", {
+      token: decodeURIComponent(token as string),
+      email: decodeURIComponent(deepLink.queryParams!.email as string),
+    });
     const parsed = v.safeParse(verifyUserSuccessResponseSchema, response.data);
     if (parsed.success) {
       router.replace("/(auth)/sign-in?verified=true");

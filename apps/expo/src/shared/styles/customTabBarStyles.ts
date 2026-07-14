@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native-unistyles";
+
 import { CUSTOM_TAB_BAR_WIDTH } from "../constants/ui";
 
 export const styles = StyleSheet.create((theme) => ({

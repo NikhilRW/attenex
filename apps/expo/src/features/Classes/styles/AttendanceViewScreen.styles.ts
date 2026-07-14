@@ -8,6 +8,9 @@ export const styles = StyleSheet.create((theme, rt) => {
       flex: 1,
       backgroundColor: theme.background.primary,
     },
+    flex1: {
+      flex: 1,
+    },
     header: {
       paddingTop: theme.spacing.custom(20),
       paddingBottom: theme.spacing.custom(20),
@@ -197,9 +200,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderLeftWidth: 4,
       padding: theme.spacing.md,
       overflow: "hidden",
-      backgroundColor: isDark
-        ? theme.surface.cardBg
-        : "rgba(255, 255, 255, 0.7)",
+      backgroundColor: isDark ? theme.surface.cardBg : "rgba(255, 255, 255, 0.7)",
       borderColor: theme.surface.glassBorder,
     },
     studentCardPresent: {
@@ -389,9 +390,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       padding: theme.spacing.custom(20),
       marginBottom: theme.spacing.custom(20),
       minHeight: 80,
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.3)"
-        : "rgba(255, 255, 255, 0.8)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.8)",
       borderColor: theme.border.modal,
     },
     rollNumberText: {
@@ -471,9 +470,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       paddingHorizontal: theme.spacing.md,
       borderWidth: 1,
       marginBottom: theme.spacing.lg,
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.3)"
-        : "rgba(255, 255, 255, 0.8)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.8)",
       borderColor: theme.border.modal,
     },
     inputContainerError: {
@@ -550,5 +547,6 @@ export const styles = StyleSheet.create((theme, rt) => {
     submitButtonIcon: {
       marginLeft: theme.spacing.sm,
     },
+    actionButtonStyle: { borderWidth: 0 },
   };
 });

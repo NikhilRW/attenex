@@ -1,8 +1,9 @@
-import SettingsScreen from "@/features/Settings/screens/SettingsScreen";
 import React from "react";
 
+import SettingsScreen from "@/features/Settings/screens/SettingsScreen";
+
 const SettingsIndex = () => {
-    return <SettingsScreen />;
+  return <SettingsScreen />;
 };
 
 export default SettingsIndex;

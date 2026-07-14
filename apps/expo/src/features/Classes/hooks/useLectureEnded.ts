@@ -1,17 +1,15 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAlerts } from "react-native-paper-alerts";
+import { useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { useAuthStore } from "@/shared/stores/authStore";
 import { lectureService } from "@classes/services/lectureService";
 import { socketService } from "@shared/services/socketService";
 import { logger } from "@shared/utils/logger";
-import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAlerts } from "react-native-paper-alerts";
-import {
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
 
 export const useLectureEnded = () => {
   const router = useRouter();
@@ -27,8 +25,7 @@ export const useLectureEnded = () => {
 
   useEffect(() => {
     glowOpacity.value = withRepeat(withTiming(1, { duration: 1500 }), -1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [glowOpacity]);
 
   const fetchPasscodeDataQueryFn = async () => {
     try {

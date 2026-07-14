@@ -1,3 +1,8 @@
+import { useState } from "react";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { linkedinAuthService } from "@auth/services/linkedinAuthService";
 import { authService } from "@shared/services/authService";
@@ -6,9 +11,6 @@ import { subscribeToClassName } from "@shared/utils/fcm";
 import { logger } from "@shared/utils/logger";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { showMessage } from "@shared/utils/toasts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
 
 const REDIRECT_URI = process.env.EXPO_PUBLIC_LINKEDIN_REDIRECT_URI || "";
 
@@ -47,22 +49,16 @@ export const useLinkedInAuth = () => {
   });
 
   const handleLinkedInLogout = async () => {
-    await logoutDeleteAccountMutation.mutateAsync(
-      isLogout ? "logout" : "delete-account",
-    );
+    await logoutDeleteAccountMutation.mutateAsync(isLogout ? "logout" : "delete-account");
     router.replace("/sign-in");
   };
 
   const { mutateAsync: linkedInLogin } = useMutation({
     mutationKey: mutationKeys.auth.signInLinkedIn,
     mutationFn: async (authCode: string) => {
-      const exchange = await linkedinAuthService.exchangeCodeForUser(
-        authCode,
-        REDIRECT_URI,
-      );
+      const exchange = await linkedinAuthService.exchangeCodeForUser(authCode, REDIRECT_URI);
 
-      if (!exchange)
-        throw new Error("Unable to complete sign-in. Please try again.");
+      if (!exchange) throw new Error("Unable to complete sign-in. Please try again.");
 
       return exchange;
     },
@@ -83,10 +79,7 @@ export const useLinkedInAuth = () => {
         position: "bottom",
       });
 
-      logger.info(
-        `LinkedIn sign-in successful for user: ${user.email}`,
-        "LinkedInAuth",
-      );
+      logger.info(`LinkedIn sign-in successful for user: ${user.email}`, "LinkedInAuth");
 
       useAuthStore.subscribe((newState, prevState) => {
         if (newState.user && prevState.user === null) {
@@ -102,12 +95,8 @@ export const useLinkedInAuth = () => {
 
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
-      } else if (
-        err.message?.includes("Network Error") ||
-        err.message?.includes("connect")
-      ) {
-        errorMessage =
-          "Unable to connect. Please check your internet connection.";
+      } else if (err.message?.includes("Network Error") || err.message?.includes("connect")) {
+        errorMessage = "Unable to connect. Please check your internet connection.";
       } else if (
         err.message &&
         !err.message.includes("Object") &&

@@ -1,12 +1,14 @@
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-import { SocialLoginButtonsProps } from "@auth/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { useAuthStore } from "@shared/stores/authStore";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { SocialLoginButtonsProps } from "@auth/types/props";
+import { useAuthStore } from "@shared/stores/authStore";
 
 const SocialIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.primary,
@@ -24,7 +26,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   return (
     <View style={styles.socialSection}>
       <TouchableOpacity
-        style={[styles.socialButton, { borderColor: "rgba(0, 119, 181, 0.4)" }]}
+        style={[styles.socialButton, styles.googleButtonBorder]}
         activeOpacity={0.8}
         onPress={onGooglePress}
         haptic="impact"
@@ -37,7 +39,8 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
           style={[
             styles.socialButton,
             styles.googleGradient,
-            { borderWidth: 0, opacity: isGoogleLoading ? 0.6 : 1 },
+            styles.googleBorderNone,
+            isGoogleLoading && styles.googleLoading,
           ]}
         >
           {isGoogleLoading ? (
@@ -54,11 +57,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[
-          styles.socialButton,
-          styles.linkedinButton,
-          { borderColor: "rgba(0, 119, 181, 0.4)" },
-        ]}
+        style={[styles.socialButton, styles.linkedinButton, styles.linkedinButtonBorder]}
         activeOpacity={0.8}
         onPress={onLinkedInPress}
         haptic="impact"
@@ -94,6 +93,18 @@ const styles = StyleSheet.create((theme) => ({
   },
   linkedinButton: {
     backgroundColor: "rgba(0, 119, 181, 0.2)",
+  },
+  googleButtonBorder: {
+    borderColor: "rgba(0, 119, 181, 0.4)",
+  },
+  linkedinButtonBorder: {
+    borderColor: "rgba(0, 119, 181, 0.4)",
+  },
+  googleBorderNone: {
+    borderWidth: 0,
+  },
+  googleLoading: {
+    opacity: 0.6,
   },
   socialIconWrapper: {
     marginRight: 12,

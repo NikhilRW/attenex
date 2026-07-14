@@ -1,3 +1,10 @@
+import React, { useCallback } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { AttendanceFilter } from "@classes/components/AttendanceFilter";
 import { AttendanceFloatingButton } from "@classes/components/AttendanceFloatingButton";
 import { AttendanceHeader } from "@classes/components/AttendanceHeader";
@@ -7,11 +14,6 @@ import { MemoizedStudentCard } from "@classes/components/StudentCard";
 import { useAttendanceView } from "@classes/hooks/useAttendanceView";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceRecord } from "@classes/types/common";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import React, { useCallback } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
   color: theme.primary.main,
@@ -79,24 +81,15 @@ const AttendanceViewScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         {...flatListPerformanceProps}
-        ListHeaderComponent={
-          <AttendanceFilter filter={filter} setFilter={setFilter} />
-        }
+        ListHeaderComponent={<AttendanceFilter filter={filter} setFilter={setFilter} />}
         ListEmptyComponent={
           loading ? (
             <View style={styles.loadingContainer}>
               <LoadingIndicator size="large" />
             </View>
           ) : (
-            <Animated.View
-              entering={FadeInUp.delay(300).springify()}
-              style={styles.emptyState}
-            >
-              <EmptyStateIcon
-                name="search-outline"
-                size={48}
-                style={styles.emptyStateIcon}
-              />
+            <Animated.View entering={FadeInUp.delay(300).springify()} style={styles.emptyState}>
+              <EmptyStateIcon name="search-outline" size={48} style={styles.emptyStateIcon} />
               <Text style={styles.emptyStateText}>No students found</Text>
             </Animated.View>
           )

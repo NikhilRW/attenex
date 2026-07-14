@@ -1,9 +1,12 @@
-import { ThemeOption } from "./ThemeOption";
-import { styles } from "@settings/styles/Settings.styles";
-import { RoleSectionProps } from "@settings/types/props";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+
 import Animated, { FadeInDown } from "react-native-reanimated";
+
+import { styles } from "@settings/styles/Settings.styles";
+import { RoleSectionProps } from "@settings/types/props";
+
+import { ThemeOption } from "./ThemeOption";
 
 export const RoleSection: React.FC<RoleSectionProps> = ({
   role,
@@ -13,10 +16,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
   savingRole,
 }) => {
   return (
-    <Animated.View
-      entering={FadeInDown.delay(200).springify()}
-      style={styles.section}
-    >
+    <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.section}>
       <Text style={styles.sectionTitle}>ROLE</Text>
       <View style={styles.roleContainer}>
         {(["teacher", "student"] as const).map((r) => {
@@ -32,7 +32,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
                   ? isActive
                     ? "school"
                     : "school-outline"
-                  :isActive
+                  : isActive
                     ? "people"
                     : "people-outline"
               }
@@ -42,7 +42,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
           );
         })}
       </View>
-      {role !== userRole && (
+      {role !== userRole ? (
         <Animated.View entering={FadeInDown.springify()}>
           <TouchableOpacity
             style={[styles.updateButton, styles.updateButtonPrimary]}
@@ -55,7 +55,7 @@ export const RoleSection: React.FC<RoleSectionProps> = ({
             </Text>
           </TouchableOpacity>
         </Animated.View>
-      )}
+      ) : null}
     </Animated.View>
   );
 };

@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect } from "react";
-import LectureOngoing from "../components/LectureAttending/LectureOngoing";
-import { socketService } from "@/shared/services/socketService";
-import { useLectureManagement } from "../hooks/useLectureManagement";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
-import { useAuthStore } from "@/shared/stores/authStore";
+
 import { router } from "expo-router";
-import { useLectureOngoingScreen } from "../hooks/useLectureOngoingScreen";
-import { showDestructiveAlert } from "../utils/alertUtils";
-import { stopBackgroundTracking } from "../services/backgroundTask";
+
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { socketService } from "@/shared/services/socketService";
+import { useAuthStore } from "@/shared/stores/authStore";
+
+import LectureOngoing from "../components/LectureAttending/LectureOngoing";
 import { ALERT_MESSAGES } from "../constants/studentDashboard.constants";
+import { useLectureManagement } from "../hooks/useLectureManagement";
+import { useLectureOngoingScreen } from "../hooks/useLectureOngoingScreen";
+import { stopBackgroundTracking } from "../services/backgroundTask";
+import { showDestructiveAlert } from "../utils/alertUtils";
 
 const LectureOngoingScreen = () => {
   const user = useAuthStore((state) => state.user);
@@ -49,12 +52,7 @@ const LectureOngoingScreen = () => {
     );
   }, [alert, joinedLecture, refreshLectures, user?.role]);
 
-  return (
-    <LectureOngoing
-      joinedLecture={joinedLecture!}
-      handleLeaveLecture={handleLeaveLecture}
-    />
-  );
+  return <LectureOngoing joinedLecture={joinedLecture!} handleLeaveLecture={handleLeaveLecture} />;
 };
 
 export default LectureOngoingScreen;

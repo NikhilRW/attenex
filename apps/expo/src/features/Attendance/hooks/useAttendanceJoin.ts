@@ -1,26 +1,17 @@
+import { useCallback, useState } from "react";
+
+import { useMutation } from "@tanstack/react-query";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { ALERT_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { joinLecture } from "@attendance/services/attendanceService";
-import {
-  startBackgroundTracking,
-} from "@attendance/services/backgroundTask";
+import { startBackgroundTracking } from "@attendance/services/backgroundTask";
 import { Lecture } from "@attendance/types/common";
-import {
-  JoinStatus,
-  UseAttendanceJoinReturn,
-} from "@attendance/types/studentDashboard.types";
-import {
-  showErrorAlert,
-  showSuccessAlert,
-} from "@attendance/utils/alertUtils";
-import {
-  getCurrentLocation,
-  requestLocationPermission,
-} from "@attendance/utils/locationUtils";
+import { JoinStatus, UseAttendanceJoinReturn } from "@attendance/types/studentDashboard.types";
+import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
+import { getCurrentLocation, requestLocationPermission } from "@attendance/utils/locationUtils";
 import { useAuthStore } from "@shared/stores/authStore";
-import { useMutation } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
 
 const isLocationTooFarError = (error: unknown) => {
   if (!error || typeof error !== "object") {
@@ -47,15 +38,11 @@ const isLocationTooFarError = (error: unknown) => {
       : errorWithResponse.response?.data?.message;
 
   return (
-    typeof message === "string" &&
-    message.toLowerCase().includes("you are too far from the class")
+    typeof message === "string" && message.toLowerCase().includes("you are too far from the class")
   );
 };
 
-const retryJoinUnlessLocationTooFar = (
-  failureCount: number,
-  error: unknown,
-): boolean => {
+const retryJoinUnlessLocationTooFar = (failureCount: number, error: unknown): boolean => {
   if (isLocationTooFarError(error)) {
     return false;
   }
@@ -76,13 +63,7 @@ export const useAttendanceJoin = (
   const { alert } = useHapticAlerts();
 
   const proceedWithJoinMutation = useCallback(
-    async ({
-      lecture,
-      studentRollNo,
-    }: {
-      lecture: Lecture;
-      studentRollNo: string;
-    }) => {
+    async ({ lecture, studentRollNo }: { lecture: Lecture; studentRollNo: string }) => {
       const hasPermission = await requestLocationPermission(alert);
 
       if (!hasPermission) {
@@ -130,11 +111,7 @@ export const useAttendanceJoin = (
       if (res.success) {
         setJoinedLecture(lecture);
         setStatus("joined");
-        showSuccessAlert(
-          ALERT_MESSAGES.JOINED.title,
-          ALERT_MESSAGES.JOINED.message,
-          alert,
-        );
+        showSuccessAlert(ALERT_MESSAGES.JOINED.title, ALERT_MESSAGES.JOINED.message, alert);
         // Start Background Task
         await startBackgroundTracking(lecture.id);
       } else {

@@ -1,19 +1,16 @@
-import { ThemeOption } from "./ThemeOption";
-import { styles } from "@settings/styles/Settings.styles";
-import { AppearanceSectionProps } from "@settings/types/props";
 import React from "react";
 import { Text, View } from "react-native";
+
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
-  mode,
-  onThemeChange,
-}) => {
+import { styles } from "@settings/styles/Settings.styles";
+import { AppearanceSectionProps } from "@settings/types/props";
+
+import { ThemeOption } from "./ThemeOption";
+
+export const AppearanceSection: React.FC<AppearanceSectionProps> = ({ mode, onThemeChange }) => {
   return (
-    <Animated.View
-      entering={FadeInDown.delay(300).springify()}
-      style={styles.section}
-    >
+    <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
       <Text style={styles.sectionTitle}>APPEARANCE</Text>
       <View style={styles.roleContainer}>
         {(["light", "dark", "system"] as const).map((m) => {

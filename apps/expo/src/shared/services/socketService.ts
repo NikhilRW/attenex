@@ -1,5 +1,7 @@
-import { BASE_URI } from "@shared/constants/uri";
 import { io, Socket } from "socket.io-client";
+
+import { BASE_URI } from "@shared/constants/uri";
+
 import { UserSchema } from "../schemas/auth";
 class SocketService {
   private socket: Socket | null = null;
@@ -77,13 +79,7 @@ class SocketService {
   /**
    * Listen for lecture ended events
    */
-  onLectureEnded(
-    callback: (_: {
-      lectureId: string;
-      status: string;
-      endedAt: string;
-    }) => void
-  ) {
+  onLectureEnded(callback: (_: { lectureId: string; status: string; endedAt: string }) => void) {
     if (this.socket) {
       this.socket.on("lectureEnded", callback);
     }
@@ -106,11 +102,7 @@ class SocketService {
    * Listen for passcode refresh events
    */
   onPasscodeRefresh(
-    callback: (_: {
-      lectureId: string;
-      passcode: string;
-      updatedAt: string;
-    }) => void
+    callback: (_: { lectureId: string; passcode: string; updatedAt: string }) => void,
   ) {
     if (this.socket) {
       this.socket.on("passcodeRefresh", callback);
@@ -138,7 +130,7 @@ class SocketService {
       studentCount: number;
       absentCount: number;
       totalClassStudents: number;
-    }) => void
+    }) => void,
   ) {
     if (this.socket) {
       this.socket.on("studentJoined", callback);
@@ -176,11 +168,7 @@ class SocketService {
    * Listen for attendance submission events
    */
   onAttendanceSubmitted(
-    callback: (_: {
-      lectureId: string;
-      studentId: string;
-      status: string;
-    }) => void
+    callback: (_: { lectureId: string; studentId: string; status: string }) => void,
   ) {
     if (this.socket) {
       this.socket.on("attendanceSubmitted", callback);

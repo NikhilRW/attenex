@@ -1,9 +1,11 @@
+import React from "react";
+import { ActivityIndicator, Text } from "react-native";
+
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { StartLectureButtonProps } from "@classes/types/props";
-import React from "react";
-import { ActivityIndicator, Text } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
 
 const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
   color: theme.text.primary,
@@ -14,7 +16,7 @@ const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
 export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
   loading,
   onPress,
-  testID
+  testID,
 }) => {
   return (
     <TouchableOpacity
@@ -24,11 +26,7 @@ export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
       haptic="impact"
       testID={testID}
     >
-      {loading ? (
-        <PrimarySpinner />
-      ) : (
-        <Text style={styles.primaryButtonText}>Start Lecture</Text>
-      )}
+      {loading ? <PrimarySpinner /> : <Text style={styles.primaryButtonText}>Start Lecture</Text>}
     </TouchableOpacity>
   );
 };

@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { AppState } from "react-native";
+
 import { useAuthStore } from "@/shared/stores/authStore";
 import {
   ALERT_DELAY,
@@ -5,14 +8,9 @@ import {
   LOG_MESSAGES,
 } from "@attendance/constants/studentDashboard.constants";
 import { AlertFunction, Lecture } from "@attendance/types/common";
-import {
-  LectureStatus,
-  UseSocketManagerReturn,
-} from "@attendance/types/studentDashboard.types";
+import { LectureStatus, UseSocketManagerReturn } from "@attendance/types/studentDashboard.types";
 import { showSuccessAlert } from "@attendance/utils/alertUtils";
 import { socketService } from "@shared/services/socketService";
-import { useEffect, useState } from "react";
-import { AppState } from "react-native";
 
 /**
  * Custom hook to manage socket connections and lecture events
@@ -49,11 +47,7 @@ export const useSocketManager = (
 
   // Listen for lecture ended events globally
   useEffect(() => {
-    const handleLectureEnded = (data: {
-      lectureId: string;
-      status: string;
-      endedAt: string;
-    }) => {
+    const handleLectureEnded = (data: { lectureId: string; status: string; endedAt: string }) => {
       console.log(LOG_MESSAGES.LECTURE_ENDED_EVENT, data);
 
       // Update lecture status if it matches current joined lecture

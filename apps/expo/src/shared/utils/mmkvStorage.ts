@@ -1,5 +1,5 @@
-import { createMMKV } from "react-native-mmkv";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { createMMKV } from "react-native-mmkv";
 
 // Initialize MMKV instance
 export const storage = createMMKV({

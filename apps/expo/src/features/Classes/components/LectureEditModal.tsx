@@ -1,12 +1,14 @@
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/TeacherDashboard.styles";
 import { LectureEditModalProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import { Text, TextInput, View } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const ModalSurface = withUnistyles(LinearGradient, (_, { themeName }) => ({
   colors:
@@ -53,9 +55,7 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
           >
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderLeft}>
-                <Text style={[styles.modalTitle, styles.modalTitleLarge]}>
-                  Edit Duration
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleLarge]}>Edit Duration</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
@@ -83,11 +83,7 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
                 onPress={() => setEditModalVisible(false)}
                 haptic="selection"
               >
-                <Text
-                  style={[styles.modalBtnText, styles.modalBtnTextSecondary]}
-                >
-                  Cancel
-                </Text>
+                <Text style={[styles.modalBtnText, styles.modalBtnTextSecondary]}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -100,11 +96,7 @@ export const LectureEditModal: React.FC<LectureEditModalProps> = ({
                   end={{ x: 1, y: 0 }}
                   style={styles.modalBtnPrimary}
                 >
-                  <Text
-                    style={[styles.modalBtnText, styles.modalBtnTextPrimary]}
-                  >
-                    Update
-                  </Text>
+                  <Text style={[styles.modalBtnText, styles.modalBtnTextPrimary]}>Update</Text>
                 </PrimaryButton>
               </TouchableOpacity>
             </View>

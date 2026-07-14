@@ -1,25 +1,26 @@
-import type { AddManualAttendanceSuccessResponse } from "@attenex/api-contracts";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppState } from "react-native";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { setStringAsync } from "expo-clipboard";
+import { useNetworkState } from "expo-network";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { useAuthStore } from "@/shared/stores/authStore";
+import type { AddManualAttendanceSuccessResponse } from "@attenex/api-contracts";
 import { lectureService } from "@classes/services/lectureService";
 import { AttendanceRecord, FilterType } from "@classes/types/common";
 import { socketService } from "@shared/services/socketService";
 import { showMessage } from "@shared/utils/toasts";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { setStringAsync } from "expo-clipboard";
-import { useNetworkState } from "expo-network";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { AppState } from "react-native";
 
 const getMatchesFilter = (record: AttendanceRecord, filter: FilterType) =>
   filter === "all" || record.status === filter;
 
-const DEFAULT_MANUAL_ATTENDANCE_ERROR =
-  "Unable to mark attendance for this roll number.";
+const DEFAULT_MANUAL_ATTENDANCE_ERROR = "Unable to mark attendance for this roll number.";
 
 const getRollNumberSortValue = (rollNumber: string) => {
   const value = parseInt(rollNumber, 10);
@@ -63,19 +64,18 @@ export const useAttendanceView = () => {
 
   const { alert } = useHapticAlerts();
 
-  const fetchAttendance: () => Promise<AttendanceRecord[]> =
-    useCallback(async () => {
-      try {
-        const res = await lectureService.fetchLectureAttendance(lectureId);
-        if (res.success) {
-          return res.data.attendance || [];
-        }
-        return [];
-      } catch (error: any) {
-        alert("Error", error.message || "Failed to fetch attendance");
-        return [];
+  const fetchAttendance: () => Promise<AttendanceRecord[]> = useCallback(async () => {
+    try {
+      const res = await lectureService.fetchLectureAttendance(lectureId);
+      if (res.success) {
+        return res.data.attendance || [];
       }
-    }, [lectureId, alert]);
+      return [];
+    } catch (error: any) {
+      alert("Error", error.message || "Failed to fetch attendance");
+      return [];
+    }
+  }, [lectureId, alert]);
 
   const {
     data: attendance,
@@ -140,12 +140,10 @@ export const useAttendanceView = () => {
     useCallback(() => {
       if (!socketService.isConnected()) {
         socketService.connect();
-        socketService.joinLecture(lectureId,userRole || "teacher");
+        socketService.joinLecture(lectureId, userRole || "teacher");
       }
       // Only fetch if data is not already fresh (e.g. from prefetch on LectureCard press)
-      const queryState = queryClient.getQueryState(
-        queryKeys.attendance.teacher(lectureId),
-      );
+      const queryState = queryClient.getQueryState(queryKeys.attendance.teacher(lectureId));
       const isDataFresh =
         queryState?.dataUpdatedAt != null &&
         Date.now() - queryState.dataUpdatedAt < StaleTime.SECONDS_30;
@@ -269,33 +267,32 @@ export const useAttendanceView = () => {
     return lectureService.addManualAttendance(lectureId, trimmedRollNo);
   };
 
-  const { mutate: handleManualAttendance, isPending: isSubmittingManual } =
-    useMutation<
-      AddManualAttendanceSuccessResponse,
-      Error,
-      void
-    >({
-      mutationKey: mutationKeys.attendance.manual,
-      mutationFn: manualAttendance,
-      onSuccess: async (data) => {
-        if (data?.success) {
-          showMessage({
-            message: data.message || "Attendance marked successfully.",
-            type: "success",
-          });
-          setManualRollNo("");
-          setManualAttendanceError("");
-          setShowManualAttendance(false);
-          await refetchAttendance();
-          return;
-        }
+  const { mutate: handleManualAttendance, isPending: isSubmittingManual } = useMutation<
+    AddManualAttendanceSuccessResponse,
+    Error,
+    void
+  >({
+    mutationKey: mutationKeys.attendance.manual,
+    mutationFn: manualAttendance,
+    onSuccess: async (data) => {
+      if (data?.success) {
+        showMessage({
+          message: data.message || "Attendance marked successfully.",
+          type: "success",
+        });
+        setManualRollNo("");
+        setManualAttendanceError("");
+        setShowManualAttendance(false);
+        await refetchAttendance();
+        return;
+      }
 
-        setManualAttendanceError(getManualAttendanceErrorMessage(data));
-      },
-      onError: (error) => {
-        setManualAttendanceError(getManualAttendanceErrorMessage(error));
-      },
-    });
+      setManualAttendanceError(getManualAttendanceErrorMessage(data));
+    },
+    onError: (error) => {
+      setManualAttendanceError(getManualAttendanceErrorMessage(error));
+    },
+  });
 
   return {
     lectureId,

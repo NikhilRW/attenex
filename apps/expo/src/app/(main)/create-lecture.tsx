@@ -1,10 +1,9 @@
-import CreateLectureScreen from '@/features/Classes/screens/CreateLectureScreen'
-import React from 'react'
+import React from "react";
+
+import CreateLectureScreen from "@/features/Classes/screens/CreateLectureScreen";
 
 const CreateLecture = () => {
-    return (
-        <CreateLectureScreen />
-    )
-}
+  return <CreateLectureScreen />;
+};
 
-export default CreateLecture
+export default CreateLecture;

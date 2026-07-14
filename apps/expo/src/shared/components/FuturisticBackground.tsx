@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+
 import {
   BackdropFilter,
   Blur,
@@ -9,7 +11,6 @@ import {
   Rect,
   vec,
 } from "@shopify/react-native-skia";
-import React, { useEffect } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -19,6 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { useAuthStore } from "../stores/authStore";
 
 const styles = StyleSheet.create((_, rt) => ({
@@ -51,25 +53,13 @@ export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
 
   useEffect(() => {
     time1.set(
-      withRepeat(
-        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-        -1,
-        false,
-      ),
+      withRepeat(withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }), -1, false),
     );
     time2.set(
-      withRepeat(
-        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-        -1,
-        false,
-      ),
+      withRepeat(withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }), -1, false),
     );
     time3.set(
-      withRepeat(
-        withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }),
-        -1,
-        false,
-      ),
+      withRepeat(withTiming(Math.PI * 2, { duration: 10000, easing: Easing.linear }), -1, false),
     );
 
     return () => {
@@ -116,10 +106,7 @@ export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
   return (
     <Animated.View
       pointerEvents="none"
-      style={[
-        styles.container(isStudent, isAuthenticated),
-        opacityAnimatedStyle,
-      ]}
+      style={[styles.container(isStudent, isAuthenticated), opacityAnimatedStyle]}
     >
       <Canvas style={StyleSheet.absoluteFill}>
         {/* Deep Space Background */}
@@ -150,23 +137,11 @@ export const FuturisticBackground = ({ show = true }: { show?: boolean }) => {
 
         {/* Glassmorphism Overlay */}
         <BackdropFilter filter={<Blur blur={30} />} opacity={isVisible ? 1 : 0}>
-          <Rect
-            x={0}
-            y={0}
-            width={width}
-            height={height}
-            color={colors.background.overlay}
-          />
+          <Rect x={0} y={0} width={width} height={height} color={colors.background.overlay} />
         </BackdropFilter>
 
         {/* Subtle Gradient Overlay to unify */}
-        <Rect
-          opacity={isVisible ? 1 : 0}
-          x={0}
-          y={0}
-          width={width}
-          height={height + 600}
-        >
+        <Rect opacity={isVisible ? 1 : 0} x={0} y={0} width={width} height={height + 600}>
           <LinearGradient
             start={vec(0, 0)}
             end={vec(width, height)}

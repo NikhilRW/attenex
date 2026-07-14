@@ -1,3 +1,5 @@
+import { useCallback, useEffect } from "react";
+
 import {
   FirebaseMessagingTypes,
   getInitialNotification,
@@ -6,7 +8,6 @@ import {
   onNotificationOpenedApp,
   setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
-import { useNotificationStore } from "@shared/stores/notificationStore";
 import {
   addNotificationResponseReceivedListener,
   AndroidImportance,
@@ -20,8 +21,10 @@ import {
   useLastNotificationResponse,
 } from "expo-notifications";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
 import { UnistylesRuntime } from "react-native-unistyles";
+
+import { useNotificationStore } from "@shared/stores/notificationStore";
+
 import { ATTENEX_ANDROID_CHANNEL_ID } from "../constants/notifications";
 import { queryKeys } from "../constants/queryKeys";
 import { queryClient } from "../constants/tanstackConfig";
@@ -74,17 +77,19 @@ export const useNotificationBootstrap = () => {
       requestIdleCallback(() => {
         // Android: create an Attenex notification channel (controls importance, vibration, accent light)
         // Safe to call repeatedly; Android will keep existing channel settings.
-        setNotificationChannelAsync(ATTENEX_ANDROID_CHANNEL_ID, {
-          name: "Attenex",
-          importance: AndroidImportance.MAX,
-          lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
-          enableVibrate: true,
-          vibrationPattern: [0, 250, 200, 250],
-          lightColor: getCurrentTheme().primary.main,
-          sound: "notification.mp3",
-        }).catch(() => {
+        try {
+          await setNotificationChannelAsync(ATTENEX_ANDROID_CHANNEL_ID, {
+            name: "Attenex",
+            importance: AndroidImportance.MAX,
+            lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+            enableVibrate: true,
+            vibrationPattern: [0, 250, 200, 250],
+            lightColor: getCurrentTheme().primary.main,
+            sound: "notification.mp3",
+          });
+        } catch {
           // Ignore channel creation failures to avoid blocking app startup.
-        });
+        }
 
         // Check if the app was opened from a notification (when the app was completely quit)
         // This checks both Firebase data messages and Expo scheduled notifications
@@ -207,7 +212,7 @@ export const useNotificationBootstrap = () => {
               lastNotificationResponse?.notification?.request?.content?.data?.lectureId;
             if (parseLectureId(lectureId)) {
               console.log("✅ Navigating to lecture from notification:", lectureId);
-              requestIdleCallback(() => {
+              requestIdleCallback(async () => {
                 setTimeout(() => {
                   router.replace({ pathname: "/attendance", params: { lectureId } });
                 }, 500);

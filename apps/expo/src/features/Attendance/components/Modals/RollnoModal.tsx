@@ -1,12 +1,14 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import { withUnistyles } from "react-native-unistyles";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { RollnoModalProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 const RollnoModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
@@ -52,9 +54,7 @@ const RollnoModal = ({
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, styles.modalTitlePrimary]}>
-              Enter Roll Number
-            </Text>
+            <Text style={[styles.modalTitle, styles.modalTitlePrimary]}>Enter Roll Number</Text>
             <TouchableOpacity
               onPress={() => {
                 setShowRollNoModal(false);
@@ -89,9 +89,7 @@ const RollnoModal = ({
                 testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.TEXT_INPUT"
               />
             </View>
-            {hasError ? (
-              <Text style={styles.rollnoModalError}>{errorMessage}</Text>
-            ) : null}
+            {hasError ? <Text style={styles.rollnoModalError}>{errorMessage}</Text> : null}
           </View>
 
           <View style={styles.modalFooter}>
@@ -105,11 +103,7 @@ const RollnoModal = ({
               // TODO: ask ai is it right to have like this here selection and thier impact let's see.
               haptic="selection"
             >
-              <Text
-                style={[styles.modalButtonText, styles.modalButtonTextPrimary]}
-              >
-                Cancel
-              </Text>
+              <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -118,17 +112,8 @@ const RollnoModal = ({
               haptic="impact"
               testID="STUDENT_DASHBOARD.ROLL_NO_REQUIRED_MODAL.SUBMIT_BUTTON"
             >
-              <PrimaryGradient
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-              >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    styles.modalButtonTextPrimary,
-                  ]}
-                >
-                  Submit
-                </Text>
+              <PrimaryGradient style={[styles.modalButton, styles.modalButtonPrimary]}>
+                <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Submit</Text>
               </PrimaryGradient>
             </TouchableOpacity>
           </View>

@@ -1,14 +1,10 @@
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-import { lectureService } from "@classes/services/lectureService";
-import { styles } from "@classes/styles/TeacherDashboard.styles";
-import { LectureCardProps } from "@classes/types/props";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { LayoutChangeEvent, Text, View } from "react-native";
+
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { queryKeys } from "@shared/constants/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useMemo } from "react";
-import { LayoutChangeEvent, Text, View } from "react-native";
 import Animated, {
   Easing,
   // interpolate,
@@ -19,6 +15,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { lectureService } from "@classes/services/lectureService";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { LectureCardProps } from "@classes/types/props";
+import { queryKeys } from "@shared/constants/queryKeys";
 
 const PendingGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -75,11 +77,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
   useEffect(() => {
     if (isPending) {
       opacity.set(
-        withRepeat(
-          withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-          -1,
-          true,
-        ),
+        withRepeat(withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }), -1, true),
       );
       return;
     }
@@ -189,9 +187,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                 color="#3B82F6"
                 style={styles.metaIconSpacing}
               />
-              <Text style={[styles.statusText, styles.statusTextPending]}>
-                Creating...
-              </Text>
+              <Text style={[styles.statusText, styles.statusTextPending]}>Creating...</Text>
             </View>
           ) : lecture.status === "active" ? (
             <View style={styles.activeBadge}>
@@ -200,27 +196,19 @@ const LectureCard: React.FC<LectureCardProps> = ({
             </View>
           ) : (
             <View style={[styles.statusBadge, styles.statusBadgeEnded]}>
-              <Text style={[styles.statusText, styles.statusTextEnded]}>
-                Ended
-              </Text>
+              <Text style={[styles.statusText, styles.statusTextEnded]}>Ended</Text>
             </View>
           )}
         </View>
 
         <View style={styles.cardStats}>
           <View style={styles.statItem}>
-            <Ionicons
-              name="checkmark-circle-outline"
-              size={16}
-              color="#22C55E"
-            />
+            <Ionicons name="checkmark-circle-outline" size={16} color="#22C55E" />
             <Text style={styles.statText}>{lecture.studentCount} Present</Text>
           </View>
           <View style={styles.statItem}>
             <Ionicons name="close-circle-outline" size={16} color="#EF4444" />
-            <Text style={styles.statText}>
-              {lecture.absentCount || 0} Absent
-            </Text>
+            <Text style={styles.statText}>{lecture.absentCount || 0} Absent</Text>
           </View>
           <View style={styles.statItem}>
             <TimeIcon name="time-outline" size={16} />
@@ -243,7 +231,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
           </TouchableOpacity>
 
           <View style={styles.iconActions}>
-            {lecture.status === "active" && (
+            {lecture.status === "active" ? (
               <>
                 <TouchableOpacity
                   disabled={isPending}
@@ -262,8 +250,8 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   <Ionicons name="stop" size={20} color="#EF4444" />
                 </TouchableOpacity>
               </>
-            )}
-            {lecture.status === "ended" && (
+            ) : null}
+            {lecture.status === "ended" ? (
               <>
                 <TouchableOpacity
                   style={[styles.iconBtn, styles.iconBtnNeutral]}
@@ -280,7 +268,7 @@ const LectureCard: React.FC<LectureCardProps> = ({
                   <Ionicons name="trash-outline" size={20} color="#EF4444" />
                 </TouchableOpacity>
               </>
-            )}
+            ) : null}
           </View>
         </View>
       </CardGradient>

@@ -1,8 +1,9 @@
+import { router } from "expo-router";
+import * as v from "valibot";
+
+import { forgotPasswordSuccessResponseSchema } from "@attenex/api-contracts";
 import { useAuthStore } from "@shared/stores/authStore";
 import http from "@shared/utils/http";
-import * as v from "valibot";
-import { forgotPasswordSuccessResponseSchema } from "@attenex/api-contracts";
-import { router } from "expo-router";
 
 export const resetPassword = async () => {
   const { user } = useAuthStore.getState();
@@ -10,16 +11,11 @@ export const resetPassword = async () => {
     email: user?.email.trim().toLowerCase(),
   });
 
-  const parsed = v.safeParse(
-    forgotPasswordSuccessResponseSchema,
-    response.data,
-  );
+  const parsed = v.safeParse(forgotPasswordSuccessResponseSchema, response.data);
 
   if (!parsed.success) {
     throw new Error("Failed to send password reset email");
   }
 
-  router.push(
-    `/(auth)/forgot-password?email=${encodeURIComponent(user?.email || "")}`
-  );
+  router.push(`/(auth)/forgot-password?email=${encodeURIComponent(user?.email || "")}`);
 };

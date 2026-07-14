@@ -1,14 +1,13 @@
-import { styles } from "@classes/styles/AttendanceViewScreen.styles";
-import { StudentCardProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  LinearTransition,
-} from "react-native-reanimated";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
+import { styles } from "@classes/styles/AttendanceViewScreen.styles";
+import { StudentCardProps } from "@classes/types/props";
 
 const PresentAvatar = withUnistyles(LinearGradient, () => ({
   colors: ["rgba(74, 222, 128, 0.2)", "rgba(74, 222, 128, 0.1)"] as const,
@@ -76,20 +75,14 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         {/* Info */}
         <View style={styles.infoContainer}>
           <View style={styles.nameRow}>
-            <Text
-              style={styles.studentName}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
+            <Text style={styles.studentName} ellipsizeMode="tail" numberOfLines={1}>
               {record.studentName.length > 20
                 ? record.studentName.substr(0, 20) + "..."
                 : record.studentName}
             </Text>
           </View>
 
-          <Text style={styles.rollNo}>
-            {record.studentRollNo || "No Roll No"}
-          </Text>
+          <Text style={styles.rollNo}>{record.studentRollNo || "No Roll No"}</Text>
 
           <View style={styles.metaRow}>
             {record.joinTime ? (
@@ -106,11 +99,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
                 <View style={styles.metaDot} />
                 <View style={styles.metaItem}>
                   <MetaIcon
-                    name={
-                      record.method === "manual"
-                        ? "hand-left-outline"
-                        : "location-outline"
-                    }
+                    name={record.method === "manual" ? "hand-left-outline" : "location-outline"}
                     size={12}
                   />
                   <Text style={styles.metaText}>{record.method}</Text>
@@ -128,22 +117,25 @@ export const StudentCard: React.FC<StudentCardProps> = ({ record, index }) => {
         {/* Roll Number/Status */}
         <View style={styles.statusContainer}>
           {record.status === "present" ? (
-            <View style={styles.rollBadge} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
-              <Text style={styles.rollText}>
-                {record.studentRollNo || "N/A"}
-              </Text>
+            <View
+              style={styles.rollBadge}
+              testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}
+            >
+              <Text style={styles.rollText}>{record.studentRollNo || "N/A"}</Text>
             </View>
           ) : record.status === "incomplete" ? (
-            <View style={[styles.absentBadge, styles.absentBadgeIncomplete]} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
-              <Text style={[styles.absentText, styles.absentTextIncomplete]}>
-                INC
-              </Text>
+            <View
+              style={[styles.absentBadge, styles.absentBadgeIncomplete]}
+              testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}
+            >
+              <Text style={[styles.absentText, styles.absentTextIncomplete]}>INC</Text>
             </View>
           ) : (
-            <View style={[styles.absentBadge, styles.absentBadgeAbsent]} testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}>
-              <Text style={[styles.absentText, styles.absentTextAbsent]}>
-                ABS
-              </Text>
+            <View
+              style={[styles.absentBadge, styles.absentBadgeAbsent]}
+              testID={`STUDENT_CARD.STATUS_${record.studentRollNo || record.studentId}`}
+            >
+              <Text style={[styles.absentText, styles.absentTextAbsent]}>ABS</Text>
             </View>
           )}
         </View>

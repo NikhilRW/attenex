@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
-import { Lecture } from "./common";
+
 import { UserSchema } from "@/shared/schemas/auth";
+
+import { Lecture } from "./common";
 
 /**
  * Props type definitions for Attendance components

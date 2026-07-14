@@ -1,8 +1,6 @@
-import { triggerImpactHapticOn } from "@/shared/utils/haptics";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { styles } from "@settings/styles/Settings.styles";
-import { ThemeOptionProps } from "@settings/types/props";
 import { Pressable, Text } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -12,6 +10,10 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
+import { triggerImpactHapticOn } from "@/shared/utils/haptics";
+import { styles } from "@settings/styles/Settings.styles";
+import { ThemeOptionProps } from "@settings/types/props";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -26,7 +28,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
   onPress,
   icon,
   label,
-  testID
+  testID,
 }) => {
   const scale = useSharedValue(1);
 
@@ -65,9 +67,7 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
       style={[styles.optionCard(isActive), animatedContainerStyle]}
       testID={testID}
     >
-      <Animated.View
-        style={[styles.optionIconContainer(isActive), animatedIconStyle]}
-      >
+      <Animated.View style={[styles.optionIconContainer(isActive), animatedIconStyle]}>
         <OptionIcon
           // TODO: correct type add it
           name={icon as any}
@@ -78,14 +78,11 @@ export const ThemeOption: React.FC<ThemeOptionProps> = ({
         />
       </Animated.View>
       <Text style={styles.optionText(isActive)}>{label}</Text>
-      {isActive && (
-        <Animated.View
-          entering={FadeInDown.springify()}
-          style={styles.checkIcon}
-        >
+      {isActive ? (
+        <Animated.View entering={FadeInDown.springify()} style={styles.checkIcon}>
           <CheckIcon name="checkmark-circle" size={20} />
         </Animated.View>
-      )}
+      ) : null}
     </AnimatedPressable>
   );
 };

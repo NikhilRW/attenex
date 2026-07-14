@@ -1,12 +1,14 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const NewSubjectGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -61,17 +63,11 @@ export const NewSubjectModal: React.FC<NewSubjectModalProps> = ({
           <NewSubjectGradient
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              styles.modalSurfaceElevated,
-              styles.modalSurfaceFlat,
-            ]}
+            style={[styles.modalContent, styles.modalSurfaceElevated, styles.modalSurfaceFlat]}
           >
             <View style={styles.modalHeaderRow}>
               <View>
-                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
-                  Add New Subject
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>Add New Subject</Text>
               </View>
               <TouchableOpacity
                 onPress={onClose}
@@ -85,12 +81,7 @@ export const NewSubjectModal: React.FC<NewSubjectModalProps> = ({
             <View style={styles.modalBody}>
               <Text style={styles.modalLabel}>Subject Name</Text>
 
-              <View
-                style={[
-                  styles.modalInputRow,
-                  hasError && styles.modalInputRowError,
-                ]}
-              >
+              <View style={[styles.modalInputRow, hasError && styles.modalInputRowError]}>
                 <NewSubjectInput
                   style={styles.modalInputText}
                   placeholder="e.g., Mathematics"
@@ -98,9 +89,7 @@ export const NewSubjectModal: React.FC<NewSubjectModalProps> = ({
                   onChangeText={setNewSubjectName}
                 />
               </View>
-              {hasError && (
-                <Text style={styles.modalErrorText}>{errorMessage}</Text>
-              )}
+              {hasError ? <Text style={styles.modalErrorText}>{errorMessage}</Text> : null}
             </View>
 
             <View style={styles.modalFooter}>
@@ -122,9 +111,7 @@ export const NewSubjectModal: React.FC<NewSubjectModalProps> = ({
                   end={{ x: 1, y: 0 }}
                   style={styles.modalButton}
                 >
-                  <Text style={styles.modalButtonTextPrimary}>
-                    Create Subject
-                  </Text>
+                  <Text style={styles.modalButtonTextPrimary}>Create Subject</Text>
                 </PrimaryGradient>
               </TouchableOpacity>
             </View>

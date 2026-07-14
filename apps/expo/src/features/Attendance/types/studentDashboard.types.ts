@@ -1,6 +1,7 @@
+import { Dispatch, SetStateAction } from "react";
+
 import { Lecture } from "@attendance/types/common";
 import type { SuccessResponse } from "@attenex/api-contracts";
-import { Dispatch, SetStateAction } from "react";
 
 /**
  * Type definitions for StudentDashboard component

@@ -1,12 +1,7 @@
-import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
-import { useAuthStore } from "@/shared/stores/authStore";
+import { useCallback, useEffect } from "react";
+import { useColorScheme, LogBox } from "react-native";
+
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
-import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
-import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
-import { useNotificationBootstrap } from "@shared/hooks/useNotificationBootstrap";
-import { useThemeStore } from "@shared/hooks/useTheme";
-import { clientPersister } from "@shared/utils/mmkvStorage";
-import { markPerformance } from "@shared/utils/performance";
 import {
   // PerformanceMeasureView,
   // PerformanceProfiler,
@@ -18,24 +13,25 @@ import { useNetworkState } from "expo-network";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect } from "react";
-import { useColorScheme,LogBox } from "react-native";
 import FlashMessage from "react-native-flash-message";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
-import {
-  configureReanimatedLogger,
-  ReanimatedLogLevel,
-} from "react-native-reanimated";
-import {
-  SafeAreaProvider,
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
+
+import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
+import { useAuthStore } from "@/shared/stores/authStore";
+import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
+import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
+import { useNotificationBootstrap } from "@shared/hooks/useNotificationBootstrap";
+import { useThemeStore } from "@shared/hooks/useTheme";
+import { clientPersister } from "@shared/utils/mmkvStorage";
+import { markPerformance } from "@shared/utils/performance";
+
 import { queryClient, StaleTime } from "../shared/constants/tanstackConfig";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const ROOT_LAYOUT_SCREEN_NAME = "RootLayout";
 const QUERY_PERSIST_MAX_AGE_MS = StaleTime.DAYS_5;
@@ -90,11 +86,7 @@ export default function RootLayout() {
   );
 
   const effectiveThemeName =
-    mode === "system"
-      ? systemColorScheme === "dark"
-        ? "dark"
-        : "light"
-      : mode;
+    mode === "system" ? (systemColorScheme === "dark" ? "dark" : "light") : mode;
   const statusBarStyle = effectiveThemeName === "dark" ? "light" : "dark";
 
   useDeepLinkBootstrap();
@@ -140,15 +132,10 @@ export default function RootLayout() {
     //     screenName={ROOT_LAYOUT_SCREEN_NAME}
     //   >
     <SafeAreaProvider>
-      <StatusBar
-        style={statusBarStyle}
-        hideTransitionAnimation="fade"
-      />
+      <StatusBar style={statusBarStyle} hideTransitionAnimation="fade" />
 
       <ThemedSafeAreaView style={styles.safeArea}>
-        <FuturisticBackground
-          show={!(isAuthenticated && user?.role === "student")}
-        />
+        <FuturisticBackground show={!(isAuthenticated && user?.role === "student")} />
         <>
           <ThemedPaperProvider>
             <AlertsProvider>
@@ -163,15 +150,12 @@ export default function RootLayout() {
                     // Persist mutations that are queued/in-flight (paused = queued while offline)
                     shouldDehydrateMutation: (mutation: any) => {
                       return (
-                        mutation.state.status === "pending" ||
-                        mutation.state.status === "paused"
+                        mutation.state.status === "pending" || mutation.state.status === "paused"
                       );
                     },
                     // Persist successful, fresh query data so screens load instantly after app kill
                     shouldDehydrateQuery: (query: any) => {
-                      const isFresh =
-                        Date.now() - query.state.dataUpdatedAt <
-                        StaleTime.HALF_DAY;
+                      const isFresh = Date.now() - query.state.dataUpdatedAt < StaleTime.HALF_DAY;
                       return query.state.status === "success" && isFresh;
                     },
                   },

@@ -1,9 +1,8 @@
 import * as v from "valibot";
-import {
-  passcodeSchema,
-  rollNoSchema,
-} from "../schema/common";
+
 import { getStudentLectureSuccessResponseSchema } from "@attenex/api-contracts";
+
+import { passcodeSchema, rollNoSchema } from "../schema/common";
 
 /**
  * Validate passcode format
@@ -18,8 +17,7 @@ export const parsePasscode = (passcode: string): boolean =>
  * @param rollNo - The roll number to validate
  * @returns true if valid, false otherwise
  */
-export const parseRollNo = (rollNo: string): boolean =>
-  v.safeParse(rollNoSchema, rollNo).success;
+export const parseRollNo = (rollNo: string): boolean => v.safeParse(rollNoSchema, rollNo).success;
 
 export const parseStudentLectureAPIResponseData = (data: unknown) =>
   v.safeParse(getStudentLectureSuccessResponseSchema, data);

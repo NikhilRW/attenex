@@ -1,5 +1,6 @@
-import Test from "@/features/Test/screens/Test";
 import { render } from "@testing-library/react-native";
+
+import Test from "@/features/Test/screens/Test";
 
 describe("Test Screen", () => {
   it("should render correctly", async () => {

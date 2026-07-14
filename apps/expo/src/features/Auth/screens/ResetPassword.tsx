@@ -1,3 +1,8 @@
+import React from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
+import { Controller } from "react-hook-form";
+
 import FuturisticButton from "@auth/components/common/FuturisticButton";
 import FuturisticInput from "@auth/components/common/FuturisticInput";
 import InvalidResetPasswordLink from "@auth/components/ResetPassword/InvalidResetPasswordLink";
@@ -6,9 +11,6 @@ import ResetPasswordFormHeader from "@auth/components/ResetPassword/ResetPasswor
 import VerifyingResetPasswordLink from "@auth/components/ResetPassword/VerifyingResetPasswordLink";
 import { useResetPassword } from "@auth/hooks/useResetPassword";
 import { styles } from "@auth/styles/ResetPassword.styles";
-import React from "react";
-import { Controller } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 /**
  * Reset Password Screen
@@ -86,9 +88,7 @@ const ResetPassword = () => {
                   onBlur={onBlur}
                   isPassword
                   showPassword={showConfirmPassword}
-                  onTogglePassword={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                   secureTextEntry={!showConfirmPassword}
                   editable={!isSubmitting}
                   error={errors.confirmPassword?.message}
@@ -96,10 +96,7 @@ const ResetPassword = () => {
               )}
             />
 
-            <PasswordRequirements
-              password={newPassword}
-              confirmPassword={confirmPassword}
-            />
+            <PasswordRequirements password={newPassword} confirmPassword={confirmPassword} />
 
             <FuturisticButton
               title="Reset Password"

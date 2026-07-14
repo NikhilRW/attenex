@@ -1,4 +1,3 @@
-import { storage } from "@shared/utils/mmkvStorage";
 import {
   Accuracy,
   requestBackgroundPermissionsAsync,
@@ -6,8 +5,11 @@ import {
   stopLocationUpdatesAsync,
 } from "expo-location";
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
-import { sendPing } from "./attendanceService";
+
 import { parseLectureId } from "@/shared/utils/parsers";
+import { storage } from "@shared/utils/mmkvStorage";
+
+import { sendPing } from "./attendanceService";
 import { IS_TESTING } from "../constants/common";
 
 const LOCATION_TASK_NAME = "background-location-task";
@@ -36,11 +38,7 @@ defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
             longitude &&
             typeof longitude === "number"
           )
-            await sendPing(
-              lectureId,
-              location.coords.latitude,
-              location.coords.longitude,
-            );
+            await sendPing(lectureId, location.coords.latitude, location.coords.longitude);
         }
       } catch (err) {
         console.error("Error in background task:", err);
@@ -57,7 +55,7 @@ export const startBackgroundTracking = async (lectureId: string) => {
       if (status === "granted") {
         await startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           accuracy: Accuracy.Highest,
-          timeInterval: __DEV__ && IS_TESTING? 10 * 1000 : 3 * 60 * 1000, // Check every 3 minutes (10s in dev for testing)
+          timeInterval: __DEV__ && IS_TESTING ? 10 * 1000 : 3 * 60 * 1000, // Check every 3 minutes (10s in dev for testing)
           distanceInterval: 1,
           foregroundService: {
             notificationTitle: "Attendance Active",

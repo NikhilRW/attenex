@@ -212,15 +212,15 @@
 
 // export default Test;
 
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from "react";
+import { View, Text } from "react-native";
 
 const Test = () => {
   return (
     <View>
       <Text>Test</Text>
     </View>
-  )
-}
+  );
+};
 
-export default Test
+export default Test;

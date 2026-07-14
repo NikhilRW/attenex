@@ -1,19 +1,21 @@
+import { useEffect, useState } from "react";
+import { Keyboard } from "react-native";
+
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useMutation } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useForm } from "react-hook-form";
+import { useShallow } from "zustand/shallow";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { HttpResponse } from "@/shared/utils/http";
 import { logger } from "@/shared/utils/logger";
 import { defaultFaliureCount } from "@/shared/utils/tanstack";
 import { handleEmailSignIn, handleGoogleSignIn } from "@auth/utils/common";
 import { SignInFormData, signInSchema } from "@auth/validation/authSchemas";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
 import { showMessage } from "@shared/utils/toasts";
-import { useMutation } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Keyboard } from "react-native";
-import { useShallow } from "zustand/shallow";
 
 export const useSignIn = () => {
   const router = useRouter();
@@ -21,12 +23,7 @@ export const useSignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const sendEmailMutation = useMutation<
-    HttpResponse<any>,
-    Error,
-    string,
-    unknown
-  >({
+  const sendEmailMutation = useMutation<HttpResponse<any>, Error, string, unknown>({
     mutationKey: mutationKeys.auth.sendVerificationEmail,
     onSuccess: () => {
       showMessage({
@@ -39,9 +36,7 @@ export const useSignIn = () => {
       });
     },
     onError: (error) => {
-      logger.error(
-        "Could not send verification email :: useSignIn.ts : " + error,
-      );
+      logger.error("Could not send verification email :: useSignIn.ts : " + error);
       showMessage({
         message: "Error",
         description: "Unable to send verification email. Please try again.",

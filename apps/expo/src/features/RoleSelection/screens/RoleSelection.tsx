@@ -1,12 +1,14 @@
+import React from "react";
+import { View } from "react-native";
+
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { ConfirmButton } from "@role-selection/components/ConfirmButton";
 import { RoleCard } from "@role-selection/components/RoleCard";
 import { RoleSelectionHeader } from "@role-selection/components/RoleSelectionHeader";
 import { STUDENT_IMG, TEACHER_IMG } from "@role-selection/constants/common";
 import { useRoleSelection } from "@role-selection/hooks/useRoleSelection";
 import { styles } from "@role-selection/styles/RoleSelection.styles";
-import React from "react";
-import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const RoleSelection = () => {
   const insets = useSafeAreaInsets();

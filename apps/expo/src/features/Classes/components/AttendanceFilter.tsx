@@ -1,20 +1,16 @@
+import React from "react";
+import { Text } from "react-native";
+
+import Animated, { FadeInDown } from "react-native-reanimated";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { FilterType } from "@classes/types/common";
 import { AttendanceFilterProps } from "@classes/types/props";
-import React from "react";
-import { Text } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 
-export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
-  filter,
-  setFilter,
-}) => {
+export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setFilter }) => {
   return (
-    <Animated.View
-      entering={FadeInDown.delay(200).springify()}
-      style={styles.filterContainer}
-    >
+    <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.filterContainer}>
       {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
         <TouchableOpacity
           key={f}
@@ -36,9 +32,7 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({
           <Text
             style={[
               styles.filterButtonText,
-              filter === f
-                ? styles.filterButtonTextActive
-                : styles.filterButtonTextInactive,
+              filter === f ? styles.filterButtonTextActive : styles.filterButtonTextInactive,
             ]}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}

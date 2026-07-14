@@ -1,13 +1,15 @@
+import React, { useCallback } from "react";
+import { ActivityIndicator, LayoutChangeEvent, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { useStudentDashboardLectureAnimation } from "@attendance/hooks/useStudentDashboardFocusAnimation";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { OnGoingLectureProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback } from "react";
-import { ActivityIndicator, LayoutChangeEvent, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const LectureCardGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -52,6 +54,7 @@ const OnGoingLecture = ({
         return;
       }
 
+      // eslint-disable-next-line react-compiler/react-compiler
       lectureHeightRef.current = e.nativeEvent.layout.height;
     },
     [lectureHeightRef],
@@ -74,14 +77,8 @@ const OnGoingLecture = ({
                 {lecture.subject}
               </Text>
               <View style={styles.lectureMetaRow}>
-                <SecondaryIcon
-                  name="school-outline"
-                  size={12}
-                  style={styles.lectureMetaIcon}
-                />
-                <Text style={styles.lectureClassName}>
-                  {lecture!.className}
-                </Text>
+                <SecondaryIcon name="school-outline" size={12} style={styles.lectureMetaIcon} />
+                <Text style={styles.lectureClassName}>{lecture!.className}</Text>
               </View>
             </View>
           </View>
@@ -100,17 +97,10 @@ const OnGoingLecture = ({
           haptic="impact"
           testID={`STUDENT_DASHBOARD.LECTURE_ITEM_${index + 1}_JOIN_BUTTON`}
         >
-          <PrimaryGradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.joinButton}
-          >
+          <PrimaryGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.joinButton}>
             <Text style={styles.joinButtonText}>Join Class Now</Text>
             {currentLectureJoining && joining ? (
-              <PrimaryTextSpinner
-                size="small"
-                style={styles.joinButtonLoader}
-              />
+              <PrimaryTextSpinner size="small" style={styles.joinButtonLoader} />
             ) : (
               <View style={styles.joinIconContainer}>
                 <PrimaryTextIcon name="arrow-forward" size={18} />

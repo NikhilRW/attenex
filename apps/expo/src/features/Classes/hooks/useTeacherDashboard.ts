@@ -1,3 +1,21 @@
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { AppState } from "react-native";
+
+import { useMutation, useMutationState, useQuery, useQueryClient } from "@tanstack/react-query";
+import { selectionAsync } from "expo-haptics";
+import { useNetworkState } from "expo-network";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { Gesture } from "react-native-gesture-handler";
+import {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
@@ -14,24 +32,9 @@ import {
 } from "@classes/types/common";
 import { generateMockLectures, getTeacherDashboardStressOptions } from "@classes/utils/stressTest";
 import { socketService } from "@shared/services/socketService";
-import { useMutation, useMutationState, useQuery, useQueryClient } from "@tanstack/react-query";
-import { selectionAsync } from "expo-haptics";
-import { useNetworkState } from "expo-network";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { AppState } from "react-native";
-import { Gesture } from "react-native-gesture-handler";
-import {
-  Extrapolation,
-  interpolate,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { getIsFreshQuery, mapLectureWithCount } from "../utils/common";
+
 import { DEFAULT_LECTURE_ROW_HEIGHT } from "../constants/common";
+import { getIsFreshQuery, mapLectureWithCount } from "../utils/common";
 
 export const useTeacherDashboard = () => {
   const router = useRouter();

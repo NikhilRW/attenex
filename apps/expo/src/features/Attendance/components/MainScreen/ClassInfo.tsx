@@ -1,11 +1,13 @@
+import React from "react";
+import { Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { ClassInfoProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
 
 const ClassInfoGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
@@ -26,9 +28,7 @@ const ClassInfo = ({ user, setShowClassModal }: ClassInfoProps) => {
           <PrimaryIcon name="school" size={24} style={styles.classInfoIcon} />
           <View>
             <Text style={styles.classInfoLabel}>Your Class</Text>
-            <Text style={styles.classInfoValue}>
-              {(user)?.className || "Not Set"}
-            </Text>
+            <Text style={styles.classInfoValue}>{user?.className || "Not Set"}</Text>
           </View>
         </View>
         <TouchableOpacity

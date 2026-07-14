@@ -1,19 +1,17 @@
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import { userService } from "../services/userService";
 import * as Haptics from "expo-haptics";
-import { UserRole } from "@/features/Settings/types/common";
-import { lectureService } from "@/features/Classes/services/lectureService";
 import {
   Accuracy,
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
 } from "expo-location";
-import {
-  LectureWithCount,
-} from "@/features/Classes/types/common";
-import {
-  CreateLectureVariables
-} from '@classes/types/params';
+
+import { lectureService } from "@/features/Classes/services/lectureService";
+import { LectureWithCount } from "@/features/Classes/types/common";
+import { UserRole } from "@/features/Settings/types/common";
+import { CreateLectureVariables } from "@classes/types/params";
+
+import { userService } from "../services/userService";
 
 export const nameUpdateMutateFn = async (username: string) => {
   impactAsync(ImpactFeedbackStyle.Medium);
@@ -75,11 +73,7 @@ export const createLectureMutateFn = async ({
   return res;
 };
 
-export const deleteLectureMutateFn = async ({
-  lecture,
-}: {
-  lecture: LectureWithCount;
-}) => {
+export const deleteLectureMutateFn = async ({ lecture }: { lecture: LectureWithCount }) => {
   const res = await lectureService.deleteLecture(lecture.id);
   return res;
 };

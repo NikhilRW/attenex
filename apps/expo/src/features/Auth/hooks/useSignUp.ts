@@ -1,14 +1,16 @@
+import { useEffect, useState } from "react";
+import { Keyboard } from "react-native";
+
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useForm } from "react-hook-form";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { handleEmailSignUp, handleGoogleSignIn } from "@auth/utils/common";
 import { SignUpFormData, signUpSchema } from "@auth/validation/authSchemas";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useAuthStore } from "@shared/stores/authStore";
 import { getStartingScreenPath } from "@shared/utils/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Keyboard } from "react-native";
 
 export const useSignUp = () => {
   const router = useRouter();
@@ -31,8 +33,7 @@ export const useSignUp = () => {
     if (!authLoading && isAuthenticated) {
       router.replace(getStartingScreenPath());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, router]);
 
   const {
     control,

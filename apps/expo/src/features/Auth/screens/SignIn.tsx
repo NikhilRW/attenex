@@ -1,3 +1,7 @@
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
+import { Controller } from "react-hook-form";
+
 import AuthFooter from "@auth/components/common/AuthFooter";
 import AuthHeader from "@auth/components/common/AuthHeader";
 import AuthOptions from "@auth/components/common/AuthOptions";
@@ -9,8 +13,6 @@ import { LOGO_TRANSPARENT_IMAGE } from "@auth/constants/images";
 import { useSignIn } from "@auth/hooks/useSignIn";
 import { styles } from "@auth/styles/SignIn.styles";
 import { handleLinkedInSignIn } from "@auth/utils/common";
-import { Controller } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 const SignIn = () => {
   const {
@@ -39,10 +41,7 @@ const SignIn = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <AuthHeader
-            title="Welcome Back !"
-            logoSource={LOGO_TRANSPARENT_IMAGE}
-          />
+          <AuthHeader title="Welcome Back !" logoSource={LOGO_TRANSPARENT_IMAGE} />
 
           <SocialLoginButtons
             onGooglePress={handleGooglePress}

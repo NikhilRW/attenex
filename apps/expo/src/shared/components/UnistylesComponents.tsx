@@ -1,8 +1,9 @@
+import { Modal } from "react-native";
+
 import Entypo from "@react-native-vector-icons/entypo";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
-import { Modal } from "react-native";
 import { withUnistyles } from "react-native-unistyles";
 
 export const UniModal = withUnistyles(Modal, (theme) => ({

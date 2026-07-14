@@ -19,4 +19,5 @@ export const styles = StyleSheet.create((theme) => ({
     zIndex: 1000, // Ensure it appears above WebView
     backgroundColor: theme.background.overlay,
   },
+  linkedinContainerStyle: { backgroundColor: "#000" },
 }));

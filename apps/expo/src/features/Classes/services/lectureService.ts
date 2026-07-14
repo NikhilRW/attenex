@@ -1,5 +1,5 @@
-import http from "@shared/utils/http";
 import * as v from "valibot";
+
 import {
   createLectureResponseSchema,
   addTeacherClassSuccessResponseSchema,
@@ -16,6 +16,7 @@ import {
   getTeacherSubjectsSuccessResponseSchema,
   updateLectureSuccessResponseSchema,
 } from "@attenex/api-contracts";
+import http from "@shared/utils/http";
 
 const API_URL = `/api/lectures`;
 
@@ -90,10 +91,7 @@ export const lectureService = {
       const response = await http.post(`${API_URL}/classes`, {
         className: newClassName,
       });
-      const parsed = v.safeParse(
-        addTeacherClassSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(addTeacherClassSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid add class response");
       }
@@ -121,10 +119,7 @@ export const lectureService = {
     },
   ) => {
     try {
-      const response = await http.put(
-        `${API_URL}/${lectureId}/update`,
-        updateData,
-      );
+      const response = await http.put(`${API_URL}/${lectureId}/update`, updateData);
       const parsed = v.safeParse(updateLectureSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid update lecture response");
@@ -137,10 +132,7 @@ export const lectureService = {
   deleteLecture: async (lectureId: string) => {
     try {
       const response = await http.delete(`${API_URL}/${lectureId}`);
-      const parsed = v.safeParse(
-        deleteLectureSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(deleteLectureSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid delete lecture response");
       }
@@ -164,16 +156,10 @@ export const lectureService = {
   },
   addManualAttendance: async (lectureId: string, studentRollNo: string) => {
     try {
-      const response = await http.post(
-        `${API_URL}/${lectureId}/attendance/manual`,
-        {
-          studentRollNo,
-        },
-      );
-      const parsed = v.safeParse(
-        addManualAttendanceSuccessResponseSchema,
-        response.data,
-      );
+      const response = await http.post(`${API_URL}/${lectureId}/attendance/manual`, {
+        studentRollNo,
+      });
+      const parsed = v.safeParse(addManualAttendanceSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid manual attendance response");
       }
@@ -197,10 +183,7 @@ export const lectureService = {
   createSubject: async (name: string) => {
     try {
       const response = await http.post(`${API_URL}/subjects`, { name });
-      const parsed = v.safeParse(
-        addTeacherSubjectSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(addTeacherSubjectSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid create subject response");
       }
@@ -211,9 +194,7 @@ export const lectureService = {
   },
   getStudentLectures: async (className: string) => {
     try {
-      const response = await http.get(
-        `${API_URL}/student/lectures?class=${encodeURI(className)}`,
-      );
+      const response = await http.get(`${API_URL}/student/lectures?class=${encodeURI(className)}`);
       const parsed = v.safeParse(getStudentLecturesSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Invalid get student lectures response");

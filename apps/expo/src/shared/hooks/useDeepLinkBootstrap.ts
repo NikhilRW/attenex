@@ -1,11 +1,10 @@
-import { handleEmailVerification } from "@auth/utils/common";
+import { useEffect } from "react";
+
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
-import {
-  parseResetQueryParams,
-  parseVerifyEmailQueryParams,
-} from "@shared/utils/parsers";
+
+import { handleEmailVerification } from "@auth/utils/common";
+import { parseResetQueryParams, parseVerifyEmailQueryParams } from "@shared/utils/parsers";
 
 export const useDeepLinkBootstrap = () => {
   const router = useRouter();
@@ -26,10 +25,7 @@ export const useDeepLinkBootstrap = () => {
         }
 
         // For https URLs, verify domain is whitelisted
-        if (
-          parsedUrl.protocol === "https:" &&
-          !allowedDomains.includes(parsedUrl.hostname)
-        ) {
+        if (parsedUrl.protocol === "https:" && !allowedDomains.includes(parsedUrl.hostname)) {
           return false;
         }
 
@@ -47,7 +43,7 @@ export const useDeepLinkBootstrap = () => {
         if (parseResetQueryParams(parsed.queryParams)) {
           router.navigate("/");
           router.navigate({
-            pathname: '/reset-password',
+            pathname: "/reset-password",
             params: { token: parsed.queryParams?.token, email: parsed.queryParams?.email },
           });
         }

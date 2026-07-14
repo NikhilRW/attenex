@@ -1,16 +1,13 @@
-import { triggerSelectionHapticOnCallback } from "@shared/utils/haptics";
 import { useCallback } from "react";
+
 import { useAlerts } from "react-native-paper-alerts";
-import type {
-  AlertButton,
-  AlertsMethods,
-} from "react-native-paper-alerts/lib/typescript/type";
+import type { AlertButton, AlertsMethods } from "react-native-paper-alerts/lib/typescript/type";
+
+import { triggerSelectionHapticOnCallback } from "@shared/utils/haptics";
 
 const DEFAULT_ALERT_BUTTON_TEXT = "Ok";
 
-const addSelectionHapticToDefaultButtons = (
-  buttons?: AlertButton[],
-): AlertButton[] | undefined => {
+const addSelectionHapticToDefaultButtons = (buttons?: AlertButton[]): AlertButton[] | undefined => {
   if (buttons === undefined) {
     return [
       {
@@ -21,8 +18,7 @@ const addSelectionHapticToDefaultButtons = (
   }
 
   return buttons.map((button) => {
-    const isDefaultButton =
-      button.style === undefined || button.style === "default";
+    const isDefaultButton = button.style === undefined || button.style === "default";
 
     if (!isDefaultButton || button.onPress) {
       return button;
@@ -40,12 +36,7 @@ export const useHapticAlerts = () => {
 
   const alert = useCallback<AlertsMethods["alert"]>(
     (title, message, buttons, options) => {
-      alerts.alert(
-        title,
-        message,
-        addSelectionHapticToDefaultButtons(buttons),
-        options,
-      );
+      alerts.alert(title, message, addSelectionHapticToDefaultButtons(buttons), options);
     },
     [alerts],
   );

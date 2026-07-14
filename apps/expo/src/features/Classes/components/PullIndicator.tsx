@@ -1,10 +1,12 @@
-import { styles } from "@classes/styles/TeacherDashboard.styles";
-import { PullIndicatorProps } from "@classes/types/props";
+import { View } from "react-native";
+
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { Canvas, Path } from "@shopify/react-native-skia";
-import { View } from "react-native";
 import Animated, { useDerivedValue } from "react-native-reanimated";
 import { useUnistyles, withUnistyles } from "react-native-unistyles";
+
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { PullIndicatorProps } from "@classes/types/props";
 
 const ProgressTrackPath = withUnistyles(Path, (_theme, rt) => ({
   color: rt.themeName === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
@@ -19,10 +21,7 @@ const PullIndicator: React.FC<PullIndicatorProps> = ({
   pullIndicatorStyle,
   pullProgress,
 }) => {
-  const actualPullProgress = useDerivedValue(
-    () => pullProgress.value,
-    [pullProgress],
-  );
+  const actualPullProgress = useDerivedValue(() => pullProgress.value, [pullProgress]);
   const { theme } = useUnistyles();
 
   return (

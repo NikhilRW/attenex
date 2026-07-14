@@ -1,16 +1,14 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { useLocalSearchParams, useRouter } from "expo-router";
+
 import { lectureService } from "@/features/Classes/services/lectureService";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { parseLectureId } from "@/shared/utils/parsers";
-import {
-  ALERT_MESSAGES,
-  LOG_MESSAGES,
-} from "@attendance/constants/studentDashboard.constants";
+import { ALERT_MESSAGES, LOG_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { Lecture } from "@attendance/types/common";
 import { UseLectureDetailsParamReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert } from "@attendance/utils/alertUtils";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-
 
 /**
  * Custom hook to handle auto-join from notification (lectureId param)
@@ -22,8 +20,7 @@ export const useLectureDetailsParam = (
   const { lectureId } = useLocalSearchParams();
   const router = useRouter();
   const { alert } = useHapticAlerts();
-  const [isFetchingLectureDetails, setIsFetchingLectureDetails] =
-    useState(false);
+  const [isFetchingLectureDetails, setIsFetchingLectureDetails] = useState(false);
   const handledLectureId = useRef<string | null>(null);
 
   const fetchAndJoinLecture = useCallback(async () => {
@@ -32,21 +29,15 @@ export const useLectureDetailsParam = (
       try {
         // First check if we already have the lecture in our list
         const lectureToJoin = lectures.find((lec) => lec.id === lectureId);
-        console.log("Lecture To Join : "+lectureToJoin);
-        
+        console.log("Lecture To Join : " + lectureToJoin);
+
         if (lectureToJoin) {
           await onJoinLecture(lectureToJoin);
         } else {
           try {
-            const res =
-              await lectureService.getStudentLectureDetails(lectureId);
+            const res = await lectureService.getStudentLectureDetails(lectureId);
             if (res.success && res.data && !Array.isArray(res.data)) {
-              
-              console.log(
-                LOG_MESSAGES.DETAILS_FETCHED,
-                "useLectureDetailsParams",
-                res.data,
-              );
+              console.log(LOG_MESSAGES.DETAILS_FETCHED, "useLectureDetailsParams", res.data);
               const lectureData = {
                 id: res.data.id,
                 subject: res.data.subject,

@@ -1,13 +1,15 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { NewClassModalProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const NewClassGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -53,17 +55,11 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
           <NewClassGradient
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.modalContent,
-              styles.modalSurfaceElevated,
-              styles.modalSurfaceFlat,
-            ]}
+            style={[styles.modalContent, styles.modalSurfaceElevated, styles.modalSurfaceFlat]}
           >
             <View style={styles.modalHeaderRow}>
               <View>
-                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
-                  Add New Class
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>Add New Class</Text>
               </View>
               <TouchableOpacity
                 onPress={onClose}
@@ -85,9 +81,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                   onChangeText={setNewClassName}
                 />
               </View>
-              {hasError && (
-                <Text style={styles.modalErrorText}>{errorMessage}</Text>
-              )}
+              {hasError ? <Text style={styles.modalErrorText}>{errorMessage}</Text> : null}
             </View>
 
             <View style={styles.modalFooter}>
@@ -109,9 +103,7 @@ export const NewClassModal: React.FC<NewClassModalProps> = ({
                   end={{ x: 1, y: 0 }}
                   style={styles.modalButton}
                 >
-                  <Text style={styles.modalButtonTextPrimary}>
-                    Create Class
-                  </Text>
+                  <Text style={styles.modalButtonTextPrimary}>Create Class</Text>
                 </PrimaryGradient>
               </TouchableOpacity>
             </View>

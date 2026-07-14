@@ -5,7 +5,7 @@ module.exports = (config) => {
     const modResults = config.modResults.contents;
     const lines = modResults.split('\n');
     const onCreateIndex = lines.indexOf('  override fun onCreate() {');
-    if(onCreateIndex != -1){
+    if(onCreateIndex !== -1){
       const initializationCallString = `    ReactNativePerformance.onAppStarted()`;
       if(!lines.includes(initializationCallString)){
         lines.splice(onCreateIndex + 1, 0,initializationCallString)

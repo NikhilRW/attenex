@@ -1,20 +1,22 @@
+import { useState } from "react";
+import { Keyboard } from "react-native";
+
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useForm, useWatch } from "react-hook-form";
+import * as v from "valibot";
+
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { StaleTime } from "@/shared/constants/tanstackConfig";
-import { ResetPasswordFormData, resetPasswordSchema } from "@auth/validation/authSchemas";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { mutationKeys } from "@shared/constants/mutationKeys";
-import http from "@shared/utils/http";
-import { showMessage } from "@shared/utils/toasts";
-import * as v from "valibot";
 import {
   verifyResetTokenSuccessResponseSchema,
   resetPasswordSuccessResponseSchema,
 } from "@attenex/api-contracts";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { Keyboard } from "react-native";
+import { ResetPasswordFormData, resetPasswordSchema } from "@auth/validation/authSchemas";
+import { mutationKeys } from "@shared/constants/mutationKeys";
+import http from "@shared/utils/http";
+import { showMessage } from "@shared/utils/toasts";
 
 export const useResetPassword = () => {
   const router = useRouter();

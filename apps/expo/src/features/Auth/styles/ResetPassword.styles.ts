@@ -89,4 +89,5 @@ export const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
     color: theme.text.secondary,
   },
+  gradientStyle: { borderRadius: 12 },
 }));

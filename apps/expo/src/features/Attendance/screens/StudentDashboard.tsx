@@ -1,11 +1,17 @@
-import ClassUpdateModal from "@attendance/components/Modals/ClassUpdateModal";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+
+import { router, useLocalSearchParams } from "expo-router";
+import Animated, { LinearTransition } from "react-native-reanimated";
+
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import LectureEnded from "@attendance/components/LectureAttending/LectureEnded";
 import LoadingScreen from "@attendance/components/MainScreen/LoadingScreen";
 import NoClassSelected from "@attendance/components/MainScreen/NoClassSelected";
 import NoLectureFound from "@attendance/components/MainScreen/NoLectureFound";
 import OnGoingLecture from "@attendance/components/MainScreen/OnGoingLecture";
-import RollnoModal from "@attendance/components/Modals/RollnoModal";
 import StudentDashboardHeader from "@attendance/components/MainScreen/StudentDashboardHeader";
+import ClassUpdateModal from "@attendance/components/Modals/ClassUpdateModal";
+import RollnoModal from "@attendance/components/Modals/RollnoModal";
 import { useAttendanceJoin } from "@attendance/hooks/useAttendanceJoin";
 import { useAttendanceSubmit } from "@attendance/hooks/useAttendanceSubmit";
 import { useClassManagement } from "@attendance/hooks/useClassManagement";
@@ -23,10 +29,6 @@ import {
 import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { markPerformance } from "@shared/utils/performance";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import Animated, { LinearTransition } from "react-native-reanimated";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 
 // TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 const DEFAULT_LECTURE_ROW_HEIGHT = 220;
@@ -69,10 +71,7 @@ const StudentDashboard = () => {
   );
 
   const mockLectures = useMemo(
-    () =>
-      stressOptions.enabled
-        ? generateMockStudentLectures(stressOptions.lectureCount)
-        : [],
+    () => (stressOptions.enabled ? generateMockStudentLectures(stressOptions.lectureCount) : []),
     [stressOptions.enabled, stressOptions.lectureCount],
   );
 
@@ -105,19 +104,10 @@ const StudentDashboard = () => {
   const { lectures, refreshLectures } = useLectureManagement(joinedLecture);
 
   // Attendance submit management
-  const {
-    passcode,
-    loading: submitLoading,
-    setPasscode,
-    handleSubmit,
-  } = useAttendanceSubmit();
+  const { passcode, loading: submitLoading, setPasscode, handleSubmit } = useAttendanceSubmit();
 
   // Socket manager
-  const { lectureStatus } = useSocketManager(
-    joinedLecture,
-    refreshLectures,
-    alert,
-  );
+  const { lectureStatus } = useSocketManager(joinedLecture, refreshLectures, alert);
 
   const handleJoinAction = useCallback(
     async (lecture: Lecture) => {
@@ -145,17 +135,14 @@ const StudentDashboard = () => {
 
   const keyExtractor = useCallback((lecture: Lecture) => lecture.id, []);
 
-  const getItemLayout = useCallback(
-    (_: ArrayLike<Lecture> | null | undefined, index: number) => {
-      const rowHeight = lectureHeight.current || DEFAULT_LECTURE_ROW_HEIGHT;
-      return {
-        length: rowHeight,
-        offset: rowHeight * index,
-        index,
-      };
-    },
-    [],
-  );
+  const getItemLayout = useCallback((_: ArrayLike<Lecture> | null | undefined, index: number) => {
+    const rowHeight = lectureHeight.current || DEFAULT_LECTURE_ROW_HEIGHT;
+    return {
+      length: rowHeight,
+      offset: rowHeight * index,
+      index,
+    };
+  }, []);
 
   const flatListPerformanceProps = useMemo(
     () => ({
@@ -179,10 +166,7 @@ const StudentDashboard = () => {
   } = useClassManagement(refreshLectures);
 
   // Handle lecture details from URL params (notification join)
-  const { isFetchingLectureDetails } = useLectureDetailsParam(
-    lectures,
-    handleJoin,
-  );
+  const { isFetchingLectureDetails } = useLectureDetailsParam(lectures, handleJoin);
 
   // Roll number submission handler
   const onRollNoSubmit = useCallback(
@@ -211,9 +195,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     if (status === "joined" && lectureStatus === "active") {
       router.navigate(
-        joinedLecture?.id
-          ? `/lecture-ongoing?lectureId=${joinedLecture.id}`
-          : "/lecture-ongoing",
+        joinedLecture?.id ? `/lecture-ongoing?lectureId=${joinedLecture.id}` : "/lecture-ongoing",
       );
     }
   }, [joinedLecture?.id, lectureStatus, status]);
@@ -264,10 +246,7 @@ const StudentDashboard = () => {
         scrollEventThrottle={16}
         {...flatListPerformanceProps}
         ListHeaderComponent={
-          <StudentDashboardHeader
-            user={user}
-            setShowClassModal={setShowClassModal}
-          />
+          <StudentDashboardHeader user={user} setShowClassModal={setShowClassModal} />
         }
         ListEmptyComponent={
           <Animated.View style={emptyStateAnimatedStyle}>

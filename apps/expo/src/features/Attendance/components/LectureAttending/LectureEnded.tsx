@@ -1,11 +1,13 @@
-import styles from "@attendance/styles/StudentDashboard.styles";
-import { LectureEndedProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import styles from "@attendance/styles/StudentDashboard.styles";
+import { LectureEndedProps } from "@attendance/types/props";
 
 const PrimaryGradient = withUnistyles(LinearGradient, (theme) => ({
   colors: [theme.primary.main, theme.accent.blue] as const,
@@ -30,14 +32,9 @@ const LectureEnded = ({
   passcode,
   setPasscode,
 }: LectureEndedProps) => {
-
   return (
     <View style={styles.screenContainer}>
-      <View
-        style={[
-          styles.joinedContainer,
-        ]}
-      >
+      <View style={styles.joinedContainer}>
         <View style={styles.guardianIconOuter}>
           <PrimaryGradient style={styles.guardianIconInner}>
             <PrimaryTextIcon name="checkmark-done-circle" size={48} />
@@ -48,10 +45,8 @@ const LectureEnded = ({
         <Text style={styles.guardianSubtitle}>
           {joinedLecture?.subject ? (
             <>
-              <Text style={styles.lectureTitleHighlight}>
-                {joinedLecture.subject} Lecture
-              </Text>{" "}
-              has finished!
+              <Text style={styles.lectureTitleHighlight}>{joinedLecture.subject} Lecture</Text> has
+              finished!
               {"\n"}
             </>
           ) : (

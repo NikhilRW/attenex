@@ -1,12 +1,14 @@
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { styles } from "@settings/styles/Settings.styles";
-import { ProfileSectionProps } from "@settings/types/props";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Image, Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { styles } from "@settings/styles/Settings.styles";
+import { ProfileSectionProps } from "@settings/types/props";
 
 const ProfileHeaderGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -49,25 +51,16 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   };
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(100).springify()}
-      style={styles.section}
-    >
+    <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
       <Text style={styles.sectionTitle}>PROFILE</Text>
       <View style={[styles.card, styles.cardSurface]}>
         <ProfileHeaderGradient style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             {userPhotoUrl ? (
-              <Image
-                source={{ uri: userPhotoUrl }}
-                style={styles.avatarImage}
-                resizeMode="cover"
-              />
+              <Image source={{ uri: userPhotoUrl }} style={styles.avatarImage} resizeMode="cover" />
             ) : (
               <AvatarGradient style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {getInitials(displayName)}
-                </Text>
+                <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
               </AvatarGradient>
             )}
             <View style={styles.onlineBadge} />
@@ -82,7 +75,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 style={styles.input}
                 placeholder="Enter name"
               />
-              {displayName !== userName && (
+              {displayName !== userName ? (
                 <TouchableOpacity
                   onPress={() => onNameUpdate(displayName)}
                   disabled={savingName}
@@ -95,16 +88,14 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     <SaveIcon name="checkmark-circle" size={24} />
                   )}
                 </TouchableOpacity>
-              )}
+              ) : null}
             </View>
           </View>
         </ProfileHeaderGradient>
 
         <View style={[styles.statsRow, styles.statsRowCentered]}>
           <MailIcon name="mail-outline" size={16} />
-          <Text style={styles.emailText}>
-            {userEmail || "No email connected"}
-          </Text>
+          <Text style={styles.emailText}>{userEmail || "No email connected"}</Text>
         </View>
       </View>
     </Animated.View>

@@ -1,11 +1,13 @@
+import { View } from "react-native";
+
+import Animated from "react-native-reanimated";
+
 import AuthHeader from "@auth/components/common/AuthHeader";
 import BackButton from "@auth/components/common/BackButton";
 import EmailSent from "@auth/components/ForgotPassword/EmailSent";
 import ForgotPasswordForm from "@auth/components/ForgotPassword/ForgotPasswordForm";
 import { useForgotPassword } from "@auth/hooks/useForgotPassword";
 import { styles } from "@auth/styles/ForgotPassword.styles";
-import { View } from "react-native";
-import Animated from "react-native-reanimated";
 
 /**
  * Forgot Password Screen
@@ -36,12 +38,12 @@ const ForgotPassword = () => {
           {/* Back Button */}
           <BackButton />
 
-          {emailSent === false && (
+          {emailSent === false ? (
             <AuthHeader
               title="Forgot Password"
               logoSource={require("@assets/images/logo-transparent.png")}
             />
-          )}
+          ) : null}
 
           {emailSent ? (
             <EmailSent

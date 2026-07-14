@@ -1,7 +1,7 @@
+import { Stack } from "expo-router";
+
 import { setupAuthOfflineMutations } from "@/features/Auth/utils/tanstack";
 import { queryClient } from "@/shared/constants/tanstackConfig";
-import { Stack } from "expo-router";
-import React from "react";
 
 setupAuthOfflineMutations(queryClient);
 
@@ -39,18 +39,9 @@ const Layout = () => {
       {/* User Registration Screen */}
       <Stack.Screen name="sign-up/index" options={{ headerShown: false }} />
       <Stack.Screen name="linkedin/index" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="forgot-password/index"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="reset-password/index"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="verify-email/index"
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="forgot-password/index" options={{ headerShown: false }} />
+      <Stack.Screen name="reset-password/index" options={{ headerShown: false }} />
+      <Stack.Screen name="verify-email/index" options={{ headerShown: false }} />
     </Stack>
   );
 };

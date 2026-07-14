@@ -1,21 +1,24 @@
+import { useCallback, useState } from "react";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
+import { useNetworkState } from "expo-network";
+import { useRouter } from "expo-router";
+
+import { showErrorAlert } from "@/features/Attendance/utils/alertUtils";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
+import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { UserSchema } from "@/shared/schemas/auth";
+import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
+import { parseUserName } from "@/shared/utils/parsers";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
 import { lectureService } from "@classes/services/lectureService";
 import type { UserRole } from "@settings/types/common";
 import { authService } from "@shared/services/authService";
 import { useAuthStore } from "@shared/stores/authStore";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as Haptics from "expo-haptics";
-import { useNetworkState } from "expo-network";
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+
 import { resetPassword } from "../utils/common";
-import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
-import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
-import { parseUserName } from "@/shared/utils/parsers";
-import { UserSchema } from "@/shared/schemas/auth";
-import { showErrorAlert } from "@/features/Attendance/utils/alertUtils";
 
 // TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
@@ -126,9 +129,7 @@ export const useSettings = () => {
         updateUser({ name: onMutateResult?.prevName });
       }
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update name";
+        error?.response?.data?.message || error?.message || "Failed to update name";
       alert("Error", errorMessage);
     },
   });
@@ -199,11 +200,7 @@ export const useSettings = () => {
     if (parseUserName(displayName)) {
       return await handleNameUpdate(displayName);
     } else {
-      showErrorAlert(
-        "Invalid Name",
-        "Name must be at least 1 characters long.",
-        alert,
-      );
+      showErrorAlert("Invalid Name", "Name must be at least 1 characters long.", alert);
       return null;
     }
   };

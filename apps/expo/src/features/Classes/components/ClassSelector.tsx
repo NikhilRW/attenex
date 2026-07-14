@@ -1,14 +1,16 @@
+import React, { useCallback, useMemo } from "react";
+import { ListRenderItemInfo, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { ClassItem } from "@classes/types/common";
 import { ClassSelectorProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo } from "react";
-import { ListRenderItemInfo, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const AddCircleIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.secondary,
@@ -48,10 +50,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
     ({ item: cls, index }: ListRenderItemInfo<ClassItem>) => (
       <TouchableOpacity
         onPress={() => onSelectClass(cls.name)}
-        style={[
-          styles.optionItem,
-          selectedClass === cls.name && styles.optionItemSelected,
-        ]}
+        style={[styles.optionItem, selectedClass === cls.name && styles.optionItemSelected]}
         haptic="selection"
         testID={`CREATE_LECTURE_SCREEN.CLASS_SELECTOR_ITEM_${index + 1}`}
       >
@@ -63,9 +62,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
         >
           {cls.name}
         </Text>
-        {selectedClass === cls.name && (
-          <PrimaryIcon name="checkmark-circle" size={20} />
-        )}
+        {selectedClass === cls.name ? <PrimaryIcon name="checkmark-circle" size={20} /> : null}
       </TouchableOpacity>
     ),
     [onSelectClass, selectedClass],
@@ -99,18 +96,13 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
       <TouchableOpacity
         haptic="selection"
         onPress={onToggleDropdown}
-        testID={"CREATE_LECTURE_SCREEN.CLASS_SELECTOR.BUTTON"}
+        testID="CREATE_LECTURE_SCREEN.CLASS_SELECTOR.BUTTON"
         style={styles.dropdown}
       >
-        <Text
-          style={[
-            styles.dropdownText,
-            !selectedClass && styles.dropdownTextMuted,
-          ]}
-        >
+        <Text style={[styles.dropdownText, !selectedClass && styles.dropdownTextMuted]}>
           {selectedClass || "Select a class"}
         </Text>
-        <AddCircleIcon name={"add-circle-sharp"} size={20} />
+        <AddCircleIcon name="add-circle-sharp" size={20} />
       </TouchableOpacity>
 
       <UniModal
@@ -120,23 +112,14 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
         onRequestClose={onToggleDropdown}
       >
         <View style={styles.modalContainer}>
-          <AnimatedView
-            entering={FadeInUp.springify()}
-            style={styles.modalAnimatedWrapper}
-          >
+          <AnimatedView entering={FadeInUp.springify()} style={styles.modalAnimatedWrapper}>
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[
-                styles.modalContent,
-                styles.modalSurface,
-                styles.modalSurfaceFlat,
-              ]}
+              style={[styles.modalContent, styles.modalSurface, styles.modalSurfaceFlat]}
             >
               <View style={styles.modalHeaderRow}>
-                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
-                  Select Class
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>Select Class</Text>
                 <TouchableOpacity
                   haptic="selection"
                   onPress={onToggleDropdown}
@@ -152,11 +135,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                 getItemLayout={getItemLayout}
                 ListEmptyComponent={
                   <View style={styles.selectionEmptyState}>
-                    <MutedIcon
-                      name="school-outline"
-                      size={48}
-                      style={styles.selectionEmptyIcon}
-                    />
+                    <MutedIcon name="school-outline" size={48} style={styles.selectionEmptyIcon} />
                     <Text style={styles.selectionEmptyText}>
                       No classes found.{"\n"}Add one below!
                     </Text>

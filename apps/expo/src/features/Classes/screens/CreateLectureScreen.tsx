@@ -1,3 +1,8 @@
+import React from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
+import Animated, { FadeInUp } from "react-native-reanimated";
+
 import { CreateLectureFormCard } from "@classes/components/CreateLectureFormCard";
 import { CreateLectureHeader } from "@classes/components/CreateLectureHeader";
 import { NewClassModal } from "@classes/components/NewClassModal";
@@ -5,9 +10,6 @@ import { NewSubjectModal } from "@classes/components/NewSubjectModal";
 import { DURATION_OPTIONS } from "@classes/constants/common";
 import { useCreateLectureScreen } from "@classes/hooks/useCreateLectureScreen";
 import { styles } from "@classes/styles/CreateLecture.styles";
-import React from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
 
 const CreateLectureScreen = () => {
   const {
@@ -53,16 +55,13 @@ const CreateLectureScreen = () => {
       <CreateLectureHeader onBack={handleGoBack} />
 
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.flex1}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { minHeight: minHeightScrollView },
-          ]}
+          contentContainerStyle={[styles.scrollContent, { minHeight: minHeightScrollView }]}
           keyboardShouldPersistTaps="always"
         >
           <Animated.View entering={FadeInUp.delay(100).springify()}>

@@ -1,26 +1,20 @@
-import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
-import { AlertFunction } from "../types/common";
 import { selectionAsync } from "expo-haptics";
+
+import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
+
+import { AlertFunction } from "../types/common";
 
 /**
  * Show a success alert
  */
-export const showSuccessAlert = (
-  title: string,
-  message: string,
-  alert: AlertFunction,
-) => {
+export const showSuccessAlert = (title: string, message: string, alert: AlertFunction) => {
   alert(title, message);
 };
 
 /**
  * Show an error alert
  */
-export const showErrorAlert = (
-  title: string,
-  message: string,
-  alert: AlertFunction,
-) => {
+export const showErrorAlert = (title: string, message: string, alert: AlertFunction) => {
   alert(title, message);
 };
 

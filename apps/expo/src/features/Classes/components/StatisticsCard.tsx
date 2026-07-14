@@ -1,10 +1,12 @@
-import { styles } from "@classes/styles/TeacherDashboard.styles";
-import { StatisticsCardProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { withUnistyles } from "react-native-unistyles";
+
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { StatisticsCardProps } from "@classes/types/props";
 
 const BlueGradient = withUnistyles(LinearGradient, (_, rt) => ({
   colors:

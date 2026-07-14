@@ -1,8 +1,5 @@
-import {
-  MessageOptions,
-  showMessage as rnfsShowMessage,
-} from "react-native-flash-message";
 import * as Haptics from "expo-haptics";
+import { MessageOptions, showMessage as rnfsShowMessage } from "react-native-flash-message";
 
 export const showInternetNotConnected = () => {
   showMessage({

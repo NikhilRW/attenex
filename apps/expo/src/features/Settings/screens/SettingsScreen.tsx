@@ -1,3 +1,8 @@
+import { View } from "react-native";
+
+import Animated from "react-native-reanimated";
+import { useShallow } from "zustand/shallow";
+
 import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { AppearanceSection } from "@settings/components/AppearanceSection";
 import { DangerZoneSection } from "@settings/components/DangerZoneSection";
@@ -6,9 +11,7 @@ import { RoleSection } from "@settings/components/RoleSection";
 import { useSettings } from "@settings/hooks/useSettings";
 import { styles } from "@settings/styles/Settings.styles";
 import { useThemeStore } from "@shared/hooks/useTheme";
-import { View } from "react-native";
-import Animated from "react-native-reanimated";
-import { useShallow } from "zustand/shallow";
+
 import SettingsHeader from "../components/SettingsHeader";
 import { useSlideAnimation } from "../hooks/useSlideAnimation";
 

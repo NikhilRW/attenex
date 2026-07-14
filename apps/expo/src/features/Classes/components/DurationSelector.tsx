@@ -1,13 +1,15 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { DurationSelectorProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const DurationTextInput = withUnistyles(TextInput, (theme) => ({
   placeholderTextColor: theme.text.muted,
@@ -42,9 +44,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   options,
 }) => {
   const selectedDurationLabel =
-    duration === -1
-      ? "Custom"
-      : options.find((opt) => opt.value === duration)?.label || "1 hour";
+    duration === -1 ? "Custom" : options.find((opt) => opt.value === duration)?.label || "1 hour";
 
   return (
     <>
@@ -57,12 +57,12 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
           style={styles.dropdown}
         >
           <Text style={styles.dropdownText}>{selectedDurationLabel}</Text>
-          <AddCircleIcon name={"add-circle-sharp"} size={20} />
+          <AddCircleIcon name="add-circle-sharp" size={20} />
         </TouchableOpacity>
       </View>
 
       {/* Custom Duration Input */}
-      {duration === -1 && (
+      {duration === -1 ? (
         <View style={[styles.inputGroup, styles.customDurationGroup]}>
           <Text style={styles.label}>Custom Duration (minutes)</Text>
           <DurationTextInput
@@ -74,36 +74,23 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
             testID="CREATE_LECTURE_SCREEN.CUSTOM_DURATION_INPUT"
           />
         </View>
-      )}
+      ) : null}
 
-      <UniModal
-        visible={showDropdown}
-        animationType="fade"
-        onRequestClose={onToggleDropdown}
-      >
+      <UniModal visible={showDropdown} animationType="fade" onRequestClose={onToggleDropdown}>
         <View style={styles.modalOverlay}>
           <TouchableOpacity
             style={styles.modalBackdrop}
             onPress={onToggleDropdown}
             activeOpacity={1}
           />
-          <Animated.View
-            entering={FadeInUp.springify()}
-            style={styles.modalAnimatedWrapper}
-          >
+          <Animated.View entering={FadeInUp.springify()} style={styles.modalAnimatedWrapper}>
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[
-                styles.modalContent,
-                styles.modalSurface,
-                styles.modalSurfaceFlat,
-              ]}
+              style={[styles.modalContent, styles.modalSurface, styles.modalSurfaceFlat]}
             >
               <View style={styles.modalHeaderRow}>
-                <Text style={[styles.modalTitle, styles.modalTitleInline]}>
-                  Select Duration
-                </Text>
+                <Text style={[styles.modalTitle, styles.modalTitleInline]}>Select Duration</Text>
                 <TouchableOpacity
                   onPress={onToggleDropdown}
                   style={styles.modalCloseButton}
@@ -114,7 +101,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
               </View>
 
               <View style={styles.optionsWrapper}>
-                {options.map((option,index) => (
+                {options.map((option, index) => (
                   <TouchableOpacity
                     key={option.label}
                     onPress={() => onSelectDuration(option.value)}
@@ -128,16 +115,14 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                     <Text
                       style={[
                         styles.optionItemText,
-                        duration === option.value
-                          ? styles.optionItemTextSelected
-                          : null,
+                        duration === option.value ? styles.optionItemTextSelected : null,
                       ]}
                     >
                       {option.label}
                     </Text>
-                    {duration === option.value && (
+                    {duration === option.value ? (
                       <PrimaryIcon name="checkmark-circle" size={20} />
-                    )}
+                    ) : null}
                   </TouchableOpacity>
                 ))}
               </View>

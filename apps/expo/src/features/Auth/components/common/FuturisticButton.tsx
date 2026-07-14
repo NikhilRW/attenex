@@ -1,14 +1,11 @@
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { StyleSheet } from "react-native-unistyles";
+
 import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { triggerImpactHapticOn } from "@/shared/utils/haptics";
 import { FuturisticButtonProps } from "@auth/types/props";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
-
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,

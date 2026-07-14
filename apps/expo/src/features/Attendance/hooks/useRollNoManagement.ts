@@ -1,11 +1,13 @@
+import { useState } from "react";
+
+import { useMutation } from "@tanstack/react-query";
+
 import { parseRollNo } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { GarbageTime } from "@/shared/constants/tanstackConfig";
 import { useAuthStore } from "@/shared/stores/authStore";
 import { Lecture } from "@attendance/types/common";
 import { UseRollNoManagementReturn } from "@attendance/types/studentDashboard.types";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 
 /**
  * Custom hook to manage roll number handling
@@ -21,9 +23,7 @@ export const useRollNoManagement = (): UseRollNoManagementReturn => {
     setRollNoState(value);
   };
 
-  const handleRollNoSubmitMutateFn = async (
-    onSubmit: (rollNo: string) => Promise<void>,
-  ) => {
+  const handleRollNoSubmitMutateFn = async (onSubmit: (rollNo: string) => Promise<void>) => {
     if (!parseRollNo(rollNo)) {
       setErrorMessage("Invalid roll number entered");
       return false;

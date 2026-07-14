@@ -1,17 +1,20 @@
-import type { AddTeacherSubjectSuccessResponse } from "@attenex/api-contracts";
-import { mutationKeys } from "@/shared/constants/mutationKeys";
-import { queryKeys } from "@/shared/constants/queryKeys";
-import { lectureService } from "@classes/services/lectureService";
-import { ClassItem, LectureWithCount, SubjectItem } from "@classes/types/common";
-import { CreateLectureAPIResponse } from "@classes/types/api";
-import { getMinHeightForScrollView } from "@classes/utils/common";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { CreateLectureVariables } from "../types/params";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { selectionAsync } from "expo-haptics";
+import { useRouter } from "expo-router";
+
+import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { queryKeys } from "@/shared/constants/queryKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import type { AddTeacherSubjectSuccessResponse } from "@attenex/api-contracts";
+import { lectureService } from "@classes/services/lectureService";
+import { CreateLectureAPIResponse } from "@classes/types/api";
+import { ClassItem, LectureWithCount, SubjectItem } from "@classes/types/common";
+import { getMinHeightForScrollView } from "@classes/utils/common";
+
+import { CreateLectureVariables } from "../types/params";
 
 export const useCreateLectureScreen = () => {
   const router = useRouter();
@@ -306,7 +309,7 @@ export const useCreateLectureScreen = () => {
         const result: SubjectItem[] = [];
         if (old) {
           result.push(...old.filter((s) => s.name !== name));
-        }// TODO: make the use of the createdAt for ordering the subjects
+        } // TODO: make the use of the createdAt for ordering the subjects
         result.push({
           id: "temp" + new Date().getTime(),
           name,
@@ -350,10 +353,10 @@ export const useCreateLectureScreen = () => {
       }
     },
     retry(failureCount, error) {
-      if(error.message.includes("already exists")) {
+      if (error.message.includes("already exists")) {
         return false; // Don't retry if the subject already exists
       }
-      return failureCount < 3; 
+      return failureCount < 3;
     },
   });
 

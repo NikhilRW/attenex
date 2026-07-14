@@ -1,11 +1,8 @@
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-import StatisticsCard from "@classes/components/StatisticsCard";
-import { styles } from "@classes/styles/TeacherDashboard.styles";
-import { HeaderSectionProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
 import { Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { useFocusEffect } from "expo-router";
 import Animated, {
   Easing,
   interpolate,
@@ -14,6 +11,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import StatisticsCard from "@classes/components/StatisticsCard";
+import { styles } from "@classes/styles/TeacherDashboard.styles";
+import { HeaderSectionProps } from "@classes/types/props";
 
 const AddIcon = withUnistyles(Ionicons, () => ({
   color: "white",
@@ -68,11 +70,7 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({
           <Text style={styles.headerTitle}>Teacher Dashboard</Text>
           <Text style={styles.headerSubtitle}>Overview & Management</Text>
         </View>
-        <TouchableOpacity
-          haptic="impact"
-          onPress={navigateToCreate}
-          style={styles.addButton}
-        >
+        <TouchableOpacity haptic="impact" onPress={navigateToCreate} style={styles.addButton}>
           <AddIcon name="add" size={24} />
         </TouchableOpacity>
       </Animated.View>

@@ -1,14 +1,17 @@
-import { useAnimatedStyle } from "react-native-reanimated";
-import { CUSTOM_TAB_BAR_WIDTH } from "../constants/ui";
 import { useCallback, useMemo } from "react";
+
 import { useQueryClient } from "@tanstack/react-query";
+import { BottomTabNavigationEventMap } from "expo-router/js-tabs";
+import { NavigationHelpers, ParamListBase } from "expo-router/react-navigation";
+import { useAnimatedStyle } from "react-native-reanimated";
+
+import { lectureService } from "@/features/Classes/services/lectureService";
+
+import { queryKeys } from "../constants/queryKeys";
+import { StaleTime } from "../constants/tanstackConfig";
+import { CUSTOM_TAB_BAR_WIDTH } from "../constants/ui";
 import { useAuthStore } from "../stores/authStore";
 import { isFreshQuery } from "../utils/tanstack";
-import { lectureService } from "@/features/Classes/services/lectureService";
-import { StaleTime } from "../constants/tanstackConfig";
-import { queryKeys } from "../constants/queryKeys";
-import { NavigationHelpers, ParamListBase } from "expo-router/react-navigation";
-import { BottomTabNavigationEventMap } from "expo-router/js-tabs";
 
 export const useCustomTabBar = ({
   index,
@@ -31,14 +34,10 @@ export const useCustomTabBar = ({
         if (!className) {
           return;
         }
-        const studentLecturesQueryKey =
-          queryKeys.lectures.studentByClass(className);
+        const studentLecturesQueryKey = queryKeys.lectures.studentByClass(className);
 
         const queryState = queryClient.getQueryState(studentLecturesQueryKey);
-        const isDataFresh = isFreshQuery(
-          queryState?.dataUpdatedAt,
-          StaleTime.SECONDS_30,
-        );
+        const isDataFresh = isFreshQuery(queryState?.dataUpdatedAt, StaleTime.SECONDS_30);
 
         if (!isDataFresh) {
           queryClient.prefetchQuery({
@@ -54,10 +53,7 @@ export const useCustomTabBar = ({
 
       if (routeName.includes("classes") && role === "teacher") {
         const queryState = queryClient.getQueryState(queryKeys.classes.teacher);
-        const isDataFresh = isFreshQuery(
-          queryState?.dataUpdatedAt,
-          StaleTime.SECONDS_30,
-        );
+        const isDataFresh = isFreshQuery(queryState?.dataUpdatedAt, StaleTime.SECONDS_30);
 
         if (!isDataFresh) {
           queryClient.prefetchQuery({
@@ -129,10 +125,7 @@ export const useCustomTabBar = ({
     return {
       width: isEmptyTabBar ? 0 : CUSTOM_TAB_BAR_WIDTH,
       height: 60,
-      left:
-        activeFilteredIndex >= 0
-          ? activeFilteredIndex * CUSTOM_TAB_BAR_WIDTH + 10
-          : 10,
+      left: activeFilteredIndex >= 0 ? activeFilteredIndex * CUSTOM_TAB_BAR_WIDTH + 10 : 10,
     };
   });
   return {
@@ -142,6 +135,6 @@ export const useCustomTabBar = ({
     isEmptyTabBar,
     activatedBackgroundStyle,
     isAuthenticated,
-    user
+    user,
   };
 };

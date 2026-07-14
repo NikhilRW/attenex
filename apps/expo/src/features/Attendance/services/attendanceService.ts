@@ -1,10 +1,11 @@
-import http from "@shared/utils/http";
 import * as v from "valibot";
+
 import {
   joinLectureSuccessResponseSchema,
   pingLectureSuccessResponseSchema,
   submitAttendanceSuccessResponseSchema,
 } from "@attenex/api-contracts";
+import http from "@shared/utils/http";
 
 const API_URL = `/api/attendance`;
 
@@ -54,11 +55,7 @@ export const submitAttendance = async (
   }
 };
 
-export const sendPing = async (
-  lectureId: string,
-  latitude: number,
-  longitude: number,
-) => {
+export const sendPing = async (lectureId: string, latitude: number, longitude: number) => {
   try {
     const response = await http.post(`${API_URL}/ping`, {
       lectureId,

@@ -1,11 +1,12 @@
+import React from "react";
+import { View } from "react-native";
+
 import FuturisticButton from "@auth/components/common/FuturisticButton";
 import VerifyEmailHelp from "@auth/components/VerifyEmail/VerifyEmailHelp";
 import VerifyEmailIcon from "@auth/components/VerifyEmail/VerifyEmailIcon";
 import VerifyEmailMessage from "@auth/components/VerifyEmail/VerifyEmailMessage";
 import { useVerifyEmail } from "@auth/hooks/useVerifyEmail";
 import { styles } from "@auth/styles/VerifyEmail.style";
-import React from "react";
-import { View } from "react-native";
 
 /**
  * Verify Email Screen
@@ -23,10 +24,7 @@ const VerifyEmail = () => {
           <VerifyEmailIcon />
           <VerifyEmailMessage />
 
-          <FuturisticButton
-            title="Back to Sign In"
-            onPress={handleBackToSignIn}
-          />
+          <FuturisticButton title="Back to Sign In" onPress={handleBackToSignIn} />
 
           <VerifyEmailHelp />
         </View>

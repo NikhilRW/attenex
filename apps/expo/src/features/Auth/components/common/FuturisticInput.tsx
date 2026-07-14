@@ -1,10 +1,12 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { FuturisticInputProps } from "@auth/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import { StyleSheet, withUnistyles } from "react-native-unistyles";
 
 const ThemedInputField = withUnistyles(TextInput, (theme) => ({
   placeholderTextColor: theme.text.muted,
@@ -36,20 +38,13 @@ const FuturisticInput: React.FC<FuturisticInputProps> = ({
           end={{ x: 1, y: 0 }}
           style={styles.inputBorder}
         />
-        {isPassword && (
-          <TouchableOpacity
-            onPress={onTogglePassword}
-            style={styles.eyeIcon}
-            haptic="selection"
-          >
-            <EyeIcon
-              name={showPassword ? "eye-outline" : "eye-off-outline"}
-              size={20}
-            />
+        {isPassword ? (
+          <TouchableOpacity onPress={onTogglePassword} style={styles.eyeIcon} haptic="selection">
+            <EyeIcon name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} />
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
 };

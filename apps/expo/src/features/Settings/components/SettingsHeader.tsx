@@ -1,7 +1,10 @@
-import { View, Text, ViewStyle } from "react-native";
 import React from "react";
-import UniLinearGradient from "@/shared/components/UniLinearGradient";
+import { View, Text, ViewStyle } from "react-native";
+
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
+
+import UniLinearGradient from "@/shared/components/UniLinearGradient";
+
 import { styles } from "../styles/Settings.styles";
 
 const SettingsHeader = ({

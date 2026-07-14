@@ -1,22 +1,22 @@
+import { useCallback, useState } from "react";
+
+import { useMutation } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
+import { useNetworkState } from "expo-network";
+import { useRouter } from "expo-router";
+import { useSharedValue, withSpring } from "react-native-reanimated";
+
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { userService } from "@/shared/services/userService";
 import { showInternetNotConnected, showMessage } from "@/shared/utils/toasts";
 import { Role } from "@role-selection/types/common";
 import { useAuthStore } from "@shared/stores/authStore";
 import { logger } from "@shared/utils/logger";
-import { useMutation } from "@tanstack/react-query";
-import * as Haptics from "expo-haptics";
-import { useNetworkState } from "expo-network";
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { useSharedValue, withSpring } from "react-native-reanimated";
 
 export const useRoleSelection = () => {
   const router = useRouter();
   const { user, updateUser } = useAuthStore();
-  const [selectedRole, setSelectedRole] = useState<Role>(
-    (user?.role as Role) ?? null,
-  );
+  const [selectedRole, setSelectedRole] = useState<Role>((user?.role as Role) ?? null);
   const [, setHoveredRole] = useState<Role>(null);
   const { isConnected } = useNetworkState();
   const teacherScale = useSharedValue(1);
@@ -75,14 +75,10 @@ export const useRoleSelection = () => {
       }
     },
     onError(error, _, onMutateResult) {
-      logger.error(
-        "User update failed : handleConfirm() RoleSelection.tsx",
-        error,
-      );
+      logger.error("User update failed : handleConfirm() RoleSelection.tsx", error);
       showMessage({
         message: "Update Failed",
-        description:
-          error.message || "Failed to update role. Please try again.",
+        description: error.message || "Failed to update role. Please try again.",
         type: "danger",
         duration: 3000,
         position: "bottom",

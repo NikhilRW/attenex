@@ -1,11 +1,13 @@
+import React from "react";
+import { Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { AttendanceHeaderProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Text, TextInput, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
 
 const HeaderGradient = withUnistyles(LinearGradient, (theme, rt) => ({
   colors:
@@ -76,11 +78,11 @@ export const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          {searchQuery.length > 0 && (
+          {searchQuery.length > 0 ? (
             <TouchableOpacity haptic="selection" onPress={() => setSearchQuery("")}>
               <ClearIcon name="close-circle" size={18} />
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
       </View>
     </HeaderGradient>

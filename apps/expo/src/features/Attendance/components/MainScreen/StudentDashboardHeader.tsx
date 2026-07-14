@@ -1,17 +1,16 @@
+import React from "react";
+import { Text } from "react-native";
+
+import Animated from "react-native-reanimated";
+
 import { useStudentDashboardHeaderAnimation } from "@attendance/hooks/useStudentDashboardFocusAnimation";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { StudentDashboardHeaderProps } from "@attendance/types/props";
-import React from "react";
-import { Text } from "react-native";
-import Animated from "react-native-reanimated";
+
 import ClassInfo from "./ClassInfo";
 
-const StudentDashboardHeader = ({
-  setShowClassModal,
-  user,
-}: StudentDashboardHeaderProps) => {
-  const { headerAnimatedStyle, subtitleAnimatedStyle } =
-    useStudentDashboardHeaderAnimation();
+const StudentDashboardHeader = ({ setShowClassModal, user }: StudentDashboardHeaderProps) => {
+  const { headerAnimatedStyle, subtitleAnimatedStyle } = useStudentDashboardHeaderAnimation();
 
   return (
     <>

@@ -1,12 +1,14 @@
+import React from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/LectureEndedScreen.styles";
 import { PasscodeCardProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const PasscodeSurface = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -27,16 +29,9 @@ const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
   color: theme.primary.main,
 }));
 
-export const PasscodeCard: React.FC<PasscodeCardProps> = ({
-  passcode,
-  loading,
-  onRefresh,
-}) => {
+export const PasscodeCard: React.FC<PasscodeCardProps> = ({ passcode, loading, onRefresh }) => {
   return (
-    <Animated.View
-      entering={FadeInUp.delay(400).springify()}
-      style={styles.passcodeSection}
-    >
+    <Animated.View entering={FadeInUp.delay(400).springify()} style={styles.passcodeSection}>
       <PasscodeSurface style={styles.passcodeCard}>
         <View style={styles.passcodeHeader}>
           <LockIcon name="lock-closed" size={20} />
@@ -49,18 +44,13 @@ export const PasscodeCard: React.FC<PasscodeCardProps> = ({
           <>
             <View style={styles.passcodeDigits} testID="TEACHER.ENDED_LECTURE.PASSCODE_DIGITS">
               {passcode.split("").map((digit) => (
-                <View
-                  key={`passcode-${digit}`}
-                  style={styles.passcodeDigit}
-                >
+                <View key={`passcode-${digit}`} style={styles.passcodeDigit}>
                   <Text style={styles.passcodeDigitText}>{digit}</Text>
                 </View>
               ))}
             </View>
 
-            <Text style={styles.passcodeHint}>
-              Students need this code to verify attendance
-            </Text>
+            <Text style={styles.passcodeHint}>Students need this code to verify attendance</Text>
           </>
         ) : (
           <Text style={styles.errorText}>Failed to load passcode</Text>

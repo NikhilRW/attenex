@@ -1,10 +1,12 @@
+import React from "react";
+import { Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import styles from "@attendance/styles/StudentDashboard.styles";
 import { NoLectureFoundProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import React from "react";
-import { Text, View } from "react-native";
-import { withUnistyles } from "react-native-unistyles";
 
 const MutedIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,

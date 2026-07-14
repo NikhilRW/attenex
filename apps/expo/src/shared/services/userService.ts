@@ -1,18 +1,15 @@
-import { useAuthStore } from "@shared/stores/authStore";
-import {
-  getDeviceToken,
-  subscribeToClassName,
-  unsubscribeFromClassName,
-} from "@shared/utils/fcm";
-import http from "@shared/utils/http";
-import { logger } from "@shared/utils/logger";
 import * as v from "valibot";
+
 import {
   updateUserRoleSuccessResponseSchema,
   updateStudentClassSuccessResponseSchema,
   updateUserDeviceTokenSuccessResponseSchema,
   updateUserFullNameSuccessResponseSchema,
 } from "@attenex/api-contracts";
+import { useAuthStore } from "@shared/stores/authStore";
+import { getDeviceToken, subscribeToClassName, unsubscribeFromClassName } from "@shared/utils/fcm";
+import http from "@shared/utils/http";
+import { logger } from "@shared/utils/logger";
 
 export const userService = {
   async updateUserRole(role: "teacher" | "student") {
@@ -21,10 +18,7 @@ export const userService = {
         role,
       });
 
-      const parsed = v.safeParse(
-        updateUserRoleSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(updateUserRoleSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Failed to update user role");
       }
@@ -45,9 +39,7 @@ export const userService = {
       return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateUserRole - error", error);
-      throw new Error(
-        error.response?.data?.message || "Failed to update user role",
-      );
+      throw new Error(error.response?.data?.message || "Failed to update user role");
     }
   },
 
@@ -57,10 +49,7 @@ export const userService = {
         className,
       });
 
-      const parsed = v.safeParse(
-        updateStudentClassSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(updateStudentClassSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Failed to update student class");
       }
@@ -72,9 +61,7 @@ export const userService = {
       return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateStudentClass - error", error);
-      throw new Error(
-        error.response?.data?.message || "Failed to update student class",
-      );
+      throw new Error(error.response?.data?.message || "Failed to update student class");
     }
   },
   async updateUserToken(token: string | null) {
@@ -83,10 +70,7 @@ export const userService = {
         token,
       });
 
-      const parsed = v.safeParse(
-        updateUserDeviceTokenSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(updateUserDeviceTokenSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Failed to update device token");
       }
@@ -94,19 +78,14 @@ export const userService = {
       return parsed.output;
     } catch (error: any) {
       logger.info("authService:updateUserToken - error", error);
-      throw new Error(
-        error.response?.data?.message || "Failed to update device token",
-      );
+      throw new Error(error.response?.data?.message || "Failed to update device token");
     }
   },
   async updateUserFullName(fullName: string) {
     try {
       const response = await http.patch("/api/users/full-name", { fullName });
 
-      const parsed = v.safeParse(
-        updateUserFullNameSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(updateUserFullNameSuccessResponseSchema, response.data);
       if (!parsed.success) {
         throw new Error("Failed to update user full name");
       }

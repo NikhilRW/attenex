@@ -1,5 +1,6 @@
-import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
+
+import { useFocusEffect } from "expo-router";
 import {
   Easing,
   interpolate,
@@ -24,7 +25,7 @@ export const useStudentDashboardFocusAnimation = (duration = DEFAULT_DURATION_MS
     );
   }, [duration, focusProgress]);
 
-  useFocusEffect(onFocus)
+  useFocusEffect(onFocus);
 
   return focusProgress;
 };

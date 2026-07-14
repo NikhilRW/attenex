@@ -1,13 +1,15 @@
+import React from "react";
+import { ActivityIndicator, Text, TextInput, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { UniModal } from "@/shared/components/UnistylesComponents";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { ManualAttendanceModalProps } from "@classes/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ActivityIndicator, Text, TextInput, View } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { withUnistyles } from "react-native-unistyles";
 
 const ModalSurface = withUnistyles(LinearGradient, (_, rt) => ({
   colors:
@@ -71,32 +73,18 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                 </View>
                 <Text style={styles.modalTitle}>Add Manual Attendance</Text>
               </View>
-              <TouchableOpacity
-                haptic="selection"
-                onPress={onClose}
-                style={styles.closeButton}
-              >
+              <TouchableOpacity haptic="selection" onPress={onClose} style={styles.closeButton}>
                 <CloseIcon name="close" size={20} />
               </TouchableOpacity>
             </View>
 
             <View style={[styles.modalBody, styles.modalBodyTop]}>
               <Text style={[styles.modalLabel, styles.modalLabelDescription]}>
-                Enter the student&apos;s roll number to manually mark them
-                present.
+                Enter the student&apos;s roll number to manually mark them present.
               </Text>
 
-              <View
-                style={[
-                  styles.inputContainer,
-                  hasError && styles.inputContainerError,
-                ]}
-              >
-                <InputIcon
-                  name="id-card-outline"
-                  size={20}
-                  style={styles.inputIcon}
-                />
+              <View style={[styles.inputContainer, hasError && styles.inputContainerError]}>
+                <InputIcon name="id-card-outline" size={20} style={styles.inputIcon} />
                 <ModalInput
                   style={styles.input}
                   placeholder="e.g 66"
@@ -106,9 +94,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                   autoCorrect={false}
                 />
               </View>
-              {hasError ? (
-                <Text style={styles.manualAttendanceError}>{errorMessage}</Text>
-              ) : null}
+              {hasError ? <Text style={styles.manualAttendanceError}>{errorMessage}</Text> : null}
             </View>
 
             <View style={[styles.modalFooter, styles.modalFooterCompact]}>
@@ -129,7 +115,7 @@ export const ManualAttendanceModal: React.FC<ManualAttendanceModalProps> = ({
                 <SubmitButtonGradient
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={[styles.actionButton, { borderWidth: 0 }]}
+                  style={[styles.actionButton, styles.actionButtonStyle]}
                 >
                   {isSubmitting ? (
                     <SubmitIndicator />

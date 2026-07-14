@@ -1,9 +1,10 @@
+import { router } from "expo-router";
+import * as v from "valibot";
+
+import { sendVerificationEmailSuccessResponseSchema } from "@attenex/api-contracts";
 import http, { HttpResponse } from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { showMessage } from "@shared/utils/toasts";
-import * as v from "valibot";
-import { sendVerificationEmailSuccessResponseSchema } from "@attenex/api-contracts";
-import { router } from "expo-router";
 
 export const sendVerificationEmailRequest = async (email: string) => {
   return await http.post(`/api/users/send-verification-email`, {
@@ -11,14 +12,9 @@ export const sendVerificationEmailRequest = async (email: string) => {
   });
 };
 
-export const handleVerificationEmailResponse = async (
-  response: HttpResponse<any>,
-) => {
+export const handleVerificationEmailResponse = async (response: HttpResponse<any>) => {
   try {
-    const parsed = v.safeParse(
-      sendVerificationEmailSuccessResponseSchema,
-      response.data,
-    );
+    const parsed = v.safeParse(sendVerificationEmailSuccessResponseSchema, response.data);
     if (parsed.success) {
       showMessage({
         message: "Verification Email Sent",
@@ -31,8 +27,7 @@ export const handleVerificationEmailResponse = async (
     } else {
       showMessage({
         message: "Error",
-        description:
-          response.data.message || "Failed to send verification email.",
+        description: response.data.message || "Failed to send verification email.",
         type: "danger",
         duration: 3000,
         position: "bottom",
@@ -40,9 +35,7 @@ export const handleVerificationEmailResponse = async (
       router.replace("/sign-in");
     }
   } catch (error) {
-    logger.error(
-      "Could not send email :: sendVerificationEmail() :: email.ts : " + error,
-    );
+    logger.error("Could not send email :: sendVerificationEmail() :: email.ts : " + error);
     showMessage({
       message: "Error",
       description: "An unexpected error occurred. Please try again later.",

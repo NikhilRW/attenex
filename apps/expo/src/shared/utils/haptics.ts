@@ -1,5 +1,6 @@
-import * as Haptics from "expo-haptics";
 import { GestureResponderEvent } from "react-native";
+
+import * as Haptics from "expo-haptics";
 
 export const triggerSelectionHapticOn = (
   callback: (event: GestureResponderEvent) => void = () => {},
@@ -22,8 +23,7 @@ export const triggerImpactHapticOn = (
 
 export const triggerNotificationHapticOn = (
   callback: (event: GestureResponderEvent) => void = () => {},
-  style: Haptics.NotificationFeedbackType = Haptics.NotificationFeedbackType
-    .Warning,
+  style: Haptics.NotificationFeedbackType = Haptics.NotificationFeedbackType.Warning,
 ) => {
   return async (event: GestureResponderEvent) => {
     Haptics.notificationAsync(style);
@@ -31,9 +31,7 @@ export const triggerNotificationHapticOn = (
   };
 };
 
-export const triggerSelectionHapticOnCallback = (
-  callback: () => void = () => {},
-) => {
+export const triggerSelectionHapticOnCallback = (callback: () => void = () => {}) => {
   return async () => {
     Haptics.selectionAsync();
     callback();
@@ -52,8 +50,7 @@ export const triggerImpactHapticOnCallback = (
 
 export const triggerNotificationHapticOnCallback = (
   callback: () => void = () => {},
-  style: Haptics.NotificationFeedbackType = Haptics.NotificationFeedbackType
-    .Warning,
+  style: Haptics.NotificationFeedbackType = Haptics.NotificationFeedbackType.Warning,
 ) => {
   return async () => {
     Haptics.notificationAsync(style);

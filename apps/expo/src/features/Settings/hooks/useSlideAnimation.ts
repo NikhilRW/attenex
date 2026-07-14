@@ -1,6 +1,6 @@
-import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { SETTINGS_FOCUS_ANIMATION_DURATION_MS } from "../constants/common";
+
+import { useFocusEffect } from "expo-router";
 import {
   Easing,
   interpolate,
@@ -8,6 +8,8 @@ import {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+
+import { SETTINGS_FOCUS_ANIMATION_DURATION_MS } from "../constants/common";
 
 export const useSlideAnimation = () => {
   const focusProgress = useSharedValue(1);

@@ -1,5 +1,6 @@
-import { logger } from "@shared/utils/logger";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+
+import { logger } from "@shared/utils/logger";
 
 export enum StaleTime {
   SECONDS_3 = 3000,
@@ -77,4 +78,3 @@ export const queryClient = new QueryClient({
     },
   },
 });
-

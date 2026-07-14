@@ -1,6 +1,3 @@
-import { BASE_URI } from "@shared/constants/uri";
-import { useAuthStore } from "@shared/stores/authStore";
-import { secureStore } from "@shared/utils/secureStore";
 import {
   AxiosError,
   AxiosHeaders,
@@ -10,15 +7,18 @@ import {
   InternalAxiosRequestConfig,
 } from "axios";
 import { router } from "expo-router";
-import {
-  fetch as nitroFetch,
-} from "react-native-nitro-fetch";
+import { fetch as nitroFetch } from "react-native-nitro-fetch";
+
+import { BASE_URI } from "@shared/constants/uri";
+import { useAuthStore } from "@shared/stores/authStore";
+import { secureStore } from "@shared/utils/secureStore";
 
 export type HttpRequestConfig = AxiosRequestConfig;
 export type HttpResponse<T = any> = AxiosResponse<T>;
 export type HttpError<T = any> = AxiosError<T>;
 
 // TODO: Test that it works with stream,formData,blob, etc. requests and responses acutally then Response would probably be compatible with AxiosResponse one.
+// eslint-disable-next-line
 const axiosFetchEnv = {
   fetch: nitroFetch,
   Request: null,
@@ -54,10 +54,7 @@ const handleUnauthorized = (error: AxiosError) => {
   const errorMsg = typeof data?.error === "string" ? data.error : "";
   const normalizedErrorMsg = errorMsg.toLowerCase();
 
-  if (
-    normalizedErrorMsg.includes("token") ||
-    normalizedErrorMsg.includes("authorization")
-  ) {
+  if (normalizedErrorMsg.includes("token") || normalizedErrorMsg.includes("authorization")) {
     useAuthStore.getState().logout();
     router.replace("/sign-in");
   }

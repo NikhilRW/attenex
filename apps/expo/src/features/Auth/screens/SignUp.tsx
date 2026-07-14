@@ -1,3 +1,8 @@
+import React from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
+import { Controller } from "react-hook-form";
+
 import AuthFooter from "@auth/components/common/AuthFooter";
 import AuthHeader from "@auth/components/common/AuthHeader";
 import FuturisticButton from "@auth/components/common/FuturisticButton";
@@ -7,9 +12,6 @@ import SocialLoginButtons from "@auth/components/common/SocialLoginButtons";
 import { useSignUp } from "@auth/hooks/useSignUp";
 import { styles } from "@auth/styles/SignUp.styles";
 import { handleLinkedInSignIn } from "@auth/utils/common";
-import React from "react";
-import { Controller } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 const SignUp = () => {
   const {
@@ -114,9 +116,7 @@ const SignUp = () => {
                   onBlur={onBlur}
                   isPassword
                   showPassword={showConfirmPassword}
-                  onTogglePassword={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                   secureTextEntry={!showConfirmPassword}
                   error={errors.confirmPassword?.message}
                 />

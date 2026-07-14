@@ -1,11 +1,10 @@
-import {
-  focusManager,
-  onlineManager,
-  QueryClient,
-} from "@tanstack/react-query";
-import * as Network from "expo-network";
 import { AppState, AppStateStatus, Platform } from "react-native";
+
+import { focusManager, onlineManager, QueryClient } from "@tanstack/react-query";
+import * as Network from "expo-network";
+
 import { mutationKeys } from "../constants/mutationKeys";
+import { queryKeys } from "../constants/queryKeys";
 import {
   createLectureMutateFn,
   createNewClassMutateFn,
@@ -14,7 +13,6 @@ import {
   roleUpdateMutateFn,
   updateLectureMutateFn,
 } from "../utils/offlineMutationFuncs";
-import { queryKeys } from "../constants/queryKeys";
 
 export const setupTanstackForReactNative = (queryClient: QueryClient) => {
   // Set up online/offline detection for React Native
@@ -31,15 +29,12 @@ export const setupTanstackForReactNative = (queryClient: QueryClient) => {
   });
 
   // Set up focus management for app state changes
-  const subscription = AppState.addEventListener(
-    "change",
-    (status: AppStateStatus) => {
-      if (Platform.OS !== "web") {
-        focusManager.setFocused(status === "active");
-        console.log(`📱 App state changed: ${status}`);
-      }
-    },
-  );
+  const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
+    if (Platform.OS !== "web") {
+      focusManager.setFocused(status === "active");
+      console.log(`📱 App state changed: ${status}`);
+    }
+  });
 
   return () => subscription.remove();
 };
@@ -120,10 +115,6 @@ export const setupMainOfflineMutations = (queryClient: QueryClient) => {
   });
 };
 
-export const isFreshQuery = (
-  dataUpdatedAt: number | undefined,
-  staleTimeMs: number,
-) => {
+export const isFreshQuery = (dataUpdatedAt: number | undefined, staleTimeMs: number) => {
   return dataUpdatedAt != null && Date.now() - dataUpdatedAt < staleTimeMs;
 };
-

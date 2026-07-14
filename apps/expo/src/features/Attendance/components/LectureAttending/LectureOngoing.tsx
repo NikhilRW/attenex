@@ -1,10 +1,12 @@
-import styles from "@attendance/styles/StudentDashboard.styles";
-import { LectureOngoingProps } from "@attendance/types/props";
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { withUnistyles } from "react-native-unistyles";
+
+import styles from "@attendance/styles/StudentDashboard.styles";
+import { LectureOngoingProps } from "@attendance/types/props";
 import { TouchableOpacity } from "@shared/components/TouchableOpacity";
 
 const SuccessGradient = withUnistyles(LinearGradient, (theme) => ({
@@ -19,13 +21,10 @@ const PrimaryTextIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.primary,
 }));
 
-const LectureOngoing = ({
-  handleLeaveLecture,
-  joinedLecture,
-}: LectureOngoingProps) => {
+const LectureOngoing = ({ handleLeaveLecture, joinedLecture }: LectureOngoingProps) => {
   return (
     <View style={styles.screenContainer}>
-      <View style={[styles.joinedContainer]}>
+      <View style={styles.joinedContainer}>
         <View style={styles.guardianIconOuter}>
           <SuccessGradient style={styles.guardianIconInner}>
             <PrimaryTextIcon name="school" size={48} />
@@ -37,9 +36,7 @@ const LectureOngoing = ({
           {joinedLecture?.subject ? (
             <>
               Attending:{" "}
-              <Text style={styles.leaveLectureTitleHighlight}>
-                {joinedLecture.subject} Lecture
-              </Text>
+              <Text style={styles.leaveLectureTitleHighlight}>{joinedLecture.subject} Lecture</Text>
               {"\n"}
             </>
           ) : null}
@@ -52,9 +49,7 @@ const LectureOngoing = ({
             <Text style={styles.trackingBadgeText}>Tracking Active</Text>
           </View>
 
-          <Text style={styles.waitText}>
-            Wait for your teacher to end the class
-          </Text>
+          <Text style={styles.waitText}>Wait for your teacher to end the class</Text>
         </View>
 
         <TouchableOpacity

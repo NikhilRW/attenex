@@ -7,6 +7,9 @@ export const styles = StyleSheet.create((theme, rt) => {
     container: {
       flex: 1,
     },
+    flex1: {
+      flex: 1,
+    },
     screenFill: {
       flex: 1,
     },
@@ -91,9 +94,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.2)"
-        : "rgba(255, 255, 255, 0.5)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.2)" : "rgba(255, 255, 255, 0.5)",
       borderColor: theme.surface.glassBorder,
     },
     dropdownText: {
@@ -147,9 +148,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       borderWidth: 1,
       fontSize: 16,
       fontWeight: "500",
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.2)"
-        : "rgba(255, 255, 255, 0.5)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.2)" : "rgba(255, 255, 255, 0.5)",
       borderColor: theme.surface.glassBorder,
       color: theme.text.primary,
     },
@@ -229,9 +228,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       justifyContent: "space-between",
       padding: theme.spacing.custom(20),
       borderBottomWidth: 1,
-      borderBottomColor: isDark
-        ? "rgba(255,255,255,0.05)"
-        : "rgba(125,125,125,0.3)",
+      borderBottomColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(125,125,125,0.3)",
     },
     modalTitle: {
       fontSize: 24,
@@ -267,9 +264,7 @@ export const styles = StyleSheet.create((theme, rt) => {
     modalInputRow: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.3)"
-        : "rgba(255, 255, 255, 0.8)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.8)",
       borderRadius: 16,
       borderWidth: 1,
       borderColor: theme.border.modal,
@@ -288,9 +283,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       fontSize: 16,
       marginBottom: theme.spacing.lg,
       color: theme.text.primary,
-      backgroundColor: isDark
-        ? "rgba(0, 0, 0, 0.3)"
-        : "rgba(255, 255, 255, 0.8)",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.8)",
       borderColor: theme.border.modal,
       fontWeight: "500",
     },
@@ -354,9 +347,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       marginBottom: theme.spacing.sm,
     },
     optionItemSelected: {
-      backgroundColor: isDark
-        ? "rgba(8, 145, 178, 0.15)"
-        : "rgba(8, 145, 178, 0.1)",
+      backgroundColor: isDark ? "rgba(8, 145, 178, 0.15)" : "rgba(8, 145, 178, 0.1)",
     },
     optionItemText: {
       fontSize: 16,
@@ -392,9 +383,7 @@ export const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
       justifyContent: "center",
       padding: theme.spacing.md,
-      backgroundColor: isDark
-        ? "rgba(59, 130, 246, 0.1)"
-        : "rgba(59, 130, 246, 0.05)",
+      backgroundColor: isDark ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.05)",
       borderRadius: 16,
       borderWidth: 1,
       borderColor: theme.primary.glow,

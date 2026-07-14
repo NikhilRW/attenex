@@ -1,13 +1,11 @@
-import { AuthFooterProps } from "@auth/types/props";
 import { Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
-const AuthFooter: React.FC<AuthFooterProps> = ({
-  text,
-  linkText,
-  onLinkPress,
-}) => {
+import { StyleSheet } from "react-native-unistyles";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { AuthFooterProps } from "@auth/types/props";
+
+const AuthFooter: React.FC<AuthFooterProps> = ({ text, linkText, onLinkPress }) => {
   return (
     <View style={styles.footer}>
       <Text style={styles.footerText}>{text}</Text>

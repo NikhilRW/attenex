@@ -1,13 +1,14 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { router } from "expo-router";
+import * as v from "valibot";
+
+import { deleteUserAccountSuccessResponseSchema } from "@attenex/api-contracts";
 import { useAuthStore } from "@shared/stores/authStore";
 import { unsubscribeFromClassName } from "@shared/utils/fcm";
 import http from "@shared/utils/http";
 import { logger } from "@shared/utils/logger";
 import { secureStore } from "@shared/utils/secureStore";
 import { showMessage } from "@shared/utils/toasts";
-import * as v from "valibot";
-import { deleteUserAccountSuccessResponseSchema } from "@attenex/api-contracts";
-import { router } from "expo-router";
 
 export const authService = {
   async login(user: any, token: string) {
@@ -43,10 +44,7 @@ export const authService = {
   async deleteUserAccount() {
     try {
       const response = await http.delete("/api/users/delete-account");
-      const parsed = v.safeParse(
-        deleteUserAccountSuccessResponseSchema,
-        response.data,
-      );
+      const parsed = v.safeParse(deleteUserAccountSuccessResponseSchema, response.data);
       if (parsed.success) {
         await secureStore.removeItem("jwt");
         await secureStore.removeItem("is-signup");
@@ -85,9 +83,7 @@ export const authService = {
         duration: 3000,
         position: "bottom",
       });
-      throw new Error(
-        error.response?.data?.message || "Failed to delete user account",
-      );
+      throw new Error(error.response?.data?.message || "Failed to delete user account");
     }
   },
 };

@@ -1,8 +1,10 @@
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+
 import { UserSchema } from "../schemas/auth";
 
 interface AuthState {
@@ -47,11 +49,13 @@ export const useAuthStore = create<AuthState>()(
           isNotSynced,
         }));
       },
-      logout: () => {
+      logout: async () => {
         // Remove token from secure storage and clear the persisted state
-        secureStore.removeItem("jwt").catch((err) => {
+        try {
+          await secureStore.removeItem("jwt");
+        } catch (err) {
           console.error("Failed to remove token from secure storage", err);
-        });
+        }
         useThemeStore.getState().setTheme("system");
         set({
           user: null,

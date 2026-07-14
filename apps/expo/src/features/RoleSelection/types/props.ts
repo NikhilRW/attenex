@@ -1,5 +1,6 @@
-import { Role } from "@role-selection/types/common";
 import { SharedValue } from "react-native-reanimated";
+
+import { Role } from "@role-selection/types/common";
 
 export interface RoleCardProps {
   role: "teacher" | "student";

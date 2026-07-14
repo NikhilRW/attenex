@@ -1,4 +1,5 @@
 import * as v from "valibot";
+
 import { linkedInAuthSuccessResponseSchema } from "@attenex/api-contracts";
 import http from "@shared/utils/http";
 
@@ -6,7 +7,10 @@ export const linkedinAuthService = {
   async exchangeCodeForUser(
     code: string,
     redirectUri: string,
-  ): Promise<{ user: v.InferOutput<typeof linkedInAuthSuccessResponseSchema>["user"]; token: string } | null> {
+  ): Promise<{
+    user: v.InferOutput<typeof linkedInAuthSuccessResponseSchema>["user"];
+    token: string;
+  } | null> {
     try {
       const response = await http.post(`/api/users/signin?authType=linkedin`, {
         code,
@@ -29,9 +33,7 @@ export const linkedinAuthService = {
       if (err.response?.data?.message) {
         throw new Error(err.response.data.message);
       } else if (err.message?.includes("Network Error")) {
-        throw new Error(
-          "Unable to connect. Please check your internet connection.",
-        );
+        throw new Error("Unable to connect. Please check your internet connection.");
       }
 
       throw err;

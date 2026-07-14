@@ -1,18 +1,18 @@
-import { mutationKeys } from "@/shared/constants/mutationKeys";
-import { showMessage } from "@shared/utils/toasts";
-import { validateEmail } from "@auth/utils/email";
-import http from "@shared/utils/http";
-import { useMutation } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Keyboard } from "react-native";
+
+import { useMutation } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
+
+import { mutationKeys } from "@/shared/constants/mutationKeys";
+import { validateEmail } from "@auth/utils/email";
+import http from "@shared/utils/http";
+import { showMessage } from "@shared/utils/toasts";
 
 export const useForgotPassword = () => {
   const emailParam = useLocalSearchParams().email;
-  const [email, setEmail] = useState(() =>
-    typeof emailParam === "string" ? emailParam : "",
-  );
+  const [email, setEmail] = useState(() => (typeof emailParam === "string" ? emailParam : ""));
   const [emailSent, setEmailSent] = useState(false);
 
   const resetEmailMutation = useMutation({
@@ -35,8 +35,7 @@ export const useForgotPassword = () => {
     onError: (error: any) => {
       setEmailSent(false);
       const errorMessage =
-        error.response?.data?.error ||
-        "Unable to send reset email. Please try again.";
+        error.response?.data?.error || "Unable to send reset email. Please try again.";
       showMessage({
         message: "Request Failed",
         description: errorMessage,

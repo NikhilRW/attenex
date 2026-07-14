@@ -1,16 +1,14 @@
-import type { BottomTabBarProps } from "expo-router/js-tabs";
 import React from "react";
+
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { routeNameToNavButtonTestId } from "../utils/ui";
-import { styles } from "../styles/customTabBarStyles";
+
 import TabBarButton from "./TabBarButton";
 import { useCustomTabBar } from "../hooks/useCustomTabBar";
+import { styles } from "../styles/customTabBarStyles";
+import { routeNameToNavButtonTestId } from "../utils/ui";
 
-const CustomTabBar = ({
-  state: { index, routeNames },
-  navigation,
-}: BottomTabBarProps) => {
-  
+const CustomTabBar = ({ state: { index, routeNames }, navigation }: BottomTabBarProps) => {
   const {
     activatedBackgroundStyle,
     filteredRoutes,
@@ -30,14 +28,9 @@ const CustomTabBar = ({
   }
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        (isEmptyTabBar || !isAuthenticated) && styles.hidden,
-      ]}
-    >
+    <Animated.View style={[styles.container, (isEmptyTabBar || !isAuthenticated) && styles.hidden]}>
       <Animated.View
-        key={"activated-background"}
+        key="activated-background"
         layout={LinearTransition}
         style={[styles.activeBackground, activatedBackgroundStyle]}
       />

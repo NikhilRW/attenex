@@ -1,7 +1,8 @@
-import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+
+import { mmkvStorage } from "@shared/utils/mmkvStorage";
 
 type ThemeMode = "dark" | "light" | "system";
 

@@ -1,3 +1,7 @@
+import { useState } from "react";
+
+import { useMutation } from "@tanstack/react-query";
+
 import { parsePasscode } from "@/features/Attendance/utils/parsers";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
@@ -7,8 +11,7 @@ import { stopBackgroundTracking } from "@attendance/services/backgroundTask";
 import { UseAttendanceSubmitReturn } from "@attendance/types/studentDashboard.types";
 import { showErrorAlert, showSuccessAlert } from "@attendance/utils/alertUtils";
 import { getCurrentLocationHigh } from "@attendance/utils/locationUtils";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+
 import { Lecture } from "../types/common";
 
 /**

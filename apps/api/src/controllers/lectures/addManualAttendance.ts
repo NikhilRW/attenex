@@ -1,12 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import {
-  attendance,
-  classes,
-  db,
-  lectures,
-  users,
-} from "../../config/database_setup";
+import { attendance, classes, db, lectures, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { LectureParams } from "../../types/params";
 import * as v from "valibot";
@@ -100,12 +94,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
     const existingAttendance = await db
       .select()
       .from(attendance)
-      .where(
-        and(
-          eq(attendance.lectureId, lectureId),
-          eq(attendance.studentId, studentId),
-        ),
-      )
+      .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, studentId)))
       .limit(1);
 
     if (existingAttendance.length > 0) {
@@ -116,17 +105,10 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
           method: "manual",
           submitTime: new Date(),
         })
-        .where(
-          and(
-            eq(attendance.lectureId, lectureId),
-            eq(attendance.studentId, studentId),
-          ),
-        )
+        .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, studentId)))
         .returning();
 
-      logger.info(
-        `Updated manual attendance for student: ${studentId} in lecture: ${lectureId}`,
-      );
+      logger.info(`Updated manual attendance for student: ${studentId} in lecture: ${lectureId}`);
 
       return res.status(200).json({
         success: true,
@@ -157,9 +139,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
       })
       .returning();
 
-    logger.info(
-      `Added manual attendance for student: ${studentId} in lecture: ${lectureId}`,
-    );
+    logger.info(`Added manual attendance for student: ${studentId} in lecture: ${lectureId}`);
 
     return res.status(201).json({
       success: true,
@@ -175,7 +155,7 @@ export const addManualAttendance = async (req: AuthRequest, res: Response) => {
         },
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     logger.error("Error adding manual attendance:", error);
     return res.status(500).json({
       success: false,

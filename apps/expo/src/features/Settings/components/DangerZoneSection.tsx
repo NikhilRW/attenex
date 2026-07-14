@@ -1,11 +1,13 @@
-import Ionicons from "@react-native-vector-icons/ionicons";
-import { styles } from "@settings/styles/Settings.styles";
-import { DangerZoneSectionProps } from "@settings/types/props";
 import React from "react";
 import { Text, View } from "react-native";
+
+import Ionicons from "@react-native-vector-icons/ionicons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
+import { styles } from "@settings/styles/Settings.styles";
+import { DangerZoneSectionProps } from "@settings/types/props";
 
 const DangerIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.accent.red,
@@ -22,30 +24,19 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
   onDeleteAccount,
 }) => {
   return (
-    <Animated.View
-      entering={FadeInDown.delay(400).springify()}
-      style={styles.section}
-    >
-      <Text style={[styles.sectionTitle, styles.sectionTitleDanger]}>
-        DANGER ZONE
-      </Text>
+    <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+      <Text style={[styles.sectionTitle, styles.sectionTitleDanger]}>DANGER ZONE</Text>
       <View style={[styles.card, styles.dangerCard]}>
-        {!userProvider && (
+        {!userProvider ? (
           <>
-            <TouchableOpacity
-              style={styles.dangerRow}
-              onPress={onResetPassword}
-              haptic="impact"
-            >
+            <TouchableOpacity style={styles.dangerRow} onPress={onResetPassword} haptic="impact">
               <View style={styles.rowLeft}>
                 <View style={[styles.iconBox, styles.iconBoxDanger]}>
                   <DangerIcon name="key-outline" size={20} />
                 </View>
                 <View>
                   <Text style={styles.dangerLabel}>Change Password</Text>
-                  <Text style={styles.dangerSub}>
-                    Change your account password
-                  </Text>
+                  <Text style={styles.dangerSub}>Change your account password</Text>
                 </View>
               </View>
               <ChevronIcon name="chevron-forward" size={20} />
@@ -53,13 +44,9 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
 
             <View style={styles.divider} />
           </>
-        )}
+        ) : null}
 
-        <TouchableOpacity
-          haptic="impact"
-          style={styles.dangerRow}
-          onPress={onLogout}
-        >
+        <TouchableOpacity haptic="impact" style={styles.dangerRow} onPress={onLogout}>
           <View style={styles.rowLeft}>
             <View style={[styles.iconBox, styles.iconBoxDanger]}>
               <DangerIcon name="log-out" size={20} />
@@ -74,11 +61,7 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
 
         <View style={styles.divider} />
 
-        <TouchableOpacity
-          haptic="impact"
-          style={styles.dangerRow}
-          onPress={onDeleteAccount}
-        >
+        <TouchableOpacity haptic="impact" style={styles.dangerRow} onPress={onDeleteAccount}>
           <View style={styles.rowLeft}>
             <View style={[styles.iconBox, styles.iconBoxDanger]}>
               <DangerIcon name="warning" size={20} />
