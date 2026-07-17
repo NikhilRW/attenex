@@ -14,6 +14,7 @@ import { User } from "@middleware/auth";
 import attendanceRoutes from "./routes/attendanceRoutes";
 import lectureRoutes from "./routes/lectureRoutes";
 import testRoutes from "./routes/testRoutes";
+import { analyticsRouter } from "@routes/analyticsRoutes";
 
 // TODO: fix security vulnerabilties in npm pacakage.
 
@@ -108,6 +109,7 @@ app.use("/api/test", testRoutes);
  */
 app.use("/api/lectures", lectureRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/analytics", analyticsRouter);
 
 /**
  * Authentication Routes
@@ -170,13 +172,11 @@ app.get(
 
 // Health check endpoint for Azure App Service
 app.get("/", (_, res) => {
-  res
-    .status(200)
-    .json({ status: "healthy", message: "Attenex backend is running" });
+  res.status(200).json({ status: "healthy", message: "Attenex backend is running" });
 });
 
 // remove cache
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();
 });
