@@ -39,7 +39,7 @@ export const useResetPassword = () => {
     },
   });
 
-  const { confirmPassword, newPassword } = useWatch({
+  const { confirmPassword = "", newPassword = "" } = useWatch({
     control: control,
   });
 

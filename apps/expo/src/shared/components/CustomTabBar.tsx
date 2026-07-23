@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import Animated, { LinearTransition } from "react-native-reanimated";
 

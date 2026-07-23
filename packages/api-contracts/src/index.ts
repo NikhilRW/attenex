@@ -40,6 +40,10 @@ export { createLectureRequestSchema } from "./apiRequests/lectures/createLecture
 export { addManualAttendanceRequestSchema } from "./apiRequests/lectures/addManualAttendance";
 export { updateLectureRequestSchema } from "./apiRequests/lectures/updateLecture";
 
+// apiRequests - analytics
+export { getTeacherAnalyticsRequestSchema } from "./apiRequests/analytics/getTeacherAnalytics";
+export type { GetTeacherAnalyticsRequestType } from "./apiRequests/analytics/getTeacherAnalytics";
+
 // apiResponses - lectures
 export { addTeacherClassSuccessResponseSchema } from "./apiResponses/lectures/addTeacherClass";
 export type { AddTeacherSubjectSuccessResponse } from "./apiResponses/lectures/addTeacherSubject";
@@ -81,4 +85,3 @@ export { submitAttendanceRequestSchema } from "./apiRequests/attendance/submitAt
 export { joinLectureSuccessResponseSchema } from "./apiResponses/attendance/joinLecture";
 export { pingLectureSuccessResponseSchema } from "./apiResponses/attendance/pingLecture";
 export { submitAttendanceSuccessResponseSchema } from "./apiResponses/attendance/submitAttendance";
-

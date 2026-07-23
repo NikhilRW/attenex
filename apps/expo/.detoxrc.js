@@ -18,16 +18,14 @@ module.exports = {
     },
     "ios.release": {
       type: "ios.app",
-      binaryPath:
-        "ios/build/Build/Products/Release-iphonesimulator/YOUR_APP.app",
+      binaryPath: "ios/build/Build/Products/Release-iphonesimulator/YOUR_APP.app",
       build:
         "xcodebuild -workspace ios/YOUR_APP.xcworkspace -scheme YOUR_APP -configuration Release -sdk iphonesimulator -derivedDataPath ios/build",
     },
     "android.debug": {
       type: "android.apk",
       binaryPath: "android/app/build/outputs/apk/debug/app-debug.apk",
-      build:
-        "cd android && gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug",
+      build: "cd android && gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug",
       reversePorts: [8081],
     },
     "android.release": {

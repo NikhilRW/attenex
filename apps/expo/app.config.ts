@@ -106,8 +106,13 @@ export default (): ExpoConfig => ({
         sounds: ["assets/mp3s/notification.mp3"],
       },
     ],
+    "./plugins/androidGradlePropertiesPlugin.js",
+    "./plugins/androidProguardPlugin.js",
     "./plugins/androidManifestPlugin.js",
     "./plugins/androidMainApplicationPlugin.js",
+    "./plugins/androidProjectBuildGradlePlugin.js",
+    "./plugins/androidAppBuildGradlePlugin.js",
+    "./plugins/detoxAndroidTestPlugin.js",
     "react-native-edge-to-edge",
     [
       "expo-build-properties",

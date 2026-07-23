@@ -74,7 +74,7 @@ export const useNotificationBootstrap = () => {
 
   const interactionHandle = useCallback(
     (cleanupTasks: (() => void)[]) =>
-      requestIdleCallback(() => {
+      requestIdleCallback(async () => {
         // Android: create an Attenex notification channel (controls importance, vibration, accent light)
         // Safe to call repeatedly; Android will keep existing channel settings.
         try {
