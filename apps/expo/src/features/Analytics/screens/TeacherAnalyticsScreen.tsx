@@ -1,9 +1,12 @@
 import { View, Text } from "react-native";
 
+import { useAnalyticsQuery } from "../hooks/useAnalyticsQuery";
+
 const Analytics = () => {
+  const { data } = useAnalyticsQuery();
   return (
     <View>
-      <Text>Analytics</Text>
+      <Text>{data}</Text>
     </View>
   );
 };
