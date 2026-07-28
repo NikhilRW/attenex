@@ -1,4 +1,7 @@
-import { DeleteLectureSuccessResponse, GetAllLecturesSuccessResponse } from "@attenex/api-contracts";
+import {
+  DeleteLectureSuccessResponse,
+  GetAllLecturesSuccessResponse,
+} from "@attenex/api-contracts";
 
 export interface LectureWithCount {
   id: string;
@@ -33,10 +36,6 @@ export interface ClassItem {
   name: string;
 }
 
-export interface SubjectItem {
-  id: string;
-  name: string;
-}
 export type LectureApiItem = GetAllLecturesSuccessResponse["data"][number];
 
 export type LectureMutationResponse = DeleteLectureSuccessResponse;

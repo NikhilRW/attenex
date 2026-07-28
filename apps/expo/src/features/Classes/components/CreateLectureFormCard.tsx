@@ -7,11 +7,11 @@ import { withUnistyles } from "react-native-unistyles";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
 import { styles } from "@classes/styles/CreateLecture.styles";
 import { CreateLectureFormCardProps } from "@classes/types/props";
+import { SubjectSelector } from "@shared/components/SubjectSelector";
 
 import { ClassSelector } from "./ClassSelector";
 import { DurationSelector } from "./DurationSelector";
 import { StartLectureButton } from "./StartLectureButton";
-import { SubjectSelector } from "./SubjectSelector";
 
 const CreateLectureCardGradient = withUnistyles(LinearGradient, (_theme, { themeName }) => ({
   colors:

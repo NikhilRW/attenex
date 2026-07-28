@@ -6,12 +6,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
-import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
-import { UniModal } from "@/shared/components/UnistylesComponents";
-import { styles } from "@classes/styles/CreateLecture.styles";
-import { SubjectItem } from "@classes/types/common";
+import { subjectSelectorStyles as styles } from "@/shared/styles/SubjectSelector.styles";
+import { SubjectItem } from "@shared/types/common";
 
-// TODO: cleanup file to do only ONE THING.
+import { TouchableOpacity } from "./TouchableOpacity";
+import { UniModal } from "./UnistylesComponents";
+import { ITEM_HEIGHT } from "../constants/ui";
+import { SubjectSelectorProps } from "../types/props";
+
 const AddCircleIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.secondary,
 }));
@@ -29,23 +31,12 @@ const MutedIcon = withUnistyles(Ionicons, (theme) => ({
 }));
 
 const AnimatedView = withUnistyles(Animated.View);
-const ITEM_HEIGHT = 56;
-
 const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
   colors:
     rt.themeName === "dark"
       ? (["rgba(40, 40, 40, 0.95)", "rgba(20, 20, 20, 0.98)"] as const)
       : (["rgba(255, 255, 255, 0.95)", "rgba(245, 245, 255, 0.98)"] as const),
 }));
-
-interface SubjectSelectorProps {
-  selectedSubject: string;
-  existingSubjects: SubjectItem[];
-  showDropdown: boolean;
-  onToggleDropdown: () => void;
-  onSelectSubject: (name: string) => void;
-  onAddNewSubject: () => void;
-}
 
 export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   selectedSubject,
@@ -54,6 +45,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   onToggleDropdown,
   onSelectSubject,
   onAddNewSubject,
+  isSubjectModificationEnabled = true,
 }) => {
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
@@ -155,17 +147,18 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                 showsVerticalScrollIndicator={true}
                 {...flatListPerformanceProps}
               />
-
-              <View style={styles.selectionFooter}>
-                <TouchableOpacity
-                  onPress={onAddNewSubject}
-                  style={styles.addClassCta}
-                  haptic="impact"
-                >
-                  <PrimaryIcon name="add-circle" size={20} />
-                  <Text style={styles.addClassCtaText}>Add New Subject</Text>
-                </TouchableOpacity>
-              </View>
+              {isSubjectModificationEnabled ? (
+                <View style={styles.selectionFooter}>
+                  <TouchableOpacity
+                    onPress={onAddNewSubject}
+                    style={styles.addClassCta}
+                    haptic="impact"
+                  >
+                    <PrimaryIcon name="add-circle" size={20} />
+                    <Text style={styles.addClassCtaText}>Add New Subject</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
             </SelectionModalGradient>
           </AnimatedView>
         </View>

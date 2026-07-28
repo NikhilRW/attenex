@@ -1,14 +1,21 @@
-import { View, Text } from "react-native";
+import { useState } from "react";
+import { View } from "react-native";
 
+import { SubjectSelectorWrapper } from "../components/SubjectSelectorWrapper";
 import { useAnalyticsQuery } from "../hooks/useAnalyticsQuery";
+import { styles } from "../styles/AnalyticsScreen.styles";
 
-const Analytics = () => {
-  const { data } = useAnalyticsQuery();
+const TeacherAnalyticsScreen = () => {
+  const {} = useAnalyticsQuery();
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   return (
-    <View>
-      <Text>{data}</Text>
+    <View style={styles.container}>
+      <SubjectSelectorWrapper
+        selectedSubject={selectedSubject || ""}
+        onSelectSubject={setSelectedSubject}
+      />
     </View>
   );
 };
 
-export default Analytics;
+export default TeacherAnalyticsScreen;

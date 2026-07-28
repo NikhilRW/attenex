@@ -4,7 +4,9 @@ import { StyleProp, ViewStyle } from "react-native";
 import { SkPath } from "@shopify/react-native-skia";
 import { AnimatedStyle, SharedValue } from "react-native-reanimated";
 
-import { AttendanceRecord, ClassItem, FilterType, LectureWithCount, SubjectItem } from "./common";
+import { SubjectItem } from "@/shared/types/common";
+
+import { AttendanceRecord, ClassItem, FilterType, LectureWithCount } from "./common";
 import { CreateLectureVariables } from "./params";
 
 /**

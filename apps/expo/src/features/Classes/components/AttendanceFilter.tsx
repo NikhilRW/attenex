@@ -8,6 +8,8 @@ import { styles } from "@classes/styles/AttendanceViewScreen.styles";
 import { FilterType } from "@classes/types/common";
 import { AttendanceFilterProps } from "@classes/types/props";
 
+import { getFilterButtonStyle } from "../utils/common";
+
 export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setFilter }) => {
   return (
     <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.filterContainer}>
@@ -15,18 +17,7 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setF
         <TouchableOpacity
           key={f}
           haptic="selection"
-          style={[
-            styles.filterButton,
-            filter === f
-              ? f === "present"
-                ? styles.filterButtonPresent
-                : f === "incomplete"
-                  ? styles.filterButtonIncomplete
-                  : f === "absent"
-                    ? styles.filterButtonAbsent
-                    : styles.filterButtonAll
-              : styles.filterButtonInactive,
-          ]}
+          style={[styles.filterButton, getFilterButtonStyle(f)]}
           onPress={() => setFilter(f)}
         >
           <Text

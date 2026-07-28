@@ -95,7 +95,6 @@ export const useCustomTabBar = ({
         ) {
           return false;
         }
-
         return true;
       })
       .sort((a, b) => {

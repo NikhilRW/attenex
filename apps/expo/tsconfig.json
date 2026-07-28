@@ -11,6 +11,7 @@
       "@auth/*": ["./src/features/Auth/*"],
       "@classes/*": ["./src/features/Classes/*"],
       "@attendance/*": ["./src/features/Attendance/*"],
+      "@analytics/*": ["./src/features/Analytics/*"],
       "@settings/*": ["./src/features/Settings/*"],
       "@role-selection/*": ["./src/features/RoleSelection/*"],
       "@test/*": ["./src/features/Test/*"]

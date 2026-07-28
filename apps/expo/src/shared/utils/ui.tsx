@@ -73,5 +73,15 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
         })}
       />
     );
+  } else if (routeName.includes("analytics")) {
+    return (
+      <TabIonicons
+        name={activated ? "stats-chart" : "stats-chart-outline"}
+        size={25}
+        uniProps={(theme) => ({
+          color: activated ? theme.primary.main : theme.text.secondary,
+        })}
+      />
+    );
   }
 };

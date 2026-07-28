@@ -8,10 +8,12 @@ import { useRouter } from "expo-router";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
+import { TeacherService } from "@/shared/services/teacherService";
+import { SubjectItem } from "@/shared/types/common";
 import type { AddTeacherSubjectSuccessResponse } from "@attenex/api-contracts";
 import { lectureService } from "@classes/services/lectureService";
 import { CreateLectureAPIResponse } from "@classes/types/api";
-import { ClassItem, LectureWithCount, SubjectItem } from "@classes/types/common";
+import { ClassItem, LectureWithCount } from "@classes/types/common";
 import { getMinHeightForScrollView } from "@classes/utils/common";
 
 import { CreateLectureVariables } from "../types/params";
@@ -65,22 +67,8 @@ export const useCreateLectureScreen = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const fetchTeacherSubjects: () => Promise<SubjectItem[] | null> = useCallback(async () => {
-    try {
-      const res = await lectureService.getSubjects();
-      let currentSubjects: SubjectItem[] = [];
-      if (res.success) {
-        currentSubjects = res.data;
-      }
-      return currentSubjects;
-    } catch (error) {
-      console.log("Error fetching subjects", error);
-      throw error;
-    }
-  }, []);
-
   const { data: existingSubjects } = useQuery({
-    queryFn: fetchTeacherSubjects,
+    queryFn: TeacherService.fetchTeacherSubjects,
     queryKey: queryKeys.lectures.subjects,
     networkMode: "offlineFirst",
     enabled: true,
