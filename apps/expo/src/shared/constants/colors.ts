@@ -1,4 +1,4 @@
-import { spacing, responsiveSpacing, typography } from "./spacing";
+import { spacing, responsiveSpacing, typography, size } from "./spacing";
 
 // Attenex Color Palette - Digital Trust Blue Theme
 export const staticColors = {
@@ -74,8 +74,8 @@ export const darkTheme = {
   spacing,
   rsp: responsiveSpacing,
   typography,
+  size,
 } as const;
-
 export const lightTheme = {
   static: staticColors,
 
@@ -144,6 +144,7 @@ export const lightTheme = {
   spacing,
   rsp: responsiveSpacing,
   typography,
+  size,
 } as const;
 
 export { darkTheme as colors };

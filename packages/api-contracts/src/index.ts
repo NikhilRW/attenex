@@ -85,3 +85,4 @@ export { submitAttendanceRequestSchema } from "./apiRequests/attendance/submitAt
 export { joinLectureSuccessResponseSchema } from "./apiResponses/attendance/joinLecture";
 export { pingLectureSuccessResponseSchema } from "./apiResponses/attendance/pingLecture";
 export { submitAttendanceSuccessResponseSchema } from "./apiResponses/attendance/submitAttendance";
+

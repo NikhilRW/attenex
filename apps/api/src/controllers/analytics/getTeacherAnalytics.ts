@@ -9,11 +9,13 @@ import { Response } from "express";
 import * as v from "valibot";
 
 export const getTeacherAnalytics = async (req: AuthRequest, res: Response) => {
-  if (!v.safeParse(getTeacherAnalyticsRequestSchema, req.body).success) {
+  if (!v.safeParse(getTeacherAnalyticsRequestSchema, req.query).success) {
     return res.status(400).json({ success: false, message: "Invalid request body" });
   }
-  const { subjectId, startDate, endDate } = req.body as GetTeacherAnalyticsRequestType;
-  const userId = "b5569849-2eed-44fa-ada4-36274fbf6fac";
+  const { startDate, endDate, subjectId } = req.query as GetTeacherAnalyticsRequestType;
+  const userId = req.user?.id;
+
+  const subjectEqualQueryCheck = subjectId ? [eq(lectures.subjectId, subjectId)] : [];
 
   const response = await db
     .select({
@@ -24,7 +26,7 @@ export const getTeacherAnalytics = async (req: AuthRequest, res: Response) => {
     .innerJoin(attendance, eq(lectures.id, attendance.lectureId))
     .where(
       and(
-        eq(lectures.subjectId, subjectId),
+        ...subjectEqualQueryCheck,
         eq(attendance.status, "present"),
         eq(lectures.teacherId, userId),
         gte(lectures.startedAt, sql`date(${startDate})`),

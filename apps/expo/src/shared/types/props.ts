@@ -16,4 +16,5 @@ export interface SubjectSelectorProps {
   onSelectSubject: (name: string) => void;
   onAddNewSubject: () => void;
   isSubjectModificationEnabled?: boolean;
+  showLabel?: boolean;
 }

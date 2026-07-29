@@ -46,6 +46,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   onSelectSubject,
   onAddNewSubject,
   isSubjectModificationEnabled = true,
+  showLabel = true,
 }) => {
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
@@ -93,7 +94,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
 
   return (
     <View style={[styles.inputGroup, styles.inputGroupTopic]}>
-      <Text style={styles.label}>Subject</Text>
+      {showLabel ? <Text style={styles.label}>Subject</Text> : null}
       <TouchableOpacity
         haptic="selection"
         onPress={onToggleDropdown}
