@@ -12,9 +12,10 @@ export const getStartingScreenPath = (newUser: UserSchema | null = null) => {
   if (!user) {
     return "/(auth)/sign-in";
   }
-  if (1 === 1) {
-    ("/(main)/(tabs)/analytics");
-  }
+  // if (1 === 1) {
+  return "/(main)/(tabs)/analytics";
+  // }
+
   // if (user?.role === "teacher") {
   //   return "/(main)/(tabs)/classes";
   // }

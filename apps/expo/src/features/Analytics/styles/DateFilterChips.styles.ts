@@ -5,5 +5,6 @@ export const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     gap: theme.spacing.sm,
     marginBottom: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
 }));

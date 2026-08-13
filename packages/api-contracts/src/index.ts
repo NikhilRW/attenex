@@ -43,6 +43,8 @@ export { updateLectureRequestSchema } from "./apiRequests/lectures/updateLecture
 // apiRequests - analytics
 export { getTeacherAnalyticsRequestSchema } from "./apiRequests/analytics/getTeacherAnalytics";
 export type { GetTeacherAnalyticsRequestType } from "./apiRequests/analytics/getTeacherAnalytics";
+export { getAiAnalyticsRequestSchema } from "./apiRequests/analytics/getAiAnalytics";
+export { GetAiAnalyticsRequestType } from "./apiRequests/analytics/getAiAnalytics";
 
 // apiResponses - lectures
 export { addTeacherClassSuccessResponseSchema } from "./apiResponses/lectures/addTeacherClass";
@@ -75,6 +77,9 @@ export type { GetTeacherSubjectsSuccessResponse } from "./apiResponses/lectures/
 export { getTeacherSubjectsSuccessResponseSchema } from "./apiResponses/lectures/getTeacherSubjects";
 export type { UpdateLectureSuccessResponse } from "./apiResponses/lectures/updateLecture";
 export { updateLectureSuccessResponseSchema } from "./apiResponses/lectures/updateLecture";
+export type { GetTeacherAnalyticsResponseType } from "./apiResponses/analytics/getTeacherAnalytics";
+export { getTeacherAnalyticsResponseSchema } from "./apiResponses/analytics/getTeacherAnalytics";
+export { AnalyticsGraphPointType } from "./common/analytics";
 
 // apiRequests - attendance
 export { joinLectureRequestSchema } from "./apiRequests/attendance/joinLecture";
@@ -85,4 +90,3 @@ export { submitAttendanceRequestSchema } from "./apiRequests/attendance/submitAt
 export { joinLectureSuccessResponseSchema } from "./apiResponses/attendance/joinLecture";
 export { pingLectureSuccessResponseSchema } from "./apiResponses/attendance/pingLecture";
 export { submitAttendanceSuccessResponseSchema } from "./apiResponses/attendance/submitAttendance";
-

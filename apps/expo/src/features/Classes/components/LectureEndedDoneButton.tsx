@@ -3,7 +3,7 @@ import { Text } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -16,13 +16,18 @@ const DoneGradient = withUnistyles(LinearGradient, (theme) => ({
 
 export const LectureEndedDoneButton: React.FC<LectureEndedDoneButtonProps> = ({ onDone }) => {
   return (
-    <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.doneButtonContainer}>
+    <EaseView
+      initialAnimate={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 600 }}
+      style={styles.doneButtonContainer}
+    >
       <TouchableOpacity onPress={onDone} haptic="impact" activeOpacity={0.8}>
         <DoneGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.doneButton}>
           <Text style={styles.doneButtonText}>Done</Text>
           <Ionicons name="checkmark" size={22} color="white" />
         </DoneGradient>
       </TouchableOpacity>
-    </Animated.View>
+    </EaseView>
   );
 };

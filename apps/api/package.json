@@ -16,7 +16,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "mock:add": "ts-node src/scripts/mock_data.ts --add",
+    "mock:remove": "ts-node src/scripts/mock_data.ts --remove"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",

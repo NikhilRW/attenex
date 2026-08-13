@@ -4,5 +4,6 @@ export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     padding: theme.spacing.lg,
+    position: "relative",
   },
 }));

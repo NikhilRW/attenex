@@ -1,8 +1,8 @@
 import {
-  TabEntypo,
-  TabFontAwesome6,
-  TabIonicons,
-  TabMaterialCommunityIcons,
+  UniEntypo,
+  UniFontAwesome6,
+  UniIonicons,
+  UniMaterialCommunityIcons,
 } from "../components/UnistylesComponents";
 
 export const routeNameToNavButtonTestId = (routeName: string) => {
@@ -15,7 +15,7 @@ export const routeNameToNavButtonTestId = (routeName: string) => {
 export const getIconForRoute = (routeName: string, activated: boolean) => {
   if (routeName.includes("attendance")) {
     return (
-      <TabFontAwesome6
+      <UniFontAwesome6
         name={activated ? "calendar-plus" : "calendar"}
         size={25}
         uniProps={(theme) => ({
@@ -25,7 +25,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("classes")) {
     return (
-      <TabEntypo
+      <UniEntypo
         name="blackboard"
         size={25}
         uniProps={(theme) => ({
@@ -35,7 +35,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("role-selection")) {
     return (
-      <TabIonicons
+      <UniIonicons
         name="people"
         size={25}
         uniProps={(theme) => ({
@@ -45,7 +45,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("settings")) {
     return (
-      <TabIonicons
+      <UniIonicons
         name={activated ? "settings" : "settings-outline"}
         size={25}
         uniProps={(theme) => ({
@@ -55,7 +55,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("create-class")) {
     return (
-      <TabIonicons
+      <UniIonicons
         name="school"
         size={25}
         uniProps={(theme) => ({
@@ -65,7 +65,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("test")) {
     return (
-      <TabMaterialCommunityIcons
+      <UniMaterialCommunityIcons
         name={activated ? "test-tube" : "test-tube-empty"}
         size={25}
         uniProps={(theme) => ({
@@ -75,7 +75,7 @@ export const getIconForRoute = (routeName: string, activated: boolean) => {
     );
   } else if (routeName.includes("analytics")) {
     return (
-      <TabMaterialCommunityIcons
+      <UniMaterialCommunityIcons
         name={activated ? "chart-timeline-variant" : "chart-timeline-variant"}
         size={27}
         uniProps={(theme) => ({

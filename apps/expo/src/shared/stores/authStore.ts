@@ -29,9 +29,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: true,
       setAuth: (user, token) => {
-        if (__DEV__) {
-          console.log(token);
-        }
+        // if (__DEV__) {
+        //   console.log(token);
+        // }
         set({
           user,
           token,

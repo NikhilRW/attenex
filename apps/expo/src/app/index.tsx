@@ -12,9 +12,9 @@ export default function Index() {
   }
 
   // Redirect based on authentication status
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/sign-in" />;
-  }
-
-  return <Redirect href={getStartingScreenPath()} />;
+  return isAuthenticated ? (
+    <Redirect href={getStartingScreenPath()} />
+  ) : (
+    <Redirect href="/(auth)/sign-in" />
+  );
 }

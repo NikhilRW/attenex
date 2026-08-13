@@ -1,7 +1,9 @@
 import { FC } from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 
 import Animated from "react-native-reanimated";
+
+import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 
 import { useFilterChip } from "../hooks/useFilterChip";
 import { styles } from "../styles/FilterChip.styles";

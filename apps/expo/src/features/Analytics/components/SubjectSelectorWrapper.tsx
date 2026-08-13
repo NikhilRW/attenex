@@ -31,7 +31,7 @@ export const SubjectSelectorWrapper = ({
       }}
       onAddNewSubject={() => {}}
       isSubjectModificationEnabled={false}
-      showLabel={false}
+      showLabel={true}
     />
   );
 };

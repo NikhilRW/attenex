@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
+// TODO: fix the deprecated animated keyboard
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
