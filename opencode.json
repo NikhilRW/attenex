@@ -5,6 +5,11 @@
       "type": "local",
       "command": ["codegraph", "serve", "--mcp"],
       "enabled": true
+    },
+    "mobile-mcp": {
+      "type": "local",
+      "command": ["bunx", "@mobilenext/mobile-mcp@latest"],
+      "enabled": true
     }
   },
   "plugin": ["opencode-codegraph"],
