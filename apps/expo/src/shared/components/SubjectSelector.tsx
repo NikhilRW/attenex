@@ -47,6 +47,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   onAddNewSubject,
   isSubjectModificationEnabled = true,
   showLabel = true,
+  isAllSubjectAvailable = false,
 }) => {
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
@@ -102,7 +103,11 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         style={styles.dropdown}
       >
         <Text style={[styles.dropdownText, !selectedSubject && styles.dropdownTextMuted]}>
-          {selectedSubject || "Select a subject"}
+          {selectedSubject
+            ? selectedSubject
+            : isAllSubjectAvailable === true
+              ? "All"
+              : "Select a subject"}
         </Text>
         <AddCircleIcon name="add-circle-sharp" size={20} />
       </TouchableOpacity>

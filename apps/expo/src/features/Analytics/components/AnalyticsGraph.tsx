@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import { LineGraph } from "react-native-graph";
 import type { GraphPoint } from "react-native-graph";
@@ -11,6 +11,7 @@ import { UniFontAwesome6 } from "@/shared/components/UnistylesComponents";
 import CustomSelectionDot from "./CustomSelectionDot";
 import { styles } from "../styles/AnalyticsGraph.styles";
 import { AnalyticsGraphProps } from "../types/props";
+import { goToCreateLectureScreen } from "../utils/common";
 
 const UniAcitivityIndicator = withUnistyles(ActivityIndicator, (theme) => ({
   color: theme.primary.glow,
@@ -32,13 +33,16 @@ const AnalyticsGraph: FC<AnalyticsGraphProps> = ({ points, isLoading }) => {
         <View style={styles.noDataFoundContainer}>
           <UniFontAwesome6
             name="face-sad-tear"
-            size={60}
+            size={58}
             style={styles.noDataFoundIcon}
             uniProps={(theme) => ({
               color: theme.text.secondary,
             })}
           />
-          <Text style={styles.noDataFoundText}>No Data Found</Text>
+          <Text style={styles.noDataFoundText}>No attendance available</Text>
+          <TouchableOpacity onPress={goToCreateLectureScreen} style={styles.createLectureButton}>
+            <Text style={styles.createLectureButtonText}>Create a lecture now</Text>
+          </TouchableOpacity>
         </View>
       ) : null}
 

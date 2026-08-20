@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Text } from "react-native";
 
 import Animated, {
@@ -32,8 +32,17 @@ const AiAnalysisCard: FC<AiAnalysisCardProps> = ({ text, isLoading }) => {
         )
       : 1,
   }));
+
+  const toDisplay = useMemo(() => {
+    return text !== "" || isLoading;
+  }, [text, isLoading]);
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(toDisplay ? 1 : 0, { duration: 300 }),
+  }));
+
   return (
-    <Animated.View style={styles.container(text !== "" || isLoading)}>
+    <Animated.View style={animatedContainerStyle}>
       <Text style={styles.labelText}>AI Analysis</Text>
       <Animated.View style={[styles.card, breathingAnimatedStyle]}>
         <Text style={styles.cardText}>{text || ""}</Text>

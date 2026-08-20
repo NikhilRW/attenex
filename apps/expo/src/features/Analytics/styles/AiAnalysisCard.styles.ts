@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme) => ({
-  container: (isVisible: boolean) => (isVisible ? { flex: 1 } : { display: "none" }),
   labelText: {
     color: theme.text.primary,
     fontSize: theme.typography.xl,

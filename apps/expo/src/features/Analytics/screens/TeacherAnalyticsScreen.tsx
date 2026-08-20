@@ -106,7 +106,6 @@ const TeacherAnalyticsScreen = () => {
   }, []);
 
   // TODO: create a beautiful hook
-
   const handleAiAnalyticsPress = useCallback(async () => {
     // add params
     setText("");
@@ -150,12 +149,13 @@ const TeacherAnalyticsScreen = () => {
         selectedSubject={selectedSubject || ""}
         onSelectSubject={setSelectedSubject}
       />
-      <AnalyticsGraph points={graphPoints} isLoading={isLoading} />
       <DateFilters
         onSelectFilter={dateFilterOnChangeWrapper}
         selectedFilter={selectedDateFilter}
         openDateFilterSheet={openDateFilterSheet}
       />
+
+      <AnalyticsGraph points={graphPoints} isLoading={isLoading} />
       <CustomDateBottomSheet
         ref={trueSheetRef}
         customStartDate={customStartDate}

@@ -1,4 +1,5 @@
 import { SkFont } from "@shopify/react-native-skia";
+import { router } from "expo-router";
 
 import { GetTeacherAnalyticsResponseType } from "@attenex/api-contracts";
 
@@ -70,4 +71,8 @@ export const buildQueryParamsForTeacherAnalytics = (data: GetAiAnalyticsQueryPar
   params.append("startDate", startDate);
   params.append("endDate", endDate);
   return params;
+};
+
+export const goToCreateLectureScreen = () => {
+  router.navigate("/create-lecture");
 };

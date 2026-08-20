@@ -32,6 +32,8 @@ export const SubjectSelectorWrapper = ({
       onAddNewSubject={() => {}}
       isSubjectModificationEnabled={false}
       showLabel={true}
+      isAnalyticsScreen={true}
+      isAllSubjectAvailable={true}
     />
   );
 };

@@ -70,6 +70,7 @@ export const typography = {
   h3: bpScale(28),
   h2: bpScale(32),
   h1: bpScale(40),
+  custom: (n: number) => bpScale(n),
 } as const;
 
 export type TypographyToken = keyof typeof typography;
