@@ -15,7 +15,7 @@ export interface FilterChipProps {
 }
 
 export interface DateFiltersProps {
-  selectedFilter: string | null;
+  selectedFilter: DateFilterType | null;
   onSelectFilter: (filter: DateFilterType) => void;
   openDateFilterSheet: () => void;
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Text, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -6,6 +7,7 @@ import { queryKeys } from "@/shared/constants/queryKeys";
 import { TeacherService } from "@/shared/services/teacherService";
 import { SubjectSelector } from "@shared/components/SubjectSelector";
 
+import { styles as dateFilterStyles } from "../styles/DateFilterChips.styles";
 import { SubjectSelectorWrapperProps } from "../types/props";
 
 export const SubjectSelectorWrapper = ({
@@ -20,20 +22,24 @@ export const SubjectSelectorWrapper = ({
   });
 
   return (
-    <SubjectSelector
-      selectedSubject={selectedSubject}
-      existingSubjects={existingSubjects}
-      showDropdown={showDropdown}
-      onToggleDropdown={() => setShowDropdown((prev) => !prev)}
-      onSelectSubject={(name) => {
-        onSelectSubject(name);
-        setShowDropdown(false);
-      }}
-      onAddNewSubject={() => {}}
-      isSubjectModificationEnabled={false}
-      showLabel={true}
-      isAnalyticsScreen={true}
-      isAllSubjectAvailable={true}
-    />
+    <View>
+      <View style={dateFilterStyles.subjectLabelRow}>
+        <Text style={dateFilterStyles.label}>Subject</Text>
+      </View>
+      <SubjectSelector
+        selectedSubject={selectedSubject}
+        existingSubjects={existingSubjects}
+        showDropdown={showDropdown}
+        onToggleDropdown={() => setShowDropdown((prev) => !prev)}
+        onSelectSubject={(name) => {
+          onSelectSubject(name);
+          setShowDropdown(false);
+        }}
+        onAddNewSubject={() => {}}
+        isSubjectModificationEnabled={false}
+        showLabel={false}
+        isAllSubjectAvailable={true}
+      />
+    </View>
   );
 };

@@ -3,6 +3,7 @@ import { router } from "expo-router";
 
 import { GetTeacherAnalyticsResponseType } from "@attenex/api-contracts";
 
+import { monthLabels } from "../constants/common";
 import {
   DateFilterType,
   GetAiAnalyticsQueryParamsType,
@@ -75,4 +76,8 @@ export const buildQueryParamsForTeacherAnalytics = (data: GetAiAnalyticsQueryPar
 
 export const goToCreateLectureScreen = () => {
   router.navigate("/create-lecture");
+};
+
+export const formatReadableDate = (date: Date) => {
+  return `${date.getDate()} ${monthLabels[date.getMonth()]} ${date.getFullYear()}`;
 };

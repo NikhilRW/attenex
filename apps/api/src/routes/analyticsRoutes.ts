@@ -1,5 +1,5 @@
-import { getAiAnalytics } from "@controllers/analytics/getAiAnalytics";
-import { getTeacherAnalytics } from "@controllers/analytics/getTeacherAnalytics";
+import { getAiAnalytics } from "@controllers/analytics/teacher/getAiAnalytics";
+import { getTeacherAnalytics } from "@controllers/analytics/teacher/getTeacherAnalytics";
 import { authenticate } from "@middleware/auth";
 import { Router } from "express";
 

@@ -2,10 +2,29 @@ import { StyleSheet } from "react-native-unistyles";
 
 export const styles = StyleSheet.create((theme) => ({
   graphContainer: {
-    height: 210,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  graphCard: {
+    minHeight: 230,
+    padding: theme.spacing.md,
+    borderRadius: theme.size.xl,
+    borderWidth: 1,
+    borderColor: theme.surface.glassBorder,
+    backgroundColor: theme.surface.glassCardBg,
+    overflow: "hidden",
+  },
+  graphViewport: {
+    height: 200,
+    padding: -20,
+    borderBottomLeftRadius: theme.size["3xl"],
+    borderBottomRightRadius: theme.size["3xl"],
+    overflow: "hidden",
   },
   graph: {
     height: 200,
+    borderBottomLeftRadius: theme.size["3xl"],
+    borderBottomRightRadius: theme.size["3xl"],
   },
   hideGraph: {
     width: 0,
@@ -45,5 +64,28 @@ export const styles = StyleSheet.create((theme) => ({
     color: theme.text.primary,
     fontSize: theme.typography.lg,
     fontWeight: "bold",
+  },
+  detailCardsRow: {
+    flexDirection: "row",
+    gap: theme.spacing.md,
+  },
+  detailCard: {
+    flex: 1,
+    padding: theme.spacing.md,
+    borderRadius: theme.size.lg,
+    borderWidth: 1,
+    borderColor: theme.surface.glassBorder,
+    backgroundColor: theme.surface.glassCardBg,
+  },
+  detailLabel: {
+    color: theme.text.secondary,
+    fontSize: theme.typography.sm,
+    fontWeight: "600",
+    marginBottom: theme.spacing.xs,
+  },
+  detailValue: {
+    color: theme.text.primary,
+    fontSize: theme.typography.lg,
+    fontWeight: "700",
   },
 }));

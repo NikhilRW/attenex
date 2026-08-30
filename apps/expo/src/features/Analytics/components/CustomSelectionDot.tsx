@@ -7,12 +7,17 @@ import {
   useSharedValue,
   useDerivedValue,
 } from "react-native-reanimated";
+import { useUnistyles } from "react-native-unistyles";
 import { scheduleOnRN } from "react-native-worklets";
 
 import {
   CUSTOM_FONT,
+  DARK_TOOLTIP_BACKGROUND,
+  DARK_TOOLTIP_TEXT,
   EMPTY_STRING,
   FONT_SIZE,
+  LIGHT_TOOLTIP_BACKGROUND,
+  LIGHT_TOOLTIP_TEXT,
   RECTANGLE_RADIUS_X_AND_Y,
   RECT_HEIGHT,
   RECT_WIDTH,
@@ -27,8 +32,14 @@ function CustomSelectionDot({
   circleY,
   selectedValue,
 }: CustomSelectionDotProps) {
+  const {
+    rt: { themeName },
+  } = useUnistyles();
   const circleRadius = useSharedValue(0);
   const skiaFont = useFont(CUSTOM_FONT, FONT_SIZE);
+  const tooltipBackground =
+    themeName === "light" ? LIGHT_TOOLTIP_BACKGROUND : DARK_TOOLTIP_BACKGROUND;
+  const tooltipText = themeName === "light" ? LIGHT_TOOLTIP_TEXT : DARK_TOOLTIP_TEXT;
   const setIsActive = useCallback(
     (active: boolean) => {
       circleRadius.set(
@@ -93,9 +104,9 @@ function CustomSelectionDot({
         width={rectangleWidth}
         height={RECT_HEIGHT}
         zIndex={1}
-        color="#131829"
+        color={tooltipBackground}
       >
-        <Text text={textToShow} font={skiaFont} color="white" x={textX} y={textY} />
+        <Text text={textToShow} font={skiaFont} color={tooltipText} x={textX} y={textY} />
       </RoundedRect>
       <Circle cx={circleX} cy={circleY} zIndex={-1} r={circleRadius} color={color} />
     </Group>

@@ -1,5 +1,7 @@
 import { Easing } from "react-native-reanimated";
 
+import { DateFilterType } from "../types/common";
+
 export const filters = [
   "7d" as const,
   "1m" as const,
@@ -23,3 +25,31 @@ export const breathingAnimationConfiguration = {
   duration: 800,
   easing: Easing.bezierFn(0.45, 0, 0.55, 1),
 };
+
+export const monthLabels = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+export const filterLabels: Record<DateFilterType, string> = {
+  "7d": "7 days",
+  "1m": "1 month",
+  "3m": "3 months",
+  "1y": "1 year",
+  custom: "Custom",
+};
+
+export const DARK_TOOLTIP_BACKGROUND = "#131829";
+export const DARK_TOOLTIP_TEXT = "#FFFFFF";
+export const LIGHT_TOOLTIP_BACKGROUND = "#CBD5E1";
+export const LIGHT_TOOLTIP_TEXT = "#0F172A";

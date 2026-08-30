@@ -1,12 +1,10 @@
 import { FC } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 
 import FilterChip from "./FilterChip";
-import { filters } from "../constants/common";
+import { filterLabels, filters } from "../constants/common";
 import { styles } from "../styles/DateFilterChips.styles";
 import { DateFiltersProps } from "../types/props";
-
-// TODO: think we need to refactor the filter for readability ? - []
 
 const DateFilters: FC<DateFiltersProps> = ({
   onSelectFilter,
@@ -15,19 +13,24 @@ const DateFilters: FC<DateFiltersProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {filters.map((filter) => (
-        <FilterChip
-          isSelected={filter === selectedFilter}
-          key={filter}
-          filterText={filter}
-          onFilterPress={() => {
-            if (filter === "custom") {
-              openDateFilterSheet();
-            }
-            onSelectFilter(filter);
-          }}
-        />
-      ))}
+      <View style={styles.labelRow}>
+        <Text style={styles.label}>Date Range</Text>
+      </View>
+      <View style={styles.chipsContainer}>
+        {filters.map((filter) => (
+          <FilterChip
+            isSelected={filter === selectedFilter}
+            key={filter}
+            filterText={filterLabels[filter]}
+            onFilterPress={() => {
+              if (filter === "custom") {
+                openDateFilterSheet();
+              }
+              onSelectFilter(filter);
+            }}
+          />
+        ))}
+      </View>
     </View>
   );
 };
