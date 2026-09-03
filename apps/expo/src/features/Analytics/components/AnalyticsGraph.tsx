@@ -3,7 +3,12 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import { LineGraph } from "react-native-graph";
 import type { GraphPoint } from "react-native-graph";
-import { useSharedValue } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeOutUp,
+  LinearTransition,
+  useSharedValue,
+} from "react-native-reanimated";
 import { withUnistyles } from "react-native-unistyles";
 
 import { UniFontAwesome6 } from "@/shared/components/UnistylesComponents";
@@ -94,11 +99,27 @@ const AnalyticsGraph: FC<AnalyticsGraphProps> = ({ points, isLoading }) => {
         <View style={styles.detailCardsRow}>
           <View style={styles.detailCard}>
             <Text style={styles.detailLabel}>Date</Text>
-            <Text style={styles.detailValue}>{formatReadableDate(displayPoint.date)}</Text>
+            <Animated.Text
+              key={displayPoint.date.toISOString()}
+              entering={FadeInDown.duration(180)}
+              exiting={FadeOutUp.duration(120)}
+              layout={LinearTransition}
+              style={styles.detailValue}
+            >
+              {formatReadableDate(displayPoint.date)}
+            </Animated.Text>
           </View>
           <View style={styles.detailCard}>
             <Text style={styles.detailLabel}>Students Attended</Text>
-            <Text style={styles.detailValue}>{displayPoint.value}</Text>
+            <Animated.Text
+              key={String(displayPoint.value)}
+              entering={FadeInDown.duration(180)}
+              exiting={FadeOutUp.duration(120)}
+              layout={LinearTransition}
+              style={styles.detailValue}
+            >
+              {displayPoint.value}
+            </Animated.Text>
           </View>
         </View>
       ) : null}

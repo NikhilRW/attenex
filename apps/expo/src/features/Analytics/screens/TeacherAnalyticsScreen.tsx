@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { useQueryClient } from "@tanstack/react-query";
@@ -144,18 +144,21 @@ const TeacherAnalyticsScreen = () => {
   return (
     <View style={styles.container}>
       <FuturisticBackground />
-      <AnalyticsScreenHeader />
-      <SubjectSelectorWrapper
-        selectedSubject={selectedSubject || ""}
-        onSelectSubject={setSelectedSubject}
-      />
-      <DateFilters
-        onSelectFilter={dateFilterOnChangeWrapper}
-        selectedFilter={selectedDateFilter}
-        openDateFilterSheet={openDateFilterSheet}
-      />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <AnalyticsScreenHeader />
+        <SubjectSelectorWrapper
+          selectedSubject={selectedSubject || ""}
+          onSelectSubject={setSelectedSubject}
+        />
+        <DateFilters
+          onSelectFilter={dateFilterOnChangeWrapper}
+          selectedFilter={selectedDateFilter}
+          openDateFilterSheet={openDateFilterSheet}
+        />
 
-      <AnalyticsGraph points={graphPoints} isLoading={isLoading} />
+        <AnalyticsGraph points={graphPoints} isLoading={isLoading} />
+        <AiAnalysisCard text={text} isLoading={isAiAnalysisLoading} />
+      </ScrollView>
       <CustomDateBottomSheet
         ref={trueSheetRef}
         customStartDate={customStartDate}
@@ -164,7 +167,6 @@ const TeacherAnalyticsScreen = () => {
         setCustomEndDate={setCustomEndDate}
         applyDateFilter={applyDateFilter}
       />
-      <AiAnalysisCard text={text} isLoading={isAiAnalysisLoading} />
       <AiFavButton onPress={handleAiAnalyticsPress} />
     </View>
   );

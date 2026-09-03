@@ -6,4 +6,7 @@ export const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing.lg,
     position: "relative",
   },
+  scrollContent: {
+    paddingBottom: theme.spacing["4xl"],
+  },
 }));
