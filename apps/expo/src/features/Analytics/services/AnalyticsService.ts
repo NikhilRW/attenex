@@ -5,11 +5,25 @@ import { BASE_URI } from "@/shared/constants/uri";
 import http from "@/shared/utils/http";
 import { getUserAuthToken } from "@/shared/utils/user";
 import {
+  getStudentAnalyticsResponseSchema,
   getTeacherAnalyticsResponseSchema,
+  GetStudentAnalyticsResponseType,
   GetTeacherAnalyticsResponseType,
 } from "@attenex/api-contracts";
 
 export const AnalyticsService = {
+  getStudentAnalytics: async (queryParams: {
+    subjectId?: string;
+    startDate: string;
+    endDate: string;
+  }) => {
+    const response = await http.get("/api/analytics/student", { params: queryParams });
+    const result = v.safeParse(getStudentAnalyticsResponseSchema, response.data);
+    if (!result.success) {
+      throw new Error("Invalid response from server");
+    }
+    return result.output as GetStudentAnalyticsResponseType;
+  },
   getTeacherAnalytics: async (queryParams: {
     subjectId?: string;
     startDate: string;

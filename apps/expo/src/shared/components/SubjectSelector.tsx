@@ -40,6 +40,7 @@ const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
 
 export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   selectedSubject,
+  selectedSubjectId,
   existingSubjects,
   showDropdown,
   onToggleDropdown,
@@ -52,23 +53,31 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
       <TouchableOpacity
-        onPress={() => onSelectSubject(item.name)}
-        style={[styles.optionItem, selectedSubject === item.name && styles.optionItemSelected]}
+        onPress={() => onSelectSubject(item.name, item.id)}
+        style={[
+          styles.optionItem,
+          (selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name) &&
+            styles.optionItemSelected,
+        ]}
         haptic="selection"
         testID={`CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR_ITEM_${index + 1}`}
       >
         <Text
           style={[
             styles.optionItemText,
-            selectedSubject === item.name ? styles.optionItemTextSelected : null,
+            (selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name)
+              ? styles.optionItemTextSelected
+              : null,
           ]}
         >
           {item.name}
         </Text>
-        {selectedSubject === item.name ? <PrimaryIcon name="checkmark-circle" size={20} /> : null}
+        {(selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name) ? (
+          <PrimaryIcon name="checkmark-circle" size={20} />
+        ) : null}
       </TouchableOpacity>
     ),
-    [onSelectSubject, selectedSubject],
+    [onSelectSubject, selectedSubject, selectedSubjectId],
   );
 
   const keyExtractor = useCallback((item: SubjectItem) => item.id, []);

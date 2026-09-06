@@ -53,3 +53,12 @@ export const DARK_TOOLTIP_BACKGROUND = "#131829";
 export const DARK_TOOLTIP_TEXT = "#FFFFFF";
 export const LIGHT_TOOLTIP_BACKGROUND = "#CBD5E1";
 export const LIGHT_TOOLTIP_TEXT = "#0F172A";
+
+export const ALL_SUBJECTS_ID = "all";
+export const ALL_SUBJECTS_LABEL = "All subjects";
+
+export const STUDENT_CARD_ANIMATION_DURATION = {
+  layout: 180,
+  enter: 140,
+  exit: 100,
+} as const;

@@ -23,14 +23,13 @@ import { styles } from "../styles/TeacherAnalyticsScreen.styles";
 import { DateFilterType } from "../types/common";
 import {
   buildQueryParamsForTeacherAnalytics,
+  getAnalyticsDateRange,
   getAnalyticsGraphPoints,
-  getCurrentDate,
-  getNormalizedDate,
-  getStartDateBasedOnFilter,
+  getCustomDateRangeError,
 } from "../utils/common";
 
 const TeacherAnalyticsScreen = () => {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterType>("7d");
   const [isCustomDateFilterApplied, setIsCustomDateFilterApplied] = useState(false);
   const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
@@ -40,22 +39,18 @@ const TeacherAnalyticsScreen = () => {
   const decoder = useRef(new TextDecoder());
   const qc = useQueryClient();
 
-  const startDate = useMemo(() => {
-    if (selectedDateFilter === "custom" && customStartDate && isCustomDateFilterApplied) {
-      return getNormalizedDate(customStartDate);
-    }
-    const date = getStartDateBasedOnFilter(getCurrentDate(), selectedDateFilter);
-    return getNormalizedDate(date);
-  }, [selectedDateFilter, customStartDate, isCustomDateFilterApplied]);
+  const { startDate, endDate } = useMemo(
+    () =>
+      getAnalyticsDateRange({
+        selectedDateFilter,
+        customStartDate,
+        customEndDate,
+        isCustomDateFilterApplied,
+      }),
+    [customEndDate, customStartDate, isCustomDateFilterApplied, selectedDateFilter],
+  );
 
   const trueSheetRef = useRef<TrueSheet>(null);
-
-  const endDate = useMemo(() => {
-    if (selectedDateFilter === "custom" && customEndDate && isCustomDateFilterApplied) {
-      return getNormalizedDate(customEndDate);
-    }
-    return getNormalizedDate(getCurrentDate());
-  }, [selectedDateFilter, customEndDate, isCustomDateFilterApplied]);
 
   const resetDateValues = useCallback(() => {
     setCustomEndDate(null);
@@ -63,7 +58,7 @@ const TeacherAnalyticsScreen = () => {
   }, []);
 
   const { data, isPending: isLoading } = useAnalyticsQuery({
-    subjectId: selectedSubject || undefined,
+    subjectId: selectedSubjectId,
     startDate,
     endDate,
     selectedDateFilter,
@@ -80,17 +75,10 @@ const TeacherAnalyticsScreen = () => {
   }, [resetDateValues]);
 
   const applyDateFilter = useCallback(() => {
-    if (customEndDate === null || customStartDate === null) {
+    const error = getCustomDateRangeError(customStartDate, customEndDate);
+    if (error) {
       showMessage({
-        description: "Start and End date cannot be empty.",
-        type: "danger",
-        message: "Invalid Date Range",
-      });
-      return;
-    }
-    if (customEndDate.getTime() < customStartDate.getTime()) {
-      showMessage({
-        description: "End date cannot be earlier than start date.",
+        description: error,
         type: "danger",
         message: "Invalid Date Range",
       });
@@ -111,7 +99,7 @@ const TeacherAnalyticsScreen = () => {
     setText("");
     const params = buildQueryParamsForTeacherAnalytics({
       startDate,
-      subjectId: selectedSubject,
+      subjectId: selectedSubjectId ?? null,
       endDate,
     });
     setIsAiAnalysisLoading(true);
@@ -134,7 +122,7 @@ const TeacherAnalyticsScreen = () => {
     } finally {
       setIsAiAnalysisLoading(false);
     }
-  }, [append, startDate, selectedSubject, endDate]);
+  }, [append, startDate, selectedSubjectId, endDate]);
 
   const dateFilterOnChangeWrapper = useCallback((filter: DateFilterType) => {
     setSelectedDateFilter(filter);
@@ -147,8 +135,8 @@ const TeacherAnalyticsScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <AnalyticsScreenHeader />
         <SubjectSelectorWrapper
-          selectedSubject={selectedSubject || ""}
-          onSelectSubject={setSelectedSubject}
+          selectedSubjectId={selectedSubjectId}
+          onSelectSubject={setSelectedSubjectId}
         />
         <DateFilters
           onSelectFilter={dateFilterOnChangeWrapper}

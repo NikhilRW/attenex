@@ -2,10 +2,20 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { GraphPoint, SelectionDotProps } from "react-native-graph";
 import { SharedValue } from "react-native-reanimated";
 
-import { DateFilterType } from "./common";
+import { DateFilterType, StudentAnalyticsLecture, StudentAnalyticsSubject } from "./common";
 export interface SubjectSelectorWrapperProps {
-  selectedSubject: string;
-  onSelectSubject: (name: string) => void;
+  selectedSubjectId?: string;
+  onSelectSubject: (subjectId?: string) => void;
+}
+
+export interface StudentSubjectSelectorProps {
+  subjects: StudentAnalyticsSubject[];
+  selectedSubjectId?: string;
+  onSelectSubject: (subjectId?: string) => void;
+}
+
+export interface StudentAttendanceCardProps {
+  lecture: StudentAnalyticsLecture;
 }
 
 export interface FilterChipProps {

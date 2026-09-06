@@ -43,6 +43,8 @@ export { updateLectureRequestSchema } from "./apiRequests/lectures/updateLecture
 // apiRequests - analytics
 export { getTeacherAnalyticsRequestSchema } from "./apiRequests/analytics/getTeacherAnalytics";
 export type { GetTeacherAnalyticsRequestType } from "./apiRequests/analytics/getTeacherAnalytics";
+export { getStudentAnalyticsRequestSchema } from "./apiRequests/analytics/getStudentAnalytics";
+export type { GetStudentAnalyticsRequestType } from "./apiRequests/analytics/getStudentAnalytics";
 export { getAiAnalyticsRequestSchema } from "./apiRequests/analytics/getAiAnalytics";
 export { GetAiAnalyticsRequestType } from "./apiRequests/analytics/getAiAnalytics";
 
@@ -79,6 +81,8 @@ export type { UpdateLectureSuccessResponse } from "./apiResponses/lectures/updat
 export { updateLectureSuccessResponseSchema } from "./apiResponses/lectures/updateLecture";
 export type { GetTeacherAnalyticsResponseType } from "./apiResponses/analytics/getTeacherAnalytics";
 export { getTeacherAnalyticsResponseSchema } from "./apiResponses/analytics/getTeacherAnalytics";
+export type { GetStudentAnalyticsResponseType } from "./apiResponses/analytics/getStudentAnalytics";
+export { getStudentAnalyticsResponseSchema } from "./apiResponses/analytics/getStudentAnalytics";
 export { AnalyticsGraphPointType } from "./common/analytics";
 
 // apiRequests - attendance
