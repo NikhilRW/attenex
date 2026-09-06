@@ -28,7 +28,9 @@
     ]
   },
   "patchedDependencies": {
-    "react-native-nitro-fetch@1.5.0": "patches/react-native-nitro-fetch@1.5.0.patch"
+    "react-native-nitro-fetch@1.5.0": "patches/react-native-nitro-fetch@1.5.0.patch",
+    "metro@0.84.5": "patches/metro@0.84.5.patch",
+    "metro-runtime@0.84.5": "patches/metro-runtime@0.84.5.patch"
   },
   "trustedDependencies": [
     "@apollo/protobufjs",

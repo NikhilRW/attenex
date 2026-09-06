@@ -1,0 +1,38 @@
+diff --git a/android/src/main/java/com/margelo/nitro/nitrofetch/NitroFetch.kt b/android/src/main/java/com/margelo/nitro/nitrofetch/NitroFetch.kt
+index ff872eb087ecd3b1af07980dc64b982b2238a7dc..add48c3e0e7728a746917c11e7571d7eb4eb2504 100644
+--- a/android/src/main/java/com/margelo/nitro/nitrofetch/NitroFetch.kt
++++ b/android/src/main/java/com/margelo/nitro/nitrofetch/NitroFetch.kt
+@@ -1,6 +1,7 @@
+ package com.margelo.nitro.nitrofetch
+ 
+ import android.app.Application
++import android.util.Base64
+ import android.util.Log
+ import com.facebook.proguard.annotations.DoNotStrip
+ import org.chromium.net.CronetEngine
+@@ -8,6 +9,7 @@ import org.chromium.net.CronetProvider
+ import java.io.File
+ import java.util.concurrent.Executor
+ import java.util.concurrent.Executors
++import java.util.Date
+ 
+ @DoNotStrip
+ class NitroFetch : HybridNitroFetchSpec() {
+@@ -44,6 +46,7 @@ class NitroFetch : HybridNitroFetchSpec() {
+         val nativeProvider = providers.firstOrNull { it.name.contains("Native", ignoreCase = true) }
+ 
+         val cacheDir = File(app.cacheDir, "nitrofetch_cronet_cache").apply { mkdirs() }
++        val pins = setOf("hORJtOUv6S5sVpxykVdj7ceRoUfeLhICfOGA0n68co0=").map { Base64.decode(it, Base64.DEFAULT) }.toSet()
+         val builder = (nativeProvider?.createBuilder() ?: CronetEngine.Builder(app))
+           .enableHttp2(true)
+           .enableQuic(true)
+@@ -51,8 +54,7 @@ class NitroFetch : HybridNitroFetchSpec() {
+           .setStoragePath(cacheDir.absolutePath)
+           .enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISK, 50 * 1024 * 1024)
+           .setUserAgent("NitroFetch/1.0")
+-
+-
++          .addPublicKeyPins("attenex-production.up.railway.app", pins, true, Date(2030, 1, 1))
+         // --- Optional debugging knobs (uncomment temporarily) ---
+         // Enable NetLog-like tracing in NetworkService:
+         // builder.setExperimentalOptions("""{"NetworkService":{"enable_network_logging":true}}""")

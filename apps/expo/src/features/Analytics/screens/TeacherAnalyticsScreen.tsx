@@ -5,7 +5,6 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { useQueryClient } from "@tanstack/react-query";
 import { TextDecoder } from "react-native-nitro-text-decoder";
 
-import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { logger } from "@/shared/utils/logger";
 import { showMessage } from "@/shared/utils/toasts";
@@ -131,7 +130,6 @@ const TeacherAnalyticsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FuturisticBackground />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <AnalyticsScreenHeader />
         <SubjectSelectorWrapper
