@@ -31,6 +31,7 @@ export const styles = StyleSheet.create((theme) => ({
     color: theme.text.muted,
     fontSize: theme.typography.sm,
     fontWeight: "600",
+    marginTop: theme.spacing.xxs,
   },
   lectureCard: {
     padding: theme.spacing.md,

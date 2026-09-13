@@ -33,9 +33,7 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
     }
 
     // Get the lecture
-    const lecture = await db.query.lectures.findFirst({
-      where: eq(lectures.id, lectureId),
-    });
+    const [lecture] = await db.select().from(lectures).where(eq(lectures.id, lectureId)).limit(1);
 
     if (!lecture) {
       return res.status(404).json({
@@ -82,7 +80,7 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
       logger.info(`Refreshed passcode for lecture ${lectureId}: ${passcode}`);
 
       // Emit socket event to notify all connected clients about passcode refresh
-      const io = (req as any).app.get("io");
+      const io = req.app.get("io");
       if (io) {
         io.to(`lecture-${lectureId}`).emit("passcodeRefresh", {
           lectureId,
@@ -90,7 +88,8 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
           updatedAt: passcodeUpdatedAt.toISOString(),
         });
         logger.info(
-          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`,`new passcode: ${passcode}, updatedAt: ${passcodeUpdatedAt.toISOString()}`
+          `Socket event emitted: passcodeRefresh for lecture-${lectureId}`,
+          `new passcode: ${passcode}, updatedAt: ${passcodeUpdatedAt.toISOString()}`,
         );
       }
     }
@@ -102,7 +101,7 @@ export const getPasscode = async (req: AuthRequest, res: Response) => {
         updatedAt: passcodeUpdatedAt,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error("Get passcode error:", error);
     return res.status(500).json({
       success: false,

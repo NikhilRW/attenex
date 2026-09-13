@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { Request, Response } from "express";
-import { attendance, db, lectures, users } from "../../config/database_setup";
+import { attendance, classes, db, lectures, users } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { getLectureCounts } from "../../utils/lectureCounts";
 import { logger } from "../../utils/logger";
@@ -18,8 +18,7 @@ interface AuthRequest extends Request {
 export const joinLecture = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    if (!userId)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
     const parsed = v.safeParse(joinLectureRequestSchema, req.body);
     if (!parsed.success) {
@@ -30,30 +29,31 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
 
     // If rollNo is provided, update the user's roll number
     if (rollNo && rollNo.trim()) {
-      await db
-        .update(users)
-        .set({ rollNo: rollNo.trim() })
-        .where(eq(users.id, userId));
+      await db.update(users).set({ rollNo: rollNo.trim() }).where(eq(users.id, userId));
 
       logger.info(`Updated roll number for user ${userId}: ${rollNo.trim()}`);
     }
 
     // Get lecture details with class relation
-    const lecture = await db.query.lectures.findFirst({
-      where: eq(lectures.id, lectureId),
-      with: { class: true },
-    });
+    const [lecture] = await db
+      .select({ ...getTableColumns(lectures), class: classes })
+      .from(lectures)
+      .leftJoin(classes, eq(lectures.classId, classes.id))
+      .where(eq(lectures.id, lectureId))
+      .limit(1);
 
     if (!lecture) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Lecture not found" });
+      return res.status(404).json({ success: false, message: "Lecture not found" });
     }
 
     if (lecture.status !== "active") {
       return res
         .status(400)
-        .json({ success: false, message: "Lecture has been ended ask teacher to give manual attendance if it is authentic" });
+        .json({
+          success: false,
+          message:
+            "Lecture has been ended ask teacher to give manual attendance if it is authentic",
+        });
     }
 
     // Check distance
@@ -61,7 +61,7 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       latitude,
       longitude,
       parseFloat(lecture.teacherLatitude!),
-      parseFloat(lecture.teacherLongitude!)
+      parseFloat(lecture.teacherLongitude!),
     );
 
     // Log coordinates for debugging
@@ -88,17 +88,14 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
     }
 
     // Get the updated user data to return
-    const updatedUser = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
+    const [updatedUser] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
     // Check if already joined
-    const existingAttendance = await db.query.attendance.findFirst({
-      where: and(
-        eq(attendance.lectureId, lectureId),
-        eq(attendance.studentId, userId)
-      ),
-    });
+    const [existingAttendance] = await db
+      .select()
+      .from(attendance)
+      .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, userId)))
+      .limit(1);
 
     if (existingAttendance) {
       return res.status(200).json({
@@ -123,12 +120,12 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       .returning();
 
     logger.info(
-      `Student ${userId} joined lecture ${lectureId} successfully. Initial checkScore: 1`
+      `Student ${userId} joined lecture ${lectureId} successfully. Initial checkScore: 1`,
     );
 
     // Query actual counts and emit with absolute values (not deltas) for drift-proof reactivity
     const counts = await getLectureCounts(lectureId, lecture.class?.name);
-    const io = (req as any).app.get("io");
+    const io = req.app.get("io");
     if (io) {
       io.to(`lecture-${lectureId}`).emit("studentJoined", {
         lectureId,
@@ -137,9 +134,7 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
         joinTime: newAttendance[0].joinTime,
         ...counts,
       });
-      logger.info(
-        `Socket event emitted: studentJoined for lecture-${lectureId}`
-      );
+      logger.info(`Socket event emitted: studentJoined for lecture-${lectureId}`);
     }
 
     return res.status(200).json({
@@ -148,10 +143,8 @@ export const joinLecture = async (req: AuthRequest, res: Response) => {
       data: newAttendance[0],
       user: updatedUser,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error("Join lecture error", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

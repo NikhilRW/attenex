@@ -5,6 +5,7 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { withUnistyles } from "react-native-unistyles";
 
+import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
 import { TouchableOpacity } from "@shared/components/TouchableOpacity";
 import { showMessage } from "@shared/utils/toasts";
 
@@ -141,6 +142,7 @@ const StudentAnalyticsScreen = () => {
 
   return (
     <View style={styles.container}>
+      <FuturisticBackground />
       <FlatList
         data={lectures}
         renderItem={renderLecture}

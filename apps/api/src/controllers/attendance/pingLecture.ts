@@ -1,11 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import {
-  attendance,
-  attendancePings,
-  db,
-  lectures,
-} from "../../config/database_setup";
+import { attendance, attendancePings, db, lectures } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
 import * as v from "valibot";
@@ -22,8 +17,7 @@ interface AuthRequest extends Request {
 export const pingLecture = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    if (!userId)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
     const parsed = v.safeParse(pingLectureRequestSchema, req.body);
     if (!parsed.success) {
@@ -33,14 +27,10 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
     const { lectureId, latitude, longitude, _testTimestamp } = parsed.output;
 
     // Get lecture details for geofence check
-    const lecture = await db.query.lectures.findFirst({
-      where: eq(lectures.id, lectureId),
-    });
+    const [lecture] = await db.select().from(lectures).where(eq(lectures.id, lectureId)).limit(1);
 
     if (!lecture) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Lecture not found" });
+      return res.status(404).json({ success: false, message: "Lecture not found" });
     }
 
     // Calculate distance
@@ -48,7 +38,7 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
       latitude,
       longitude,
       parseFloat(lecture.teacherLatitude!),
-      parseFloat(lecture.teacherLongitude!)
+      parseFloat(lecture.teacherLongitude!),
     );
 
     const radius = parseFloat(lecture.geofenceRadius || "200");
@@ -70,12 +60,11 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
 
     // If ping is valid, increment the checkScore in attendance table
     if (isValid) {
-      const currentAttendance = await db.query.attendance.findFirst({
-        where: and(
-          eq(attendance.lectureId, lectureId),
-          eq(attendance.studentId, userId)
-        ),
-      });
+      const [currentAttendance] = await db
+        .select()
+        .from(attendance)
+        .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, userId)))
+        .limit(1);
 
       if (currentAttendance) {
         const currentScore = parseInt(currentAttendance.checkScore || "0");
@@ -84,26 +73,17 @@ export const pingLecture = async (req: AuthRequest, res: Response) => {
         await db
           .update(attendance)
           .set({ checkScore: newScore.toString() })
-          .where(
-            and(
-              eq(attendance.lectureId, lectureId),
-              eq(attendance.studentId, userId)
-            )
-          );
+          .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, userId)));
 
         logger.info(
-          `Updated checkScore for student ${userId} in lecture ${lectureId}: ${currentScore} -> ${newScore}`
+          `Updated checkScore for student ${userId} in lecture ${lectureId}: ${currentScore} -> ${newScore}`,
         );
       }
     }
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Ping received", isValid });
-  } catch (error: any) {
+    return res.status(200).json({ success: true, message: "Ping received", isValid });
+  } catch (error: unknown) {
     logger.error("Ping error", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

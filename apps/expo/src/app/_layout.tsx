@@ -56,11 +56,7 @@ const ThemedPaperProvider = withUnistyles(PaperProvider, (theme, rt) => {
   return {
     theme: {
       ...paperTheme,
-      colors: {
-        ...paperTheme.colors,
-        primary: theme.primary.main,
-        backdrop: "#00000053",
-      },
+      colors: { ...paperTheme.colors, primary: theme.primary.main, backdrop: "#00000053" },
     },
   };
 });
@@ -133,7 +129,7 @@ export default function RootLayout() {
     //     screenName={ROOT_LAYOUT_SCREEN_NAME}
     //   >
     <SafeAreaProvider>
-      {__DEV__ ? <FloatingDevTools /> : null}
+      {__DEV__ && false ? <FloatingDevTools /> : null}
 
       <StatusBar style={statusBarStyle} hideTransitionAnimation="fade" />
 
