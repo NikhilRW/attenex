@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useThemeStore } from "@shared/hooks/useTheme";
 import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
+import { clearUsersTokens } from "@shared/utils/user";
 
 import { UserSchema } from "../schemas/auth";
 
@@ -15,7 +16,7 @@ interface AuthState {
   isNotSynced: boolean;
   setAuth: (user: UserSchema | null, token: string | null, isSignUp?: boolean) => void;
   updateUser: (user: Partial<UserSchema>) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setIsNotSynced: (isNotSynced: boolean) => void;
 }
@@ -50,19 +51,18 @@ export const useAuthStore = create<AuthState>()(
         }));
       },
       logout: async () => {
-        // Remove token from secure storage and clear the persisted state
-        try {
-          await secureStore.removeItem("jwt");
-        } catch (err) {
-          console.error("Failed to remove token from secure storage", err);
-        }
-        useThemeStore.getState().setTheme("system");
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           isLoading: false,
         });
+        useThemeStore.getState().setTheme("system");
+        try {
+          await clearUsersTokens();
+        } catch (err) {
+          console.error("Failed to remove tokens from secure storage", err);
+        }
       },
       setLoading: (loading) => set({ isLoading: loading }),
     }),
@@ -85,7 +85,12 @@ export const useAuthStore = create<AuthState>()(
             state?.setIsNotSynced?.(state.isNotSynced);
           } else {
             // No token found; set loading to false
-            (state as any)?.setLoading?.(false);
+            useAuthStore.setState({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              isLoading: false,
+            });
           }
         })();
       },

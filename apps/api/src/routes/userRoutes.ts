@@ -1,4 +1,5 @@
 import { deleteUserAccount } from "@controllers/auth/deleteUserAccount";
+import { refreshAuthToken } from "@controllers/auth/refreshAuthToken";
 import {
   requestPasswordReset,
   resetPassword,
@@ -23,35 +24,15 @@ export const userRoutes = Router();
 // Use clear, action-based routes and POST for operations that carry a request body
 userRoutes.post("/signup", signUpUser);
 userRoutes.post("/signin", signInUser);
-userRoutes.post(
-  "/forgot-password",
-  forgotPasswordLimiter,
-  requestPasswordReset
-); // Request password reset email
+userRoutes.post("/forgot-password", forgotPasswordLimiter, requestPasswordReset); // Request password reset email
 userRoutes.post("/verify-reset-token", verifyResetToken); // Verify reset token is valid
 userRoutes.post("/reset-password", resetPassword); // Reset password with token
 userRoutes.post("/verify-user", verifyUser); // Verify user email
 userRoutes.post("/update-role", authenticate, updateUserRole); // Update user role (protected route)
-userRoutes.delete(
-  "/delete-account",
-  authenticate,
-  asyncHandler(deleteUserAccount)
-);
-userRoutes.post(
-  "/send-verification-email",
-  asyncHandler(sendVerificationEmailController)
-); // Update user role (protected route)
+userRoutes.delete("/delete-account", authenticate, asyncHandler(deleteUserAccount));
+userRoutes.post("/send-verification-email", asyncHandler(sendVerificationEmailController)); // Update user role (protected route)
 userRoutes.post("/update-class", authenticate, updateStudentClass); // Update student class (protected route)
-userRoutes.post(
-  "/update-device-token",
-  authenticate,
-  asyncHandler(updateUserDeviceToken)
-); // Update teacher's phone token
-userRoutes.patch(
-  "/full-name",
-  authenticate,
-  asyncHandler(updateUserFullName)
-); // Update teacher's phone token
+userRoutes.post("/update-device-token", authenticate, asyncHandler(updateUserDeviceToken)); // Update teacher's phone token
+userRoutes.patch("/full-name", authenticate, asyncHandler(updateUserFullName)); // Update teacher's phone token
 
-
-// TODO: how to invalidate token.
+userRoutes.get("/refresh-token", refreshAuthToken);

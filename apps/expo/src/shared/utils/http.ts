@@ -6,93 +6,29 @@ import {
   create,
   InternalAxiosRequestConfig,
 } from "axios";
-import { router } from "expo-router";
-import { fetch as nitroFetch } from "react-native-nitro-fetch";
+import { showMessage } from "react-native-flash-message";
 
 import { BASE_URI } from "@shared/constants/uri";
 import { useAuthStore } from "@shared/stores/authStore";
-import { secureStore } from "@shared/utils/secureStore";
+
+import {
+  attachAuthHeader,
+  expireSession,
+  getRefreshPromise,
+  isPublicAuthRoute,
+  refreshSession,
+  setRefreshPromise,
+} from "./httpAuth";
+import { getErrorMessage } from "./httpErrors";
+import { getUserAuthToken } from "./user";
 
 export type HttpRequestConfig = AxiosRequestConfig;
 export type HttpResponse<T = any> = AxiosResponse<T>;
 export type HttpError<T = any> = AxiosError<T>;
 
-// TODO: Test that it works with stream,formData,blob, etc. requests and responses acutally then Response would probably be compatible with AxiosResponse one.
-// eslint-disable-next-line
-const axiosFetchEnv = {
-  fetch: nitroFetch,
-  Request: null,
-  Response: null,
-} as unknown as NonNullable<AxiosRequestConfig["env"]>;
-
-const attachAuthHeader = async (config: InternalAxiosRequestConfig) => {
-  const state = useAuthStore.getState();
-  let token = state.token;
-
-  if (!token) {
-    token = await secureStore.getItem("jwt");
-  }
-
-  if (token) {
-    config.headers = AxiosHeaders.from(config.headers);
-    config.headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  return config;
-};
-
-const handleUnauthorized = (error: AxiosError) => {
-  if (error.response?.status !== 401) {
-    return;
-  }
-
-  const data = error.response.data as
-    | {
-        error?: unknown;
-      }
-    | undefined;
-  const errorMsg = typeof data?.error === "string" ? data.error : "";
-  const normalizedErrorMsg = errorMsg.toLowerCase();
-
-  if (normalizedErrorMsg.includes("token") || normalizedErrorMsg.includes("authorization")) {
-    useAuthStore.getState().logout();
-    router.replace("/sign-in");
-  }
-};
-
-const getErrorMessage = (error: AxiosError) => {
-  const data = error.response?.data as
-    | {
-        error?: unknown;
-        message?: unknown;
-      }
-    | undefined;
-
-  if (typeof data?.error === "string") {
-    return data.error;
-  }
-
-  if (typeof data?.message === "string") {
-    return data.message;
-  }
-
-  if (error.message === "Network Error") {
-    return "Unable to connect. Please check your internet connection.";
-  }
-
-  if (error.code === AxiosError.ETIMEDOUT || error.code === "ECONNABORTED") {
-    return "Request timeout. Please try again.";
-  }
-
-  return error.message;
-};
-
 const http = create({
   baseURL: BASE_URI,
   adapter: "fetch",
-  // env: {
-  //   ...axiosFetchEnv,
-  // },
 });
 
 http.interceptors.request.use(async (config) => {
@@ -105,12 +41,60 @@ http.interceptors.response.use(
     console.log("[HTTP Response]", response.status, response.config.url);
     return response;
   },
-  (error: AxiosError) => {
-    handleUnauthorized(error);
-    error.message = getErrorMessage(error);
+  async (error: AxiosError) => {
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        })
+      | undefined;
 
-    console.error("[HTTP Error]", error.response?.status, error.config?.url);
-    return Promise.reject(error);
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !isPublicAuthRoute(originalRequest.url)
+    ) {
+      const currentToken = await getUserAuthToken();
+      if (originalRequest._retry) {
+        if (useAuthStore.getState().isAuthenticated) await expireSession();
+      } else if (currentToken && useAuthStore.getState().isAuthenticated) {
+        originalRequest._retry = true;
+        const headers = AxiosHeaders.from(originalRequest.headers);
+
+        if (headers.get("Authorization") === `Bearer ${currentToken}`) {
+          const promise = getRefreshPromise() ?? refreshSession(currentToken);
+          setRefreshPromise(promise);
+          headers.set("Authorization", `Bearer ${await promise}`);
+        } else {
+          headers.set("Authorization", `Bearer ${currentToken}`);
+        }
+        originalRequest.headers = headers;
+        return http(originalRequest);
+      }
+    }
+
+    const errorMessage = getErrorMessage(error);
+    if (error.response?.status === 403 && errorMessage.toLowerCase().includes("blocked")) {
+      showMessage({
+        message: "Account Blocked",
+        description: "Your account has been blocked. Contact support.",
+        type: "danger",
+        duration: 4000,
+      });
+      await expireSession();
+      throw error;
+    }
+
+    if (__DEV__) {
+      showMessage({
+        message: "Error occurred",
+        description: errorMessage,
+        type: "danger",
+      });
+      console.error("[HTTP Error]", error.response?.status, error.config?.url);
+    }
+
+    error.message = errorMessage;
+    throw error;
   },
 );
 

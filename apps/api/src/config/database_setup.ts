@@ -69,11 +69,7 @@ export const attendanceStatusEnum = pgEnum("attendance_status", [
  * - auto: Student used passcode/location to mark attendance
  * - oauth: Attendance marked through OAuth-verified system (future use)
  */
-export const attendanceMethodEnum = pgEnum("attendance_method", [
-  "manual",
-  "auto",
-  "oauth",
-]);
+export const attendanceMethodEnum = pgEnum("attendance_method", ["manual", "auto", "oauth"]);
 
 // ==================== TABLES ====================
 
@@ -143,10 +139,7 @@ export const classes = pgTable(
   (table) => {
     return {
       teacherIdx: index("classes_teacher_idx").on(table.teacherId), // Find classes by teacher
-      uniqueNameTeacher: uniqueIndex("classes_name_teacher_idx").on(
-        table.name,
-        table.teacherId,
-      ), // Each teacher can have unique class names
+      uniqueNameTeacher: uniqueIndex("classes_name_teacher_idx").on(table.name, table.teacherId), // Each teacher can have unique class names
     };
   },
 );
@@ -169,10 +162,7 @@ export const subjects = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => ({
-    uniqueNameTeacher: uniqueIndex("subjects_name_teacher_idx").on(
-      table.name,
-      table.teacherId,
-    ),
+    uniqueNameTeacher: uniqueIndex("subjects_name_teacher_idx").on(table.name, table.teacherId),
   }),
 );
 
@@ -291,9 +281,7 @@ export const attendancePings = pgTable(
     longitude: numeric("longitude", { precision: 10, scale: 7 }),
     isValid: boolean("is_valid").notNull(), // True if within geofence radius
   },
-  (table) => [
-    index("pings_lecture_student_idx").on(table.lectureId, table.studentId),
-  ],
+  (table) => [index("pings_lecture_student_idx").on(table.lectureId, table.studentId)],
 );
 
 /**
@@ -317,9 +305,7 @@ export const geofenceLogs = pgTable(
     eventType: varchar("event_type", { length: 10 }).notNull(), // 'EXIT' or 'ENTER'
     timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow(),
   },
-  (table) => [
-    index("geofence_lecture_student_idx").on(table.lectureId, table.studentId),
-  ],
+  (table) => [index("geofence_lecture_student_idx").on(table.lectureId, table.studentId)],
 );
 
 // ==================== RELATIONS ====================
@@ -390,19 +376,16 @@ export const attendanceRelations = relations(attendance, ({ one }) => ({
   }), // Attendance belongs to one student
 }));
 
-export const attendanceAttemptsRelations = relations(
-  attendanceAttempts,
-  ({ one }) => ({
-    lecture: one(lectures, {
-      fields: [attendanceAttempts.lectureId],
-      references: [lectures.id],
-    }), // Attempt belongs to one lecture
-    student: one(users, {
-      fields: [attendanceAttempts.studentId],
-      references: [users.id],
-    }), // Attempt belongs to one student
-  }),
-);
+export const attendanceAttemptsRelations = relations(attendanceAttempts, ({ one }) => ({
+  lecture: one(lectures, {
+    fields: [attendanceAttempts.lectureId],
+    references: [lectures.id],
+  }), // Attempt belongs to one lecture
+  student: one(users, {
+    fields: [attendanceAttempts.studentId],
+    references: [users.id],
+  }), // Attempt belongs to one student
+}));
 
 // ==================== DATABASE CONNECTION ====================
 

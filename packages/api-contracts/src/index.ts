@@ -19,9 +19,14 @@ export { updateUserFullNameRequestSchema } from "./apiRequests/auth/users/update
 
 // apiResponses - auth
 export { emailSignInSuccessResponseSchema } from "./apiResponses/auth/emailSignIn";
+export type { EmailSignInSuccessResponse } from "./apiResponses/auth/emailSignIn";
 export { emailSignUpSuccessResponseSchema } from "./apiResponses/auth/emailSignUp";
 export { googleAuthSuccessResponseSchema } from "./apiResponses/auth/googleAuth";
+export type { GoogleAuthSuccessResponse } from "./apiResponses/auth/googleAuth";
+export { refreshAuthTokenSuccessResponseSchema } from "./apiResponses/auth/refreshAuthToken";
+export type { RefreshAuthTokenSuccessResponse } from "./apiResponses/auth/refreshAuthToken";
 export { linkedInAuthSuccessResponseSchema } from "./apiResponses/auth/linkedInAuth";
+export type { LinkedInAuthSuccessResponse } from "./apiResponses/auth/linkedInAuth";
 export { verifyUserSuccessResponseSchema } from "./apiResponses/auth/verifyUser";
 export { sendVerificationEmailSuccessResponseSchema } from "./apiResponses/auth/sendVerificationEmail";
 export { forgotPasswordSuccessResponseSchema } from "./apiResponses/auth/forgotPassword";
@@ -46,7 +51,7 @@ export type { GetTeacherAnalyticsRequestType } from "./apiRequests/analytics/get
 export { getStudentAnalyticsRequestSchema } from "./apiRequests/analytics/getStudentAnalytics";
 export type { GetStudentAnalyticsRequestType } from "./apiRequests/analytics/getStudentAnalytics";
 export { getAiAnalyticsRequestSchema } from "./apiRequests/analytics/getAiAnalytics";
-export { GetAiAnalyticsRequestType } from "./apiRequests/analytics/getAiAnalytics";
+export type { GetAiAnalyticsRequestType } from "./apiRequests/analytics/getAiAnalytics";
 
 // apiResponses - lectures
 export { addTeacherClassSuccessResponseSchema } from "./apiResponses/lectures/addTeacherClass";
@@ -83,7 +88,7 @@ export type { GetTeacherAnalyticsResponseType } from "./apiResponses/analytics/g
 export { getTeacherAnalyticsResponseSchema } from "./apiResponses/analytics/getTeacherAnalytics";
 export type { GetStudentAnalyticsResponseType } from "./apiResponses/analytics/getStudentAnalytics";
 export { getStudentAnalyticsResponseSchema } from "./apiResponses/analytics/getStudentAnalytics";
-export { AnalyticsGraphPointType } from "./common/analytics";
+export type { AnalyticsGraphPointType } from "./common/analytics";
 
 // apiRequests - attendance
 export { joinLectureRequestSchema } from "./apiRequests/attendance/joinLecture";

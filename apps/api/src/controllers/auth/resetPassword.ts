@@ -25,11 +25,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 
     const { email } = parsed.output;
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!user) {
       return res.status(200).json({
@@ -61,8 +57,6 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
       resetToken,
     )}&email=${encodeURIComponent(email)}`;
 
-    const to = email;
-    const subject = "Reset Your Password - Attenex";
     const html = `
         <!DOCTYPE html>
         <html>
@@ -136,11 +130,7 @@ export const verifyResetToken = async (req: Request, res: Response) => {
 
     const { email, token } = parsed.output;
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
       return res.status(400).json({
@@ -189,12 +179,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 
     const { email, token, newPassword } = parsed.output;
-// TODO: try to make the response message more generic info not detailed to avoid giving hints to potential attackers about the validity of the email or token.
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    // TODO: try to make the response message more generic info not detailed to avoid giving hints to potential attackers about the validity of the email or token.
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
       return res.status(400).json({
@@ -206,7 +192,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     if (new Date() > new Date(user.resetTokenExpiresAt)) {
       return res.status(400).json({
         success: false,
-        message: "Reset link has expired. Please request a new one.",
+        message: "Invalid or expired reset link",
       });
     }
 
@@ -232,8 +218,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       .where(eq(users.id, user.id));
 
     return res.status(200).json({
-      message:
-        "Password reset successfully. You can now sign in with your new password.",
+      message: "Password reset successfully. You can now sign in with your new password.",
     });
   } catch (error) {
     console.error("Password reset error:", error);

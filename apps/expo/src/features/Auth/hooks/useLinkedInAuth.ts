@@ -6,7 +6,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { linkedinAuthService } from "@auth/services/linkedinAuthService";
 import { authService } from "@shared/services/authService";
-import { useAuthStore } from "@shared/stores/authStore";
 import { subscribeToClassName } from "@shared/utils/fcm";
 import { logger } from "@shared/utils/logger";
 import { getStartingScreenPath } from "@shared/utils/navigation";
@@ -63,9 +62,9 @@ export const useLinkedInAuth = () => {
       return exchange;
     },
     onSuccess: async (data) => {
-      const { user, token } = data;
+      const { user, token, refreshToken } = data;
 
-      await authService.login(user, token);
+      await authService.login(user, token, refreshToken);
 
       if (user.className && user.role === "student") {
         subscribeToClassName(user.className);
@@ -81,11 +80,7 @@ export const useLinkedInAuth = () => {
 
       logger.info(`LinkedIn sign-in successful for user: ${user.email}`, "LinkedInAuth");
 
-      useAuthStore.subscribe((newState, prevState) => {
-        if (newState.user && prevState.user === null) {
-          router.replace(getStartingScreenPath());
-        }
-      });
+      router.replace(getStartingScreenPath());
     },
     onError: (error) => {
       const err = error as any;

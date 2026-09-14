@@ -1,14 +1,13 @@
 import axios from "axios";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { generateAuthTokens } from "../../../utils/tokens";
 import { db, users } from "../../../config/database_setup";
 import { logger } from "../../../utils/logger";
 import * as v from "valibot";
 import { linkedInAuthRequestSchema } from "@attenex/api-contracts";
 import "dotenv/config";
 
-const JWT_SECRET = process.env.JWT_SECRET || "xxxx-xxxx-xxxx";
 const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || "";
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET || "";
 
@@ -54,7 +53,7 @@ export const linkedInAuth = async (req: Request, res: Response) => {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      }
+      },
     );
 
     const { access_token } = tokenResponse.data;
@@ -78,23 +77,16 @@ export const linkedInAuth = async (req: Request, res: Response) => {
      * - email: Primary email address
      * - picture: Profile picture URL (if available)
      */
-    const profileResponse = await axios.get(
-      "https://api.linkedin.com/v2/userinfo",
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    );
+    const profileResponse = await axios.get("https://api.linkedin.com/v2/userinfo", {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
 
     const linkedinUser = profileResponse.data;
 
     logger.info(`LinkedIn OAuth: Retrieved profile for ${linkedinUser.email}`);
-    logger.info(
-      `LinkedIn OAuth: Retrieved profile for ${JSON.stringify(
-        profileResponse.data
-      )}`
-    );
+    logger.info(`LinkedIn OAuth: Retrieved profile for ${JSON.stringify(profileResponse.data)}`);
 
     /**
      * Step 3: Check if User Exists in Database
@@ -157,16 +149,9 @@ export const linkedInAuth = async (req: Request, res: Response) => {
      * - email: For user identification
      * - role: For authorization checks
      *
-     * Token expires in 30 days, requiring re-authentication
+     * Access token expires in 10 minutes
      */
-    const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      JWT_SECRET,
-      { expiresIn: "30d" }
-    );
+    const { token, refreshToken } = generateAuthTokens(user);
 
     /**
      * Step 5: Return Success Response
@@ -187,16 +172,15 @@ export const linkedInAuth = async (req: Request, res: Response) => {
       success: true,
       user: safeUser,
       token,
+      refreshToken,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error("LinkedIn OAuth error: " + error);
 
-    if (error.response?.data) {
+    if (axios.isAxiosError<{ error_description?: string }>(error) && error.response?.data) {
       return res.status(400).json({
         success: false,
-        message:
-          error.response.data.error_description ||
-          "LinkedIn authentication failed",
+        message: error.response.data.error_description || "LinkedIn authentication failed",
       });
     }
 

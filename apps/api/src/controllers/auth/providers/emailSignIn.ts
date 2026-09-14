@@ -2,7 +2,7 @@ import { db, users } from "@config/database_setup";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateAuthTokens } from "@utils/tokens";
 import * as v from "valibot";
 import { emailSignInRequestSchema } from "@attenex/api-contracts";
 
@@ -19,11 +19,7 @@ export const emailSignIn = async (req: Request, res: Response) => {
     const { email, password } = parsed.output;
 
     // Find user by email
-    const existingUsers = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!existingUsers || existingUsers.length === 0) {
       return res.status(401).json({
@@ -34,10 +30,7 @@ export const emailSignIn = async (req: Request, res: Response) => {
 
     const userFound = existingUsers[0];
     // Compare hashed password
-    const passwordMatch = bcrypt.compareSync(
-      password,
-      userFound.passwordHash || ""
-    );
+    const passwordMatch = bcrypt.compareSync(password, userFound.passwordHash || "");
     if (!passwordMatch) {
       return res.status(401).json({
         success: false,
@@ -45,12 +38,7 @@ export const emailSignIn = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: userFound.id, role: userFound.role },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: 10 * 24 * 60 * 60 } // 10 days expiration
-    );
+    const { token, refreshToken } = generateAuthTokens(userFound);
 
     // Return user info without sensitive fields
     const safeUser = {
@@ -65,7 +53,7 @@ export const emailSignIn = async (req: Request, res: Response) => {
       oauthProvider: userFound.oauthProvider || null,
     };
 
-    return res.status(200).json({ success: true, user: safeUser, token });
+    return res.status(200).json({ success: true, user: safeUser, token, refreshToken });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({

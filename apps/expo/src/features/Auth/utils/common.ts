@@ -90,10 +90,10 @@ export const handleGoogleSignIn = async () => {
       return;
     }
 
-    const { user, token } = parsedResponse.output;
+    const { user, token, refreshToken } = parsedResponse.output;
 
     // Step 3: Update local authentication state
-    await authService.login(user, token);
+    await authService.login(user, token, refreshToken);
 
     if (user.className && user.role === "student") {
       await subscribeToClassName(user.className);
@@ -114,11 +114,7 @@ export const handleGoogleSignIn = async () => {
       "common.ts :: handleGoogleSignIn()",
     );
 
-    useAuthStore.subscribe((newState, prevState) => {
-      if (newState.user && prevState.user === null) {
-        router.replace(getStartingScreenPath());
-      }
-    });
+    router.replace(getStartingScreenPath());
   } catch (err) {
     // Handle any errors during the sign-in process
     const e = err as any;
@@ -220,7 +216,7 @@ export const handleEmailSignIn = async ({
       return;
     }
 
-    const { token, user } = parsedResponse.output;
+    const { token, refreshToken, user } = parsedResponse.output;
 
     if (user.isVerified === false) {
       showMessage({
@@ -250,6 +246,8 @@ export const handleEmailSignIn = async ({
       await subscribeToClassName(user.className!);
     }
 
+    await authService.login(user, token, refreshToken);
+
     // Prefetch initial data based on role so first screen loads instantly
     if (user.role === "teacher") {
       queryClient.prefetchQuery({
@@ -278,20 +276,14 @@ export const handleEmailSignIn = async ({
       position: "bottom",
     });
 
-    // // Replace to main stack after successful signin
-    useAuthStore.subscribe((newState, prevState) => {
-      if (newState.user && prevState.user === null) {
-        router.replace(getStartingScreenPath());
-      }
-    });
-    await authService.login(user, token);
+    router.replace(getStartingScreenPath());
   } catch (err) {
     const e = err as any;
 
     // Parse user-friendly error message
     let errorMessage = "Unable to sign in. Please check your credentials.";
 
-    if (e.response!.status === 401) {
+    if (e.response?.status === 401) {
       errorMessage = "Invalid email or password. Please try again.";
     } else if (e.response?.status === 400) {
       errorMessage = e.response?.data?.message || "Please check your email and password.";
@@ -299,7 +291,7 @@ export const handleEmailSignIn = async ({
       errorMessage = "Unable to connect. Please check your internet connection.";
     } else if (e.response?.data?.message) {
       errorMessage = e.response.data.message;
-    } else if (e.response.status === 429) {
+    } else if (e.response?.status === 429) {
       errorMessage = e.response.data;
     }
 

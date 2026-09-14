@@ -1,16 +1,16 @@
 import * as v from "valibot";
 
-import { linkedInAuthSuccessResponseSchema } from "@attenex/api-contracts";
+import {
+  linkedInAuthSuccessResponseSchema,
+  LinkedInAuthSuccessResponse,
+} from "@attenex/api-contracts";
 import http from "@shared/utils/http";
 
 export const linkedinAuthService = {
   async exchangeCodeForUser(
     code: string,
     redirectUri: string,
-  ): Promise<{
-    user: v.InferOutput<typeof linkedInAuthSuccessResponseSchema>["user"];
-    token: string;
-  } | null> {
+  ): Promise<LinkedInAuthSuccessResponse | null> {
     try {
       const response = await http.post(`/api/users/signin?authType=linkedin`, {
         code,
@@ -23,7 +23,7 @@ export const linkedinAuthService = {
         return null;
       }
 
-      return { user: parsed.output.user, token: parsed.output.token };
+      return parsed.output;
     } catch (err: any) {
       console.error(
         "linkedinAuthService: exchangeCodeForUser failed",

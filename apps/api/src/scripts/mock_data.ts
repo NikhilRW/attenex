@@ -46,7 +46,7 @@
  */
 
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateAccessToken } from "../utils/tokens";
 import { and, eq, inArray, sql } from "drizzle-orm";
 
 import {
@@ -545,11 +545,7 @@ const seedLecturesWithAttendance = async ({
   }
 
   // Print summary + teacher JWT for direct API testing
-  const token = jwt.sign(
-    { id: teacherId, role: "teacher" },
-    JWT_SECRET,
-    { expiresIn: 10 * 24 * 60 * 60 }, // 10 days
-  );
+  const token = generateAccessToken({ id: teacherId, role: "teacher" }, { secret: JWT_SECRET });
 
   const endDate = now.toISOString().slice(0, 10);
   const startDate = new Date(now);
@@ -568,7 +564,7 @@ const seedLecturesWithAttendance = async ({
     `  Attendance: ${presentCreated} present, ${incompleteCreated} incomplete (absent not stored)`,
   );
   console.log("");
-  console.log(`  Teacher JWT (10d, for direct API calls):`);
+  console.log(`  Teacher JWT (10m, for direct API calls):`);
   console.log(`  ${token}`);
   console.log("");
   console.log(`  Try: curl -H "Authorization: Bearer <token>" \\`);

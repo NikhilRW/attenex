@@ -6,6 +6,7 @@ export const googleAuthSuccessResponseSchema = v.object({
   message: v.string(),
   user: userSchema,
   token: v.pipe(v.string(), v.trim(), v.jwsCompact()),
+  refreshToken: v.pipe(v.string(), v.trim(), v.jwsCompact()),
 });
 export type GoogleAuthSuccessResponse = v.InferOutput<
   typeof googleAuthSuccessResponseSchema
