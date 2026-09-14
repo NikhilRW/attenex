@@ -11,7 +11,7 @@ export default (): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.attenex.attenex",
-    googleServicesFile: "./personal/secrets/google-services.json",
+    googleServicesFile: "./personal/secrets/GoogleService-Info.plist",
   },
   android: {
     config: {
