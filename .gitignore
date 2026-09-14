@@ -7,4 +7,5 @@ node_modules/
 skills-lock.json
 .vscode
 /personal
-/patches/
+.codegraph 
+.opencode

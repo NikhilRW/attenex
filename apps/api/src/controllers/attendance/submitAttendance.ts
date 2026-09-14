@@ -1,11 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import {
-  attendance,
-  attendancePings,
-  db,
-  lectures,
-} from "../../config/database_setup";
+import { attendance, attendancePings, db, lectures } from "../../config/database_setup";
 import { calculateDistance } from "../../utils/location";
 import { logger } from "../../utils/logger";
 import * as v from "valibot";
@@ -22,8 +17,7 @@ interface AuthRequest extends Request {
 export const submitAttendance = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    if (!userId)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
     const parsed = v.safeParse(submitAttendanceRequestSchema, req.body);
     if (!parsed.success) {
@@ -31,23 +25,15 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
     }
 
     const { lectureId, latitude, longitude, passcode, _testElapsedMinutes } = parsed.output;
-    // TODO: remove it
-    // Get lecture
-    const lecture = await db.query.lectures.findFirst({
-      where: eq(lectures.id, lectureId),
-    });
+    const [lecture] = await db.select().from(lectures).where(eq(lectures.id, lectureId)).limit(1);
 
-    if (!lecture)
-      return res
-        .status(404)
-        .json({ success: false, message: "Lecture not found" });
+    if (!lecture) return res.status(404).json({ success: false, message: "Lecture not found" });
 
     // Validate passcode
     if (lecture.passcode !== passcode) {
       return res.status(403).json({
         success: false,
-        message:
-          "Invalid passcode. Please re confirm the correct code from your teacher.",
+        message: "Invalid passcode. Please re confirm the correct code from your teacher.",
       });
     }
 
@@ -56,7 +42,7 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       latitude,
       longitude,
       parseFloat(lecture.teacherLatitude!),
-      parseFloat(lecture.teacherLongitude!)
+      parseFloat(lecture.teacherLongitude!),
     );
 
     const radius = parseFloat(lecture.geofenceRadius || "200");
@@ -69,12 +55,11 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
     }
 
     // Get attendance record to check score
-    const attendanceRecord = await db.query.attendance.findFirst({
-      where: and(
-        eq(attendance.lectureId, lectureId),
-        eq(attendance.studentId, userId)
-      ),
-    });
+    const [attendanceRecord] = await db
+      .select()
+      .from(attendance)
+      .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, userId)))
+      .limit(1);
 
     if (!attendanceRecord) {
       return res.status(400).json({
@@ -88,7 +73,7 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       where: and(
         eq(attendancePings.lectureId, lectureId),
         eq(attendancePings.studentId, userId),
-        eq(attendancePings.isValid, true)
+        eq(attendancePings.isValid, true),
       ),
       orderBy: (pings, { asc }) => [asc(pings.timestamp)],
     });
@@ -164,8 +149,8 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
 
     logger.info(
       `Student ${userId} submitting attendance for lecture ${lectureId}. Duration: ${durationMinutes.toFixed(
-        1
-      )}m. Pings: ${pings.length}. Status: ${finalStatus}`
+        1,
+      )}m. Pings: ${pings.length}. Status: ${finalStatus}`,
     );
 
     // Update Attendance
@@ -177,16 +162,11 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
         checkScore: pings.length.toString(),
         locationSnapshot: { lat: latitude, lng: longitude, accuracy: 0 },
       })
-      .where(
-        and(
-          eq(attendance.lectureId, lectureId),
-          eq(attendance.studentId, userId)
-        )
-      )
+      .where(and(eq(attendance.lectureId, lectureId), eq(attendance.studentId, userId)))
       .returning();
 
     // Emit socket event to notify teacher about attendance submission
-    const io = (req as any).app.get("io");
+    const io = req.app.get("io");
     if (io) {
       io.to(`lecture-${lectureId}`).emit("attendanceSubmitted", {
         lectureId,
@@ -195,9 +175,7 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
         checkScore: pings.length,
         submitTime: result[0].submitTime,
       });
-      logger.info(
-        `Socket event emitted: attendanceSubmitted for lecture-${lectureId}`
-      );
+      logger.info(`Socket event emitted: attendanceSubmitted for lecture-${lectureId}`);
     }
 
     return res.status(200).json({
@@ -205,10 +183,8 @@ export const submitAttendance = async (req: AuthRequest, res: Response) => {
       message,
       data: result[0],
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error("Submit attendance error", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

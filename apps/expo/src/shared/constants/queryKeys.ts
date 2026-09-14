@@ -4,6 +4,11 @@
  * https://tkdodo.eu/blog/effective-react-query-keys
  */
 
+import {
+  getQueryKeyForStudentAnalytics,
+  getQueryKeyForTeacherAnalytics,
+} from "@/features/Analytics/utils/common";
+
 export const queryKeys = {
   // Auth domain
   auth: {
@@ -47,8 +52,14 @@ export const queryKeys = {
 
   analytics: {
     all: ["analytics"] as const,
-    teacher: ["analytics", "teacher"] as const,
-    student: ["analytics", "student"] as const,
+    teacher: {
+      all: ["analytics", "teacher"] as const,
+      byOptions: getQueryKeyForTeacherAnalytics,
+    },
+    student: {
+      all: ["analytics", "student"] as const,
+      byOptions: getQueryKeyForStudentAnalytics,
+    },
   },
 
   // Real-time socket updates

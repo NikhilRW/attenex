@@ -3,7 +3,7 @@ import { Text, TextInput, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -83,7 +83,12 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
             onPress={onToggleDropdown}
             activeOpacity={1}
           />
-          <Animated.View entering={FadeInUp.springify()} style={styles.modalAnimatedWrapper}>
+          <EaseView
+            initialAnimate={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4 }}
+            style={styles.modalAnimatedWrapper}
+          >
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -127,7 +132,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
                 ))}
               </View>
             </SelectionModalGradient>
-          </Animated.View>
+          </EaseView>
         </View>
       </UniModal>
     </>

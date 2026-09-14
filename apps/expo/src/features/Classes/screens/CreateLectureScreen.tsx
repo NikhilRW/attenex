@@ -1,7 +1,7 @@
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 
 import { CreateLectureFormCard } from "@classes/components/CreateLectureFormCard";
 import { CreateLectureHeader } from "@classes/components/CreateLectureHeader";
@@ -64,7 +64,11 @@ const CreateLectureScreen = () => {
           contentContainerStyle={[styles.scrollContent, { minHeight: minHeightScrollView }]}
           keyboardShouldPersistTaps="always"
         >
-          <Animated.View entering={FadeInUp.delay(100).springify()}>
+          <EaseView
+            initialAnimate={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 100 }}
+          >
             <CreateLectureFormCard
               selectedClass={selectedClass}
               existingClasses={existingClasses || []}
@@ -89,7 +93,7 @@ const CreateLectureScreen = () => {
               loading={loading}
               onCreateLecture={handleCreateLecture}
             />
-          </Animated.View>
+          </EaseView>
         </ScrollView>
       </KeyboardAvoidingView>
 

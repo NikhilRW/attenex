@@ -7,7 +7,6 @@ const pluginJest = require("eslint-plugin-jest");
 const promisePlugin = require("eslint-plugin-promise");
 const reactCompiler = require("eslint-plugin-react-compiler");
 const reactNative = require("eslint-plugin-react-native");
-const reactNativeA11y = require("eslint-plugin-react-native-a11y");
 const globals = require("globals");
 
 // Jest test file patterns matching Jest's default testMatch
@@ -133,7 +132,6 @@ module.exports = defineConfig([
   {
     plugins: {
       "react-native": reactNative,
-      "react-native-a11y": reactNativeA11y,
       promise: promisePlugin,
       "@react-native": reactNativePlugin,
       "react-compiler": reactCompiler,

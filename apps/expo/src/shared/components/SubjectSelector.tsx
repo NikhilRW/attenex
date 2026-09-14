@@ -40,6 +40,7 @@ const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
 
 export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   selectedSubject,
+  selectedSubjectId,
   existingSubjects,
   showDropdown,
   onToggleDropdown,
@@ -47,27 +48,36 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   onAddNewSubject,
   isSubjectModificationEnabled = true,
   showLabel = true,
+  isAllSubjectAvailable = false,
 }) => {
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<SubjectItem>) => (
       <TouchableOpacity
-        onPress={() => onSelectSubject(item.name)}
-        style={[styles.optionItem, selectedSubject === item.name && styles.optionItemSelected]}
+        onPress={() => onSelectSubject(item.name, item.id)}
+        style={[
+          styles.optionItem,
+          (selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name) &&
+            styles.optionItemSelected,
+        ]}
         haptic="selection"
         testID={`CREATE_LECTURE_SCREEN.SUBJECT_SELECTOR_ITEM_${index + 1}`}
       >
         <Text
           style={[
             styles.optionItemText,
-            selectedSubject === item.name ? styles.optionItemTextSelected : null,
+            (selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name)
+              ? styles.optionItemTextSelected
+              : null,
           ]}
         >
           {item.name}
         </Text>
-        {selectedSubject === item.name ? <PrimaryIcon name="checkmark-circle" size={20} /> : null}
+        {(selectedSubjectId ? selectedSubjectId === item.id : selectedSubject === item.name) ? (
+          <PrimaryIcon name="checkmark-circle" size={20} />
+        ) : null}
       </TouchableOpacity>
     ),
-    [onSelectSubject, selectedSubject],
+    [onSelectSubject, selectedSubject, selectedSubjectId],
   );
 
   const keyExtractor = useCallback((item: SubjectItem) => item.id, []);
@@ -102,7 +112,11 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         style={styles.dropdown}
       >
         <Text style={[styles.dropdownText, !selectedSubject && styles.dropdownTextMuted]}>
-          {selectedSubject || "Select a subject"}
+          {selectedSubject
+            ? selectedSubject
+            : isAllSubjectAvailable === true
+              ? "All"
+              : "Select a subject"}
         </Text>
         <AddCircleIcon name="add-circle-sharp" size={20} />
       </TouchableOpacity>

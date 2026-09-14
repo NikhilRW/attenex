@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from "react";
-import { ListRenderItemInfo, Text, View } from "react-native";
+import { FlatList, ListRenderItemInfo, Text, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -28,7 +28,6 @@ const MutedIcon = withUnistyles(Ionicons, (theme) => ({
   color: theme.text.muted,
 }));
 
-const AnimatedView = withUnistyles(Animated.View);
 const CLASS_ITEM_HEIGHT = 56;
 
 const SelectionModalGradient = withUnistyles(LinearGradient, (_theme, rt) => ({
@@ -112,7 +111,12 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
         onRequestClose={onToggleDropdown}
       >
         <View style={styles.modalContainer}>
-          <AnimatedView entering={FadeInUp.springify()} style={styles.modalAnimatedWrapper}>
+          <EaseView
+            initialAnimate={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4 }}
+            style={styles.modalAnimatedWrapper}
+          >
             <SelectionModalGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -128,7 +132,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                   <SecondaryIcon name="close" size={20} />
                 </TouchableOpacity>
               </View>
-              <Animated.FlatList<ClassItem>
+              <FlatList<ClassItem>
                 data={existingClasses}
                 keyExtractor={keyExtractor}
                 renderItem={renderClassItem}
@@ -158,7 +162,7 @@ export const ClassSelector: React.FC<ClassSelectorProps> = ({
                 </TouchableOpacity>
               </View>
             </SelectionModalGradient>
-          </AnimatedView>
+          </EaseView>
         </View>
       </UniModal>
     </View>

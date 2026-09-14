@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { Request, Response } from "express";
-import { attendance, db, lectures, users } from "../../config/database_setup";
+import { attendance, classes, db, lectures, users } from "../../config/database_setup";
 import { logger } from "../../utils/logger";
 import { LectureParams } from "../../types/params";
 
@@ -12,10 +12,7 @@ interface AuthRequest extends Request {
   };
 }
 
-export const fetchLectureAttendance = async (
-  req: AuthRequest,
-  res: Response,
-) => {
+export const fetchLectureAttendance = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const userRole = req.user?.role;
@@ -59,12 +56,12 @@ export const fetchLectureAttendance = async (
     }
 
     // Get the lecture with class information
-    const lecture = await db.query.lectures.findFirst({
-      where: eq(lectures.id, lectureId),
-      with: {
-        class: true,
-      },
-    });
+    const [lecture] = await db
+      .select({ ...getTableColumns(lectures), class: classes })
+      .from(lectures)
+      .leftJoin(classes, eq(lectures.classId, classes.id))
+      .where(eq(lectures.id, lectureId))
+      .limit(1);
 
     const className = lecture?.class?.name;
 
@@ -102,9 +99,7 @@ export const fetchLectureAttendance = async (
       .where(eq(attendance.lectureId, lectureId));
 
     // Create a map of attendance by studentId for quick lookup
-    const attendanceMap = new Map(
-      attendanceRecords.map((record) => [record.studentId, record]),
-    );
+    const attendanceMap = new Map(attendanceRecords.map((record) => [record.studentId, record]));
 
     // Merge all students with their attendance status
     const completeAttendanceList = allStudentsInClass.map((student) => {
@@ -158,7 +153,7 @@ export const fetchLectureAttendance = async (
         attendance: completeAttendanceList,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error("Error fetching lecture attendance:", error);
     return res.status(500).json({
       success: false,

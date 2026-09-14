@@ -1,16 +1,11 @@
 const { getDefaultConfig } = require("expo/metro-config");
+const { getBundleModeMetroConfig } = require("react-native-worklets/bundleMode");
 
 const config = getDefaultConfig(__dirname);
 
-config.resolver.sourceExts = ["js", "jsx", "json", "ts", "tsx", "cjs", "mjs","css"];
+config.resolver.sourceExts = ["js", "jsx", "json", "ts", "tsx", "cjs", "mjs", "css"];
 
-config.resolver.assetExts = [
-  ...config.resolver.assetExts,
-  "glb",
-  "gltf",
-  "obj",
-  "mtl",
-];
+config.resolver.assetExts = [...config.resolver.assetExts, "glb", "gltf", "obj", "mtl"];
 
 // Performance optimizations
 config.transformer = {
@@ -33,4 +28,4 @@ config.transformer.getTransformOptions = async () => ({
   },
 });
 
-module.exports = config;
+module.exports = getBundleModeMetroConfig(config);

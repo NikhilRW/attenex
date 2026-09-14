@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -24,7 +24,12 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
   onDeleteAccount,
 }) => {
   return (
-    <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+    <EaseView
+      initialAnimate={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 400 }}
+      style={styles.section}
+    >
       <Text style={[styles.sectionTitle, styles.sectionTitleDanger]}>DANGER ZONE</Text>
       <View style={[styles.card, styles.dangerCard]}>
         {!userProvider ? (
@@ -74,6 +79,6 @@ export const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
           <ChevronIcon name="chevron-forward" size={20} />
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </EaseView>
   );
 };

@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -31,7 +31,12 @@ const LoadingIndicator = withUnistyles(ActivityIndicator, (theme) => ({
 
 export const PasscodeCard: React.FC<PasscodeCardProps> = ({ passcode, loading, onRefresh }) => {
   return (
-    <Animated.View entering={FadeInUp.delay(400).springify()} style={styles.passcodeSection}>
+    <EaseView
+      initialAnimate={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 400 }}
+      style={styles.passcodeSection}
+    >
       <PasscodeSurface style={styles.passcodeCard}>
         <View style={styles.passcodeHeader}>
           <LockIcon name="lock-closed" size={20} />
@@ -68,6 +73,6 @@ export const PasscodeCard: React.FC<PasscodeCardProps> = ({ passcode, loading, o
           </TouchableOpacity>
         </View>
       </PasscodeSurface>
-    </Animated.View>
+    </EaseView>
   );
 };

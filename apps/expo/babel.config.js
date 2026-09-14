@@ -1,3 +1,9 @@
+/** @type {import('react-native-worklets/plugin').PluginOptions} */
+const workletsPluginOptions = {
+  bundleMode: true,
+  strictGlobal: true, // optional, but recommended
+};
+
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -16,7 +22,10 @@ module.exports = function (api) {
           root: "src",
         },
       ],
-      "react-native-reanimated/plugin", // Must be last for Reanimated
+      [
+        "react-native-worklets/plugin", // Must be last for Reanimated
+        workletsPluginOptions,
+      ],
     ],
     env: {
       production: {

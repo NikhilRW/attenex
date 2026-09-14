@@ -25,6 +25,7 @@ export const spacing = {
   "3xl": 48,
   "4xl": 56,
   "5xl": 64,
+  "6xl": 72,
   custom: (n: number) => n,
 } as const;
 
@@ -39,6 +40,9 @@ export const size = {
   "3xl": 48,
   "4xl": 56,
   "5xl": 64,
+  "6xl": 72,
+  "7xl": 80,
+  "8xl": 88,
   custom: (n: number) => n,
 } as const;
 
@@ -66,6 +70,7 @@ export const typography = {
   h3: bpScale(28),
   h2: bpScale(32),
   h1: bpScale(40),
+  custom: (n: number) => bpScale(n),
 } as const;
 
 export type TypographyToken = keyof typeof typography;

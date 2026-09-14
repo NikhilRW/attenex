@@ -1,7 +1,7 @@
 import React from "react";
 import { Text } from "react-native";
 
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
@@ -12,7 +12,12 @@ import { getFilterButtonStyle } from "../utils/common";
 
 export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setFilter }) => {
   return (
-    <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.filterContainer}>
+    <EaseView
+      initialAnimate={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 200 }}
+      style={styles.filterContainer}
+    >
       {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
         <TouchableOpacity
           key={f}
@@ -30,6 +35,6 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setF
           </Text>
         </TouchableOpacity>
       ))}
-    </Animated.View>
+    </EaseView>
   );
 };

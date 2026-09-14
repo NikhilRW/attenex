@@ -3,7 +3,7 @@ import { ActivityIndicator, Image, Text, TextInput, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
 import { withUnistyles } from "react-native-unistyles";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
@@ -51,7 +51,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
+    <EaseView
+      initialAnimate={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 100 }}
+      style={styles.section}
+    >
       <Text style={styles.sectionTitle}>PROFILE</Text>
       <View style={[styles.card, styles.cardSurface]}>
         <ProfileHeaderGradient style={styles.profileHeader}>
@@ -98,6 +103,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           <Text style={styles.emailText}>{userEmail || "No email connected"}</Text>
         </View>
       </View>
-    </Animated.View>
+    </EaseView>
   );
 };
