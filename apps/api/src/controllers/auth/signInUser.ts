@@ -9,8 +9,7 @@ export const signInUser = async (req: Request, res: Response) => {
   if (!parsed.success) {
     return res.status(400).json({
       success: false,
-      message:
-        "Invalid authType parameter; expected 'email'|'google'|'linkedin'",
+      message: "Invalid authType parameter; expected 'email'|'google'|'linkedin'",
     });
   }
 
@@ -25,7 +24,6 @@ export const signInUser = async (req: Request, res: Response) => {
   // TODO: write internal server error occured in the message.
   return res.status(400).json({
     success: false,
-    message:
-      "",
+    message: "Internal Server Error Occurred",
   });
 };
