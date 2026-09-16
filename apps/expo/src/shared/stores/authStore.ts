@@ -6,7 +6,7 @@ import { mmkvStorage } from "@shared/utils/mmkvStorage";
 import { secureStore } from "@shared/utils/secureStore";
 import { clearUsersTokens } from "@shared/utils/user";
 
-import { UserSchema } from "../schemas/auth";
+import type { UserSchema } from "../types/common";
 
 interface AuthState {
   user: UserSchema | null;

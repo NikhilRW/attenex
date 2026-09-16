@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { router, useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -30,7 +30,6 @@ import { socketService } from "@shared/services/socketService";
 import { useAuthStore } from "@shared/stores/authStore";
 import { markPerformance } from "@shared/utils/performance";
 
-// TODO: fetch lectures on focus if the data is not fresh meaning is older than 30 seconds.
 const DEFAULT_LECTURE_ROW_HEIGHT = 220;
 
 const StudentDashboard = () => {

@@ -10,7 +10,7 @@ export const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing["4xl"],
   },
   listContentEmpty: {
-    flexGrow: 1,
+    flexGrow: 0.2,
   },
   listHeader: {
     marginBottom: theme.spacing.md,

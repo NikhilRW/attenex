@@ -9,7 +9,7 @@ import { showErrorAlert } from "@/features/Attendance/utils/alertUtils";
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { useHapticAlerts } from "@/shared/hooks/useHapticAlerts";
-import { UserSchema } from "@/shared/schemas/auth";
+import type { UserSchema } from "@/shared/types/common";
 import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
 import { parseUserName } from "@/shared/utils/parsers";
 import { showInternetNotConnected } from "@/shared/utils/toasts";
@@ -20,7 +20,6 @@ import { useAuthStore } from "@shared/stores/authStore";
 
 import { resetPassword } from "../utils/common";
 
-// TODO: student lectures error occurs when roled changed to teacher
 export const useSettings = () => {
   const { user, updateUser } = useAuthStore();
   const router = useRouter();
@@ -73,7 +72,17 @@ export const useSettings = () => {
           });
           router.replace("/(main)/(tabs)/classes");
         } else {
-          // TODO: why not student fetching done.
+          const className = user?.className?.trim();
+
+          if (className) {
+            queryClient.prefetchQuery({
+              queryKey: queryKeys.lectures.studentByClass(className),
+              queryFn: async () => {
+                const res = await lectureService.getStudentLectures(className);
+                return res.success ? res.data : [];
+              },
+            });
+          }
           router.replace("/(main)/(tabs)/attendance");
         }
         alert("Role updated", `Your role is now set to ${newRole}.`);

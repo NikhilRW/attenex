@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -7,13 +7,11 @@ import { lectureService } from "@/features/Classes/services/lectureService";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { GarbageTime, StaleTime } from "@/shared/constants/tanstackConfig";
 import { parseClassName, parseEndedTrue } from "@/shared/utils/parsers";
-import {
-  LECTURE_AUTO_REFRESH_INTERVAL,
-  LOG_MESSAGES,
-} from "@attendance/constants/studentDashboard.constants";
+import { LOG_MESSAGES } from "@attendance/constants/studentDashboard.constants";
 import { UseLectureManagementReturn } from "@attendance/types/studentDashboard.types";
 import { useAuthStore } from "@shared/stores/authStore";
 
+import { useStaleLectureRefresh } from "./useStaleLectureRefresh";
 import { Lecture } from "../types/common";
 
 /**
@@ -56,17 +54,24 @@ export const useLectureManagement = (joinedLecture: Lecture | null): UseLectureM
   const shouldQueryBeEnabled =
     joinedLecture === null && user?.role !== "teacher" && parseClassName(userClassName);
 
+  const lecturesQueryKey = useMemo(
+    () =>
+      userClassName ? queryKeys.lectures.studentByClass(userClassName) : queryKeys.lectures.student,
+    [userClassName],
+  );
+
   const { data: lectures, refetch: refreshLectures } = useQuery({
     queryFn: fetchLectures,
-    queryKey: userClassName
-      ? queryKeys.lectures.studentByClass(userClassName)
-      : queryKeys.lectures.student,
-    refetchInterval: () => {
-      return joinedLecture !== null || user?.role === "teacher" ? 0 : LECTURE_AUTO_REFRESH_INTERVAL;
-    },
+    queryKey: lecturesQueryKey,
     staleTime: StaleTime.SECONDS_30,
     gcTime: GarbageTime.SECONDS_30,
     enabled: shouldQueryBeEnabled,
+  });
+
+  useStaleLectureRefresh({
+    refreshLectures,
+    queryKey: lecturesQueryKey,
+    shouldQueryBeEnabled,
   });
 
   useEffect(() => {

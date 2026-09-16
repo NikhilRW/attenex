@@ -1,4 +1,4 @@
-import { UserSchema } from "@/shared/schemas/auth";
+import type { UserSchema } from "@/shared/types/common";
 
 export type RegisterGoogleUserResponse = {
   success: boolean;

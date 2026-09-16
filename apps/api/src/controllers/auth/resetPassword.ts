@@ -174,12 +174,11 @@ export const resetPassword = async (req: Request, res: Response) => {
     if (!parsed.success) {
       return res.status(400).json({
         success: false,
-        message: "Email, token, and new password are required",
+        message: "Invalid or expired reset link",
       });
     }
 
     const { email, token, newPassword } = parsed.output;
-    // TODO: try to make the response message more generic info not detailed to avoid giving hints to potential attackers about the validity of the email or token.
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!user || !user.resetToken || !user.resetTokenExpiresAt) {

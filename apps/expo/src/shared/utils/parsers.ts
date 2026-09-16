@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-import { classNameSchema, tokenSchema, userSchema } from "../schemas/auth";
+import { classNameSchema, userSchema } from "../schemas/auth";
 import { resetPasswordQueryParams, verifyEmailQueryParams } from "../schemas/deepLink";
 import { bodySchema, endedTrueSchema, lectureIdSchema, titleSchema } from "../schemas/notification";
 
@@ -17,13 +17,6 @@ export const parseLectureId = (data: unknown): data is string =>
   v.safeParse(lectureIdSchema, data).success;
 export const parseEndedTrue = (data: unknown): data is "true" =>
   v.safeParse(endedTrueSchema, data).success;
-
-export const parseToken = (data: unknown) => v.safeParse(tokenSchema, data).success;
-
-export const parseUser = (data: unknown) => {
-  const result = v.safeParse(userSchema, data);
-  return result.success;
-};
 
 export const parseUserName = (data: unknown) => {
   return v.safeParse(userSchema.entries.name, data).success;

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { UserSchema } from "@/shared/schemas/auth";
+import type { UserSchema } from "@/shared/types/common";
 
 import { Lecture } from "./common";
 

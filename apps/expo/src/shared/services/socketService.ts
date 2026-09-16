@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 
 import { BASE_URI } from "@shared/constants/uri";
 
-import { UserSchema } from "../schemas/auth";
+import type { UserSchema } from "../types/common";
 class SocketService {
   private socket: Socket | null = null;
   private isConnecting = false;

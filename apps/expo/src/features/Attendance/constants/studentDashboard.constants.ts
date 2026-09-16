@@ -3,7 +3,6 @@
  */
 
 // Timing constants
-export const LECTURE_AUTO_REFRESH_INTERVAL = 30000; // 30 Seconds
 export const ALERT_DELAY = 100; // Delay before showing alerts
 
 // Validation constants
@@ -17,8 +16,7 @@ export const ALERT_MESSAGES = {
   },
   JOINED: {
     title: "Joined!",
-    message:
-      "Location tracking started. Wait for class to end, then verify attendance.",
+    message: "Location tracking started. Wait for class to end, then verify attendance.",
   },
   JOIN_FAILED: {
     title: "Join Failed",
@@ -46,8 +44,7 @@ export const ALERT_MESSAGES = {
   },
   LEAVE_LECTURE: {
     title: "Leave Lecture",
-    message:
-      "Are you sure you want to leave this lecture? Your attendance will not be recorded.",
+    message: "Are you sure you want to leave this lecture? Your attendance will not be recorded.",
   },
   LECTURE_ENDED: {
     title: "Lecture Ended",

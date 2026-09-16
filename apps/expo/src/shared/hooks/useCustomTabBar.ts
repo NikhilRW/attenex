@@ -76,8 +76,7 @@ export const useCustomTabBar = ({
         if (!role) {
           return false;
         }
-        // TODO: change this after proper testing is done
-        if (__DEV__ && name.includes("test")) {
+        if (name.includes("test")) {
           return false;
         }
 

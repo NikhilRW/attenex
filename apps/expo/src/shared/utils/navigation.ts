@@ -1,6 +1,6 @@
 import { useAuthStore } from "@shared/stores/authStore";
 
-import { UserSchema } from "../schemas/auth";
+import type { UserSchema } from "../types/common";
 
 // TODO: revert to the previous implmentation once analytics feature done
 export const getStartingScreenPath = (newUser: UserSchema | null = null) => {
