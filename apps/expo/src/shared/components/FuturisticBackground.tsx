@@ -30,6 +30,7 @@ const styles = StyleSheet.create((_, rt) => ({
     right: 0,
     top: isAuthenticated && isStudent ? 0 : rt.insets.top,
     bottom: 0,
+    zIndex: 0,
   }),
 }));
 

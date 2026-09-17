@@ -11,8 +11,6 @@ const PrimarySpinner = withUnistyles(ActivityIndicator, (theme) => ({
   color: theme.text.primary,
 }));
 
-// TODO: ask ai for is the haptic impact right for serious buttons.
-
 export const StartLectureButton: React.FC<StartLectureButtonProps> = ({
   loading,
   onPress,

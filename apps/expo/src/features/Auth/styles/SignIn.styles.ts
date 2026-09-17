@@ -3,9 +3,11 @@ import { StyleSheet } from "react-native-unistyles";
 export const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   keyboardView: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   scrollContent: {
     flexGrow: 1,

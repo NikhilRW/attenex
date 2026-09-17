@@ -4,11 +4,3 @@ export const BASE_URI = __DEV__
     process.env.EXPO_PUBLIC_PRODUCTION_BACKEND_URL;
 export const ATTENEX_NOTIFICATION_IMAGE_URL =
   "https://attenex.vercel.app/notification-attachment.png";
-
-/*
- *
- *
- *  --max-dimension 640 --quality 0.5 --fps 24
- *
- *
- * */

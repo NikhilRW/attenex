@@ -4,17 +4,17 @@ import {
   unsubscribeFromTopic,
   getToken,
 } from "@react-native-firebase/messaging";
-
+// NOTE:IMP for ios removed the blocking await
 export const subscribeToClassName = async (className: string) => {
   if (!className) return;
-  await subscribeToTopic(getMessaging(), className);
+  subscribeToTopic(getMessaging(), className);
 };
 
 export const unsubscribeFromClassName = async (className: string) => {
   if (!className) return;
-  await unsubscribeFromTopic(getMessaging(), className);
+  unsubscribeFromTopic(getMessaging(), className);
 };
 
 export const getDeviceToken = async () => {
-  return await getToken(getMessaging());
+  return getToken(getMessaging());
 };

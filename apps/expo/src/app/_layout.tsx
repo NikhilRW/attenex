@@ -165,6 +165,7 @@ export default function RootLayout() {
                     screenOptions={{
                       headerShown: false,
                       contentStyle: styles.stackContent,
+                      presentation: "transparentModal",
                     }}
                   >
                     <Stack.Screen name="(auth)" />

@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 import * as v from "valibot";
 
 import {
@@ -24,13 +26,16 @@ export const userService = {
       }
       if (role === "teacher") {
         unsubscribeFromClassName(useAuthStore.getState().user?.className || "");
-        const token = await getDeviceToken();
-        await this.updateUserToken(token);
+        // NOTE:IMP for ios removing get token
+        if (Platform.OS !== "ios") {
+          const token = await getDeviceToken();
+          await this.updateUserToken(token);
+        }
       }
       if (role === "student") {
         const className = useAuthStore.getState().user?.className;
         // TODO:fix this
-        if (className) {
+        if (className && Platform.OS !== "ios") {
           await subscribeToClassName(className);
         }
         await this.updateUserToken(null);

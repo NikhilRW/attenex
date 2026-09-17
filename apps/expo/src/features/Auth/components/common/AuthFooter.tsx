@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-import { StyleSheet } from "react-native-unistyles";
-
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { AuthFooterProps } from "@auth/types/props";
+
+import { styles } from "../../styles/AuthFooter.styles";
 
 const AuthFooter: React.FC<AuthFooterProps> = ({ text, linkText, onLinkPress }) => {
   return (
@@ -15,24 +15,5 @@ const AuthFooter: React.FC<AuthFooterProps> = ({ text, linkText, onLinkPress }) 
     </View>
   );
 };
-
-// TODO: move to right file or folder.
-
-const styles = StyleSheet.create((theme) => ({
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 40,
-  },
-  footerText: {
-    fontSize: 14,
-    color: theme.text.secondary,
-  },
-  signUpLink: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: theme.primary.main,
-  },
-}));
 
 export default AuthFooter;
