@@ -24,6 +24,7 @@ import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useShallow } from "zustand/shallow";
 
 import { FuturisticBackground } from "@/shared/components/FuturisticBackground";
+import { useBackgroundWhite } from "@/shared/hooks/useBackgrounWhite";
 import { useAuthStore } from "@/shared/stores/authStore";
 import { useAppQueryBootstrap } from "@shared/hooks/useAppQueryBootstrap";
 import { useDeepLinkBootstrap } from "@shared/hooks/useDeepLinkBootstrap";
@@ -89,6 +90,7 @@ export default function RootLayout() {
   useDeepLinkBootstrap();
   useNotificationBootstrap();
   useAppQueryBootstrap();
+  useBackgroundWhite();
 
   const [loaded, error] = useFonts({
     Inter_700Bold,

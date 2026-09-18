@@ -35,6 +35,7 @@ const TeacherAnalyticsScreen = () => {
   const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
   const [text, setText] = useState("");
   const [isAiAnalysisLoading, setIsAiAnalysisLoading] = useState(false);
+  const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null);
   const decoder = useRef(new TextDecoder());
   const qc = useQueryClient();
 
@@ -96,6 +97,7 @@ const TeacherAnalyticsScreen = () => {
   const handleAiAnalyticsPress = useCallback(async () => {
     // add params
     setText("");
+    setAiAnalysisError(null);
     const params = buildQueryParamsForTeacherAnalytics({
       startDate,
       subjectId: selectedSubjectId ?? null,
@@ -106,18 +108,30 @@ const TeacherAnalyticsScreen = () => {
       const res = await AnalyticsService.getAiAnalytics(params);
       const reader = res.body?.getReader();
       if (!reader) {
-        append("No readable stream!");
+        const msg = "No readable stream!";
+        logger.warn(msg);
+        setAiAnalysisError(msg);
+        append(msg);
         return;
       }
 
+      let chunksReceived = 0;
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          break;
+        }
+        chunksReceived++;
         const text = decoder.current.decode(value, { stream: true });
         append(text);
       }
+
+      if (chunksReceived === 0) {
+        setAiAnalysisError("No chunks received from AI analysis");
+      }
     } catch (error) {
-      logger.info(error + " Error while fetching AI analytics");
+      logger.error("Error while fetching AI analytics", error);
+      setAiAnalysisError("Ai Analysis failed. Please try again later.");
     } finally {
       setIsAiAnalysisLoading(false);
     }
@@ -143,7 +157,7 @@ const TeacherAnalyticsScreen = () => {
         />
 
         <AnalyticsGraph points={graphPoints} isLoading={isLoading} />
-        <AiAnalysisCard text={text} isLoading={isAiAnalysisLoading} />
+        <AiAnalysisCard text={text} isLoading={isAiAnalysisLoading} error={aiAnalysisError} />
       </ScrollView>
       <CustomDateBottomSheet
         ref={trueSheetRef}

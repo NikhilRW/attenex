@@ -15,7 +15,7 @@ export const getAiAnalytics = async (req: AuthRequest, res: Response) => {
     if (!v.safeParse(getAiAnalyticsRequestSchema, req.query).success) {
       return res.status(400).json({ success: false, message: "Invalid request body" });
     }
-    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders();
@@ -33,12 +33,15 @@ export const getAiAnalytics = async (req: AuthRequest, res: Response) => {
 
     await consumeStreamingAnalysis(stream, (content) => {
       if (res.closed) return;
-      res.write(`${content}`);
+      res.write(content);
     });
 
     return res.end();
   } catch (error) {
-    logger.info("Error occured while fetching AI repsonse : ", error);
+    logger.error("Error occurred while fetching AI response", error);
+    if (!res.headersSent) {
+      return res.status(500).json({ success: false, message: "AI analysis failed" });
+    }
     return res.end();
   }
 };

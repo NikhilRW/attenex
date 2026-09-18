@@ -57,6 +57,7 @@ export interface AnalyticsGraphProps {
 export type AiAnalysisCardProps = {
   text?: string;
   isLoading: boolean;
+  error?: string | null;
 };
 
 export type AiFavButtonProps = {

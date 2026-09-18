@@ -13,7 +13,7 @@ import { breathingAnimationConfiguration } from "../constants/common";
 import { styles } from "../styles/AiAnalysisCard.styles";
 import { AiAnalysisCardProps } from "../types/props";
 
-const AiAnalysisCard: FC<AiAnalysisCardProps> = ({ text, isLoading }) => {
+const AiAnalysisCard: FC<AiAnalysisCardProps> = ({ text, isLoading, error }) => {
   const isLoadingSV = useSharedValue(false);
 
   useEffect(() => {
@@ -34,18 +34,25 @@ const AiAnalysisCard: FC<AiAnalysisCardProps> = ({ text, isLoading }) => {
   }));
 
   const toDisplay = useMemo(() => {
-    return text !== "" || isLoading;
-  }, [text, isLoading]);
+    return text !== "" || isLoading || !!error;
+  }, [text, isLoading, error]);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     opacity: withTiming(toDisplay ? 1 : 0, { duration: 300 }),
   }));
 
+  const displayText = useMemo(() => {
+    if (text !== "") return text;
+    if (isLoading) return "";
+    if (error) return "Failed to load AI analysis. Please try again.";
+    return "";
+  }, [text, isLoading, error]);
+
   return (
     <Animated.View style={animatedContainerStyle}>
       <Text style={styles.labelText}>AI Analysis</Text>
       <Animated.View style={[styles.card, breathingAnimatedStyle]}>
-        <Text style={styles.cardText}>{text || ""}</Text>
+        <Text style={styles.cardText}>{displayText}</Text>
       </Animated.View>
     </Animated.View>
   );
