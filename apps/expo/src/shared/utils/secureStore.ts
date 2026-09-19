@@ -1,6 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
-const memoryStore = new Map<string, string>();
+import { mmkvStorage } from "./mmkvStorage";
+
+const memoryStore = mmkvStorage;
 
 const isMissingEntitlementError = (error: unknown) =>
   error instanceof Error && error.message.includes("A required entitlement isn't present");
@@ -15,11 +17,11 @@ export const secureStore = {
       await SecureStore.setItemAsync(key, value, {
         keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY,
       });
-      memoryStore.delete(key);
+      memoryStore.removeItem(key);
     } catch (err) {
       console.error("SecureStore#setItem error", err);
       if (isMissingEntitlementError(err)) {
-        memoryStore.set(key, value);
+        memoryStore.setItem(key, value);
         return;
       }
       throw err;
@@ -33,7 +35,7 @@ export const secureStore = {
     } catch (err) {
       console.error("SecureStore#getItem error", err);
       if (isMissingEntitlementError(err)) {
-        return memoryStore.get(key) ?? null;
+        return memoryStore.getItem(key) ?? null;
       }
       return null;
     }
@@ -42,11 +44,11 @@ export const secureStore = {
   async removeItem(key: string) {
     try {
       await SecureStore.deleteItemAsync(key);
-      memoryStore.delete(key);
+      memoryStore.removeItem(key);
     } catch (err) {
       console.error("SecureStore#removeItem error", err);
       if (isMissingEntitlementError(err)) {
-        memoryStore.delete(key);
+        memoryStore.removeItem(key);
         return;
       }
       throw err;
