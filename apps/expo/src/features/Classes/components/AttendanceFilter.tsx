@@ -5,10 +5,7 @@ import { EaseView } from "react-native-ease";
 
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import { styles } from "@classes/styles/AttendanceViewScreen.styles";
-import { FilterType } from "@classes/types/common";
 import { AttendanceFilterProps } from "@classes/types/props";
-
-import { getFilterButtonStyle } from "../utils/common";
 
 export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setFilter }) => {
   return (
@@ -18,11 +15,14 @@ export const AttendanceFilter: React.FC<AttendanceFilterProps> = ({ filter, setF
       transition={{ type: "spring", damping: 120, stiffness: 900, mass: 4, delay: 200 }}
       style={styles.filterContainer}
     >
-      {(["all", "present", "incomplete", "absent"] as FilterType[]).map((f) => (
+      {(["all", "present", "incomplete", "absent"] as const).map((f) => (
         <TouchableOpacity
           key={f}
           haptic="selection"
-          style={[styles.filterButton, getFilterButtonStyle(f)]}
+          style={[
+            styles.filterButton,
+            filter === f ? styles.filterButtonActive : styles.filterButtonInactive,
+          ]}
           onPress={() => setFilter(f)}
         >
           <Text

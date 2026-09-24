@@ -140,22 +140,15 @@ export const styles = StyleSheet.create((theme, rt) => {
       alignItems: "center",
       justifyContent: "center",
     },
+    filterButtonActive: {
+      backgroundColor: theme.primary.main,
+      borderWidth: 1,
+      borderColor: theme.primary.main,
+    },
     filterButtonInactive: {
       backgroundColor: isDark ? theme.surface.glass : "rgba(0, 0, 0, 0.05)",
       borderWidth: 1,
       borderColor: theme.surface.glassBorder,
-    },
-    filterButtonAll: {
-      backgroundColor: theme.primary.main,
-    },
-    filterButtonPresent: {
-      backgroundColor: "#4ADE80",
-    },
-    filterButtonIncomplete: {
-      backgroundColor: "#FBBF24",
-    },
-    filterButtonAbsent: {
-      backgroundColor: "#F87171",
     },
     filterButtonText: {
       fontSize: 14,
