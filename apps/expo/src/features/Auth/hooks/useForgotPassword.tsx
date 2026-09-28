@@ -3,9 +3,9 @@ import { Keyboard } from "react-native";
 
 import { useMutation } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
+import { useKeyboardState } from "react-native-keyboard-controller";
+import { useAnimatedStyle } from "react-native-reanimated";
 
-// TODO: fix the deprecated animated keyboard
 import { mutationKeys } from "@/shared/constants/mutationKeys";
 import { validateEmail } from "@auth/utils/email";
 import http from "@shared/utils/http";
@@ -76,12 +76,12 @@ export const useForgotPassword = () => {
 
   const { isPending } = resetEmailMutation;
 
-  const keyboard = useAnimatedKeyboard();
+  const keyboard = useKeyboardState();
 
   // Animated style to add padding when keyboard is open
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      paddingBottom: keyboard.height.value + 50,
+      paddingBottom: keyboard.height + 50,
     };
   });
 

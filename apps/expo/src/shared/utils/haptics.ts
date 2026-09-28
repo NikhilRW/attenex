@@ -15,9 +15,9 @@ export const triggerImpactHapticOn = (
   callback: (event: GestureResponderEvent) => void = () => {},
   style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Medium,
 ) => {
-  return async (event: GestureResponderEvent) => {
+  return async (event?: GestureResponderEvent) => {
     Haptics.impactAsync(style);
-    callback(event);
+    if (event) callback(event);
   };
 };
 

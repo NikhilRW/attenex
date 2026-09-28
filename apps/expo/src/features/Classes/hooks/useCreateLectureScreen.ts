@@ -297,8 +297,8 @@ export const useCreateLectureScreen = () => {
         const result: SubjectItem[] = [];
         if (old) {
           result.push(...old.filter((s) => s.name !== name));
-        } // TODO: make the use of the createdAt for ordering the subjects
-        result.push({
+        }
+        result.unshift({
           id: "temp" + new Date().getTime(),
           name,
         });

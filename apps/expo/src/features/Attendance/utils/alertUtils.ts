@@ -1,4 +1,4 @@
-import { selectionAsync } from "expo-haptics";
+import { ImpactFeedbackStyle, selectionAsync } from "expo-haptics";
 
 import { triggerImpactHapticOnCallback } from "@/shared/utils/haptics";
 
@@ -56,8 +56,7 @@ export const showDestructiveAlert = (
     {
       text: confirmText,
       style: "destructive",
-      // TODO: add heavy impact here
-      onPress: triggerImpactHapticOnCallback(onConfirm),
+      onPress: triggerImpactHapticOnCallback(onConfirm, ImpactFeedbackStyle.Heavy),
     },
   ]);
 };

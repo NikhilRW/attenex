@@ -16,6 +16,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import FlashMessage from "react-native-flash-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import { AlertsProvider } from "react-native-paper-alerts";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
@@ -140,41 +141,43 @@ export default function RootLayout() {
         <>
           <ThemedPaperProvider>
             <AlertsProvider>
-              <PersistQueryClientProvider
-                client={queryClient}
-                onSuccess={tanstackOnSuccess}
-                persistOptions={{
-                  persister: clientPersister,
-                  maxAge: QUERY_PERSIST_MAX_AGE_MS,
-                  buster: QUERY_PERSIST_BUSTER,
-                  dehydrateOptions: {
-                    // Persist mutations that are queued/in-flight (paused = queued while offline)
-                    shouldDehydrateMutation: (mutation: any) => {
-                      return (
-                        mutation.state.status === "pending" || mutation.state.status === "paused"
-                      );
+              <KeyboardProvider>
+                <PersistQueryClientProvider
+                  client={queryClient}
+                  onSuccess={tanstackOnSuccess}
+                  persistOptions={{
+                    persister: clientPersister,
+                    maxAge: QUERY_PERSIST_MAX_AGE_MS,
+                    buster: QUERY_PERSIST_BUSTER,
+                    dehydrateOptions: {
+                      // Persist mutations that are queued/in-flight (paused = queued while offline)
+                      shouldDehydrateMutation: (mutation: any) => {
+                        return (
+                          mutation.state.status === "pending" || mutation.state.status === "paused"
+                        );
+                      },
+                      // Persist successful, fresh query data so screens load instantly after app kill
+                      shouldDehydrateQuery: (query: any) => {
+                        const isFresh = Date.now() - query.state.dataUpdatedAt < StaleTime.HALF_DAY;
+                        return query.state.status === "success" && isFresh;
+                      },
                     },
-                    // Persist successful, fresh query data so screens load instantly after app kill
-                    shouldDehydrateQuery: (query: any) => {
-                      const isFresh = Date.now() - query.state.dataUpdatedAt < StaleTime.HALF_DAY;
-                      return query.state.status === "success" && isFresh;
-                    },
-                  },
-                }}
-              >
-                <GestureHandlerRootView>
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      contentStyle: styles.stackContent,
-                      presentation: "transparentModal",
-                    }}
-                  >
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(main)" />
-                  </Stack>
-                </GestureHandlerRootView>
-              </PersistQueryClientProvider>
+                  }}
+                >
+                  <GestureHandlerRootView>
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        contentStyle: styles.stackContent,
+                        presentation: "transparentModal",
+                      }}
+                    >
+                      <Stack.Screen name="(auth)" />
+                      <Stack.Screen name="(main)" />
+                    </Stack>
+                  </GestureHandlerRootView>
+                </PersistQueryClientProvider>
+              </KeyboardProvider>
             </AlertsProvider>
           </ThemedPaperProvider>
           <FlashMessage position="bottom" style={{ marginBottom: bottom }} />

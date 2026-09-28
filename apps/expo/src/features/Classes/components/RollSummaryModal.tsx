@@ -70,7 +70,6 @@ export const RollSummaryModal: React.FC<RollSummaryModalProps> = ({
             </View>
 
             <View style={[styles.modalFooter, styles.modalFooterCompact]}>
-              {/* TODO: again copy impact and close selection haptic */}
               <TouchableOpacity haptic="impact" style={styles.flex1} onPress={onCopy}>
                 <CopyGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.copyButton}>
                   <Ionicons name="copy-outline" size={20} color="white" />

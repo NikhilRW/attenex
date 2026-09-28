@@ -1,11 +1,12 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
 
 import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { triggerImpactHapticOn } from "@/shared/utils/haptics";
 import { FuturisticButtonProps } from "@auth/types/props";
+
+import { styles } from "../../styles/FuturisticButton.styles";
 
 const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   title,
@@ -29,8 +30,7 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
   const handlePressOut = async () => {
     if (loading) return;
     buttonScale.set(withSpring(1));
-    // TODO: think about the parameter.
-    triggerImpactHapticOn()("" as any);
+    triggerImpactHapticOn()();
     await onPress();
   };
 
@@ -72,46 +72,5 @@ const FuturisticButton: React.FC<FuturisticButtonProps> = ({
     </Animated.View>
   );
 };
-
-// TODO: get it to the right place.
-
-const styles = StyleSheet.create((theme) => ({
-  button: {
-    height: 56,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 8,
-    paddingHorizontal: 26,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 18,
-    letterSpacing: 0.4,
-    fontFamily: "Inter_700Bold",
-  },
-  buttonPressable: {},
-  buttonGlow: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 16,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    zIndex: -1,
-    boxShadow: [
-      {
-        blurRadius: 16,
-        offsetX: 0,
-        offsetY: 0,
-        color: `${theme.primary.main}60`,
-      },
-    ],
-    shadowColor: theme.primary.main,
-  },
-}));
 
 export default FuturisticButton;

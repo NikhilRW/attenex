@@ -59,7 +59,6 @@ export const useAttendanceSubmit = (): UseAttendanceSubmitReturn => {
         return;
       }
       const { res, onSuccess } = data;
-      // TODO: make this message less techinal.
       if (res.success) {
         const status = res.data?.status;
         if (status === "present") {

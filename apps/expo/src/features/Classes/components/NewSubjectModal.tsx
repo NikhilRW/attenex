@@ -48,8 +48,8 @@ export const NewSubjectModal: React.FC<NewSubjectModalProps> = ({
 }) => {
   const hasError = Boolean(errorMessage);
 
-  const handleCreateSubject = async () => {
-    await onCreateSubject(newSubjectName);
+  const handleCreateSubject = () => {
+    onCreateSubject(newSubjectName);
   };
 
   return (

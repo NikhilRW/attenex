@@ -85,7 +85,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                   onPress={() => onNameUpdate(displayName)}
                   disabled={savingName}
                   haptic="impact"
-                  // TODO: add the medium haptic impact later.
                 >
                   {savingName ? (
                     <SavingIndicator size="small" />

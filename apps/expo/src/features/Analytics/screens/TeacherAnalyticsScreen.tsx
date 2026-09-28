@@ -3,10 +3,8 @@ import { ScrollView, View } from "react-native";
 
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { useQueryClient } from "@tanstack/react-query";
-import { TextDecoder } from "react-native-nitro-text-decoder";
 
 import { queryKeys } from "@/shared/constants/queryKeys";
-import { logger } from "@/shared/utils/logger";
 import { showMessage } from "@/shared/utils/toasts";
 
 import AiAnalysisCard from "../components/AiAnalysisCard";
@@ -16,12 +14,11 @@ import AnalyticsScreenHeader from "../components/AnalyticsScreenHeader";
 import CustomDateBottomSheet from "../components/CustomDateBottomSheet";
 import DateFilters from "../components/DateFilters";
 import { SubjectSelectorWrapper } from "../components/SubjectSelectorWrapper";
+import { useAiAnalytics } from "../hooks/useAiAnalytics";
 import { useAnalyticsQuery } from "../hooks/useAnalyticsQuery";
-import { AnalyticsService } from "../services/AnalyticsService";
 import { styles } from "../styles/TeacherAnalyticsScreen.styles";
 import { DateFilterType } from "../types/common";
 import {
-  buildQueryParamsForTeacherAnalytics,
   getAnalyticsDateRange,
   getAnalyticsGraphPoints,
   getCustomDateRangeError,
@@ -33,10 +30,6 @@ const TeacherAnalyticsScreen = () => {
   const [isCustomDateFilterApplied, setIsCustomDateFilterApplied] = useState(false);
   const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
   const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
-  const [text, setText] = useState("");
-  const [isAiAnalysisLoading, setIsAiAnalysisLoading] = useState(false);
-  const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null);
-  const decoder = useRef(new TextDecoder());
   const qc = useQueryClient();
 
   const { startDate, endDate } = useMemo(
@@ -49,6 +42,18 @@ const TeacherAnalyticsScreen = () => {
       }),
     [customEndDate, customStartDate, isCustomDateFilterApplied, selectedDateFilter],
   );
+
+  const {
+    text,
+    isLoading: isAiAnalysisLoading,
+    error: aiAnalysisError,
+    fetchAnalysis,
+    clearAnalysis,
+  } = useAiAnalytics({
+    startDate,
+    endDate,
+    subjectId: selectedSubjectId ?? null,
+  });
 
   const trueSheetRef = useRef<TrueSheet>(null);
 
@@ -89,58 +94,13 @@ const TeacherAnalyticsScreen = () => {
     qc.invalidateQueries({ queryKey: queryKeys.analytics.teacher.all });
   }, [customEndDate, customStartDate, qc]);
 
-  const append = useCallback((text: string) => {
-    setText((prev) => prev + text);
-  }, []);
-
-  // TODO: create a beautiful hook
-  const handleAiAnalyticsPress = useCallback(async () => {
-    // add params
-    setText("");
-    setAiAnalysisError(null);
-    const params = buildQueryParamsForTeacherAnalytics({
-      startDate,
-      subjectId: selectedSubjectId ?? null,
-      endDate,
-    });
-    setIsAiAnalysisLoading(true);
-    try {
-      const res = await AnalyticsService.getAiAnalytics(params);
-      const reader = res.body?.getReader();
-      if (!reader) {
-        const msg = "No readable stream!";
-        logger.warn(msg);
-        setAiAnalysisError(msg);
-        append(msg);
-        return;
-      }
-
-      let chunksReceived = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
-        chunksReceived++;
-        const text = decoder.current.decode(value, { stream: true });
-        append(text);
-      }
-
-      if (chunksReceived === 0) {
-        setAiAnalysisError("No chunks received from AI analysis");
-      }
-    } catch (error) {
-      logger.error("Error while fetching AI analytics", error);
-      setAiAnalysisError("Ai Analysis failed. Please try again later.");
-    } finally {
-      setIsAiAnalysisLoading(false);
-    }
-  }, [append, startDate, selectedSubjectId, endDate]);
-
-  const dateFilterOnChangeWrapper = useCallback((filter: DateFilterType) => {
-    setSelectedDateFilter(filter);
-    setText("");
-  }, []);
+  const dateFilterOnChangeWrapper = useCallback(
+    (filter: DateFilterType) => {
+      setSelectedDateFilter(filter);
+      clearAnalysis();
+    },
+    [clearAnalysis],
+  );
 
   return (
     <View style={styles.container}>
@@ -167,7 +127,7 @@ const TeacherAnalyticsScreen = () => {
         setCustomEndDate={setCustomEndDate}
         applyDateFilter={applyDateFilter}
       />
-      <AiFavButton onPress={handleAiAnalyticsPress} />
+      <AiFavButton onPress={fetchAnalysis} />
     </View>
   );
 };

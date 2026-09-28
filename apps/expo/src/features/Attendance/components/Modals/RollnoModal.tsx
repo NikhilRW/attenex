@@ -100,7 +100,6 @@ const RollnoModal = ({
                 setPendingLecture(null);
                 setRollNo("");
               }}
-              // TODO: ask ai is it right to have like this here selection and thier impact let's see.
               haptic="selection"
             >
               <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Cancel</Text>

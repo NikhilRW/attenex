@@ -1,6 +1,8 @@
 import React from "react";
 import { ActivityIndicator, Text } from "react-native";
 
+import { ImpactFeedbackStyle } from "expo-haptics";
+
 import { TouchableOpacity } from "@/shared/components/TouchableOpacity";
 import UniLinearGradient from "@/shared/components/UniLinearGradient";
 import { styles } from "@role-selection/styles/RoleSelection.styles";
@@ -32,7 +34,7 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
       disabled={!selectedRole || isUpdating}
       activeOpacity={0.8}
       haptic="impact"
-      // TODO: add the custom impact level with correct type.
+      impactHapticLevel={ImpactFeedbackStyle.Heavy}
     >
       <UniLinearGradient
         uniProps={(theme) => ({

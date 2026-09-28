@@ -191,8 +191,10 @@ export const useSettings = () => {
       {
         text: "Delete",
         style: "destructive",
-        // TODO: add heavy impact here.
-        onPress: triggerImpactHapticOnCallback(deleteUserAccount),
+        onPress: triggerImpactHapticOnCallback(
+          deleteUserAccount,
+          Haptics.ImpactFeedbackStyle.Heavy,
+        ),
       },
     ]);
   }, [alert, deleteUserAccount]);
