@@ -137,6 +137,21 @@ jobs:
           key: native-sim-${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml', '**/bun.lock', '**/bun.lockb', '**/Podfile.lock') }}
           restore-keys: native-sim-${{ runner.os }}-
 
+      - name: Restore iOS Firebase configuration
+        if: inputs.mode == 'build'
+        working-directory: ${{ inputs.project_dir }}
+        env:
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.IOS_GOOGLE_SERVICE_INFO_PLIST }}
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_SERVICE_INFO_PLIST" || {
+            echo "::error::Missing IOS_GOOGLE_SERVICE_INFO_PLIST secret"
+            exit 1
+          }
+          mkdir -p personal/secrets
+          printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" \
+            > personal/secrets/GoogleService-Info.plist
+
       - name: Install JS dependencies
         timeout-minutes: 20
         if: inputs.mode != 'app'
