@@ -16,6 +16,9 @@
     "dev": "bun run --filter='./apps/api' dev",
     "prepare": "husky"
   },
+  "dependencies": {
+    "zod-validation-error": "3.5.3"
+  },
   "devDependencies": {
     "eslint": "^9.0.0",
     "husky": "^9.1.7",

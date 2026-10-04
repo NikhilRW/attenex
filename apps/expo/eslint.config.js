@@ -108,7 +108,14 @@ const testFileRelaxations = {
 module.exports = defineConfig([
   // Global ignores — must be a standalone config object with ONLY `ignores`
   {
-    ignores: ["dist/*", "babel.config.js", "metro.config.js", ".prettierrc.js", "jest.config.js", "e2e/jest.config.js"],
+    ignores: [
+      "dist/*",
+      "babel.config.js",
+      "metro.config.js",
+      ".prettierrc.js",
+      "jest.config.js",
+      "e2e/jest.config.js",
+    ],
   },
   ...expoConfig.map((config) => {
     const configPlugins = new Set(Object.keys(config.plugins || {}));

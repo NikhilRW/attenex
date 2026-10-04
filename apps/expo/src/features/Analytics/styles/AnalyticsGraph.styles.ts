@@ -61,7 +61,7 @@ export const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.sm,
   },
   createLectureButtonText: {
-    color: theme.text.primary,
+    color: theme.text.secondary,
     fontSize: theme.typography.lg,
     fontWeight: "bold",
   },
