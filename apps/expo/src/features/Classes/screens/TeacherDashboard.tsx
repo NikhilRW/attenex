@@ -42,8 +42,7 @@ const SearchInput = withUnistyles(TextInput, (theme) => ({
   placeholderTextColor: theme.text.muted,
 }));
 
-const circlePath = Skia.Path.Make();
-circlePath.addCircle(30, 30, 25);
+const circlePath = Skia.Path.Circle(30, 30, 25);
 const DASHBOARD_CONTENT_FOCUS_ANIMATION_DURATION_MS = 360;
 
 const TeacherDashboard = () => {

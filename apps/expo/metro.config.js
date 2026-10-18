@@ -7,6 +7,20 @@ config.resolver.sourceExts = ["js", "jsx", "json", "ts", "tsx", "cjs", "mjs", "c
 
 config.resolver.assetExts = [...config.resolver.assetExts, "glb", "gltf", "obj", "mtl"];
 
+// Unistyles 3.4.0 exports extensionless native component paths. Use its
+// legacy component entry points so Metro can resolve extensions and platforms.
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName.startsWith("react-native-unistyles/components/native/")) {
+    return context.resolveRequest(
+      { ...context, unstable_enablePackageExports: false },
+      moduleName,
+      platform,
+    );
+  }
+
+  return context.resolveRequest(context, moduleName, platform);
+};
+
 // Performance optimizations
 config.transformer = {
   ...config.transformer,

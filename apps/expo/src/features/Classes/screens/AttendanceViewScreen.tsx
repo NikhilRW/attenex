@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 import Ionicons from "@react-native-vector-icons/ionicons";

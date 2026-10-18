@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { BottomTabNavigationEventMap } from "expo-router/js-tabs";
-import { NavigationHelpers, ParamListBase } from "expo-router/react-navigation";
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { useAnimatedStyle } from "react-native-reanimated";
 
 import { lectureService } from "@/features/Classes/services/lectureService";
@@ -14,18 +13,15 @@ import { useAuthStore } from "../stores/authStore";
 import { isFreshQuery } from "../utils/tanstack";
 
 export const useCustomTabBar = ({
-  index,
-  navigation,
-  routeNames,
-}: {
-  navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
-  routeNames: string[];
-  index: number;
-}) => {
+  state: { index, routes },
+  emitter,
+  navigateToTab,
+}: Pick<BottomTabBarProps, "state" | "emitter" | "navigateToTab">) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   const role = user?.role;
+  const routeNames = useMemo(() => routes.map((route) => route.name), [routes]);
 
   const handleTabPrefetch = useCallback(
     (routeName: string) => {
@@ -105,9 +101,22 @@ export const useCustomTabBar = ({
 
   const handleNavigate = useCallback(
     (routeName: string) => {
-      navigation.navigate(routeName);
+      const route = routes.find((route) => route.name === routeName);
+      if (!route) {
+        return;
+      }
+
+      const event = emitter.emit({
+        type: "tabPress",
+        target: route.key,
+        canPreventDefault: true,
+      });
+
+      if (route.key !== routes[index]?.key && !event.defaultPrevented) {
+        navigateToTab(route.key);
+      }
     },
-    [navigation],
+    [emitter, index, navigateToTab, routes],
   );
 
   // Find the active tab index in the filtered routes

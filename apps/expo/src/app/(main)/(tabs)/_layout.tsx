@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Tabs } from "expo-router";
 
 import { queryClient } from "@/shared/constants/tanstackConfig";
@@ -17,7 +15,15 @@ const MainLayout = () => {
         sceneStyle: { backgroundColor: "transparent" },
         animation: "shift",
       }}
-    />
+    >
+      <Tabs.Screen name="test/index" />
+      <Tabs.Screen name="classes/index" />
+      <Tabs.Screen name="settings/index" />
+      <Tabs.Screen name="analytics/index" />
+      <Tabs.Screen name="attendance/index" />
+      <Tabs.Screen name="test/graphql-test" />
+      <Tabs.Screen name="role-selection/index" />
+    </Tabs>
   );
 };
 

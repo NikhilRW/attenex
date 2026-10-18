@@ -114,6 +114,7 @@ export default (): ExpoConfig => ({
     "./plugins/androidAppBuildGradlePlugin.js",
     "./plugins/detoxAndroidTestPlugin.js",
     "react-native-edge-to-edge",
+    "@react-native-community/datetimepicker",
     [
       "expo-build-properties",
       {

@@ -6,7 +6,7 @@ import { useCustomTabBar } from "../hooks/useCustomTabBar";
 import { styles } from "../styles/customTabBarStyles";
 import { routeNameToNavButtonTestId } from "../utils/ui";
 
-const CustomTabBar = ({ state: { index, routeNames }, navigation }: BottomTabBarProps) => {
+const CustomTabBar = ({ state, emitter, navigateToTab }: BottomTabBarProps) => {
   const {
     activatedBackgroundStyle,
     filteredRoutes,
@@ -16,9 +16,9 @@ const CustomTabBar = ({ state: { index, routeNames }, navigation }: BottomTabBar
     isAuthenticated,
     user,
   } = useCustomTabBar({
-    index,
-    navigation,
-    routeNames,
+    state,
+    emitter,
+    navigateToTab,
   });
 
   if (user === null) {
@@ -34,8 +34,7 @@ const CustomTabBar = ({ state: { index, routeNames }, navigation }: BottomTabBar
       />
 
       {filteredRoutes.map((name) => {
-        const routeIndex = routeNames.indexOf(name);
-        const isActivated = index === routeIndex;
+        const isActivated = state.routes[state.index]?.name === name;
         return (
           <TabBarButton
             key={name}

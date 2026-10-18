@@ -1,4 +1,3 @@
-import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import { EaseView } from "react-native-ease";

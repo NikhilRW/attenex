@@ -37,8 +37,6 @@
   },
   "trustedDependencies": [
     "@apollo/protobufjs",
-    "@buoy-gg/console",
-    "@buoy-gg/shared-ui",
     "bun",
     "detox",
     "dtrace-provider"

@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useColorScheme, LogBox } from "react-native";
 
-import { FloatingDevTools } from "@buoy-gg/core";
 import { Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import {
   // PerformanceMeasureView,
@@ -132,8 +131,6 @@ export default function RootLayout() {
     //     screenName={ROOT_LAYOUT_SCREEN_NAME}
     //   >
     <SafeAreaProvider>
-      {__DEV__ && false ? <FloatingDevTools /> : null}
-
       <StatusBar style={statusBarStyle} hideTransitionAnimation="fade" />
 
       <ThemedSafeAreaView style={styles.safeArea}>
