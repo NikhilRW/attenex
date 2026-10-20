@@ -8,7 +8,6 @@ import { AppearanceSection } from "@settings/components/AppearanceSection";
 import { DangerZoneSection } from "@settings/components/DangerZoneSection";
 import { ProfileSection } from "@settings/components/ProfileSection";
 import { RoleSection } from "@settings/components/RoleSection";
-import { SelfAttendanceSection } from "@settings/components/SelfAttendanceSection";
 import { useSettings } from "@settings/hooks/useSettings";
 import { styles } from "@settings/styles/Settings.styles";
 import { useThemeStore } from "@shared/hooks/useTheme";
@@ -70,8 +69,6 @@ const SettingsScreen = () => {
         />
 
         <AppearanceSection mode={mode} onThemeChange={setTheme} />
-
-        <SelfAttendanceSection />
 
         <DangerZoneSection
           userProvider={user?.oauthProvider}
